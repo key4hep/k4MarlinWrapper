@@ -21,6 +21,7 @@
 
 #include "LcioEventAlgo.h"
 #include <LCEventWrapper.h>
+#include <EVENT/LCIO.h>
 
 #include <iostream>
 
@@ -38,7 +39,7 @@ StatusCode LcioEvent::initialize() {
 }
 
 StatusCode LcioEvent::execute() {
-  auto* theEvent = m_reader->readNextEvent();
+  auto* theEvent = m_reader->readNextEvent(EVENT::LCIO::UPDATE);
 
   // pass theEvent to the DataStore, so we can access them in our processor wrappers
   info() << "Reading from file: " << m_fileNames[0]  << endmsg;

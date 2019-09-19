@@ -1,32 +1,35 @@
-/**
- *   Copyright 2019 CERN
+/** MarlinProcessorWrapper.h ---
  *
- *  Author: Andre Sailer <andre.philippe.sailer@cern.ch>
+ * Copyright (C) 2019 Andre Sailer
  *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
+ * Author: Andre Sailer <andre.philippe.sailer@cern.ch>
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
  *
- *   In applying this licence, CERN does not waive the privileges and immunities
- *   granted to it by virtue of its status as an Intergovernmental Organization
- *   or submit itself to any jurisdiction. 
- *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see http://www.gnu.org/licenses/.
  */
 
 #pragma once
-
 #include <GaudiAlg/GaudiAlgorithm.h>
+
+#include <streamlog/streamlog.h>
+#include <streamlog/logbuffer.h>
+
+#include <stack>
+
 
 namespace marlin {
   class Processor;
+  class StringParameters;
 }
 
 class MarlinProcessorWrapper : public GaudiAlgorithm {
@@ -36,8 +39,16 @@ public:
   virtual StatusCode execute() override final;
   virtual StatusCode finalize() override final;
   virtual StatusCode initialize() override final;
-  
+
 private:
+  /// Load libraries specified by MARLIN_DLL environment variable
+  StatusCode loadProcessorLibraries() const;
+
+  /// Instantiate the Marlin processor and assign name and parameters
+  StatusCode instantiateProcessor(std::shared_ptr<marlin::StringParameters>& parameters);
+
+  /// Parse the parameters from the Property
+  std::shared_ptr<marlin::StringParameters> parseParameters();
 
   /// ProcessorType: The Type of the MarlinProcessor to use
   Gaudi::Property<std::string> m_processorType{this, "ProcessorType", {}};
@@ -45,5 +56,15 @@ private:
   Gaudi::Property<std::vector<std::string>> m_parameters{this, "Parameters", {}};
 
   marlin::Processor* m_processor=nullptr;
+  streamlog::logstream m_logstream;
+  streamlog::logbuffer* m_lb = nullptr;
+  std::string m_verbosity = "MESSAGE";
+
+  static std::stack<marlin::Processor*>& ProcessorStack();
 
 };
+
+std::stack<marlin::Processor*>& MarlinProcessorWrapper::ProcessorStack() {
+  static std::stack<marlin::Processor*> stack;
+  return stack;
+}

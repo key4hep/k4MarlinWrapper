@@ -31,9 +31,8 @@ class LCEventWrapper: public DataObject{
 
 public:
 
-  LCEventWrapper(EVENT::LCEvent* theEvent): m_event(theEvent) 
-  {}
-  
+  LCEventWrapper(EVENT::LCEvent* theEvent):m_event(theEvent) {
+  }
 
   //m_event is still owned by LCIO
   ~LCEventWrapper() {};
