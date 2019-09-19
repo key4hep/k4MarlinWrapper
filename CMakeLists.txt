@@ -28,8 +28,6 @@ LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/../External/install/Gaudi/cmak
 SET(BINARY_TAG broadwell-slc6-gcc8-dbg)
 SET(HOST_BINARY_TAG broadwell-slc6-gcc8-dbg)
 
-FIND_PACKAGE(CLHEP)
-
 # we use a modified way to compile ilcsoft packages
 FIND_PACKAGE(ILCSoft REQUIRED)
 
@@ -45,5 +43,3 @@ RENAME run)
 
 gaudi_project(GMP v0r1 USE Gaudi v32r0 )
 
-# have to ensure our own DD4hep comes before that of the LCG view
-gaudi_env(PREPEND LD_LIBRARY_PATH $ENV{DD4hepINSTALL/lib/})

@@ -28,7 +28,10 @@ gaudi_install_python_modules()
 
 gaudi_add_module(GMPWrapperPlugins
   src/components/Lcio*.cpp
-  LINK_LIBRARIES GaudiAlgLib GaudiKernel ILCSOFT::lcio
+  LINK_LIBRARIES GaudiAlgLib GaudiKernel
+  ROOT::Core
+  ILCSOFT::lcio
+  ILCSOFT::Marlin
   INCLUDE_DIRS GMPWrapper
   )
 
@@ -36,19 +39,12 @@ gaudi_add_module(MarlinWrapper
   src/components/Marlin*.cpp
   LINK_LIBRARIES GaudiAlgLib GaudiKernel
   ILCSOFT::lcio
-  ILCSOFT::MarlinProcessor
   ILCSOFT::Marlin
   INCLUDE_DIRS GMPWrapper
   )
 
-TARGET_LINK_LIBRARIES(MarlinWrapper
-  "-Wl,--no-as-needed"
-  ILCSOFT::MarlinTrkProcessors
-  ILCSOFT::MarlinDD4hep
-  ILCSOFT::RAIDA
-  "-Wl,--as-needed"
-  
-)
 TARGET_COMPILE_OPTIONS(GMPWrapperPlugins PUBLIC "-Wno-suggest-override")
 
-gaudi_env(PREPEND LD_LIBRARY_PATH $ENV{DD4hepINSTALL}/lib/)
+gaudi_env(PREPEND LD_LIBRARY_PATH ${ILCSoft_ROOT}/lib/)
+gaudi_env(PREPEND LD_LIBRARY_PATH ${DD4hep_ROOT}/lib/)
+gaudi_env(SET DD4hepINSTALL ${DD4hep_ROOT})
