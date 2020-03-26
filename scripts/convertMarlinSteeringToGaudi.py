@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import absolute_import, unicode_literals, print_function
 
 import sys
 from copy import deepcopy
@@ -158,17 +159,17 @@ def generateGaudiSteering(tree):
 def run():
   args = sys.argv
   if len(args) != 2:
-    print "incorrect number of input files, need one marlin steering files as argument"
-    print "convertMarlinSteeringToGaudi.py file1.xml"
+    print("incorrect number of input files, need one marlin steering files as argument")
+    print("convertMarlinSteeringToGaudi.py file1.xml")
     exit(1)
 
   try:
     tree = getTree(args[1])
   except Exception as ex:
-    print "Exception when getting trees: %r " % ex
+    print("Exception when getting trees: %r " % ex)
     exit(1)
 
-  print "\n".join(generateGaudiSteering(tree))
+  print("\n".join(generateGaudiSteering(tree)))
 
 
 if __name__ == "__main__":
