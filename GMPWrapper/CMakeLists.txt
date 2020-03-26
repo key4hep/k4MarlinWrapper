@@ -30,7 +30,7 @@ gaudi_add_module(GMPWrapperPlugins
   src/components/Lcio*.cpp
   LINK_LIBRARIES GaudiAlgLib GaudiKernel
   ROOT::Core
-  ILCSOFT::lcio
+  LCIO::LCIO
   ILCSOFT::Marlin
   INCLUDE_DIRS GMPWrapper
   )
@@ -38,13 +38,12 @@ gaudi_add_module(GMPWrapperPlugins
 gaudi_add_module(MarlinWrapper
   src/components/Marlin*.cpp
   LINK_LIBRARIES GaudiAlgLib GaudiKernel
-  ILCSOFT::lcio
+  LCIO::LCIO
   ILCSOFT::Marlin
   INCLUDE_DIRS GMPWrapper
   )
 
 TARGET_COMPILE_OPTIONS(GMPWrapperPlugins PUBLIC "-Wno-suggest-override")
-
 gaudi_env(PREPEND LD_LIBRARY_PATH ${ILCSoft_ROOT}/lib/)
 gaudi_env(PREPEND LD_LIBRARY_PATH ${DD4hep_ROOT}/lib/)
 gaudi_env(SET DD4hepINSTALL ${DD4hep_ROOT})
