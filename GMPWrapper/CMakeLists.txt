@@ -31,7 +31,7 @@ gaudi_add_module(GMPWrapperPlugins
   LINK_LIBRARIES GaudiAlgLib GaudiKernel
   ROOT::Core
   LCIO::LCIO
-  ILCSOFT::Marlin
+  Marlin::Marlin
   INCLUDE_DIRS GMPWrapper
   )
 
@@ -39,7 +39,7 @@ gaudi_add_module(MarlinWrapper
   src/components/Marlin*.cpp
   LINK_LIBRARIES GaudiAlgLib GaudiKernel
   LCIO::LCIO
-  ILCSOFT::Marlin
+  Marlin::Marlin
   INCLUDE_DIRS GMPWrapper
   )
 
