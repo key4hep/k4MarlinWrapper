@@ -1,3 +1,11 @@
+# Build and debug folders
+build*
+debug*
+
+# Files generated in runit
+runit/*.log
+runit/*.root
+
 # Prerequisites
 *.d
 
