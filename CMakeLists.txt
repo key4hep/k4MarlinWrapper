@@ -23,6 +23,16 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.14)
 cmake_policy(SET CMP0074 NEW) # use package_ROOT env var to find packages
 PROJECT(GMP)
 
+# Enable compiler output highligh (for Ninja)
+option (FORCE_COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)." TRUE)
+if (${FORCE_COLORED_OUTPUT})
+    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+       add_compile_options (-fdiagnostics-color=always)
+    elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+       add_compile_options (-fcolor-diagnostics)
+    endif ()
+endif ()
+
 # we use a modified way to compile ilcsoft packages
 FIND_PACKAGE(ILCSoft REQUIRED)
 
