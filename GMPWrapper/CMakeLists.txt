@@ -43,7 +43,7 @@ gaudi_add_module(MarlinWrapper
   INCLUDE_DIRS GMPWrapper
   )
 
-TARGET_COMPILE_OPTIONS(GMPWrapperPlugins PUBLIC "-Wno-suggest-override")
+target_compile_options(GMPWrapperPlugins PUBLIC "-Wno-suggest-override")
 gaudi_env(PREPEND LD_LIBRARY_PATH ${ILCSoft_ROOT}/lib/)
 gaudi_env(PREPEND LD_LIBRARY_PATH ${DD4hep_ROOT}/lib/)
 gaudi_env(PREPEND LD_LIBRARY_PATH ${Gaudi_DIR}/lib/)

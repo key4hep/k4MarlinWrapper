@@ -19,9 +19,9 @@
 #   or submit itself to any jurisdiction. 
 #
 
-CMAKE_MINIMUM_REQUIRED(VERSION 3.14)
+cmake_minimum_required(VERSION 3.14)
 cmake_policy(SET CMP0074 NEW) # use package_ROOT env var to find packages
-PROJECT(GMP)
+project(GMP)
 
 # Enable compiler output highligh (for Ninja)
 option (FORCE_COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)." TRUE)
@@ -34,9 +34,9 @@ if (${FORCE_COLORED_OUTPUT})
 endif ()
 
 # we use a modified way to compile ilcsoft packages
-FIND_PACKAGE(ILCSoft REQUIRED)
+find_package(ILCSoft REQUIRED)
 
-LIST(APPEND CMAKE_MODULE_PATH ${Gaudi_DIR}/cmake)
+list(APPEND CMAKE_MODULE_PATH ${Gaudi_DIR}/cmake)
 # get_host_binary_tag.py is not executable in normal gaudi installations,
 # which silently fails in the BinaryTagUtils from Gaudi
 find_program(HOST_BINARY_TAG_COMMAND
@@ -48,16 +48,16 @@ execute_process(COMMAND python ${HOST_BINARY_TAG_COMMAND}
    ERROR_VARIABLE  HOST_BINARY_ERROR
    OUTPUT_STRIP_TRAILING_WHITESPACE)
 IF(NOT HOST_BINARY_TAG_COMMAND OR HOST_TAG_RETURN OR NOT HOST_BINARY_TAG)
-  MESSAGE(SEND_ERROR "Failed to execute ${HOST_BINARY_TAG_COMMAND}")
-  MESSAGE(SEND_ERROR "HOST_BINARY_TAG: ${HOST_BINARY_TAG}")
-  MESSAGE(SEND_ERROR "Return Code ${HOST_TAG_RETURN}")
-  MESSAGE(SEND_ERROR "Error Message ${HOST_BINARY_ERROR}")
+  message(SEND_ERROR "Failed to execute ${HOST_BINARY_TAG_COMMAND}")
+  message(SEND_ERROR "HOST_BINARY_TAG: ${HOST_BINARY_TAG}")
+  message(SEND_ERROR "Return Code ${HOST_TAG_RETURN}")
+  message(SEND_ERROR "Error Message ${HOST_BINARY_ERROR}")
 ENDIF()
 set(HOST_BINARY_TAG ${HOST_BINARY_TAG} CACHE STRING "BINARY_TAG of the host")
 set(BINARY_TAG ${HOST_BINARY_TAG})
 
-MESSAGE(STATUS "Using      binary tag ${BINARY_TAG}")
-MESSAGE(STATUS "Using host binary tag ${HOST_BINARY_TAG}")
+message(STATUS "Using      binary tag ${BINARY_TAG}")
+message(STATUS "Using host binary tag ${HOST_BINARY_TAG}")
 
 find_package(GaudiProject)
 
