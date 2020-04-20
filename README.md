@@ -35,7 +35,6 @@ Copy file and run:
 
 ```bash
 export MARLIN_DLL=/path/to/libMarlinDD4hep.so:/path/to/libMarlinTrkProcessors.so
-cd runit
 cp /path/to/muon.slcio my.slcio
-../build/run ./gmprun runit.py
+./run ../runit/gmprun ../runit/runit.py
 ```
