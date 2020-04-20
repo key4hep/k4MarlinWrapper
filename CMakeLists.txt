@@ -33,21 +33,8 @@ if (${FORCE_COLORED_OUTPUT})
     endif ()
 endif ()
 
-# Enable compiler output highligh (for Ninja)
-option (FORCE_COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)." TRUE)
-if (${FORCE_COLORED_OUTPUT})
-    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-       add_compile_options (-fdiagnostics-color=always)
-    elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-       add_compile_options (-fcolor-diagnostics)
-    endif ()
-endif ()
-
 # we use a modified way to compile ilcsoft packages
-# find_package(ILCSoft REQUIRED)
-find_package(ROOT 6.0 REQUIRED)
-find_package(LCIO REQUIRED)
-find_package(Marlin REQUIRED)
+find_package(ILCSoft REQUIRED)
 
 list(APPEND CMAKE_MODULE_PATH ${Gaudi_DIR}/cmake)
 # get_host_binary_tag.py is not executable in normal gaudi installations,
