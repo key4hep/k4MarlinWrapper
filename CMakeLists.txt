@@ -34,7 +34,14 @@ if (${FORCE_COLORED_OUTPUT})
 endif ()
 
 # we use a modified way to compile ilcsoft packages
-find_package(ILCSoft REQUIRED)
+# find_package(ILCSoft REQUIRED)
+find_package(ROOT 6.0 REQUIRED)
+find_package(LCIO REQUIRED)
+
+find_package(ILCUTIL REQUIRED)
+find_package(GEAR REQUIRED)
+
+find_package(Marlin REQUIRED)
 
 list(APPEND CMAKE_MODULE_PATH ${Gaudi_DIR}/cmake)
 # get_host_binary_tag.py is not executable in normal gaudi installations,
@@ -69,5 +76,5 @@ install(FILES ${CMAKE_BINARY_DIR}/gmprun
                     WORLD_EXECUTE WORLD_READ
 RENAME run)
 
-gaudi_project(GMP v0r1 USE Gaudi v32r0 )
+gaudi_project(GMP v0r1 USE Gaudi v33r1 )
 
