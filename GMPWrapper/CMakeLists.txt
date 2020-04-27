@@ -28,23 +28,35 @@ gaudi_install_python_modules()
 
 gaudi_add_module(GMPWrapperPlugins
   src/components/Lcio*.cpp
-  LINK_LIBRARIES GaudiAlgLib GaudiKernel
-  ROOT::Core
-  LCIO::LCIO
-  Marlin::Marlin
-  INCLUDE_DIRS GMPWrapper
+  LINK_LIBRARIES
+    GaudiAlgLib
+    GaudiKernel
+    ROOT::Core
+    LCIO
+    Marlin
+  INCLUDE_DIRS
+    GMPWrapper
+    $ENV{LCIO}/src/cpp/include/
+    $ENV{LCIO}/include/
   )
 
 gaudi_add_module(MarlinWrapper
   src/components/Marlin*.cpp
-  LINK_LIBRARIES GaudiAlgLib GaudiKernel
-  LCIO::LCIO
-  Marlin::Marlin
-  INCLUDE_DIRS GMPWrapper
+  LINK_LIBRARIES
+    GaudiAlgLib
+    GaudiKernel
+    LCIO
+    Marlin
+  INCLUDE_DIRS
+    GMPWrapper
+    # for streamlog.h
+    $ENV{ILCSOFT}/ilcutil/HEAD/include/
+    $ENV{MARLIN}/include/
+    $ENV{GEAR}/include/
   )
 
-target_compile_options(GMPWrapperPlugins PUBLIC "-Wno-suggest-override")
-gaudi_env(PREPEND LD_LIBRARY_PATH ${ILCSoft_ROOT}/lib/)
-gaudi_env(PREPEND LD_LIBRARY_PATH ${DD4hep_ROOT}/lib/)
-gaudi_env(PREPEND LD_LIBRARY_PATH ${Gaudi_DIR}/lib/)
-gaudi_env(SET DD4hepINSTALL ${DD4hep_ROOT})
+# target_compile_options(GMPWrapperPlugins PUBLIC "-Wno-suggest-override")
+# gaudi_env(PREPEND LD_LIBRARY_PATH ${ILCSoft_ROOT}/lib/)
+# gaudi_env(PREPEND LD_LIBRARY_PATH ${DD4hep_ROOT}/lib/)
+# gaudi_env(PREPEND LD_LIBRARY_PATH ${Gaudi_DIR}/lib/)
+# gaudi_env(SET DD4hepINSTALL ${DD4hep_ROOT})
