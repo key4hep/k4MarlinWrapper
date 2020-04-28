@@ -108,7 +108,9 @@ StatusCode MarlinProcessorWrapper::loadProcessorLibraries() const {
   } else {
     info() << "Found marlin_dll " << marlin_dll << endmsg;
     boost::split(libraries, marlin_dll, boost::is_any_of(":"));
-    for (auto const& library : libraries) {
+    if (libraries.back().empty())
+      libraries.pop_back();
+    for (const auto& library : libraries) {
       info() << "Loading library " << library << endmsg;
       auto ret = gSystem->Load(library.c_str());
       if (ret < 0) {
