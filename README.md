@@ -35,6 +35,19 @@ Copy file and run:
 
 ```bash
 export MARLIN_DLL=/path/to/libMarlinDD4hep.so:/path/to/libMarlinTrkProcessors.so
-cp /path/to/muon.slcio my.slcio
+mkdir ../test/inputFiles
+cp /path/to/muon.slcio ../test/inputFiles/my.slcio
 ./run ../runit/gmprun ../runit/runit.py
+```
+
+## Testing
+
+```bash
+# Check that input file exist
+mkdir ../test/inputFiles
+cp /path/to/muon.slcio ../test/inputFiles/my.slcio
+# Display available tests
+ctest -N
+# Run tests
+ctest
 ```
