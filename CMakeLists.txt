@@ -37,10 +37,6 @@ endif ()
 # find_package(ILCSoft REQUIRED)
 find_package(ROOT 6.0 REQUIRED)
 find_package(LCIO REQUIRED)
-
-find_package(ILCUTIL REQUIRED)
-find_package(GEAR REQUIRED)
-
 find_package(Marlin REQUIRED)
 
 list(APPEND CMAKE_MODULE_PATH ${Gaudi_DIR}/cmake)
