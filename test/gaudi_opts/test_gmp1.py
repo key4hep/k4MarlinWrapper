@@ -7,7 +7,7 @@ evtsvc = EventDataSvc()
 
 read = LcioEvent()
 read.OutputLevel = DEBUG
-read.Files = ["../test/inputFiles/my.slcio"]
+read.Files = ["$GMP_tests_DIR/inputFiles/my.slcio"]
 algList.append(read)
 
 END_TAG = "END_TAG"

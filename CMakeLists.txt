@@ -76,5 +76,7 @@ install(FILES ${CMAKE_BINARY_DIR}/gmprun
                     WORLD_EXECUTE WORLD_READ
 RENAME run)
 
+enable_testing()
+
 gaudi_project(GMP v0r1 USE Gaudi v33r1 )
 
