@@ -38,3 +38,9 @@ runit/*.root
 *.exe
 *.out
 *.app
+
+# CMake generated
+Testing
+
+# Testing
+test/inputFiles
