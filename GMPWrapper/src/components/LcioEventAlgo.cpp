@@ -40,6 +40,9 @@ StatusCode LcioEvent::initialize() {
 
 StatusCode LcioEvent::execute() {
   auto* theEvent = m_reader->readNextEvent(EVENT::LCIO::UPDATE);
+  if (theEvent == nullptr) {
+    return StatusCode::FAILURE;
+  }
 
   // pass theEvent to the DataStore, so we can access them in our processor wrappers
   info() << "Reading from file: " << m_fileNames[0]  << endmsg;
