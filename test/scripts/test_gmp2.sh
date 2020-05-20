@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 if [ ! -d $GMP_tests_DIR/inputFiles/ ]; then
   mkdir $GMP_tests_DIR/inputFiles/

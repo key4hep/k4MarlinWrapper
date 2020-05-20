@@ -17,20 +17,37 @@ jobs:
         sudo dpkg -i cvmfs-release-latest_all.deb
         sudo apt-get update
         sudo apt-get install cvmfs cvmfs-config-default
-        wget --no-check-certificate https://lcd-data.web.cern.ch/lcd-data/CernVM/default.local
+
         sudo mkdir -p /etc/cvmfs
+
+        cat > default.local <<EOF
+        CVMFS_QUOTA_LIMIT='32140'
+        CVMFS_HTTP_PROXY=DIRECT
+        CVMFS_CACHE_BASE='/var/lib/cvmfs'
+        CVMFS_FORCE_SIGNING='yes'
+        CVMFS_REPOSITORIES='clicdp.cern.ch,sft.cern.ch,geant4.cern.ch'
+        CVMFS_SEND_INFO_HEADER=no
+        EOF
+
         sudo mv default.local /etc/cvmfs/default.local
         sudo cvmfs_config setup
+
         ls /cvmfs/sft.cern.ch
         ls /cvmfs/geant4.cern.ch
+        ls /cvmfs/clicdp.cern.ch
+
+        sudo cvmfs_config probe
+        sudo cvmfs_config status
     - name: Start container
       run: |
         docker run \
-            -it --name CI_container \
-            -v /home/runner/work/GMP/GMP:/Package \
+            -it --name GMP_CI \
+            -v /home/runner/work/GMP/GMP:/GMP \
+            -v /cvmfs/sft.cern.ch:/cvmfs/sft.cern.ch \
+            -v /cvmfs/clicdp.cern.ch:/cvmfs/clicdp.cern.ch \
+            -v /cvmfs/geant4.cern.ch:/cvmfs/geant4.cern.ch:Z \
             -e VIEW=${{ matrix.LCG }} \
-            -v /cvmfs:/cvmfs \
             -d clicdp/cc7-lcg96b /bin/bash
-    - name: Compile and test
+    - name: Compile Gaudi, GMP and run test
       run: |
-        docker exec CI_container /bin/bash -c "./Package/.github/scripts/compile_and_test.sh"
+        docker exec GMP_CI ./GMP/.github/scripts/gmp_build_and_test.sh
