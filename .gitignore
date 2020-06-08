@@ -1,6 +1,7 @@
 # Build and debug folders
 build*
 debug*
+install*
 
 # Files generated in runit
 runit/*.log
