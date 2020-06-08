@@ -36,7 +36,8 @@ jobs:
         ls /cvmfs/geant4.cern.ch
         ls /cvmfs/clicdp.cern.ch
 
-        mkdir /shared_gaudi_volume
+        mkdir shared_gaudi_volume
+        ls -l
 
         sudo cvmfs_config probe
         sudo cvmfs_config status
@@ -45,14 +46,14 @@ jobs:
         docker run \
             -it --name Gaudi_cont \
             -v /home/runner/work/GMP/GMP:/GMP \
-            -v /shared_gaudi_volume:/shared_gaudi_volume:Z \
+            -v /home/runner/work/GMP/shared_gaudi_volume:/shared_gaudi_volume:Z \
             -e VIEW=${{ matrix.LCG }} \
             -d fdplacido/gaudi-gmp /bin/bash
 
         docker run \
             -it --name GMP_CI \
             -v /home/runner/work/GMP/GMP:/GMP \
-            -v /shared_gaudi_volume:/shared_gaudi_volume:Z \
+            -v /home/runner/work/GMP/shared_gaudi_volume:/shared_gaudi_volume:Z \
             -v /cvmfs/sft.cern.ch:/cvmfs/sft.cern.ch \
             -v /cvmfs/clicdp.cern.ch:/cvmfs/clicdp.cern.ch \
             -v /cvmfs/geant4.cern.ch:/cvmfs/geant4.cern.ch:Z \
