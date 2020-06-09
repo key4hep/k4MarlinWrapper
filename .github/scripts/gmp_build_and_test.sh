@@ -11,6 +11,7 @@ cmake \
   -DCMAKE_INSTALL_PREFIX=../install \
   -DGaudi_DIR="/shared_gaudi_volume" \
   -DGaudiProject_DIR="/shared_gaudi_volume/cmake" \
+  -DHOST_BINARY_TAG=skylake-centos7-gcc8-opt \
   ..
 make -j 2
 make install
