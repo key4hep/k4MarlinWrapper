@@ -13,19 +13,21 @@ def getTree(xmlFile):
   et.parse(xmlFile)
   return et
 
-
 def getProcessors(tree):
   """ return a dict of all processors and their parameters """
   processors = dict()
+
   procElements = tree.findall('processor')
   for proc in procElements:
     procName = proc.attrib.get("name")
     paramDict = dict()
     paramDict["type"] = proc.attrib.get("type")
+
     parameters = proc.findall('parameter')
     for param in parameters:
       paramName = param.attrib.get('name')
-      paramDict[paramName] = getValue(param, "<This Value did not Exist in this file or was empty>")
+      # paramDict[paramName] = getValue(param, "<This Value did not Exist in this file or was empty>")
+      paramDict[paramName] = getValue(param, "")
     processors[procName] = paramDict
 
   groupElements = tree.findall('group')
@@ -34,17 +36,21 @@ def getProcessors(tree):
     parameters = group.findall('parameter')
     for param in parameters:
       paramName = param.attrib.get('name')
-      groupParam[paramName] = getValue(param, "<This Value did not Exist in this file or was empty>")
+      # groupParam[paramName] = getValue(param, "<This Value did not Exist in this file or was empty>")
+      groupParam[paramName] = getValue(param, "")
 
     procElements = group.findall("processor")
     for proc in procElements:
       procName = proc.attrib.get("name")
       paramDict = deepcopy(groupParam)
       paramDict["type"] = proc.attrib.get("type")
+
       parameters = proc.findall('parameter')
       for param in parameters:
         paramName = param.attrib.get('name')
-        paramDict[paramName] = getValue(param, "<This Value did not Exist in this file or was empty>")
+        # paramDict[paramName] = getValue(param, "<This Value did not Exist in this file or was empty>")
+        paramDict[paramName] = getValue(param, "")
+
       processors[procName] = paramDict
 
   return processors
@@ -88,6 +94,10 @@ def getExecutingProcessors(lines, tree):
   execGroup = tree.findall('group')
 
   for proc in execProc:
+    if proc.tag == "if":
+      for child in proc:
+        if child.tag == "processor":
+          lines.append("# algList.append(%s)" % child.get('name').replace(".", "_"))
     if proc.tag == "processor":
       lines.append("algList.append(%s)" % proc.get('name'))
     if proc.tag == "group":
@@ -122,7 +132,7 @@ def createFooter(lines, glob):
 def convertParamters(params, proc, globParams):
   """ convert json of parameters to gaudi """
   lines = []
-  lines.append("%s.OutputLevel = %s " % (proc.replace(".", "_"), params.get("Verbosity", globParams.get("Verbosity"))))
+  lines.append("%s.OutputLevel = %s " % (proc.replace(".", "_"), globParams.get("Verbosity")))
   lines.append("%s.ProcessorType = \"%s\" " % (proc.replace(".", "_"), params.get("type")))
   lines.append("%s.Parameters = [" % proc.replace(".", "_"))
   for para in sorted(params):
@@ -130,7 +140,12 @@ def convertParamters(params, proc, globParams):
       value = params[para].replace('\n', ' ')
       value = " ".join(value.split())
       value = value.replace(" ", "\", \"")
-      lines.append("%s\"%s\", \"%s\", END_TAG," % (' ' * (len(proc) + 15), para, value))
+
+      if not value:
+          lines.append("%s\"%s\", END_TAG," % (' ' * (len(proc) + 15), para))
+      else:
+        lines.append("%s\"%s\", \"%s\", END_TAG," % (' ' * (len(proc) + 15), para, value))
+
   lines[-1] = lines[-1][:-1]
   lines.append("%s]\n" % (' ' * (len(proc) + 15)))
   return lines
