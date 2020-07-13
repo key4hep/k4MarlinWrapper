@@ -13,6 +13,7 @@ def getTree(xmlFile):
   et.parse(xmlFile)
   return et
 
+
 def getProcessors(tree):
   """ return a dict of all processors and their parameters """
   processors = dict()
@@ -26,7 +27,6 @@ def getProcessors(tree):
     parameters = proc.findall('parameter')
     for param in parameters:
       paramName = param.attrib.get('name')
-      # paramDict[paramName] = getValue(param, "<This Value did not Exist in this file or was empty>")
       paramDict[paramName] = getValue(param, "")
     processors[procName] = paramDict
 
@@ -36,7 +36,6 @@ def getProcessors(tree):
     parameters = group.findall('parameter')
     for param in parameters:
       paramName = param.attrib.get('name')
-      # groupParam[paramName] = getValue(param, "<This Value did not Exist in this file or was empty>")
       groupParam[paramName] = getValue(param, "")
 
     procElements = group.findall("processor")
@@ -48,7 +47,6 @@ def getProcessors(tree):
       parameters = proc.findall('parameter')
       for param in parameters:
         paramName = param.attrib.get('name')
-        # paramDict[paramName] = getValue(param, "<This Value did not Exist in this file or was empty>")
         paramDict[paramName] = getValue(param, "")
 
       processors[procName] = paramDict
@@ -97,7 +95,8 @@ def getExecutingProcessors(lines, tree):
     if proc.tag == "if":
       for child in proc:
         if child.tag == "processor":
-          lines.append("# algList.append(%s)" % child.get('name').replace(".", "_"))
+          # lines.append("# algList.append(%s)" % child.get('name').replace(".", "_"))
+          lines.append("# algList.append(%s)  # %s" % (child.get('name').replace(".", "_"), proc.get('condition')))
     if proc.tag == "processor":
       lines.append("algList.append(%s)" % proc.get('name'))
     if proc.tag == "group":
@@ -142,7 +141,7 @@ def convertParamters(params, proc, globParams):
       value = value.replace(" ", "\", \"")
 
       if not value:
-          lines.append("%s\"%s\", END_TAG," % (' ' * (len(proc) + 15), para))
+        lines.append("%s\"%s\", END_TAG," % (' ' * (len(proc) + 15), para))
       else:
         lines.append("%s\"%s\", \"%s\", END_TAG," % (' ' * (len(proc) + 15), para, value))
 
