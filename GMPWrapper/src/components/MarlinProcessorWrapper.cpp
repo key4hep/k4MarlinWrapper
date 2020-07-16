@@ -102,7 +102,7 @@ StatusCode MarlinProcessorWrapper::loadProcessorLibraries() const {
   // Load all libraries from the marlin_dll
   std::vector<std::string> libraries;
   info() << "looking for marlindll" << endmsg;
-  char* marlin_dll = getenv("MARLIN_DLL");
+  const char* const marlin_dll = getenv("MARLIN_DLL");
   if (marlin_dll == nullptr) {
     warning() << "MARLIN_DLL not set, not loading any processors " << endmsg;
   } else {
@@ -122,25 +122,28 @@ StatusCode MarlinProcessorWrapper::loadProcessorLibraries() const {
   return StatusCode::SUCCESS;
 }
 
-std::shared_ptr<marlin::StringParameters> MarlinProcessorWrapper::parseParameters() {
-  auto parameters = std::make_shared<marlin::StringParameters>();
+std::shared_ptr<marlin::StringParameters> MarlinProcessorWrapper::parseParameters(
+  const Gaudi::Property<std::vector<std::string>>& parameters,
+  std::string& verbosity) const
+{
+  auto parameters_ptr = std::make_shared<marlin::StringParameters>();
   info() << "Parameter values for: " << name() << " of type " << std::string(m_processorType) << endmsg;
   std::string              parameterName   = "";
   std::vector<std::string> parameterValues = {};
 
   // convert the list of string into parameter name and value
-  for (auto const& parameterString : m_parameters) {
+  for (const auto& parameterString : parameters) {
     if (parameterString == "END_TAG") {
-      parameters->add(parameterName, parameterValues);
+      parameters_ptr->add(parameterName, parameterValues);
 
       info() << parameterName;
-      for (auto const& value : parameterValues) {
+      for (const auto& value : parameterValues) {
         info() << "  " << value;
       }
       info() << endmsg;
       if (parameterName == "Verbosity") {
         info() << "Setting verbosity to " << parameterValues[0] << endmsg;
-        m_verbosity = parameterValues[0];
+        verbosity = parameterValues[0];
       }
 
       parameterName = "";
@@ -156,25 +159,27 @@ std::shared_ptr<marlin::StringParameters> MarlinProcessorWrapper::parseParameter
 
     parameterValues.push_back(parameterString);
   }
-  return parameters;
+  return parameters_ptr;
 }
 
-StatusCode MarlinProcessorWrapper::instantiateProcessor(std::shared_ptr<marlin::StringParameters>& parameters) {
-  auto* procMgr       = marlin::ProcessorMgr::instance();
-  auto* processorType = procMgr->getProcessor(m_processorType);
+StatusCode MarlinProcessorWrapper::instantiateProcessor(
+  std::shared_ptr<marlin::StringParameters>& parameters,
+  Gaudi::Property<std::string>& processorTypeStr) const
+{
+  auto* processorType = marlin::ProcessorMgr::instance()->getProcessor(processorTypeStr);
   if (not processorType) {
     error() << " Failed to instantiate " << name() << endmsg;
     return StatusCode::FAILURE;
   }
-  m_processor = processorType->newProcessor();
-  if (not m_processor) {
+  marlin::Processor* processor = processorType->newProcessor();
+  if (not processor) {
     error() << " Failed to instantiate " << name() << endmsg;
     return StatusCode::FAILURE;
   }
-  info() << "new processor " << m_processor << endmsg;
-  m_processor->setName(name());
-  m_processor->setParameters(parameters);
-  ProcessorStack().push(m_processor);
+  info() << "new processor " << processor << endmsg;
+  processor->setName(name());
+  processor->setParameters(parameters);
+  ProcessorStack().push(processor);
   return StatusCode::SUCCESS;
 }
 
@@ -193,21 +198,27 @@ StatusCode MarlinProcessorWrapper::initialize() {
     }
   }
 
-  auto parameters = parseParameters();
-  if (instantiateProcessor(parameters).isFailure()) {
+  auto parameters = parseParameters(m_parameters, m_verbosity);
+  if (instantiateProcessor(parameters, m_processorType).isFailure()) {
     return StatusCode::FAILURE;
   }
 
   streamlog::logscope scope(streamlog::out);
   scope.setName(name());
   scope.setLevel(m_verbosity);
+
+  info() << "init " << endmsg;
+
   // initialize the processor
-  m_processor->init();
+  ProcessorStack().top()->init();
+  // m_processor->init();
+
+  info() << "Init processor " << endmsg;
   return StatusCode::SUCCESS;
 }
 
 StatusCode MarlinProcessorWrapper::execute() {
-  info() << "Getting the event for " << m_processor->name() << endmsg;
+  info() << "Getting the event for " << ProcessorStack().top()->name() << endmsg;
   DataObject* pObject = nullptr;
   StatusCode  sc      = eventSvc()->retrieveObject("/Event/LCEvent", pObject);
   if (sc.isFailure()) {
@@ -222,11 +233,11 @@ StatusCode MarlinProcessorWrapper::execute() {
   scope.setLevel(m_verbosity);
 
   //process the event in the processor
-  auto* modifier = dynamic_cast<marlin::EventModifier*>(m_processor);
+  auto* modifier = dynamic_cast<marlin::EventModifier*>(ProcessorStack().top());
   if (modifier) {
     modifier->modifyEvent(theEvent);
   } else {
-    m_processor->processEvent(theEvent);
+    ProcessorStack().top()->processEvent(theEvent);
   }
 
   return StatusCode::SUCCESS;

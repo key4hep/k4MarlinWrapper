@@ -27,7 +27,7 @@
 
 DECLARE_COMPONENT(LcioEvent)
 
-LcioEvent::LcioEvent(std::string const& name, ISvcLocator* pSL) : GaudiAlgorithm(name, pSL) {}
+LcioEvent::LcioEvent(const std::string& name, ISvcLocator* pSL) : GaudiAlgorithm(name, pSL) {}
 
 StatusCode LcioEvent::initialize() {
   m_reader = IOIMPL::LCFactory::getInstance()->createLCReader();
@@ -46,7 +46,7 @@ StatusCode LcioEvent::execute() {
   info() << "Reading from file: " << m_fileNames[0] << endmsg;
 
   auto*      pO = new LCEventWrapper(theEvent);
-  StatusCode sc = eventSvc()->registerObject("/Event/LCEvent", pO);
+  const StatusCode sc = eventSvc()->registerObject("/Event/LCEvent", pO);
   if (sc.isFailure()) {
     error() << "Failed to store the LCEvent" << endmsg;
     return sc;
