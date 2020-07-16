@@ -33,7 +33,7 @@
 
 class LcioEvent : public GaudiAlgorithm {
 public:
-  explicit LcioEvent(std::string const& name, ISvcLocator* pSL);
+  explicit LcioEvent(const std::string& name, ISvcLocator* pSL);
   virtual ~LcioEvent() = default;
   virtual StatusCode execute() override final;
   virtual StatusCode finalize() override final;
