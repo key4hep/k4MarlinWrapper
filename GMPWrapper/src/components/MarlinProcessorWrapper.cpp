@@ -49,7 +49,7 @@
 
 DECLARE_COMPONENT(MarlinProcessorWrapper)
 
-MarlinProcessorWrapper::MarlinProcessorWrapper(std::string const& name, ISvcLocator* pSL) : GaudiAlgorithm(name, pSL) {
+MarlinProcessorWrapper::MarlinProcessorWrapper(const std::string& name, ISvcLocator* pSL) : GaudiAlgorithm(name, pSL) {
   // register log level names with the logstream ---------
   streamlog::out.addLevelName<streamlog::DEBUG>();
   streamlog::out.addLevelName<streamlog::DEBUG0>();
@@ -166,20 +166,20 @@ StatusCode MarlinProcessorWrapper::instantiateProcessor(
   std::shared_ptr<marlin::StringParameters>& parameters,
   Gaudi::Property<std::string>& processorTypeStr) const
 {
-  auto* processorType = marlin::ProcessorMgr::instance()->getProcessor(processorTypeStr);
+  auto processorType = marlin::ProcessorMgr::instance()->getProcessor(processorTypeStr);
   if (not processorType) {
     error() << " Failed to instantiate " << name() << endmsg;
     return StatusCode::FAILURE;
   }
-  marlin::Processor* processor = processorType->newProcessor();
-  if (not processor) {
+  auto processor_ptr = processorType->newProcessor();
+  if (not processor_ptr) {
     error() << " Failed to instantiate " << name() << endmsg;
     return StatusCode::FAILURE;
   }
-  info() << "new processor " << processor << endmsg;
-  processor->setName(name());
-  processor->setParameters(parameters);
-  ProcessorStack().push(processor);
+  info() << "new processor " << processor_ptr << endmsg;
+  processor_ptr->setName(name());
+  processor_ptr->setParameters(parameters);
+  ProcessorStack().push(processor_ptr);
   return StatusCode::SUCCESS;
 }
 
@@ -211,7 +211,6 @@ StatusCode MarlinProcessorWrapper::initialize() {
 
   // initialize the processor
   ProcessorStack().top()->init();
-  // m_processor->init();
 
   info() << "Init processor " << endmsg;
   return StatusCode::SUCCESS;
@@ -226,14 +225,14 @@ StatusCode MarlinProcessorWrapper::execute() {
     return sc;
   }
 
-  auto* theEvent = static_cast<LCEventWrapper*>(pObject)->getEvent();
+  auto theEvent = static_cast<LCEventWrapper*>(pObject)->getEvent();
 
   streamlog::logscope scope(streamlog::out);
   scope.setName(name());
   scope.setLevel(m_verbosity);
 
   //process the event in the processor
-  auto* modifier = dynamic_cast<marlin::EventModifier*>(ProcessorStack().top());
+  auto modifier = dynamic_cast<marlin::EventModifier*>(ProcessorStack().top());
   if (modifier) {
     modifier->modifyEvent(theEvent);
   } else {
@@ -256,5 +255,6 @@ StatusCode MarlinProcessorWrapper::finalize() {
 
   // finalize the processor
   processor->end();
-  return StatusCode::SUCCESS;
+
+  return Algorithm::finalize();
 }

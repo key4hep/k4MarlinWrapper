@@ -23,8 +23,6 @@
 #include <EVENT/LCIO.h>
 #include <LCEventWrapper.h>
 
-#include <iostream>
-
 DECLARE_COMPONENT(LcioEvent)
 
 LcioEvent::LcioEvent(const std::string& name, ISvcLocator* pSL) : GaudiAlgorithm(name, pSL) {}
@@ -37,7 +35,7 @@ StatusCode LcioEvent::initialize() {
 }
 
 StatusCode LcioEvent::execute() {
-  auto* theEvent = m_reader->readNextEvent(EVENT::LCIO::UPDATE);
+  auto theEvent = m_reader->readNextEvent(EVENT::LCIO::UPDATE);
   if (theEvent == nullptr) {
     return StatusCode::FAILURE;
   }
@@ -45,13 +43,11 @@ StatusCode LcioEvent::execute() {
   // pass theEvent to the DataStore, so we can access them in our processor wrappers
   info() << "Reading from file: " << m_fileNames[0] << endmsg;
 
-  auto*      pO = new LCEventWrapper(theEvent);
-  const StatusCode sc = eventSvc()->registerObject("/Event/LCEvent", pO);
+  auto pO = std::make_unique<LCEventWrapper>(theEvent);
+  const StatusCode sc = eventSvc()->registerObject("/Event/LCEvent", pO.release());
   if (sc.isFailure()) {
     error() << "Failed to store the LCEvent" << endmsg;
     return sc;
   }
   return StatusCode::SUCCESS;
 }
-
-StatusCode LcioEvent::finalize() { return StatusCode::SUCCESS; }

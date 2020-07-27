@@ -31,13 +31,15 @@
 
 #include <GaudiAlg/GaudiAlgorithm.h>
 
+#include <iostream>
+#include <memory>
+
 class LcioEvent : public GaudiAlgorithm {
 public:
   explicit LcioEvent(const std::string& name, ISvcLocator* pSL);
   virtual ~LcioEvent() = default;
-  virtual StatusCode execute() override final;
-  virtual StatusCode finalize() override final;
   virtual StatusCode initialize() override final;
+  virtual StatusCode execute() override final;
 
 private:
   Gaudi::Property<std::vector<std::string>> m_fileNames{this, "Files", {}};
