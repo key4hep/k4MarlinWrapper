@@ -30,23 +30,19 @@ SET( ${PROJECT_NAME}_VERSION_PATCH 0 )
 
 SET( ${PROJECT_NAME}_VERSION  "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_PATCH}" )
 
-# Enable compiler output highligh (for Ninja)
-option (FORCE_COLORED_OUTPUT "Always produce ANSI-colored output (GNU/Clang only)." TRUE)
-if (${FORCE_COLORED_OUTPUT})
-    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-       add_compile_options (-fdiagnostics-color=always)
-    elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-       add_compile_options (-fcolor-diagnostics)
-    endif ()
-endif ()
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -g -DNDEBUG")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
+set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g")
 
-# we use a modified way to compile ilcsoft packages
-# find_package(ILCSoft REQUIRED)
+# Ninja compiler output
+include(cmake/compiler_output.cmake)
+
+find_package(Boost REQUIRED)
 find_package(ROOT 6.0 REQUIRED)
 find_package(LCIO REQUIRED)
 find_package(Marlin REQUIRED)
 
-list(APPEND CMAKE_MODULE_PATH ${Gaudi_DIR}/cmake)
+# To be removed with future Gaudi
 include(cmake/gaudi_binary_tag.cmake)
 
 find_package(GaudiProject)
@@ -57,7 +53,7 @@ install(FILES ${CMAKE_BINARY_DIR}/gmprun
         PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ 
                     GROUP_EXECUTE GROUP_READ
                     WORLD_EXECUTE WORLD_READ
-RENAME run)
+        RENAME GMPWrapper)
 
 enable_testing()
 
