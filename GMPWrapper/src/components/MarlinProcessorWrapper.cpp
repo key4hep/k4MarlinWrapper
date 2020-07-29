@@ -164,22 +164,22 @@ std::shared_ptr<marlin::StringParameters> MarlinProcessorWrapper::parseParameter
 
 StatusCode MarlinProcessorWrapper::instantiateProcessor(
   std::shared_ptr<marlin::StringParameters>& parameters,
-  Gaudi::Property<std::string>& processorTypeStr) const
+  Gaudi::Property<std::string>& processorTypeStr)
 {
   auto processorType = marlin::ProcessorMgr::instance()->getProcessor(processorTypeStr);
   if (not processorType) {
     error() << " Failed to instantiate " << name() << endmsg;
     return StatusCode::FAILURE;
   }
-  auto processor_ptr = processorType->newProcessor();
-  if (not processor_ptr) {
+  m_processor = processorType->newProcessor();
+  if (not m_processor) {
     error() << " Failed to instantiate " << name() << endmsg;
     return StatusCode::FAILURE;
   }
-  info() << "new processor " << processor_ptr << endmsg;
-  processor_ptr->setName(name());
-  processor_ptr->setParameters(parameters);
-  ProcessorStack().push(processor_ptr);
+  info() << "new processor " << m_processor << endmsg;
+  m_processor->setName(name());
+  m_processor->setParameters(parameters);
+  ProcessorStack().push(m_processor);
   return StatusCode::SUCCESS;
 }
 
@@ -210,14 +210,14 @@ StatusCode MarlinProcessorWrapper::initialize() {
   info() << "init " << endmsg;
 
   // initialize the processor
-  ProcessorStack().top()->init();
+  m_processor->init();
 
   info() << "Init processor " << endmsg;
   return StatusCode::SUCCESS;
 }
 
 StatusCode MarlinProcessorWrapper::execute() {
-  info() << "Getting the event for " << ProcessorStack().top()->name() << endmsg;
+  info() << "Getting the event for " << m_processor->name() << endmsg;
   DataObject* pObject = nullptr;
   StatusCode  sc      = eventSvc()->retrieveObject("/Event/LCEvent", pObject);
   if (sc.isFailure()) {
@@ -232,11 +232,11 @@ StatusCode MarlinProcessorWrapper::execute() {
   scope.setLevel(m_verbosity);
 
   //process the event in the processor
-  auto modifier = dynamic_cast<marlin::EventModifier*>(ProcessorStack().top());
+  auto modifier = dynamic_cast<marlin::EventModifier*>(m_processor);
   if (modifier) {
     modifier->modifyEvent(theEvent);
   } else {
-    ProcessorStack().top()->processEvent(theEvent);
+    m_processor->processEvent(theEvent);
   }
 
   return StatusCode::SUCCESS;

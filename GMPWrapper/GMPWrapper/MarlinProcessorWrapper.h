@@ -43,6 +43,7 @@ private:
   streamlog::logstream  m_logstream;
   streamlog::logbuffer* m_lb        = nullptr;
   std::string           m_verbosity = "MESSAGE";
+  marlin::Processor*    m_processor = nullptr;
 
   /// Load libraries specified by MARLIN_DLL environment variable
   StatusCode loadProcessorLibraries() const;
@@ -50,7 +51,7 @@ private:
   /// Instantiate the Marlin processor and assign name and parameters
   StatusCode instantiateProcessor(
     std::shared_ptr<marlin::StringParameters>& parameters,
-    Gaudi::Property<std::string>& processorTypeStr) const;
+    Gaudi::Property<std::string>& processorTypeStr);
 
   /// Parse the parameters from the Property
   std::shared_ptr<marlin::StringParameters> parseParameters(
