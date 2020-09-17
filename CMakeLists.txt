@@ -21,7 +21,7 @@
 
 cmake_minimum_required(VERSION 3.14)
 cmake_policy(SET CMP0074 NEW) # use package_ROOT env var to find packages
-project(GMP)
+project(GMPWrapper)
 
 # project version
 SET( ${PROJECT_NAME}_VERSION_MAJOR 0 )
@@ -45,17 +45,12 @@ find_package(Marlin REQUIRED)
 # To be removed with future Gaudi
 include(cmake/gaudi_binary_tag.cmake)
 
+include(GNUInstallDirs)
+
 find_package(GaudiProject)
 
-configure_file(cmake/gmprun.in ${CMAKE_BINARY_DIR}/gmprun)
-install(FILES ${CMAKE_BINARY_DIR}/gmprun
-        DESTINATION .
-        PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ 
-                    GROUP_EXECUTE GROUP_READ
-                    WORLD_EXECUTE WORLD_READ
-        RENAME GMPWrapper)
 
 enable_testing()
 
-gaudi_project(GMP v0r1 USE Gaudi v33r1 )
+gaudi_project(${PROJECT_NAME} v0r1 USE Gaudi v33r1 )
 
