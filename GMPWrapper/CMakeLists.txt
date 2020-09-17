@@ -25,6 +25,8 @@ gaudi_subdir(GMPWrapper v1r0)
 # APS not sure when that future is
 gaudi_depends_on_subdirs(GaudiAlg GaudiKernel)
 gaudi_install_python_modules()
+gaudi_install_scripts()
+install(DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/examples DESTINATION ${CMAKE_INSTALL_DATADIR}/${CMAKE_PROJECT_NAME})
 
 gaudi_add_module(GMPWrapperPlugins
   src/components/Lcio*.cpp

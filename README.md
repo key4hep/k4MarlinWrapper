@@ -33,7 +33,7 @@ Copy file and run:
 ```bash
 mkdir ../test/inputFiles
 cp /path/to/muon.slcio ../test/inputFiles/my.slcio
-./run ../runit/gmprun ../runit/runit.py
+./run gaudirun.py ../runit/runit.py
 ```
 
 ## Testing

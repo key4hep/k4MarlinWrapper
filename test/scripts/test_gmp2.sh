@@ -14,4 +14,4 @@ if [ ! -f $GMP_tests_DIR/inputFiles/testSimulation.slcio ]; then
     --outputFile $GMP_tests_DIR/inputFiles/testSimulation.slcio
 fi
 
-../run $GMP_tests_DIR/../runit/gmprun $GMP_tests_DIR/gaudi_opts/test_gmp2.py
+../run gaudirun.py $GMP_tests_DIR/gaudi_opts/test_gmp2.py
