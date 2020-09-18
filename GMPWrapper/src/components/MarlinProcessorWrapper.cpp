@@ -227,6 +227,12 @@ StatusCode MarlinProcessorWrapper::execute() {
 
   auto theEvent = static_cast<LCEventWrapper*>(pObject)->getEvent();
 
+  // call the refreshSeeds via the processor manager
+  // FIXME: this is an overkill, but we need to call this once per event, not once for each execute call
+  // how can this be done more efficiently?
+  auto* procMgr = marlin::ProcessorMgr::instance();
+  procMgr->modifyEvent(theEvent);
+
   streamlog::logscope scope(streamlog::out);
   scope.setName(name());
   scope.setLevel(m_verbosity);
