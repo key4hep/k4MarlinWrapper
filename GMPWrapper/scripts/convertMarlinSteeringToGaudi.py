@@ -113,7 +113,7 @@ def createHeader(lines):
 
 def createLcioReader(lines, glob):
   lines.append("read = LcioEvent()")
-  lines.append("read.OutputLevel = %s" % glob.get("Verbosity", "DEBUG"))
+  lines.append("read.OutputLevel = %s" % verbosityTranslator(glob.get("Verbosity", "DEBUG")))
   lines.append("read.Files = [\"%s\"]" % glob.get("LCIOInputFiles"))
   lines.append("algList.append(read)\n")
 
@@ -124,14 +124,30 @@ def createFooter(lines, glob):
   lines.append("                EvtSel = 'NONE',")
   lines.append("                EvtMax   = 10,")
   lines.append("                ExtSvc = [evtsvc],")
-  lines.append("                OutputLevel=%s" % glob.get("Verbosity", "DEBUG"))
+  lines.append("                OutputLevel=%s" % verbosityTranslator(glob.get("Verbosity", "DEBUG")))
   lines.append("              )\n")
+
+
+def verbosityTranslator(marlinLogLevel):
+  """Translate the verbosity level from Marlin to a Gaudi level.
+
+  Marlin log level can end with numbers, e.g., MESSAGE4
+  """
+  logLevelDict = {'DEBUG': 'DEBUG',
+                  'MESSAGE': 'INFO',
+                  'WARNING': 'WARNING',
+                  'ERROR': 'ERROR',
+                  'SILENT': 'FATAL',
+                  }
+  for level, trans in logLevelDict.items():
+    if marlinLogLevel.startswith(level):
+      return trans
 
 
 def convertParamters(params, proc, globParams):
   """ convert json of parameters to gaudi """
   lines = []
-  lines.append("%s.OutputLevel = %s " % (proc.replace(".", "_"), globParams.get("Verbosity")))
+  lines.append("%s.OutputLevel = %s " % (proc.replace(".", "_"), verbosityTranslator(globParams.get("Verbosity"))))
   lines.append("%s.ProcessorType = \"%s\" " % (proc.replace(".", "_"), params.get("type")))
   lines.append("%s.Parameters = [" % proc.replace(".", "_"))
   for para in sorted(params):
