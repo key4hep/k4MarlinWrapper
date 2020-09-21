@@ -26,14 +26,14 @@ make install
 ## Running
 
 To be able to run GMP Wrapper:
-- Copy the `muon.slcio` from the [DD4hep](https://github.com/AIDASoft/DD4hep) file located in the `DDTest/inputFiles/` directory to `test/inputFiles/` directory in GMPWrapper
+- Copy the `muons.slcio` from the [DD4hep](https://github.com/AIDASoft/DD4hep) file located in the `DDTest/inputFiles/` directory to `test/inputFiles/` directory in GMPWrapper
 
 Copy file and run:
 
 ```bash
 mkdir ../test/inputFiles
 cp /path/to/muon.slcio ../test/inputFiles/my.slcio
-./run gaudirun.py ../runit/runit.py
+./run gaudirun.py ../GMPWrapper/examples/runit.py
 ```
 
 ## Testing
