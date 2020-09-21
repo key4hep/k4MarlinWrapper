@@ -1,3 +1,8 @@
+# v00-02-01
+
+* 2020-09-21 Andre Sailer ([PR#15](https://github.com/key4hep/GMP/pull/15))
+  - convertMarlinSteeringToGaudi: translate all possible Marlin LogLevels to Gaudi levels
+
 # v00-02
 
 * 2020-09-21 Andre Sailer ([PR#13](https://github.com/key4hep/GMP/pull/13))
