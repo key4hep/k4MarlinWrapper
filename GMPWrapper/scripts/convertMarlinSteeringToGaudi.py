@@ -3,6 +3,7 @@ from __future__ import absolute_import, unicode_literals, print_function
 
 import sys
 from copy import deepcopy
+import os
 
 from xml.etree.ElementTree import ElementTree
 
@@ -199,8 +200,11 @@ def run():
     print("Exception when getting trees: %r " % ex)
     exit(1)
 
-  print("\n".join(generateGaudiSteering(tree)))
+  wf_path = os.path.splitext(args[1])[0] + '.py'
+  wf_file = open(wf_path, 'w')
 
+  wf_file.write("\n".join(generateGaudiSteering(tree)))
+  # print("\n".join(generateGaudiSteering(tree)))
 
 if __name__ == "__main__":
   run()
