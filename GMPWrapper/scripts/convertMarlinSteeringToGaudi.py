@@ -87,7 +87,7 @@ def resolveGroup(lines, proc, execGroup):
           lines.append("algList.append(%s)" % child.get('name').replace(".", "_"))
 
 
-def getExecutingProcessors(lines, tree):
+def getExecutingProcessors(lines, tree, optProcessors=False):
   """ compare the list of processors to execute, order matters """
   execProc = tree.findall('execute/*')
   execGroup = tree.findall('group')
@@ -96,12 +96,13 @@ def getExecutingProcessors(lines, tree):
     if proc.tag == "if":
       for child in proc:
         if child.tag == "processor":
-          # lines.append("# algList.append(%s)" % child.get('name').replace(".", "_"))
+          optProcessors = True
           lines.append("# algList.append(%s)  # %s" % (child.get('name').replace(".", "_"), proc.get('condition')))
     if proc.tag == "processor":
       lines.append("algList.append(%s)" % proc.get('name'))
     if proc.tag == "group":
       resolveGroup(lines, proc.get('name'), execGroup)
+  return optProcessors
 
 
 def createHeader(lines):
@@ -182,7 +183,10 @@ def generateGaudiSteering(tree):
   createHeader(lines)
   createLcioReader(lines, globParams)
   convertProcessors(lines, tree, globParams)
-  getExecutingProcessors(lines, tree)
+  optProcessors = getExecutingProcessors(lines, tree)
+  if (optProcessors == True):
+    print('Optional Processors were found!')
+    print('Please uncomment the desired ones at the bottom of the resulting file\n')
   createFooter(lines, globParams)
   return lines
 
