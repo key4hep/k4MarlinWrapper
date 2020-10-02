@@ -87,10 +87,11 @@ def resolveGroup(lines, proc, execGroup):
           lines.append("algList.append(%s)" % child.get('name').replace(".", "_"))
 
 
-def getExecutingProcessors(lines, tree, optProcessors=False):
+def getExecutingProcessors(lines, tree):
   """ compare the list of processors to execute, order matters """
   execProc = tree.findall('execute/*')
   execGroup = tree.findall('group')
+  optProcessors = False
 
   for proc in execProc:
     if proc.tag == "if":
@@ -184,7 +185,7 @@ def generateGaudiSteering(tree):
   createLcioReader(lines, globParams)
   convertProcessors(lines, tree, globParams)
   optProcessors = getExecutingProcessors(lines, tree)
-  if (optProcessors == True):
+  if optProcessors:
     print('Optional Processors were found!')
     print('Please uncomment the desired ones at the bottom of the resulting file\n')
   createFooter(lines, globParams)
@@ -193,9 +194,9 @@ def generateGaudiSteering(tree):
 
 def run():
   args = sys.argv
-  if len(args) != 2:
+  if len(args) != 3:
     print("incorrect number of input files, need one marlin steering files as argument")
-    print("convertMarlinSteeringToGaudi.py file1.xml")
+    print("convertMarlinSteeringToGaudi.py inputFile.xml outputFile.py")
     exit(1)
 
   try:
@@ -204,11 +205,8 @@ def run():
     print("Exception when getting trees: %r " % ex)
     exit(1)
 
-  wf_path = os.path.splitext(args[1])[0] + '.py'
-  wf_file = open(wf_path, 'w')
-
+  wf_file = open(args[2], 'w')
   wf_file.write("\n".join(generateGaudiSteering(tree)))
-  # print("\n".join(generateGaudiSteering(tree)))
 
 if __name__ == "__main__":
   run()
