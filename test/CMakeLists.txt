@@ -14,4 +14,11 @@ if (BASH_PROGRAM)
       ENVIRONMENT GMP_tests_DIR=${CMAKE_CURRENT_SOURCE_DIR}
       PASS_REGULAR_EXPRESSION "INFO Application Manager Terminated successfully")
 
-endif(BASH_PROGRAM) 
+  # Test clicReconstruction
+  add_test( test_clicReconstruction ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/test_clicReconstruction.sh )
+  set_tests_properties ( test_clicReconstruction
+    PROPERTIES
+      ENVIRONMENT GMP_tests_DIR=${CMAKE_CURRENT_SOURCE_DIR}
+      PASS_REGULAR_EXPRESSION "INFO Application Manager Terminated successfully")
+
+endif(BASH_PROGRAM)
