@@ -1,4 +1,6 @@
 #!/bin/bash
+# exit if command or variable fails
+set -eu
 
 # Clone CLICPerformance for input files
 if [ ! -d CLICPerformance ]; then
