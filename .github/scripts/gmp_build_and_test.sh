@@ -15,4 +15,6 @@ cmake \
   .. && \
 make -j 2 && \
 make install && \
+ctest -R test_gmp1 -V
 ctest -R test_gmp2 -V
+ctest -R test_clicReconstruction -V
