@@ -32,7 +32,7 @@ Copy file and run:
 
 ```bash
 mkdir ../test/inputFiles
-cp /path/to/muon.slcio ../test/inputFiles/my.slcio
+cp /path/to/muons.slcio ../test/inputFiles/muons.slcio
 ./run gaudirun.py ../GMPWrapper/examples/runit.py
 ```
 
@@ -41,7 +41,7 @@ cp /path/to/muon.slcio ../test/inputFiles/my.slcio
 ```bash
 # Check that input file exist
 mkdir ../test/inputFiles
-cp /path/to/muon.slcio ../test/inputFiles/my.slcio
+cp /path/to/muons.slcio ../test/inputFiles/muons.slcio
 # Display available tests
 ctest -N
 # Run tests
