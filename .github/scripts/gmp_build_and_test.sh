@@ -15,4 +15,4 @@ cmake \
   .. && \
 make -j 2 && \
 make install && \
-ctest --output-on-failure
+ctest --verbose --output-on-failure
