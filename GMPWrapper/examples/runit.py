@@ -7,7 +7,7 @@ evtsvc = EventDataSvc()
 
 read = LcioEvent()
 read.OutputLevel = DEBUG
-read.Files = ["../test/inputFiles/my.slcio"]
+read.Files = ["../test/inputFiles/muons.slcio"]
 algList.append(read)
 
 END_TAG = "END_TAG"
