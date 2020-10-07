@@ -1,6 +1,6 @@
 #!/bin/bash
 
-yum -y install make git
+yum -y install make git wget
 
 source /cvmfs/clicdp.cern.ch/iLCSoft/lcg/97/nightly/x86_64-centos7-gcc8-opt/init_ilcsoft.sh
 
