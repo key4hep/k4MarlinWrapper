@@ -4,6 +4,7 @@ from __future__ import absolute_import, unicode_literals, print_function
 import sys
 from copy import deepcopy
 import os
+import re
 
 from xml.etree.ElementTree import ElementTree
 
@@ -54,6 +55,46 @@ def getProcessors(tree):
 
   return processors
 
+
+def replaceConstants(value, constants):
+  captured_patterns = re.findall('\$\{\w*\}', value)
+  if len(captured_patterns) == 0:
+    return "\'{}\'".format(value)
+  elif len(captured_patterns) == 1:
+    pattern_content = captured_patterns[0][2:-1]
+    if pattern_content not in constants:
+      print('WARNING: No replacement found for pattern {}'.format(captured_patterns[0]))
+    format_value = '\'%({})s\' % CONSTANTS'.format(pattern_content)
+    return format_value
+  elif len(captured_patterns) > 1:
+    print('WARNING: more than one pattern found')
+    return "\'{}\'".format(value)
+
+
+def convertConstants(lines, tree):
+  constants = dict()
+
+  constElements = tree.findall('constants/include')
+  if constElements:
+    print('WARNING: include statements found inside constants tag')
+
+  constElements = tree.findall('constants/constant')
+  for const in constElements:
+    constants[const.attrib.get('name')] = const.attrib.get('value')
+
+  # replace constants internally
+  for key,value in constants.items():
+    if value:
+      captured_patterns = re.findall('\$\{\w*\}', value)
+      for pattern in captured_patterns:
+        constants[key] = constants[key].replace(pattern, constants[pattern[2:-1]])
+
+  lines.append("\nCONSTANTS = {")
+  for key in constants:
+    lines.append("    '%s': '%s'," % (key, constants[key]))
+  lines.append("}\n")
+
+  return constants
 
 def getValue(element, default=None):
   if element.get('value'):
@@ -147,7 +188,7 @@ def verbosityTranslator(marlinLogLevel):
       return trans
 
 
-def convertParamters(params, proc, globParams):
+def convertParamters(params, proc, globParams, constants):
   """ convert json of parameters to gaudi """
   lines = []
   lines.append("%s.OutputLevel = %s " % (proc.replace(".", "_"), verbosityTranslator(globParams.get("Verbosity"))))
@@ -162,19 +203,20 @@ def convertParamters(params, proc, globParams):
       if not value:
         lines.append("%s\"%s\", END_TAG," % (' ' * (len(proc) + 15), para))
       else:
-        lines.append("%s\"%s\", \"%s\", END_TAG," % (' ' * (len(proc) + 15), para, value))
+        lines.append("%s\"%s\", %s, END_TAG," % \
+          (' ' * (len(proc) + 15), para, replaceConstants(value, constants)))
 
   lines[-1] = lines[-1][:-1]
   lines.append("%s]\n" % (' ' * (len(proc) + 15)))
   return lines
 
 
-def convertProcessors(lines, tree, globParams):
+def convertProcessors(lines, tree, globParams, constants):
   """ convert XML tree to list of strings """
   processors = getProcessors(tree)
   for proc in processors:
     lines.append("%s = MarlinProcessorWrapper(\"%s\")" % (proc.replace(".", "_"), proc))
-    lines += convertParamters(processors[proc], proc, globParams)
+    lines += convertParamters(processors[proc], proc, globParams, constants)
   return lines
 
 
@@ -182,8 +224,9 @@ def generateGaudiSteering(tree):
   globParams = getGlobalParameters(tree)
   lines = []
   createHeader(lines)
+  constants = convertConstants(lines, tree)
   createLcioReader(lines, globParams)
-  convertProcessors(lines, tree, globParams)
+  convertProcessors(lines, tree, globParams, constants)
   optProcessors = getExecutingProcessors(lines, tree)
   if optProcessors:
     print('Optional Processors were found!')
