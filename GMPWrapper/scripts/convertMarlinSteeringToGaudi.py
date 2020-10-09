@@ -56,6 +56,7 @@ def getProcessors(tree):
   return processors
 
 
+# Replace with constant if pattern found in value
 def replaceConstants(value, constants):
   captured_patterns = re.findall('\$\{\w*\}', value)
   if len(captured_patterns) == 0:
@@ -71,6 +72,7 @@ def replaceConstants(value, constants):
     return "\'{}\'".format(value)
 
 
+# Find constant tags, write them to python and replace constants within themselves
 def convertConstants(lines, tree):
   constants = dict()
 
