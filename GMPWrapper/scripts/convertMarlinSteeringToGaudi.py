@@ -65,7 +65,7 @@ def replaceConstants(value, constants):
     pattern_content = captured_patterns[0][2:-1]
     if pattern_content not in constants:
       print('WARNING: No replacement found for pattern {}'.format(captured_patterns[0]))
-    format_value = '\'%s\' % CONSTANTS_B[\'{}\']'.format(pattern_content)
+    format_value = '\'%({})\' % CONSTANTS'.format(pattern_content)
     return format_value
   elif len(captured_patterns) > 1:
     print('WARNING: more than one pattern found')
@@ -84,12 +84,18 @@ def convertConstants(lines, tree):
   for const in constElements:
     constants[const.attrib.get('name')] = const.attrib.get('value')
 
+  for key,value in constants.items():
+    if value:
+      captured_patterns = re.findall('\$\{\w*\}', value)
+      for pattern in captured_patterns:
+        constants[key] = constants[key].replace(pattern, '%({})s'.format(pattern[2:-1]))
+
   lines.append("\nCONSTANTS = {")
   for key in constants:
     lines.append("    '{}': '{}',".format(key, constants[key]))
   lines.append("}\n")
 
-  lines.append("CONSTANTS_B = parseConstants(CONSTANTS)\n")
+  lines.append("parseConstants(CONSTANTS)\n")
 
   return constants
 
@@ -147,7 +153,7 @@ def getExecutingProcessors(lines, tree):
 def createHeader(lines):
   lines.append("from Gaudi.Configuration import *\n")
   lines.append("from Configurables import LcioEvent, EventDataSvc, MarlinProcessorWrapper")
-  lines.append("import parseConstants")
+  lines.append("from GMPWrapper.parseConstants import *")
   lines.append("algList = []")
   lines.append("evtsvc = EventDataSvc()\n")
   lines.append("END_TAG = \"END_TAG\"\n")
