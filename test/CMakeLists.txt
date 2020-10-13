@@ -21,4 +21,11 @@ if (BASH_PROGRAM)
       ENVIRONMENT GMP_tests_DIR=${CMAKE_CURRENT_SOURCE_DIR}
       PASS_REGULAR_EXPRESSION "INFO Application Manager Terminated successfully")
 
+  # Test converter constants
+  add_test( test_converter_constants ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/test_converter_constants.sh )
+  set_tests_properties ( test_converter_constants
+    PROPERTIES
+      ENVIRONMENT GMP_tests_DIR=${CMAKE_CURRENT_SOURCE_DIR}
+      PASS_REGULAR_EXPRESSION "INFO Application Manager Terminated successfully")
+
 endif(BASH_PROGRAM)

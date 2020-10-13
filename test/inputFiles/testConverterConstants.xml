@@ -1,0 +1,54 @@
+
+<marlin>
+  <constants>
+    <constant name="DetectorModel" value="CLIC_o2_v04" />
+    <constant name="MyCompact" value="compact" />
+    <constant name="DD4hepXMLFile_subPath" value="/cvmfs/clicdp.cern.ch/iLCSoft/builds/nightly/x86_64-slc6-gcc62-opt/lcgeo/HEAD/CLIC/${MyCompact}/${DetectorModel}/${DetectorModel}.xml" />
+  </constants>
+
+
+  <!-- ***** Execute section ***** -->
+  <execute>
+    <processor name="AidaProcessor" />
+    <processor name="EventNumber" />
+    <processor name="InitDD4hep" />
+    <processor name="VXDBarrelDigitiser" />
+  </execute>
+
+  <!-- ***** Global section ***** -->
+  <global>
+    <parameter name="LCIOInputFiles">
+      $GMP_tests_DIR/inputFiles/muons.slcio
+    </parameter>
+    <parameter name="Verbosity" options="DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT"> DEBUG  </parameter>
+  </global>
+
+  <!-- Init processors : histograming, logging, geometry ... -->
+  <processor name="AidaProcessor" type="AIDAProcessor">
+    <parameter name="FileName" type="string" value="histograms"/>
+    <parameter name="FileType" type="string" value="root "/>
+    <parameter name="Compress" type="int" value="1"/>
+    <parameter name="Verbosity" type="string">DEBUG </parameter>
+  </processor>
+
+  <processor name="EventNumber" type="Statusmonitor">
+    <parameter name="HowOften" type="int">1 </parameter>
+    <parameter name="Verbosity" type="string">DEBUG </parameter>
+  </processor>
+
+  <processor name="InitDD4hep" type="InitializeDD4hep">
+    <parameter name="DD4hepXMLFile" type="string"> ${DD4hepXMLFile_subPath} </parameter>
+  </processor>
+
+  <processor name="VXDBarrelDigitiser" type="DDPlanarDigiProcessor">
+    <parameter name="SubDetectorName" type="string">Vertex </parameter>
+    <parameter name="IsStrip" type="bool">false </parameter>
+    <parameter name="ResolutionU" type="float"> 0.003 0.003 0.003 0.003 0.003 0.003 </parameter>
+    <parameter name="ResolutionV" type="float"> 0.003 0.003 0.003 0.003 0.003 0.003  </parameter>
+    <parameter name="SimTrackHitCollectionName" type="string" lcioInType="SimTrackerHit">VertexBarrelCollection </parameter>
+    <parameter name="SimTrkHitRelCollection" type="string" lcioOutType="LCRelation">VXDTrackerHitRelations </parameter>
+    <parameter name="TrackerHitCollectionName" type="string" lcioOutType="TrackerHitPlane">VXDTrackerHits </parameter>
+    <parameter name="Verbosity" type="string">DEBUG </parameter>
+  </processor>
+
+</marlin>
