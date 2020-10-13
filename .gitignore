@@ -42,6 +42,3 @@ runit/*.root
 
 # CMake generated
 Testing
-
-# Testing
-test/inputFiles
