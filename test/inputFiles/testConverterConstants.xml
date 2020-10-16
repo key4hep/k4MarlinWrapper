@@ -4,6 +4,8 @@
     <constant name="DetectorModel" value="CLIC_o2_v04" />
     <constant name="MyCompact" value="compact" />
     <constant name="DD4hepXMLFile_subPath" value="/cvmfs/clicdp.cern.ch/iLCSoft/builds/nightly/x86_64-slc6-gcc62-opt/lcgeo/HEAD/CLIC/${MyCompact}/${DetectorModel}/${DetectorModel}.xml" />
+    <constant name="MyResTest">0.003</constant>
+    <constant name="MyResTest2">0.003</constant>
   </constants>
 
 
@@ -43,7 +45,7 @@
   <processor name="VXDBarrelDigitiser" type="DDPlanarDigiProcessor">
     <parameter name="SubDetectorName" type="string">Vertex </parameter>
     <parameter name="IsStrip" type="bool">false </parameter>
-    <parameter name="ResolutionU" type="float"> 0.003 0.003 0.003 0.003 0.003 0.003 </parameter>
+    <parameter name="ResolutionU" type="float"> ${MyResTest} ${MyResTest2} 0.003 ${MyResTest} ${MyResTest} ${MyResTest} </parameter>
     <parameter name="ResolutionV" type="float"> 0.003 0.003 0.003 0.003 0.003 0.003  </parameter>
     <parameter name="SimTrackHitCollectionName" type="string" lcioInType="SimTrackerHit">VertexBarrelCollection </parameter>
     <parameter name="SimTrkHitRelCollection" type="string" lcioOutType="LCRelation">VXDTrackerHitRelations </parameter>
