@@ -58,18 +58,17 @@ def getProcessors(tree):
 
 # Replace with constant if pattern found in value
 def replaceConstants(value, constants):
+  formatted_values = ''
   captured_patterns = re.findall('\$\{\w*\}', value)
   if len(captured_patterns) == 0:
-    return "\"{}\"".format(value)
+    formatted_values = "\"{}\"".format(value)
   elif len(captured_patterns) == 1:
-    pattern_content = captured_patterns[0][2:-1]
-    if pattern_content not in constants:
-      print('WARNING: No replacement found for pattern {}'.format(captured_patterns[0]))
-    format_value = '\"%({})s\" % CONSTANTS'.format(pattern_content)
-    return format_value
+    formatted_values = re.sub(r'\$\{(\w*)\}', r'%(\1)s" % CONSTANTS', value)
+    formatted_values = '"{}'.format(formatted_values)
   elif len(captured_patterns) > 1:
-    print('WARNING: more than one pattern found')
-    return "\"{}\"".format(value)
+    formatted_values = re.sub(r'\"\$\{(\w*)\}\"', r'"%(\1)s" % CONSTANTS', '"{}"'.format(value))
+    formatted_values = '{}'.format(formatted_values)
+  return formatted_values
 
 
 # Find constant tags, write them to python and replace constants within themselves
