@@ -81,7 +81,7 @@ def convertConstants(lines, tree):
 
   constElements = tree.findall('constants/constant')
   for const in constElements:
-    constants[const.attrib.get('name')] = const.attrib.get('value')
+    constants[const.attrib.get('name')] = getValue(const)
 
   for key,value in constants.items():
     if value:
@@ -91,7 +91,7 @@ def convertConstants(lines, tree):
 
   lines.append("\nCONSTANTS = {")
   for key in constants:
-    lines.append("    '{}': '{}',".format(key, constants[key]))
+    lines.append("\t\t'{}': '{}',".format(key, constants[key]))
   lines.append("}\n")
 
   lines.append("parseConstants(CONSTANTS)\n")
