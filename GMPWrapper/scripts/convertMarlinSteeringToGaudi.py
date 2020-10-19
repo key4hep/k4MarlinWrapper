@@ -56,19 +56,20 @@ def getProcessors(tree):
   return processors
 
 
-# Replace with constant if pattern found in value
+# Replace with constants if pattern found in value(s)
 def replaceConstants(value, constants):
-  formatted_values = ''
-  captured_patterns = re.findall('\$\{\w*\}', value)
-  if len(captured_patterns) == 0:
-    formatted_values = "\"{}\"".format(value)
-  elif len(captured_patterns) == 1:
-    formatted_values = re.sub(r'\$\{(\w*)\}', r'%(\1)s" % CONSTANTS', value)
-    formatted_values = '"{}'.format(formatted_values)
-  elif len(captured_patterns) > 1:
-    formatted_values = re.sub(r'\"\$\{(\w*)\}\"', r'"%(\1)s" % CONSTANTS', '"{}"'.format(value))
-    formatted_values = '{}'.format(formatted_values)
-  return formatted_values
+  formatted_array = []
+  split_values = value.split()
+  for val in split_values:
+    captured_patterns = re.findall('\$\{\w*\}', val)
+    if len(captured_patterns) == 0:
+      formatted_array.append("\"{}\"".format(val))
+    elif len(captured_patterns) >= 1:
+      val_format = re.sub(r'\$\{(\w*)\}', r'%(\1)s', val)
+      val_format = "\"{}\" % CONSTANTS".format(val_format)
+      formatted_array.append(val_format)
+
+  return ", ".join(formatted_array)
 
 
 # Find constant tags, write them to python and replace constants within themselves
@@ -201,7 +202,6 @@ def convertParamters(params, proc, globParams, constants):
     if para not in ["type", "Verbosity"]:
       value = params[para].replace('\n', ' ')
       value = " ".join(value.split())
-      value = value.replace(" ", "\", \"")
 
       if not value:
         lines.append("%s\"%s\", END_TAG," % (' ' * (len(proc) + 15), para))
