@@ -157,8 +157,19 @@ std::shared_ptr<marlin::StringParameters> MarlinProcessorWrapper::parseParameter
       continue;
     }
 
-    parameterValues.push_back(parameterString);
+    if (parameterString.find(", ") != std::string::npos){
+      const std::regex find_multi_parameter("<(\\w+(?:.\\w+))>,");
+      std::smatch base_match;
+      std::string parameterCopy = parameterString;
+      while (std::regex_search(parameterCopy, base_match, find_multi_parameter)) {
+        parameterValues.push_back(base_match[1]);
+        parameterCopy = base_match.suffix();
+      }
+    } else {
+      parameterValues.push_back(parameterString);
+    }
   }
+
   return parameters_ptr;
 }
 

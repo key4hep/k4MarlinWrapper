@@ -7,6 +7,7 @@
     <constant name="MyResTest">0.003</constant>
     <constant name="MyResTest2">003</constant>
     <constant name="MyResTest3">0.</constant>
+    <constant name="MyResArrayTest">0.002 ${MyResTest} 0.004 0.005</constant>
   </constants>
 
 
@@ -47,7 +48,7 @@
     <parameter name="SubDetectorName" type="string">Vertex </parameter>
     <parameter name="IsStrip" type="bool">false </parameter>
     <parameter name="ResolutionU" type="float"> ${MyResTest} 0.${MyResTest2} 0.003 ${MyResTest3}${MyResTest2} ${MyResTest} ${MyResTest} </parameter>
-    <parameter name="ResolutionV" type="float"> 0.003 0.003 0.003 0.003 0.003 0.003  </parameter>
+    <parameter name="ResolutionV" type="float"> 0.003 ${MyResArrayTest} 0.003  </parameter>
     <parameter name="SimTrackHitCollectionName" type="string" lcioInType="SimTrackerHit">VertexBarrelCollection </parameter>
     <parameter name="SimTrkHitRelCollection" type="string" lcioOutType="LCRelation">VXDTrackerHitRelations </parameter>
     <parameter name="TrackerHitCollectionName" type="string" lcioOutType="TrackerHitPlane">VXDTrackerHits </parameter>
