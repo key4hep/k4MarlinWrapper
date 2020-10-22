@@ -26,6 +26,8 @@
 
 #include <stack>
 
+#include <regex>
+
 namespace marlin {
   class Processor;
   class StringParameters;
