@@ -39,8 +39,6 @@
 
 #include <marlin/Global.h>
 
-#include <boost/algorithm/string.hpp>
-
 #include <TSystem.h>
 
 #include <cstdlib>
@@ -100,14 +98,15 @@ MarlinProcessorWrapper::MarlinProcessorWrapper(const std::string& name, ISvcLoca
 
 StatusCode MarlinProcessorWrapper::loadProcessorLibraries() const {
   // Load all libraries from the marlin_dll
-  std::vector<std::string> libraries;
   info() << "looking for marlindll" << endmsg;
   const char* const marlin_dll = getenv("MARLIN_DLL");
   if (marlin_dll == nullptr) {
     warning() << "MARLIN_DLL not set, not loading any processors " << endmsg;
   } else {
     info() << "Found marlin_dll " << marlin_dll << endmsg;
-    boost::split(libraries, marlin_dll, boost::is_any_of(":"));
+    const std::string marlin_dll_str(marlin_dll);
+    std::regex re{":"};
+    std::vector<std::string> libraries = gmp::util::split(marlin_dll_str, re);
     if (libraries.back().empty())
       libraries.pop_back();
     for (const auto& library : libraries) {
@@ -157,17 +156,9 @@ std::shared_ptr<marlin::StringParameters> MarlinProcessorWrapper::parseParameter
       continue;
     }
 
-    if (parameterString.find(", ") != std::string::npos){
-      const std::regex find_multi_parameter("<(\\w+(?:.\\w+))>,");
-      std::smatch base_match;
-      std::string parameterCopy = parameterString;
-      while (std::regex_search(parameterCopy, base_match, find_multi_parameter)) {
-        parameterValues.push_back(base_match[1]);
-        parameterCopy = base_match.suffix();
-      }
-    } else {
-      parameterValues.push_back(parameterString);
-    }
+    auto split_parameter = gmp::util::split(parameterString);
+    for (auto& s : split_parameter) parameterValues.push_back(s);
+
   }
 
   return parameters_ptr;

@@ -11,7 +11,7 @@ def parseConstants(constants):
           again = (again) or (value[idx] != val)
         formatted_list = ""
         for val in value:
-          formatted_list += '<{}>, '.format(val)
+          formatted_list += '{} '.format(val)
         constants[key] = formatted_list
       else:
         if (value):

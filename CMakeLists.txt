@@ -37,7 +37,6 @@ set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g")
 # Ninja compiler output
 include(cmake/compiler_output.cmake)
 
-find_package(Boost REQUIRED)
 find_package(ROOT 6.0 REQUIRED)
 find_package(LCIO REQUIRED)
 find_package(Marlin REQUIRED)
