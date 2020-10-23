@@ -26,7 +26,7 @@
 
 #include <stack>
 
-#include <regex>
+#include <../src/util/gmpUtil.h>
 
 namespace marlin {
   class Processor;
