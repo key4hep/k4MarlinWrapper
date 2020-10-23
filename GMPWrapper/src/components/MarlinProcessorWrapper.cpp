@@ -105,7 +105,7 @@ StatusCode MarlinProcessorWrapper::loadProcessorLibraries() const {
   } else {
     info() << "Found marlin_dll " << marlin_dll << endmsg;
     const std::string marlin_dll_str(marlin_dll);
-    std::regex re{":"};
+    std::regex re{":+"};
     std::vector<std::string> libraries = gmp::util::split(marlin_dll_str, re);
     if (libraries.back().empty())
       libraries.pop_back();

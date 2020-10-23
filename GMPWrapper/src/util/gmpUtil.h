@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <string>
 #include <regex>
@@ -5,7 +7,7 @@
 
 namespace gmp::util {
 
-// static const std::regex re{"\\s+"};
+// Split a string by a regex
 std::vector<std::string> split(
   const std::string& subject,
   const std::regex& re) 
@@ -17,6 +19,7 @@ std::vector<std::string> split(
   return container;
 }
 
+// Split a string by space character
 std::vector<std::string> split(
   const std::string& subject)
 {
