@@ -26,7 +26,7 @@
 
 #include <stack>
 
-#include <../src/util/gmpUtil.h>
+#include <GMPWrapper/src/util/gmpUtil.h>
 
 namespace marlin {
   class Processor;
