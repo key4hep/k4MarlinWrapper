@@ -56,17 +56,17 @@ def getProcessors(tree):
   return processors
 
 
-# Replace with constants if pattern found in value(s)
 def replaceConstants(value, constants):
+  """Replace with constants if pattern found in value(s) """
   formatted_array = []
   split_values = value.split()
   for val in split_values:
     captured_patterns = re.findall('\$\{\w*\}', val)
-    if len(captured_patterns) == 0:
-      formatted_array.append("\"{}\"".format(val))
-    elif len(captured_patterns) >= 1:
+    if not captured_patterns:
+      formatted_array.append('\"{}\"'.format(val))
+    elif captured_patterns:
       val_format = re.sub(r'\$\{(\w*)\}', r'%(\1)s', val)
-      val_format = "\"{}\" % CONSTANTS".format(val_format)
+      val_format = '\"{}\" % CONSTANTS'.format(val_format)
       formatted_array.append(val_format)
 
   return ", ".join(formatted_array)
@@ -84,7 +84,7 @@ def convertConstants(lines, tree):
   for const in constElements:
     constants[const.attrib.get('name')] = getValue(const)
 
-  for key,value in constants.items():
+  for key, value in constants.items():
     if value:
       formatted_array = []
       split_values = value.split()
@@ -106,7 +106,7 @@ def convertConstants(lines, tree):
 
   lines.append("\nCONSTANTS = {")
   for key in constants:
-    lines.append("\t\t'{}': {},".format(key, constants[key]))
+    lines.append(' ' * len('CONSTANTS = {') + "'{}': {},".format(key, constants[key]))
   lines.append("}\n")
 
   lines.append("parseConstants(CONSTANTS)\n")

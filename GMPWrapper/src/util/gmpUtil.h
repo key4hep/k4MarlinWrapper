@@ -19,7 +19,7 @@ std::vector<std::string> split(
   return container;
 }
 
-// Split a string by space character
+// Split a string by any whitespace characters
 std::vector<std::string> split(
   const std::string& subject)
 {
