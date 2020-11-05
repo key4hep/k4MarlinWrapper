@@ -1,22 +1,19 @@
 import re
 
 def parseConstants(constants):
+  """Keeps looping over constants dictionary,
+  replacing constants until no more are found
+  """
   again = True
   while again:
     again = False
-    for key,value in constants.items():
-      if type(value) is list:
+    for key, value in constants.items():
+      if isinstance(value, list):
         for idx, val in enumerate(value):
           value[idx] = val % constants
-          again = (again) or (value[idx] != val)
-        formatted_list = ""
-        for val in value:
-          formatted_list += '{} '.format(val)
-        constants[key] = formatted_list
-      else:
+          again = again or (value[idx] != val)
+        constants[key] = " ".join(value)
+      elif value:
         if (value):
           constants[key] = value % constants
-          again = (again) or (constants[key] != value)
-
-if __name__ == "__main__":
-  parseConstants()
+          again = again or (constants[key] != value)
