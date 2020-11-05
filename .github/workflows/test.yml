@@ -13,6 +13,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Install CVMFS
       run: |
+        # Get CVMFS working
         wget --no-check-certificate https://ecsft.cern.ch/dist/cvmfs/cvmfs-release/cvmfs-release-latest_all.deb
         sudo dpkg -i cvmfs-release-latest_all.deb
         sudo apt-get update
@@ -25,7 +26,7 @@ jobs:
         CVMFS_HTTP_PROXY=DIRECT
         CVMFS_CACHE_BASE='/var/lib/cvmfs'
         CVMFS_FORCE_SIGNING='yes'
-        CVMFS_REPOSITORIES='clicdp.cern.ch,sft.cern.ch,geant4.cern.ch'
+        CVMFS_REPOSITORIES='clicdp.cern.ch,sft.cern.ch,geant4.cern.ch,sw.hsf.org'
         CVMFS_SEND_INFO_HEADER=no
         EOF
 
@@ -35,31 +36,22 @@ jobs:
         ls /cvmfs/sft.cern.ch
         ls /cvmfs/geant4.cern.ch
         ls /cvmfs/clicdp.cern.ch
-
-        mkdir shared_gaudi_volume
-        ls -l
+        ls /cvmfs/sw.hsf.org
 
         sudo cvmfs_config probe
         sudo cvmfs_config status
+
     - name: Start containers
       run: |
         docker run \
-            -it --name Gaudi_cont \
-            -v /home/runner/work/GMP/GMP:/GMP \
-            -v /home/runner/work/GMP/shared_gaudi_volume:/shared_gaudi_volume:Z \
-            -e VIEW=${{ matrix.LCG }} \
-            -d fdplacido/gaudi-gmp /bin/bash
-
-        docker run \
             -it --name GMP_CI \
             -v /home/runner/work/GMP/GMP:/GMP \
-            -v /home/runner/work/GMP/shared_gaudi_volume:/shared_gaudi_volume:Z \
             -v /cvmfs/sft.cern.ch:/cvmfs/sft.cern.ch \
             -v /cvmfs/clicdp.cern.ch:/cvmfs/clicdp.cern.ch \
             -v /cvmfs/geant4.cern.ch:/cvmfs/geant4.cern.ch:Z \
+            -v /cvmfs/sw.hsf.org:/cvmfs/sw.hsf.org: \
             -e VIEW=${{ matrix.LCG }} \
             -d clicdp/cc7-lcg96b /bin/bash
-    - name: Compile Gaudi, GMP and run test
+    - name: Compile GMP and run test
       run: |
-        docker exec Gaudi_cont ./GMP/.github/scripts/copy_contents.sh
         docker exec GMP_CI ./GMP/.github/scripts/gmp_build_and_test.sh
