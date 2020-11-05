@@ -20,7 +20,7 @@ if [ ! -f testSimulation.slcio ]; then
   ddsim \
     --steeringFile clic_steer.py \
     --inputFiles ../Tests/yyxyev_000.stdhep -N 4 \
-    --compactFile $ILCSOFT/lcgeo/HEAD/CLIC/compact/CLIC_o3_v14/CLIC_o3_v14.xml \
+    --compactFile $LCGEO/CLIC/compact/CLIC_o3_v14/CLIC_o3_v14.xml \
     --outputFile testSimulation.slcio
 fi
 
@@ -35,7 +35,7 @@ sed -i 's;# algList.append(OverlayFalse);algList.append(OverlayFalse);' clicReco
 sed -i 's;# algList.append(MyConformalTracking);algList.append(MyConformalTracking);' clicReconstruction.py
 sed -i 's;# algList.append(ClonesAndSplitTracksFinder);algList.append(ClonesAndSplitTracksFinder);' clicReconstruction.py
 sed -i 's;# algList.append(RenameCollection);algList.append(RenameCollection);' clicReconstruction.py
-sed -i 's;"DD4hepXMLFile", ".*",; "DD4hepXMLFile", os.environ["ILCSOFT"]+"/lcgeo/HEAD/CLIC/compact/CLIC_o3_v14/CLIC_o3_v14.xml",;' clicReconstruction.py
+sed -i 's;"DD4hepXMLFile", ".*",; "DD4hepXMLFile", os.environ["LCGEO"]+"/CLIC/compact/CLIC_o3_v14/CLIC_o3_v14.xml",;' clicReconstruction.py
 # Change output level for correct test confirmation
 sed -i 's;OutputLevel=WARNING; OutputLevel=DEBUG;' clicReconstruction.py
 
