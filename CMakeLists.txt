@@ -21,7 +21,7 @@
 
 cmake_minimum_required(VERSION 3.14)
 cmake_policy(SET CMP0074 NEW) # use package_ROOT env var to find packages
-project(GMPWrapper)
+project(k4MarlinWrapper)
 
 # project version
 SET( ${PROJECT_NAME}_VERSION_MAJOR 0 )

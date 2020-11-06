@@ -173,7 +173,7 @@ def getExecutingProcessors(lines, tree):
 def createHeader(lines):
   lines.append("from Gaudi.Configuration import *\n")
   lines.append("from Configurables import LcioEvent, EventDataSvc, MarlinProcessorWrapper")
-  lines.append("from GMPWrapper.parseConstants import *")
+  lines.append("from k4MarlinWrapper.parseConstants import *")
   lines.append("algList = []")
   lines.append("evtsvc = EventDataSvc()\n")
   lines.append("END_TAG = \"END_TAG\"\n")

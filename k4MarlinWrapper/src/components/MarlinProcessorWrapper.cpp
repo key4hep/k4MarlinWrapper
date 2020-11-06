@@ -106,7 +106,7 @@ StatusCode MarlinProcessorWrapper::loadProcessorLibraries() const {
     info() << "Found marlin_dll " << marlin_dll << endmsg;
     const std::string marlin_dll_str(marlin_dll);
     std::regex re{":+"};
-    std::vector<std::string> libraries = gmp::util::split(marlin_dll_str, re);
+    std::vector<std::string> libraries = k4MW::util::split(marlin_dll_str, re);
     if (libraries.back().empty())
       libraries.pop_back();
     for (const auto& library : libraries) {
@@ -156,7 +156,7 @@ std::shared_ptr<marlin::StringParameters> MarlinProcessorWrapper::parseParameter
       continue;
     }
 
-    auto split_parameter = gmp::util::split(parameterString);
+    auto split_parameter = k4MW::util::split(parameterString);
     parameterValues.insert(parameterValues.end(), split_parameter.begin(), split_parameter.end());
 
   }
@@ -190,7 +190,7 @@ StatusCode MarlinProcessorWrapper::initialize() {
   static bool once = true;
   if (once) {
     once = false;
-    streamlog::out.init(std::cout, "GMP");
+    streamlog::out.init(std::cout, "k4MarlinWrapper");
     marlin::Global::parameters = new marlin::StringParameters();
     marlin::Global::parameters->add("AllowToModifyEvent", {"true"});
     marlin::Global::parameters->add("RandomSeed", {"123456"});

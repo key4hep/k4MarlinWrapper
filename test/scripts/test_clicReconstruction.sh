@@ -10,7 +10,7 @@ fi
 cd CLICPerformance/clicConfig
 
 python \
-  $GMP_tests_DIR/../GMPWrapper/scripts/convertMarlinSteeringToGaudi.py \
+  $k4MarlinWrapper_tests_DIR/../k4MarlinWrapper/scripts/convertMarlinSteeringToGaudi.py \
   clicReconstruction.xml \
   clicReconstruction.py
 

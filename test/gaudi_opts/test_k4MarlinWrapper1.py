@@ -7,7 +7,7 @@ evtsvc = EventDataSvc()
 
 read = LcioEvent()
 read.OutputLevel = DEBUG
-read.Files = ["$GMP_tests_DIR/inputFiles/testSimulation.slcio"]
+read.Files = ["$k4MarlinWrapper_tests_DIR/inputFiles/muons.slcio"]
 algList.append(read)
 
 END_TAG = "END_TAG"
@@ -59,25 +59,11 @@ digiVxd.Parameters = [
                     ]
 algList.append(digiVxd)
 
-digiVxd2 = MarlinProcessorWrapper("VXDBarrelDigitiser2")
-digiVxd2.OutputLevel = DEBUG
-digiVxd2.ProcessorType = "DDPlanarDigiProcessor"
-digiVxd2.Parameters = [
-    "SubDetectorName", "Vertex", END_TAG,
-    "IsStrip", "false", END_TAG,
-    "ResolutionU", "0.002", "0.002", "0.002", "0.002", "0.002", "0.002", END_TAG,
-    "ResolutionV", "0.001", "0.001", "0.001", "0.001", "0.001", "0.001", END_TAG,
-    "SimTrackHitCollectionName", "VertexBarrelCollection2", END_TAG,
-    "SimTrkHitRelCollection", "VXDTrackerHitRelations2", END_TAG,
-    "TrackerHitCollectionName", "VXDTrackerHits2", END_TAG,
-    "Verbosity" , "DEBUG", END_TAG,
-                    ]
-algList.append(digiVxd2)
 
 from Configurables import ApplicationMgr
 ApplicationMgr( TopAlg = algList,
                 EvtSel = 'NONE',
-                EvtMax   = 4,
+                EvtMax   = 10,
                 ExtSvc = [evtsvc],
                 OutputLevel=DEBUG
 )
