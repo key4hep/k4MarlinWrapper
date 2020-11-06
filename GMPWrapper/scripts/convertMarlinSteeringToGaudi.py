@@ -72,8 +72,8 @@ def replaceConstants(value, constants):
   return ", ".join(formatted_array)
 
 
-# Find constant tags, write them to python and replace constants within themselves
 def convertConstants(lines, tree):
+  """ Find constant tags, write them to python and replace constants within themselves """
   constants = dict()
 
   constElements = tree.findall('constants/include')
@@ -90,20 +90,20 @@ def convertConstants(lines, tree):
     formatted_array = []
     split_values = value.split()
     if len(split_values) == 1:
-      # capture all ${constant}
+      """ capture all ${constant} """
       captured_patterns = re.findall('\$\{\w*\}', value)
       for pattern in captured_patterns:
-        # replace every ${constant} for %(constant)s
+        """ replace every ${constant} for %(constant)s """
         constants[key] = re.sub(r'\$\{(\w*)\}', r'%(\1)s', constants[key])
       constants[key] = "\"{}\"".format(constants[key])
     elif len(split_values) > 1:
       for val in split_values:
-        # capture all ${constant}
+        """ capture all ${constant} """
         captured_patterns = re.findall('\$\{\w*\}', val)
         if len(captured_patterns) == 0:
           formatted_array.append("\"{}\"".format(val))
         elif len(captured_patterns) >= 1:
-          # replace every ${constant} for %(constant)s
+          """ replace every ${constant} for %(constant)s """
           val_format = re.sub(r'\$\{(\w*)\}', r'%(\1)s', val)
           val_format = "\"{}\"".format(val_format)
           formatted_array.append(val_format)
