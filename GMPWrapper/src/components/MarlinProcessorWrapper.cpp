@@ -157,7 +157,7 @@ std::shared_ptr<marlin::StringParameters> MarlinProcessorWrapper::parseParameter
     }
 
     auto split_parameter = gmp::util::split(parameterString);
-    for (auto& s : split_parameter) parameterValues.push_back(s);
+    parameterValues.insert(parameterValues.end(), split_parameter.begin(), split_parameter.end());
 
   }
 

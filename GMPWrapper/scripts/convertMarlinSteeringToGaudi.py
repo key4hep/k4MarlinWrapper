@@ -85,24 +85,25 @@ def convertConstants(lines, tree):
     constants[const.attrib.get('name')] = getValue(const)
 
   for key, value in constants.items():
-    if value:
-      formatted_array = []
-      split_values = value.split()
-      if len(split_values) == 1:
-        captured_patterns = re.findall('\$\{\w*\}', value)
-        for pattern in captured_patterns:
-          constants[key] = re.sub(r'\$\{(\w*)\}', r'%(\1)s', constants[key])
-        constants[key] = "\"{}\"".format(constants[key])
-      elif len(split_values) > 1:
-        for val in split_values:
-          captured_patterns = re.findall('\$\{\w*\}', val)
-          if len(captured_patterns) == 0:
-            formatted_array.append("\"{}\"".format(val))
-          elif len(captured_patterns) >= 1:
-            val_format = re.sub(r'\$\{(\w*)\}', r'%(\1)s', val)
-            val_format = "\"{}\"".format(val_format)
-            formatted_array.append(val_format)
-        constants[key] = '[{}]'.format(", ".join(formatted_array))
+    if not value:
+      continue
+    formatted_array = []
+    split_values = value.split()
+    if len(split_values) == 1:
+      captured_patterns = re.findall('\$\{\w*\}', value)
+      for pattern in captured_patterns:
+        constants[key] = re.sub(r'\$\{(\w*)\}', r'%(\1)s', constants[key])
+      constants[key] = "\"{}\"".format(constants[key])
+    elif len(split_values) > 1:
+      for val in split_values:
+        captured_patterns = re.findall('\$\{\w*\}', val)
+        if len(captured_patterns) == 0:
+          formatted_array.append("\"{}\"".format(val))
+        elif len(captured_patterns) >= 1:
+          val_format = re.sub(r'\$\{(\w*)\}', r'%(\1)s', val)
+          val_format = "\"{}\"".format(val_format)
+          formatted_array.append(val_format)
+      constants[key] = '[{}]'.format(", ".join(formatted_array))
 
   lines.append("\nCONSTANTS = {")
   for key in constants:
