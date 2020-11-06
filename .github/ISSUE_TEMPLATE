@@ -2,7 +2,7 @@
 
  - OS version: e.g. centos7
  - Compiler version: e.g GCC 8.0
- - GMP Wrapper version: tag or commit ID, or GitHub branch
+ - k4MarlinWrapper version: tag or commit ID, or GitHub branch
  - Reproduced by: exact steps to reproduce the problem: checkout, setup environment (ROOT versions, LCG release), cmake, build, run...
  - Input: link to input files if applicable
  - Output: full build and run log output

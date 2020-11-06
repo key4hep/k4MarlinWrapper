@@ -44,13 +44,13 @@ jobs:
       run: |
         docker run \
             -it --name k4MarlinWrapper_CI \
-            -v /home/runner/work/GMPk4MarlinWrapper/k4MarlinWrapper:/k4MarlinWrapper \
+            -v /home/runner/work/GMP/GMP:/k4MarlinWrapper \
             -v /cvmfs/sft.cern.ch:/cvmfs/sft.cern.ch \
             -v /cvmfs/clicdp.cern.ch:/cvmfs/clicdp.cern.ch \
             -v /cvmfs/geant4.cern.ch:/cvmfs/geant4.cern.ch:Z \
             -v /cvmfs/sw.hsf.org:/cvmfs/sw.hsf.org: \
             -e VIEW=${{ matrix.LCG }} \
             -d clicdp/cc7-lcg96b /bin/bash
-    - name: Compile GMP and run test
+    - name: Compile k4MarlinWrapper and run test
       run: |
-        docker exec k4MarlinWrapper_CI ./k4MarlinWrapper/.github/scripts/k4MarlinWrapper_build_and_test.sh
+        docker exec k4MarlinWrapper_CI /bin/bash -c "./k4MarlinWrapper/.github/scripts/k4MarlinWrapper_build_and_test.sh"
