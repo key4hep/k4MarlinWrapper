@@ -11,11 +11,11 @@ Add the iLCSoft LCG 97 view to your system, then indicate the paths to cmake for
 git clone https://github.com/andresailer/GMP.git
 cd GMP
 
-source /cvmfs/clicdp.cern.ch/iLCSoft/lcg/97/nightly/x86_64-centos7-gcc8-opt/init_ilcsoft.sh
+source /cvmfs/sw.hsf.org/key4hep/setup.sh
 
 mkdir build; cd build
 
-cmake -DGaudi_DIR="path/to/GaudiInstallation" -DGaudiProject_DIR="path/to/GaudiInstallation" ..
+cmake ..
 
 mkdir ../../gmp_install
 cmake -DCMAKE_INSTALL_PREFIX=../../gmp_install ..
