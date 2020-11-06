@@ -5,9 +5,6 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-18.04
-    strategy:
-      matrix:
-        LCG: ["LCG_96b/x86_64-centos7-gcc9-opt"]        
     steps:
     - uses: actions/checkout@v2
     - name: Install CVMFS
@@ -49,7 +46,6 @@ jobs:
             -v /cvmfs/clicdp.cern.ch:/cvmfs/clicdp.cern.ch \
             -v /cvmfs/geant4.cern.ch:/cvmfs/geant4.cern.ch:Z \
             -v /cvmfs/sw.hsf.org:/cvmfs/sw.hsf.org: \
-            -e VIEW=${{ matrix.LCG }} \
             -d clicdp/cc7-lcg96b /bin/bash
     - name: Compile k4MarlinWrapper and run test
       run: |
