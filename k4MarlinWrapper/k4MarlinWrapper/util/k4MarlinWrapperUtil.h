@@ -5,7 +5,7 @@
 #include <regex>
 #include <vector>
 
-namespace gmp::util {
+namespace k4MW::util {
 
 // Split a string by a regex
 std::vector<std::string> split(

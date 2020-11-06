@@ -20,7 +20,7 @@ jobs:
         ls /cvmfs/sft.cern.ch
     - name: Start container
       run: |
-        docker run -it --name CI_container -v /home/runner/work/GMP/GMP:/Package -v /cvmfs:/cvmfs -d clicdp/cc7-lcg96b /bin/bash
+        docker run -it --name CI_container -v /home/runner/work/k4MarlinWrapper/k4MarlinWrapper:/Package -v /cvmfs:/cvmfs -d clicdp/cc7-lcg96b /bin/bash
     - name: Check Format
       run: |
         docker exec CI_container /bin/bash -c "./Package/.github/scripts/clang_format_check.sh"

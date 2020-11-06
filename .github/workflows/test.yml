@@ -7,7 +7,6 @@ jobs:
     runs-on: ubuntu-18.04
     strategy:
       matrix:
-        # LCG: ["LCG_96b/x86_64-centos7-gcc9-opt","LCG_96b/x86_64-centos7-gcc8-opt","LCG_96b/x86_64-centos7-clang8-opt","LCG_96bpython3/x86_64-centos7-gcc8-opt"]
         LCG: ["LCG_96b/x86_64-centos7-gcc9-opt"]        
     steps:
     - uses: actions/checkout@v2
@@ -44,8 +43,8 @@ jobs:
     - name: Start containers
       run: |
         docker run \
-            -it --name GMP_CI \
-            -v /home/runner/work/GMP/GMP:/GMP \
+            -it --name k4MarlinWrapper_CI \
+            -v /home/runner/work/GMPk4MarlinWrapper/k4MarlinWrapper:/k4MarlinWrapper \
             -v /cvmfs/sft.cern.ch:/cvmfs/sft.cern.ch \
             -v /cvmfs/clicdp.cern.ch:/cvmfs/clicdp.cern.ch \
             -v /cvmfs/geant4.cern.ch:/cvmfs/geant4.cern.ch:Z \
@@ -54,4 +53,4 @@ jobs:
             -d clicdp/cc7-lcg96b /bin/bash
     - name: Compile GMP and run test
       run: |
-        docker exec GMP_CI ./GMP/.github/scripts/gmp_build_and_test.sh
+        docker exec k4MarlinWrapper_CI ./k4MarlinWrapper/.github/scripts/k4MarlinWrapper_build_and_test.sh

@@ -19,7 +19,7 @@
 #   or submit itself to any jurisdiction. 
 #
 
-gaudi_subdir(GMPWrapper v1r0)
+gaudi_subdir(k4MarlinWrapper v1r0)
 
 # this declaration will not be needed in the future
 # APS not sure when that future is
@@ -27,7 +27,7 @@ gaudi_depends_on_subdirs(GaudiAlg GaudiKernel)
 gaudi_install_python_modules()
 gaudi_install_scripts()
 
-gaudi_add_module(GMPWrapperPlugins
+gaudi_add_module(k4MarlinWrapperPlugins
   src/components/Lcio*.cpp
   LINK_LIBRARIES
     GaudiAlgLib
@@ -36,7 +36,7 @@ gaudi_add_module(GMPWrapperPlugins
     ${LCIO_LIBRARIES}
     ${Marlin_LIBRARIES}
   INCLUDE_DIRS
-    GMPWrapper
+    k4MarlinWrapper
     ${LCIO_INCLUDE_DIRS}
     ${Marlin_INCLUDE_DIRS}
   )
@@ -53,6 +53,6 @@ gaudi_add_module(MarlinWrapper
     ${LCIO_INCLUDE_DIRS}
   )
 
-target_compile_options(GMPWrapperPlugins PUBLIC "-Wno-suggest-override")
+target_compile_options(k4MarlinWrapperPlugins PUBLIC "-Wno-suggest-override")
 target_compile_options(MarlinWrapper PUBLIC "-Wno-suggest-override")
 gaudi_env(PREPEND LD_LIBRARY_PATH ${Gaudi_DIR}/lib/)
