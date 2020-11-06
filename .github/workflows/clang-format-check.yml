@@ -22,7 +22,7 @@ jobs:
       run: |
         docker run \
           -it --name CI_container \
-          -v /home/runner/work/GMP/GMP:/Package \
+          -v ${{ github.workspace }}:/Package \
           -v /cvmfs:/cvmfs \
           -d clicdp/cc7-lcg96b /bin/bash
     - name: Check Format

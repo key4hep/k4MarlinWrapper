@@ -41,7 +41,7 @@ jobs:
       run: |
         docker run \
             -it --name k4MarlinWrapper_CI \
-            -v /home/runner/work/GMP/GMP:/k4MarlinWrapper \
+            -v ${{ github.workspace }}:/k4MarlinWrapper \
             -v /cvmfs/sft.cern.ch:/cvmfs/sft.cern.ch \
             -v /cvmfs/clicdp.cern.ch:/cvmfs/clicdp.cern.ch \
             -v /cvmfs/geant4.cern.ch:/cvmfs/geant4.cern.ch:Z \
