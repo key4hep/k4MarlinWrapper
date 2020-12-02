@@ -4,4 +4,4 @@
 if( NOT DEFINED ENV{LCG_VERSION})
   set(HOST_BINARY_TAG x86_64-linux-gcc9-opt)
 endif()
-find_package(GaudiProject)
+find_package(Gaudi)

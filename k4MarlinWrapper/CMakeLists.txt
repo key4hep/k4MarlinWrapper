@@ -19,40 +19,40 @@
 #   or submit itself to any jurisdiction. 
 #
 
-gaudi_subdir(k4MarlinWrapper v1r0)
-
-# this declaration will not be needed in the future
-# APS not sure when that future is
-gaudi_depends_on_subdirs(GaudiAlg GaudiKernel)
-gaudi_install_python_modules()
-gaudi_install_scripts()
+gaudi_install(PYTHON)
+gaudi_install(SCRIPTS)
 
 gaudi_add_module(k4MarlinWrapperPlugins
-  src/components/Lcio*.cpp
-  LINK_LIBRARIES
+  SOURCES
+    src/components/LcioEventAlgo.cpp
+  LINK
     GaudiAlgLib
     GaudiKernel
     ROOT::Core
     ${LCIO_LIBRARIES}
     ${Marlin_LIBRARIES}
-  INCLUDE_DIRS
-    k4MarlinWrapper
-    ${LCIO_INCLUDE_DIRS}
-    ${Marlin_INCLUDE_DIRS}
-  )
+)
+
+target_include_directories(k4MarlinWrapperPlugins PUBLIC
+  k4MarlinWrapper/
+  ${LCIO_INCLUDE_DIRS}
+  ${Marlin_INCLUDE_DIRS}
+  /home/plfernan/workspace/json/install/include
+)
 
 gaudi_add_module(MarlinWrapper
-  src/components/Marlin*.cpp
-  LINK_LIBRARIES
+  SOURCES
+    src/components/MarlinProcessorWrapper.cpp
+  LINK
     GaudiAlgLib
     GaudiKernel
     ${LCIO_LIBRARIES}
     ${Marlin_LIBRARIES}
-  INCLUDE_DIRS
-    ${Marlin_INCLUDE_DIRS}
-    ${LCIO_INCLUDE_DIRS}
-  )
+)
 
-target_compile_options(k4MarlinWrapperPlugins PUBLIC "-Wno-suggest-override")
-target_compile_options(MarlinWrapper PUBLIC "-Wno-suggest-override")
-gaudi_env(PREPEND LD_LIBRARY_PATH ${Gaudi_DIR}/lib/)
+target_include_directories(MarlinWrapper PUBLIC
+  k4MarlinWrapper/
+  ${Marlin_INCLUDE_DIRS}
+  ${LCIO_INCLUDE_DIRS}
+  /home/plfernan/workspace/json/install/include
+)

@@ -34,22 +34,24 @@ set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -g -DNDEBUG")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
 set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g")
 
+set(CMAKE_CXX_STANDARD 17 CACHE STRING "")
+
+if(NOT CMAKE_CXX_STANDARD MATCHES "14|17")
+  message(FATAL_ERROR "Unsupported C++ standard: ${CMAKE_CXX_STANDARD}")
+endif()
+
 # Ninja compiler output
 include(cmake/compiler_output.cmake)
+
+include(GNUInstallDirs)
 
 find_package(ROOT 6.0 REQUIRED)
 find_package(LCIO REQUIRED)
 find_package(Marlin REQUIRED)
+find_package(Gaudi REQUIRED)
 
-# To be removed with future Gaudi
-include(cmake/gaudi_binary_tag.cmake)
+add_subdirectory(k4MarlinWrapper)
 
-include(GNUInstallDirs)
-
-find_package(GaudiProject)
-
+gaudi_install(CMAKE)
 
 enable_testing()
-
-gaudi_project(${PROJECT_NAME} v0r1 USE Gaudi v33r1 )
-
