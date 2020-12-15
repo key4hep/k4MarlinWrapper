@@ -50,8 +50,9 @@ find_package(LCIO REQUIRED)
 find_package(Marlin REQUIRED)
 find_package(Gaudi REQUIRED)
 
+include(CTest)
+
 add_subdirectory(k4MarlinWrapper)
+add_subdirectory(test)
 
 gaudi_install(CMAKE)
-
-enable_testing()
