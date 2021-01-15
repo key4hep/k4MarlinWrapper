@@ -56,3 +56,23 @@ target_include_directories(MarlinWrapper PUBLIC
   ${Marlin_INCLUDE_DIRS}
   ${LCIO_INCLUDE_DIRS}
 )
+
+gaudi_add_module(LCIO2EDM4hep
+  SOURCES
+    src/components/LCIO2EDM4hep.cpp
+  LINK
+    GaudiAlgLib
+    GaudiKernel
+    ${LCIO_LIBRARIES}
+    k4FWCore
+    EDM4HEP::edm4hepDict
+)
+
+target_include_directories(LCIO2EDM4hep PUBLIC
+  k4FWCore
+  EDM4HEP::edm4hep
+  k4MarlinWrapper/
+  ${Marlin_INCLUDE_DIRS}
+  ${LCIO_INCLUDE_DIRS}
+  /home/plfernan/workspace/json/install/include
+)
