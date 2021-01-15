@@ -16,12 +16,13 @@
 #
 #   In applying this licence, CERN does not waive the privileges and immunities
 #   granted to it by virtue of its status as an Intergovernmental Organization
-#   or submit itself to any jurisdiction. 
+#   or submit itself to any jurisdiction.
 #
 
 gaudi_install(PYTHON)
 gaudi_install(SCRIPTS)
 
+# k4MarlinWrapperPlugins
 gaudi_add_module(k4MarlinWrapperPlugins
   SOURCES
     src/components/LcioEventAlgo.cpp
@@ -37,9 +38,9 @@ target_include_directories(k4MarlinWrapperPlugins PUBLIC
   k4MarlinWrapper/
   ${LCIO_INCLUDE_DIRS}
   ${Marlin_INCLUDE_DIRS}
-  /home/plfernan/workspace/json/install/include
 )
 
+# MarlinWrapper
 gaudi_add_module(MarlinWrapper
   SOURCES
     src/components/MarlinProcessorWrapper.cpp
@@ -54,5 +55,4 @@ target_include_directories(MarlinWrapper PUBLIC
   k4MarlinWrapper/
   ${Marlin_INCLUDE_DIRS}
   ${LCIO_INCLUDE_DIRS}
-  /home/plfernan/workspace/json/install/include
 )
