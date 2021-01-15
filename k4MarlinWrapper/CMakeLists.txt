@@ -57,6 +57,7 @@ target_include_directories(MarlinWrapper PUBLIC
   ${LCIO_INCLUDE_DIRS}
 )
 
+# LCIO2EDM4hep
 gaudi_add_module(LCIO2EDM4hep
   SOURCES
     src/components/LCIO2EDM4hep.cpp
@@ -72,7 +73,5 @@ target_include_directories(LCIO2EDM4hep PUBLIC
   k4FWCore
   EDM4HEP::edm4hep
   k4MarlinWrapper/
-  ${Marlin_INCLUDE_DIRS}
   ${LCIO_INCLUDE_DIRS}
-  /home/plfernan/workspace/json/install/include
 )
