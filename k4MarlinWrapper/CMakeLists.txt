@@ -65,8 +65,8 @@ gaudi_add_module(LCIO2EDM4hep
     GaudiAlgLib
     GaudiKernel
     ${LCIO_LIBRARIES}
-    k4FWCore
-    EDM4HEP::edm4hepDict
+    k4FWCore::k4FWCore
+    EDM4HEP::edm4hep
 )
 
 target_include_directories(LCIO2EDM4hep PUBLIC
