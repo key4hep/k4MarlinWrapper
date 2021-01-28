@@ -9,54 +9,24 @@
 #include <ctime>
 #include <chrono>
 
-#include <LCEventWrapper.h>
-#include <EVENT/LCEvent.h>
 
-#include "lcio.h"
-#include "IO/LCWriter.h"
-#include "IMPL/LCEventImpl.h"
-#include "IMPL/LCRunHeaderImpl.h"
-#include "IMPL/LCCollectionVec.h"
-#include "IMPL/MCParticleImpl.h"
-#include "IMPL/ReconstructedParticleImpl.h"
-#include "IMPL/TrackImpl.h"
-#include "IMPL/TrackStateImpl.h"
-#include "IMPL/ParticleIDImpl.h"
+DECLARE_COMPONENT(LCIO2EDM4hep);
 
-DECLARE_COMPONENT(LCIO2EDM4hep)
 
 LCIO2EDM4hep::LCIO2EDM4hep(const std::string& name, ISvcLocator* svcLoc) : GaudiAlgorithm(name, svcLoc) {
   // declareProperty("Particle", mcps_handle, "");
 }
 
-StatusCode LCIO2EDM4hep::initialize() {
-  info() << "start LCIO2EDM4hep::initialize()\n";
 
-  return GaudiAlgorithm::initialize();
-}
-
-StatusCode LCIO2EDM4hep::execute() {
-  info() << "LCIO2EDM4hep::execute()\n";
-
-  // TODO for TrackCollection
-  // Tracks handle
+// Add EDM4hep to LCIO converted tracks to vector
+void LCIO2EDM4hep::addLCIOConvertedTracks(
+  std::vector<lcio::TrackImpl*>& lcio_tracks_vec)
+{
   DataHandle<edm4hep::TrackCollection> tracks_handle {
     "EFlowTrack", Gaudi::DataHandle::Reader, this};
   const auto tracks_coll = tracks_handle.get();
 
-  std::cout << "TrackCollection size: " << tracks_coll->size() << "\n\n";
-
-  // ReconstructedParticles handle
-  DataHandle<edm4hep::ReconstructedParticleCollection> recos_handle {
-    "ReconstructedParticles", Gaudi::DataHandle::Reader, this};
-  const auto recos_coll = recos_handle.get();
-
-  std::cout << "ReconstructedParticles size: " << recos_coll->size() << "\n\n";
-
-  std::vector<lcio::TrackImpl*> lcio_tracks_vec;
-
   // Loop over EDM4hep tracks converting them to lcio tracks
-  // including the track states
   for (const auto edm_tr = tracks_coll->begin(); edm_tr != tracks_coll->end(); ++edm_tr) {
 
     auto* lcio_tr = new lcio::TrackImpl;
@@ -93,22 +63,113 @@ StatusCode LCIO2EDM4hep::execute() {
       );
 
       lcio_tr->addTrackState( lcio_tr_state ) ;
-
-      // Default TrackState?
-      // lcio_tr_state->setLocation( tr_state.location );
-      // lcio_tr->setD0( tr_state.D0 );
-      // lcio_tr->setPhi( tr_state.phi );
-      // lcio_tr->setOmega( tr_state.omega );
-      // lcio_tr->setZ0( tr_state.Z0 );
-      // lcio_tr->setTanLambda( tr_state.tanLambda );
-      // lcio_tr->setCovMatrix( cov.data() );
-      // lcio_tr->setReferencePoint( refP.data() );
     }
 
     lcio_tracks_vec.push_back(lcio_tr);
+  }
+}
+
+
+void LCIO2EDM4hep::addLCIOReconstructedParticles(
+  std::vector<lcio::ReconstructedParticleImpl*>& lcio_rec_particles_vec)
+{
+
+  // ReconstructedParticles handle
+  DataHandle<edm4hep::ReconstructedParticleCollection> recos_handle {
+    "ReconstructedParticles", Gaudi::DataHandle::Reader, this};
+  const auto recos_coll = recos_handle.get();
+
+  for (const auto edm_rp = recos_coll->begin(); edm_rp != recos_coll->end(); ++edm_rp) {
+
+    auto* lcio_recp = new lcio::ReconstructedParticleImpl;
+    if (edm_rp->isAvailable()) {
+      lcio_recp->setType(edm_rp->getType());
+      float m[3] = {edm_rp->getMomentum()[0], edm_rp->getMomentum()[1], edm_rp->getMomentum()[2]};
+      lcio_recp->setMomentum(m);
+      lcio_recp->setEnergy(edm_rp->getEnergy());
+      lcio_recp->setCovMatrix(edm_rp->getCovMatrix().data()); // TODO Check lower or upper
+      lcio_recp->setMass(edm_rp->getMass());
+      lcio_recp->setCharge(edm_rp->getCharge());
+      float rp[3] = {edm_rp->getReferencePoint()[0], edm_rp->getReferencePoint()[1], edm_rp->getReferencePoint()[2]};
+      lcio_recp->setReferencePoint(rp);
+      lcio_recp->setGoodnessOfPID(edm_rp->getGoodnessOfPID());
+
+      // ParticleID
+      edm4hep::ConstParticleID pIDUsed = edm_rp->getParticleIDUsed();
+      if (pIDUsed.isAvailable()) {
+        auto* lcio_pID = new lcio::ParticleIDImpl;
+        lcio_pID->setType(pIDUsed.getType());
+        lcio_pID->setPDG(pIDUsed.getPDG());
+        lcio_pID->setLikelihood(pIDUsed.getLikelihood());
+        lcio_pID->setAlgorithmType(pIDUsed.getAlgorithmType());
+        podio::RelationRange<float> pID_params = pIDUsed.getParameters();
+        for (auto& param : pID_params) {
+          lcio_pID->addParameter(param);
+        }
+        lcio_recp->setParticleIDUsed( lcio_pID );
+      }
+    }
+
+    // Vertex
+    edm4hep::ConstVertex vertex = edm_rp->getStartVertex();
+    if (vertex.isAvailable()) {
+      auto* lcio_vertex = new lcio::VertexImpl;
+      lcio_vertex->setPrimary( vertex.getPrimary() );
+      #warning "AlgoritymType conversion from int to string"
+      lcio_vertex->setAlgorithmType( std::string{vertex.getAlgorithmType()} ); // TODO std::string(int)
+      lcio_vertex->setChi2( vertex.getChi2() );
+      lcio_vertex->setProbability( vertex.getProbability() );
+      lcio_vertex->setPosition( vertex.getPosition()[0], vertex.getPosition()[1], vertex.getPosition()[2]  );
+      lcio_vertex->setCovMatrix( vertex.getCovMatrix().data() );
+      lcio_recp->setStartVertex(lcio_vertex);
+
+      // Associated particle
+      edm4hep::ConstReconstructedParticle vertex_rp = vertex.getAssociatedParticle();
+      if (vertex_rp.isAvailable()) {
+        auto* lcio_vertex_rp = new lcio::ReconstructedParticleImpl;
+        lcio_vertex->setAssociatedParticle( lcio_vertex_rp ) ;
+
+        for (auto& param : vertex.getParameters()) {
+          lcio_vertex->addParameter( param );
+        }
+        // TODO add vertex to lcio_recp
+      }
+
+    }
+
+    // // Get associated edm4hep tracks
+    // for (size_t i = 0; i < p.tracks_size(); ++i) {
+    //   std::cout << "An associated track!" << std::endl;
+    // }
+
+    // // Add associated lcio converted tracks
+    // for (auto& lcio_tr : lcio_tracks_vec) {
+    //   // lcio_recp.addTrack( EVENT::Track* track)
+    //   lcio_recp->addTrack( lcio_tr );
+
+    // }
 
   }
 
+}
+
+
+
+
+StatusCode LCIO2EDM4hep::initialize() {
+  info() << "start LCIO2EDM4hep::initialize()\n";
+
+  return GaudiAlgorithm::initialize();
+}
+
+StatusCode LCIO2EDM4hep::execute() {
+  info() << "LCIO2EDM4hep::execute()\n";
+
+  std::vector<lcio::TrackImpl*> lcio_tracks_vec;
+  std::vector<lcio::ReconstructedParticleImpl*> lcio_rec_particles_vec;
+
+  addLCIOConvertedTracks(lcio_tracks_vec);
+  addLCIOReconstructedParticles(lcio_rec_particles_vec);
 
   // LCIO event to populate
   const std::string detector_name {"ToyTracker"};
@@ -132,41 +193,6 @@ StatusCode LCIO2EDM4hep::execute() {
   // auto* tracks = new lcio::LCCollectionVec(lcio::LCIO::TRACK);
 
 
-  // TODO
-  // Loop over reconstructed particles
-  for (size_t i=0; i < recos_coll->size(); ++i) {
-    const auto p = recos_coll->at(i);
-
-    auto* lcio_recp = new lcio::ReconstructedParticleImpl;
-
-    lcio_recp->setType(p.getType());
-    float m[3] = {p.getMomentum()[0], p.getMomentum()[1], p.getMomentum()[2]};
-    lcio_recp->setMomentum(m);
-    lcio_recp->setEnergy(p.getEnergy());
-
-    lcio_recp->setCovMatrix(p.getCovMatrix().data());
-
-    lcio_recp->setMass(p.getMass());
-    lcio_recp->setCharge(p.getCharge());
-    float rp[3] = {p.getReferencePoint()[0], p.getReferencePoint()[1], p.getReferencePoint()[2]};
-    lcio_recp->setReferencePoint(rp);
-
-    // ::edm4hep::ConstParticleID getParticleIDUsed()
-    // lcio_recp->setParticleIDUsed(EVENT::ParticleID*  pid);
-
-    lcio_recp->setGoodnessOfPID(p.getGoodnessOfPID());
-
-    // ::edm4hep::ConstVertex getStartVertex()
-    // lcio_recp->setStartVertex(EVENT::Vertex * sv);
-
-    // Add lcio converted tracks
-    for (auto& lcio_tr : lcio_tracks_vec) {
-
-      // addTrack( EVENT::Track* track)
-
-    }
-
-  }
 
   // StatusCode sc = eventSvc()->registerObject("/Event/LCEvent", event);
   // put(event, "/Event/SomeData");
