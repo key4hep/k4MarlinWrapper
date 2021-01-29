@@ -14,6 +14,7 @@ from Configurables import PodioInput
 inp = PodioInput('InputReader')
 inp.collections = [
     'Particle',
+    'ParticleIDs',
     'ReconstructedParticles',
     'EFlowTrack'
 ]
