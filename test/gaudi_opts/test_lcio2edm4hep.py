@@ -34,8 +34,8 @@ procA.Parameters = ["FileName", "histograms", END_TAG,
                     "Compress", "1", END_TAG,
                     "Verbosity", "DEBUG", END_TAG
                     ]
-procA.Conversion = ["LCIO2EDM4hep", "true", END_TAG,
-                    "edm4hep::Track", "EFlowTrack", "VertexBarrelCollection-ish", END_TAG
+procA.Conversion = ["EDM4hep2Lcio", "true", END_TAG,
+                    "edm4hep::Track", "EFlowTrack", "VertexBarrelCollection", END_TAG
                     ]
 algList.append(procA)
 

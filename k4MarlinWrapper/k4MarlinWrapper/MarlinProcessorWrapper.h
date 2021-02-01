@@ -28,7 +28,7 @@
 
 #include "util/k4MarlinWrapperUtil.h"
 
-#include <converters/LCIO2EDM4hep.h>
+#include <converters/EDM4hep2Lcio.h>
 
 namespace marlin {
   class Processor;
