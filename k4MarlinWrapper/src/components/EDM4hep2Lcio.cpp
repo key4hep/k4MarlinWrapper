@@ -1,4 +1,4 @@
-#include "converters/LCIO2EDM4hep.h"
+#include "converters/EDM4hep2Lcio.h"
 
 
 DECLARE_COMPONENT(EDM4hep2LcioTool);

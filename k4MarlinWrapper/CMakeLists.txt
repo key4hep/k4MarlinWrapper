@@ -58,9 +58,9 @@ target_include_directories(MarlinWrapper PUBLIC
 )
 
 # LCIO2EDM4hep
-gaudi_add_module(LCIO2EDM4hep
+gaudi_add_module(EDM4hep2Lcio
   SOURCES
-    src/components/LCIO2EDM4hep.cpp
+    src/components/EDM4hep2Lcio.cpp
   LINK
     GaudiAlgLib
     GaudiKernel
@@ -69,7 +69,7 @@ gaudi_add_module(LCIO2EDM4hep
     EDM4HEP::edm4hep
 )
 
-target_include_directories(LCIO2EDM4hep PUBLIC
+target_include_directories(EDM4hep2Lcio PUBLIC
   k4FWCore
   EDM4HEP::edm4hep
   k4MarlinWrapper/
