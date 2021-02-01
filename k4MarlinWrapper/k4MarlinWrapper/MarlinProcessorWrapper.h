@@ -28,6 +28,8 @@
 
 #include "util/k4MarlinWrapperUtil.h"
 
+#include <converters/LCIO2EDM4hep.h>
+
 namespace marlin {
   class Processor;
   class StringParameters;

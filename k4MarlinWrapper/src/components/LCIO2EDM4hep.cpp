@@ -1,12 +1,23 @@
 #include "converters/LCIO2EDM4hep.h"
 
 
-DECLARE_COMPONENT(LCIO2EDM4hep);
+DECLARE_COMPONENT(EDM4hep2LcioTool);
 
-LCIO2EDM4hep::LCIO2EDM4hep(const std::string& name, ISvcLocator* svcLoc) : GaudiAlgorithm(name, svcLoc) {}
+EDM4hep2LcioTool::EDM4hep2LcioTool(const std::string& type, const std::string& name, const IInterface* parent) 
+  : GaudiTool(type, name, parent) {
+    declareInterface<IEDM4hep2LcioTool>(this);
+}
+
+EDM4hep2LcioTool::~EDM4hep2LcioTool() { ; }
+
+StatusCode EDM4hep2LcioTool::initialize() {
+  StatusCode sc = GaudiTool::initialize();
+  info() << "Init EDM4hep2LcioTool\n";
+  return sc;
+}
 
 // Add EDM4hep to LCIO converted tracks to vector
-void LCIO2EDM4hep::addLCIOConvertedTracks(
+void EDM4hep2LcioTool::addLCIOConvertedTracks(
   std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& lcio_tracks_vec)
 {
   DataHandle<edm4hep::TrackCollection> tracks_handle {
@@ -61,7 +72,7 @@ void LCIO2EDM4hep::addLCIOConvertedTracks(
 }
 
 
-void LCIO2EDM4hep::addLCIOParticleIDs(
+void EDM4hep2LcioTool::addLCIOParticleIDs(
   std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& lcio_particleIDs_vec)
 {
   // ParticleIDs handle
@@ -92,7 +103,7 @@ void LCIO2EDM4hep::addLCIOParticleIDs(
 }
 
 
-void LCIO2EDM4hep::addLCIOReconstructedParticles(
+void EDM4hep2LcioTool::addLCIOReconstructedParticles(
   std::vector<std::pair<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>>& lcio_rec_particles_vec,
   const std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& lcio_particleIDs_vec,
   const std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& lcio_tracks_vec )
@@ -169,23 +180,27 @@ void LCIO2EDM4hep::addLCIOReconstructedParticles(
 }
 
 
-
-StatusCode LCIO2EDM4hep::initialize() {
-  info() << "start LCIO2EDM4hep::initialize()\n";
-
-  return GaudiAlgorithm::initialize();
+void EDM4hep2LcioTool::dispatcher(
+  const std::string& type,
+  const std::string& name)
+{
+  if (type == "edm4hep::TrackCollection") {
+    addLCIOConvertedTracks(lcio_tracks_vec);
+  } else
+  if (type == "edm4hep::ParticleIDCollection") {
+    addLCIOParticleIDs(lcio_particleIDs_vec);
+  } else
+  if (type == "edm4hep::ReconstructedParticleCollection") {
+    addLCIOReconstructedParticles(
+      lcio_rec_particles_vec,
+      lcio_particleIDs_vec,
+      lcio_tracks_vec);
+  }
 }
 
-StatusCode LCIO2EDM4hep::execute() {
-  info() << "LCIO2EDM4hep::execute()\n";
 
-  // Save pointer to converted element, and pointer to original element in a std::pair
-  std::vector<std::pair<
-    lcio::TrackImpl*, edm4hep::Track>> lcio_tracks_vec;
-  std::vector<std::pair<
-    lcio::ParticleIDImpl*, edm4hep::ParticleID>> lcio_particleIDs_vec;
-  std::vector<std::pair<
-    lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>> lcio_rec_particles_vec;
+StatusCode EDM4hep2LcioTool::convertCollections() {
+  info() << "EDM4hep2LcioTool::convertCollections()\n";
 
   addLCIOConvertedTracks(lcio_tracks_vec);
   addLCIOParticleIDs(lcio_particleIDs_vec);
@@ -194,37 +209,39 @@ StatusCode LCIO2EDM4hep::execute() {
     lcio_particleIDs_vec,
     lcio_tracks_vec);
 
-  // // LCIO event to populate
-  // const std::string detector_name {"ToyTracker"};
-  // auto lcio_event = new lcio::LCEventImpl;
-  // // lcio_event->setEventNumber(0);
-  // lcio_event->setDetectorName(detector_name);
-  // lcio_event->setRunNumber(1);
-  // const auto p1 = (std::chrono::system_clock::now().time_since_epoch()).count();
-  // lcio_event->setTimeStamp(p1);
+  // Populate LCIO event with EDM4hep info
+  auto* tracks = new lcio::LCCollectionVec(lcio::LCIO::TRACK);
+  auto* recops = new lcio::LCCollectionVec(lcio::LCIO::RECONSTRUCTEDPARTICLE);
 
-  // // Register LCIO event in TES
-  // auto pO = std::make_unique<LCEventWrapper>(lcio_event);
-  // const StatusCode sc = eventSvc()->registerObject("/Event/LCEvent", pO.release());
-  // if (sc.isFailure()) {
-  //   error() << "Failed to store the LCEvent" << endmsg;
-  //   return sc;
-  // }
+  // LCIO event to populate
+  const std::string detector_name {"ToyTracker"};
+  auto lcio_event = new lcio::LCEventImpl();
+  // lcio_event->setEventNumber(0);
+  lcio_event->setDetectorName(detector_name);
+  lcio_event->setRunNumber(1);
+  const auto p1 = (std::chrono::system_clock::now().time_since_epoch()).count();
+  lcio_event->setTimeStamp(p1);
 
-  // // Populate LCIO event with EDM4hep info
-  // auto* recops = new lcio::LCCollectionVec(lcio::LCIO::RECONSTRUCTEDPARTICLE);
-  // auto* tracks = new lcio::LCCollectionVec(lcio::LCIO::TRACK);
+  // Add converted tracks to vector
+  for (auto& tr : lcio_tracks_vec) {
+    tracks->addElement(tr.first);
+  }
 
-  // StatusCode sc = eventSvc()->registerObject("/Event/LCEvent", event);
-  // put(event, "/Event/SomeData");
-  // lcio_handle.put(event);
+  // Add converted reconstructed particles to event
+  for (auto& rp : lcio_rec_particles_vec) {
+    recops->addElement(rp.first);
+  }
 
-  return StatusCode::SUCCESS;
-}
+  lcio_event->addCollection(tracks, lcio::LCIO::TRACK);
+  lcio_event->addCollection(recops, lcio::LCIO::RECONSTRUCTEDPARTICLE);
 
-StatusCode LCIO2EDM4hep::finalize() {
-  info() << "LCIO2EDM4hep::finalize()\n";
+  // Register LCIO event in TES
+  auto pO = std::make_unique<LCEventWrapper>(lcio_event);
+  const StatusCode sc = evtSvc()->registerObject("/Event/LCEvent", pO.release());
+  if (sc.isFailure()) {
+    error() << "Failed to store the ConvertedLCEvent" << endmsg;
+    return sc;
+  }
 
-  // TODO add deletes
   return StatusCode::SUCCESS;
 }

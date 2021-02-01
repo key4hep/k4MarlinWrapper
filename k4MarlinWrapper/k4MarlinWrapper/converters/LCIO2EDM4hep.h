@@ -1,8 +1,8 @@
 #pragma once
 
 // GAUDI
-#include "GaudiAlg/GaudiAlgorithm.h"
 #include "Gaudi/Property.h"
+#include "GaudiAlg/GaudiTool.h"
 
 // FWCore
 #include "k4FWCore/DataHandle.h"
@@ -48,9 +48,16 @@
 #include <type_traits>
 #include <utility>
 
-class LCIO2EDM4hep : public GaudiAlgorithm {
+// Interface
+#include "IEDM4hep2Lcio.h"
+
+
+
+class EDM4hep2LcioTool : public GaudiTool, virtual public IEDM4hep2LcioTool {
 public:
-  LCIO2EDM4hep(const std::string& name, ISvcLocator* svcLoc);
+  EDM4hep2LcioTool(const std::string& type, const std::string& name, const IInterface* parent);
+  virtual ~EDM4hep2LcioTool();
+  virtual StatusCode initialize();
 
   void addLCIOConvertedTracks(std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& lcio_tracks_vec);
   void addLCIOParticleIDs(std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& lcio_particleIDs_vec);
@@ -59,16 +66,18 @@ public:
     const std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& lcio_particleIDs_vec,
     const std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& lcio_tracks_vec);
 
-  virtual StatusCode initialize();
-  virtual StatusCode execute();
-  virtual StatusCode finalize();
+  void dispatcher(
+    const std::string& type,
+    const std::string& name);
 
-private:
+  StatusCode convertCollections();
 
-  // int m_member = 0;
-  // DataHandle<edm4hep::MCParticleCollection> mcps_handle {"Particle", Gaudi::DataHandle::Reader, this};
-  /// Handle for the edm4hep MC particles to be read
-  // DataHandle<edm4hep::ReconstructedParticleData> m_e4hhandle {"ReconstructedParticles", Gaudi::DataHandle::Reader, this};
-  // DataHandle<edm4hep::MCParticleData> m_e4hhandle {"Particle", Gaudi::DataHandle::Reader, this};
-  // DataHandle<edm4hep::MCParticleData> m_e4hhandle {"Particle", Gaudi::DataHandle::Reader, this};
+  // Save pointer to converted element, and pointer to original element in a std::pair
+  std::vector<std::pair<
+    lcio::TrackImpl*, edm4hep::Track>> lcio_tracks_vec;
+  std::vector<std::pair<
+    lcio::ParticleIDImpl*, edm4hep::ParticleID>> lcio_particleIDs_vec;
+  std::vector<std::pair<
+    lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>> lcio_rec_particles_vec;
+
 };
