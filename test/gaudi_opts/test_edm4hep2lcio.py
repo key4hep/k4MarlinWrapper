@@ -1,6 +1,6 @@
 from Gaudi.Configuration import *
 
-from Configurables import k4DataSvc, LCIO2EDM4hep, MarlinProcessorWrapper
+from Configurables import k4DataSvc, ToolSvc, MarlinProcessorWrapper, EDM4hep2LcioTool
 
 algList = []
 
@@ -9,13 +9,11 @@ END_TAG = "END_TAG"
 # theFile= 'edminput.root'
 theFile = '/eos/experiment/fcc/ee/generation/DelphesEvents/fcc_tmp/p8_ee_Ztautau_ecm91_EvtGen_Tau2MuGamma/events_001720714.root'
 evtsvc = k4DataSvc('EventDataSvc')
-# evtsvc.input = '$k4MarlinWrapper_tests_DIR/inputFiles/' + theFile
 evtsvc.input = theFile
 
 from Configurables import PodioInput
 inp = PodioInput('InputReader')
 inp.collections = [
-    'Particle',
     'ParticleIDs',
     'ReconstructedParticles',
     'EFlowTrack'
@@ -23,8 +21,7 @@ inp.collections = [
 inp.OutputLevel = DEBUG
 algList.append(inp)
 
-lcioConverter = LCIO2EDM4hep()
-algList.append(lcioConverter)
+ToolSvc.LogLevel = DEBUG
 
 procA = MarlinProcessorWrapper("TestProcessor")
 procA.OutputLevel = DEBUG
@@ -34,15 +31,18 @@ procA.Parameters = ["FileName", "histograms", END_TAG,
                     "Compress", "1", END_TAG,
                     "Verbosity", "DEBUG", END_TAG
                     ]
-procA.Conversion = ["EDM4hep2Lcio", "true", END_TAG,
-                    "edm4hep::Track", "EFlowTrack", "VertexBarrelCollection", END_TAG
+procA.Conversion = ["edm4hep::ReconstructedParticleCollection", "ReconstructedParticles", "VertexBarrelCollection",
+                    "edm4hep::TrackCollection", "EFlowTrack", "VertexBarrelCollection",
+                    "edm4hep::ParticleIDCollection", "ParticleIDs", "VertexBarrelCollection"
                     ]
+procA.addTool(EDM4hep2LcioTool())
 algList.append(procA)
+
 
 from Configurables import ApplicationMgr
 ApplicationMgr( TopAlg = algList,
                 EvtSel = 'NONE',
-                EvtMax   = 2,
+                EvtMax   = 5,
                 ExtSvc = [evtsvc],
                 OutputLevel=DEBUG
 )

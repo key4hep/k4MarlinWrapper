@@ -17,7 +17,7 @@
  *
  *   In applying this licence, CERN does not waive the privileges and immunities
  *   granted to it by virtue of its status as an Intergovernmental Organization
- *   or submit itself to any jurisdiction. 
+ *   or submit itself to any jurisdiction.
  *
  */
 
@@ -121,6 +121,31 @@ StatusCode MarlinProcessorWrapper::loadProcessorLibraries() const {
   return StatusCode::SUCCESS;
 }
 
+
+void MarlinProcessorWrapper::parseConversionParams(
+  const Gaudi::Property<std::vector<std::string>>& parameters,
+  lcio::LCEventImpl* lcio_event)
+{
+  // Check if there is an event already, if not convert the input EDM4hep collection
+  info() << "Looking for event in " << m_processor->name() << " processor." << endmsg;
+  DataObject* pObject = nullptr;
+  StatusCode  sc      = eventSvc()->retrieveObject("/Event/LCEvent", pObject);
+  if (sc.isFailure()) {
+    if (parameters.size() != 0) {
+      info() << "No event found. Converting EDM4hep to LCIO. " << m_processor->name() << endmsg;
+      // Convert parameters
+      m_conversionTool = tool<IEDM4hep2LcioTool>("EDM4hep2LcioTool/Converter");
+      StatusCode sc1 =  m_conversionTool->convertCollections(parameters, lcio_event);
+
+    } else {
+      error() << "Error getting event to convert. " << m_processor->name() << endmsg;
+    }
+  } else if (sc.isSuccess()) {
+    error() << "Previous event found for " << m_processor->name() << ". Skipping conversion." << endmsg;
+  }
+}
+
+
 std::shared_ptr<marlin::StringParameters> MarlinProcessorWrapper::parseParameters(
   const Gaudi::Property<std::vector<std::string>>& parameters,
   std::string& verbosity) const
@@ -219,6 +244,11 @@ StatusCode MarlinProcessorWrapper::initialize() {
 }
 
 StatusCode MarlinProcessorWrapper::execute() {
+
+  auto* lcio_event = new lcio::LCEventImpl();
+  parseConversionParams(m_conversion_params, lcio_event);
+
+  // Get Event
   info() << "Getting the event for " << m_processor->name() << endmsg;
   DataObject* pObject = nullptr;
   StatusCode  sc      = eventSvc()->retrieveObject("/Event/LCEvent", pObject);

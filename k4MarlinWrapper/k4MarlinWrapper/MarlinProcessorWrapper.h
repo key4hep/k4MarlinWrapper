@@ -57,6 +57,10 @@ private:
     std::shared_ptr<marlin::StringParameters>& parameters,
     Gaudi::Property<std::string>& processorTypeStr);
 
+  void parseConversionParams(
+    const Gaudi::Property<std::vector<std::string>>& parameters,
+    lcio::LCEventImpl* theEvent);
+
   /// Parse the parameters from the Property
   std::shared_ptr<marlin::StringParameters> parseParameters(
     const Gaudi::Property<std::vector<std::string>>& parameters,
@@ -66,6 +70,10 @@ private:
   Gaudi::Property<std::string> m_processorType{this, "ProcessorType", {}};
   /// Parameters: Dictionary of key and list of strings would be nice, but we just use a vector of strings for the moment
   Gaudi::Property<std::vector<std::string>> m_parameters{this, "Parameters", {}};
+  /// Conversion: List of elements to convert indicated by EDM4hep Type, name of collection and ProcessorType
+  Gaudi::Property<std::vector<std::string>> m_conversion_params{this, "Conversion", {}};
+
+  IEDM4hep2LcioTool* m_conversionTool;
 
   static std::stack<marlin::Processor*>& ProcessorStack();
 };
