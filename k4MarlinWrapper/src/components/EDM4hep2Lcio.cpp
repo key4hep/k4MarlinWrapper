@@ -6,11 +6,15 @@ DECLARE_COMPONENT(EDM4hep2LcioTool);
 // Add EDM4hep to LCIO converted tracks to vector
 void EDM4hep2LcioTool::addLCIOConvertedTracks(
   std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& lcio_tracks_vec,
-  const std::string& name)
+  const std::string& name,
+  const std::string& lcio_collection_name,
+  lcio::LCEventImpl* lcio_event)
 {
   DataHandle<edm4hep::TrackCollection> tracks_handle {
     name, Gaudi::DataHandle::Reader, this};
   const auto tracks_coll = tracks_handle.get();
+
+  auto* tracks = new lcio::LCCollectionVec(lcio::LCIO::TRACK);
 
   // Loop over EDM4hep tracks converting them to lcio tracks
   for (int i = 0; i < tracks_coll->size(); ++i) {
@@ -36,7 +40,7 @@ void EDM4hep2LcioTool::addLCIOConvertedTracks(
       cov[5]  = tr_state.covMatrix[9];
       cov[9]  = tr_state.covMatrix[12];
       cov[14] = tr_state.covMatrix[14];
-      std::array<float, 15> refP = {
+      std::array<float, 3> refP = {
         tr_state.referencePoint.x, tr_state.referencePoint.y, tr_state.referencePoint.z};
 
       auto* lcio_tr_state = new lcio::TrackStateImpl(
@@ -53,21 +57,32 @@ void EDM4hep2LcioTool::addLCIOConvertedTracks(
       lcio_tr->addTrackState( lcio_tr_state ) ;
     }
 
+    // Save intermediate tracks ref
     lcio_tracks_vec.emplace_back(
       std::make_pair(lcio_tr, edm_tr)
     );
+
+    // Add to lcio tracks collection
+    tracks->addElement(lcio_tr);
   }
+
+  // Add all tracks to event
+  lcio_event->addCollection(tracks, lcio_collection_name);
 }
 
 
 void EDM4hep2LcioTool::addLCIOParticleIDs(
   std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& lcio_particleIDs_vec,
-  const std::string& name)
+  const std::string& name,
+  const std::string& lcio_collection_name,
+  lcio::LCEventImpl* lcio_event)
 {
   // ParticleIDs handle
   DataHandle<edm4hep::ParticleIDCollection> pIDs_handle {
     name, Gaudi::DataHandle::Reader, this};
   const auto pIDs_coll = pIDs_handle.get();
+
+  auto* particleIDs = new lcio::LCCollectionVec(lcio::LCIO::PARTICLEID);
 
   // for (const auto edm_pid = pIDs_coll->begin(); edm_pid != pIDs_coll->end(); ++edm_pid) {
   for (int i = 0; i < pIDs_coll->size(); ++i) {
@@ -88,7 +103,13 @@ void EDM4hep2LcioTool::addLCIOParticleIDs(
     lcio_particleIDs_vec.emplace_back(
       std::make_pair(lcio_pID, edm_pid)
     );
+
+    // Add to lcio particleIDs collection
+    particleIDs->addElement(lcio_pID);
   }
+
+  // Add all particles to event
+  lcio_event->addCollection(particleIDs, lcio_collection_name);
 }
 
 
@@ -96,12 +117,16 @@ void EDM4hep2LcioTool::addLCIOReconstructedParticles(
   std::vector<std::pair<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>>& lcio_rec_particles_vec,
   const std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& lcio_particleIDs_vec,
   const std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& lcio_tracks_vec,
-  const std::string& name)
+  const std::string& name,
+  const std::string& lcio_collection_name,
+  lcio::LCEventImpl* lcio_event)
 {
   // ReconstructedParticles handle
   DataHandle<edm4hep::ReconstructedParticleCollection> recos_handle {
     name, Gaudi::DataHandle::Reader, this};
   const auto recos_coll = recos_handle.get();
+
+  auto* recops = new lcio::LCCollectionVec(lcio::LCIO::RECONSTRUCTEDPARTICLE);
 
   for (int i = 0; i < recos_coll->size(); ++i) {
 
@@ -166,26 +191,36 @@ void EDM4hep2LcioTool::addLCIOReconstructedParticles(
     lcio_rec_particles_vec.emplace_back(
       std::make_pair(lcio_recp, edm_rp)
     );
+
+    // Add to reconstructed particles collection
+    recops->addElement(lcio_recp);
   }
+
+  // Add all reconstructed particles to event
+  lcio_event->addCollection(recops, lcio_collection_name);
 }
 
 
-void EDM4hep2LcioTool::convert(
+void EDM4hep2LcioTool::convert_add(
   const std::string& type,
-  const std::string& name)
+  const std::string& name,
+  const std::string& lcio_collection_name,
+  lcio::LCEventImpl* lcio_event)
 {
   if (type == "edm4hep::TrackCollection") {
-    addLCIOConvertedTracks(lcio_tracks_vec, name);
+    addLCIOConvertedTracks(lcio_tracks_vec, name, lcio_collection_name, lcio_event);
   } else
   if (type == "edm4hep::ParticleIDCollection") {
-    addLCIOParticleIDs(lcio_particleIDs_vec, name);
+    addLCIOParticleIDs(lcio_particleIDs_vec, name, lcio_collection_name, lcio_event);
   } else
   if (type == "edm4hep::ReconstructedParticleCollection") {
     addLCIOReconstructedParticles(
       lcio_rec_particles_vec,
       lcio_particleIDs_vec,
       lcio_tracks_vec,
-      name);
+      name,
+      lcio_collection_name,
+      lcio_event);
   } else {
     error() << "Error trying to convert requested " << type << " with name " << name << endmsg;
   }
@@ -193,10 +228,9 @@ void EDM4hep2LcioTool::convert(
 
 
 StatusCode EDM4hep2LcioTool::convertCollections(
-  const Gaudi::Property<std::vector<std::string>>& parameters,
-  lcio::LCEventImpl* lcio_event)
+  const Gaudi::Property<std::vector<std::string>>& parameters)
 {
-  info() << "Converting EDM4hep to LCIO requested collections. " << endmsg;
+  auto* lcio_event = new lcio::LCEventImpl();
 
   if (parameters.size() % 3 != 0) {
     error() << " Error processing conversion parameters. 3 arguments per collection expected. " << endmsg;
@@ -204,29 +238,12 @@ StatusCode EDM4hep2LcioTool::convertCollections(
   }
 
   for (int i = 0; i < parameters.size(); i=i+3) {
-    convert(parameters[i], parameters[i+1]);
+    convert_add(
+      parameters[i],
+      parameters[i+1],
+      parameters[i+2],
+      lcio_event);
   }
-
-  // Populate LCIO event with EDM4hep info
-  auto* tracks = new lcio::LCCollectionVec(lcio::LCIO::TRACK);
-  auto* recops = new lcio::LCCollectionVec(lcio::LCIO::RECONSTRUCTEDPARTICLE);
-
-  // LCIO event to populate
-  lcio_event->setRunNumber(1);
-  const auto p1 = (std::chrono::system_clock::now().time_since_epoch()).count();
-  lcio_event->setTimeStamp(p1);
-
-  // Add converted tracks to LCIO vector
-  for (auto& tr : lcio_tracks_vec) {
-    tracks->addElement(tr.first);
-  }
-  lcio_event->addCollection(tracks, lcio::LCIO::TRACK);
-
-  // Add converted reconstructed particles to LCIO event
-  for (auto& rp : lcio_rec_particles_vec) {
-    recops->addElement(rp.first);
-  }
-  lcio_event->addCollection(recops, lcio::LCIO::RECONSTRUCTEDPARTICLE);
 
   // Register LCIO event in TES
   info() << "Registering converted EDM4hep to LCIO event in TES" << endmsg;

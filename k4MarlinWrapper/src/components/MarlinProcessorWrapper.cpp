@@ -122,26 +122,19 @@ StatusCode MarlinProcessorWrapper::loadProcessorLibraries() const {
 }
 
 
-void MarlinProcessorWrapper::parseConversionParams(
-  const Gaudi::Property<std::vector<std::string>>& parameters,
-  lcio::LCEventImpl* lcio_event)
+StatusCode MarlinProcessorWrapper::parseConversionParams(
+  const Gaudi::Property<std::vector<std::string>>& parameters)
 {
-  // Check if there is an event already, if not convert the input EDM4hep collection
-  info() << "Looking for event in " << m_processor->name() << " processor." << endmsg;
-  DataObject* pObject = nullptr;
-  StatusCode  sc      = eventSvc()->retrieveObject("/Event/LCEvent", pObject);
-  if (sc.isFailure()) {
-    if (parameters.size() != 0) {
-      info() << "No event found. Converting EDM4hep to LCIO. " << m_processor->name() << endmsg;
-      // Convert parameters
-      m_conversionTool = tool<IEDM4hep2LcioTool>("EDM4hep2LcioTool/Converter");
-      StatusCode sc1 =  m_conversionTool->convertCollections(parameters, lcio_event);
+  if (parameters.size() >= 0) {
+    info() << "Converting EDM4hep to LCIO for " << m_processor->name() << endmsg;
+    // Convert parameters through tool
+    m_conversionTool = tool<IEDM4hep2LcioTool>("EDM4hep2LcioTool/Converter");
+    StatusCode sc =  m_conversionTool->convertCollections(parameters);
+    return sc;
 
-    } else {
-      error() << "Error getting event to convert. " << m_processor->name() << endmsg;
-    }
-  } else if (sc.isSuccess()) {
-    error() << "Previous event found for " << m_processor->name() << ". Skipping conversion." << endmsg;
+  } else {
+    error() << "No \"Conversion\" parameters found for " << m_processor->name() << endmsg;
+    return StatusCode::FAILURE;
   }
 }
 
@@ -245,15 +238,18 @@ StatusCode MarlinProcessorWrapper::initialize() {
 
 StatusCode MarlinProcessorWrapper::execute() {
 
-  auto* lcio_event = new lcio::LCEventImpl();
-  parseConversionParams(m_conversion_params, lcio_event);
-
   // Get Event
   info() << "Getting the event for " << m_processor->name() << endmsg;
   DataObject* pObject = nullptr;
   StatusCode  sc      = eventSvc()->retrieveObject("/Event/LCEvent", pObject);
   if (sc.isFailure()) {
-    error() << "Failed to retrieve the LCEvent " << endmsg;
+    StatusCode sc_conv = parseConversionParams(m_conversion_params);
+    if (sc_conv.isFailure()) {
+      error() << "Failed to retrieve the LCEvent " << endmsg;
+    } else {
+      info() << "Converted EDM4hep to LCIO event for " << m_processor->name() << endmsg;
+      return sc_conv;
+    }
     return sc;
   }
 

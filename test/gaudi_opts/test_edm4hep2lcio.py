@@ -31,9 +31,9 @@ procA.Parameters = ["FileName", "histograms", END_TAG,
                     "Compress", "1", END_TAG,
                     "Verbosity", "DEBUG", END_TAG
                     ]
-procA.Conversion = ["edm4hep::ReconstructedParticleCollection", "ReconstructedParticles", "VertexBarrelCollection",
-                    "edm4hep::TrackCollection", "EFlowTrack", "VertexBarrelCollection",
-                    "edm4hep::ParticleIDCollection", "ParticleIDs", "VertexBarrelCollection"
+procA.Conversion = ["edm4hep::ReconstructedParticleCollection", "ReconstructedParticles", "LCIOCollectionName1",
+                    "edm4hep::TrackCollection", "EFlowTrack", "LCIOCollectionName2",
+                    "edm4hep::ParticleIDCollection", "ParticleIDs", "LCIOCollectionName3"
                     ]
 procA.addTool(EDM4hep2LcioTool())
 algList.append(procA)

@@ -51,21 +51,28 @@ public:
 
   void addLCIOConvertedTracks(
     std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& lcio_tracks_vec,
-    const std::string& name);
+    const std::string& name,
+    const std::string& lcio_collection_name,
+    lcio::LCEventImpl* lcio_event);
   void addLCIOParticleIDs(
     std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& lcio_particleIDs_vec,
-    const std::string& name);
+    const std::string& name,
+    const std::string& lcio_collection_name,
+    lcio::LCEventImpl* lcio_event);
   void addLCIOReconstructedParticles(
     std::vector<std::pair<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>>& lcio_rec_particles_vec,
     const std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& lcio_particleIDs_vec,
     const std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& lcio_tracks_vec,
-    const std::string& name);
+    const std::string& name,
+    const std::string& lcio_collection_name,
+    lcio::LCEventImpl* lcio_event);
 
-  void convert(
+  void convert_add(
     const std::string& type,
-    const std::string& name);
+    const std::string& name,
+    const std::string& lcio_collection_name,
+    lcio::LCEventImpl* lcio_event);
 
   StatusCode convertCollections(
-    const Gaudi::Property<std::vector<std::string>>& parameters,
-    lcio::LCEventImpl* lcio_event);
+    const Gaudi::Property<std::vector<std::string>>& parameters);
 };
