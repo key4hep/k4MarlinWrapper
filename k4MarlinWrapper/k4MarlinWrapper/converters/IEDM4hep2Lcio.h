@@ -8,6 +8,5 @@ public:
   DeclareInterfaceID( IEDM4hep2LcioTool, 1, 0 );
 
   virtual StatusCode convertCollections(
-    const Gaudi::Property<std::vector<std::string>>& parameters,
-    lcio::LCEventImpl* lcio_event) = 0;
+    const Gaudi::Property<std::vector<std::string>>& parameters) = 0;
 };
