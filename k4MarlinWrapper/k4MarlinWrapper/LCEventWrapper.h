@@ -17,11 +17,12 @@
  *
  *   In applying this licence, CERN does not waive the privileges and immunities
  *   granted to it by virtue of its status as an Intergovernmental Organization
- *   or submit itself to any jurisdiction. 
+ *   or submit itself to any jurisdiction.
  *
  */
 
-#pragma once
+#ifndef K4MARLINWRAPPER_LCEVENTWRAPPER_H
+#define K4MARLINWRAPPER_LCEVENTWRAPPER_H
 
 #include <EVENT/LCEvent.h>
 
@@ -39,3 +40,5 @@ public:
 private:
   EVENT::LCEvent* m_event = nullptr;
 };
+
+#endif

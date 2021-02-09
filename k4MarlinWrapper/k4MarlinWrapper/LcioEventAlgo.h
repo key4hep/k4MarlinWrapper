@@ -17,11 +17,12 @@
  *
  *   In applying this licence, CERN does not waive the privileges and immunities
  *   granted to it by virtue of its status as an Intergovernmental Organization
- *   or submit itself to any jurisdiction. 
+ *   or submit itself to any jurisdiction.
  *
  */
 
-#pragma once
+#ifndef K4MARLINWRAPPER_LCIOEVENTALGO_H
+#define K4MARLINWRAPPER_LCIOEVENTALGO_H
 
 /***
  * LCEventAlgo: place the LCEvent from lcio file in the Gaudi Datastore for later retrieval by wrapped Marlin Processors
@@ -45,3 +46,5 @@ private:
   Gaudi::Property<std::vector<std::string>> m_fileNames{this, "Files", {}};
   IO::LCReader*                             m_reader = nullptr;
 };
+
+#endif

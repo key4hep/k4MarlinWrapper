@@ -17,8 +17,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see http://www.gnu.org/licenses/.
  */
+#ifndef K4MARLINWRAPPER_MARLINPROCESSORWRAPPER_H
+#define K4MARLINWRAPPER_MARLINPROCESSORWRAPPER_H
 
-#pragma once
 #include <GaudiAlg/GaudiAlgorithm.h>
 
 #include <streamlog/logbuffer.h>
@@ -81,3 +82,5 @@ std::stack<marlin::Processor*>& MarlinProcessorWrapper::ProcessorStack() {
   static std::stack<marlin::Processor*> stack;
   return stack;
 }
+
+#endif
