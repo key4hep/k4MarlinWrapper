@@ -1,4 +1,5 @@
-#pragma once
+#ifndef K4MARLINWRAPPER_IEDM4HEP2LCIO_H
+#define K4MARLINWRAPPER_IEDM4HEP2LCIO_H
 
 #include "GaudiKernel/IAlgTool.h"
 
@@ -10,3 +11,5 @@ public:
   virtual StatusCode convertCollections(
     const Gaudi::Property<std::vector<std::string>>& parameters) = 0;
 };
+
+#endif

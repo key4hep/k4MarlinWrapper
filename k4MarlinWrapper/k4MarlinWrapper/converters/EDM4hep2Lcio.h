@@ -1,4 +1,5 @@
-#pragma once
+#ifndef K4MARLINWRAPPER_EDM4HEP2LCIO_H
+#define K4MARLINWRAPPER_EDM4HEP2LCIO_H
 
 // GAUDI
 #include "GaudiKernel/AlgTool.h"
@@ -76,3 +77,5 @@ public:
   StatusCode convertCollections(
     const Gaudi::Property<std::vector<std::string>>& parameters);
 };
+
+#endif
