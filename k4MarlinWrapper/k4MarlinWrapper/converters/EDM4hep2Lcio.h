@@ -74,8 +74,13 @@ public:
     const std::string& lcio_collection_name,
     lcio::LCEventImpl* lcio_event);
 
+  bool collection_exist(
+    const std::string& collection_name,
+    lcio::LCEventImpl* lcio_event);
+
   StatusCode convertCollections(
-    const Gaudi::Property<std::vector<std::string>>& parameters);
+    const Gaudi::Property<std::vector<std::string>>& parameters,
+    lcio::LCEventImpl* lcio_event);
 };
 
 #endif

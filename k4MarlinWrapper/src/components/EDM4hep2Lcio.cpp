@@ -227,22 +227,40 @@ void EDM4hep2LcioTool::convert_add(
 }
 
 
-StatusCode EDM4hep2LcioTool::convertCollections(
-  const Gaudi::Property<std::vector<std::string>>& parameters)
+bool EDM4hep2LcioTool::collection_exist(
+  const std::string& collection_name,
+  lcio::LCEventImpl* lcio_event)
 {
-  auto* lcio_event = new lcio::LCEventImpl();
+  auto* coll = lcio_event->getCollectionNames();
+  for (int i = 0; i < coll->size(); ++i) {
+    if (collection_name == coll->at(i)) {
+      return true;
+    }
+  }
+  return false;
+}
 
+
+StatusCode EDM4hep2LcioTool::convertCollections(
+  const Gaudi::Property<std::vector<std::string>>& parameters,
+  lcio::LCEventImpl* lcio_event)
+{
   if (parameters.size() % 3 != 0) {
     error() << " Error processing conversion parameters. 3 arguments per collection expected. " << endmsg;
     return StatusCode::FAILURE;
   }
 
   for (int i = 0; i < parameters.size(); i=i+3) {
-    convert_add(
-      parameters[i],
-      parameters[i+1],
-      parameters[i+2],
-      lcio_event);
+
+    if (collection_exist(parameters[i+2], lcio_event)) {
+      debug() << " Collection " << parameters[i+2] << " already in place, skipping conversion. " << endmsg;
+    } else {
+      convert_add(
+        parameters[i],
+        parameters[i+1],
+        parameters[i+2],
+        lcio_event);
+    }
   }
 
   // Register LCIO event in TES
