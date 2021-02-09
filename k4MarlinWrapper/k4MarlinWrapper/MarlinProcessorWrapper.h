@@ -59,7 +59,8 @@ private:
     Gaudi::Property<std::string>& processorTypeStr);
 
   StatusCode parseConversionParams(
-    const Gaudi::Property<std::vector<std::string>>& parameters);
+    const Gaudi::Property<std::vector<std::string>>& parameters,
+    lcio::LCEventImpl* lcio_event);
 
   /// Parse the parameters from the Property
   std::shared_ptr<marlin::StringParameters> parseParameters(

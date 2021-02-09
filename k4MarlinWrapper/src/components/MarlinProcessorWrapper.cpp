@@ -123,13 +123,14 @@ StatusCode MarlinProcessorWrapper::loadProcessorLibraries() const {
 
 
 StatusCode MarlinProcessorWrapper::parseConversionParams(
-  const Gaudi::Property<std::vector<std::string>>& parameters)
+  const Gaudi::Property<std::vector<std::string>>& parameters,
+  lcio::LCEventImpl* lcio_event)
 {
   if (parameters.size() >= 0) {
     info() << "Converting EDM4hep to LCIO for " << m_processor->name() << endmsg;
     // Convert parameters through tool
     m_conversionTool = tool<IEDM4hep2LcioTool>("EDM4hep2LcioTool/Converter");
-    StatusCode sc =  m_conversionTool->convertCollections(parameters);
+    StatusCode sc =  m_conversionTool->convertCollections(parameters, lcio_event);
     return sc;
 
   } else {
@@ -243,7 +244,8 @@ StatusCode MarlinProcessorWrapper::execute() {
   DataObject* pObject = nullptr;
   StatusCode  sc      = eventSvc()->retrieveObject("/Event/LCEvent", pObject);
   if (sc.isFailure()) {
-    StatusCode sc_conv = parseConversionParams(m_conversion_params);
+    auto* lcio_event = new lcio::LCEventImpl();
+    StatusCode sc_conv = parseConversionParams(m_conversion_params, lcio_event);
     if (sc_conv.isFailure()) {
       error() << "Failed to retrieve the LCEvent " << endmsg;
     } else {
@@ -251,6 +253,16 @@ StatusCode MarlinProcessorWrapper::execute() {
       return sc_conv;
     }
     return sc;
+  } else if (sc.isSuccess()) {
+    auto addConversionsEvent =
+      static_cast<IMPL::LCEventImpl*>(static_cast<LCEventWrapper*>(pObject)->getEvent());
+    StatusCode sc_conv = parseConversionParams(m_conversion_params, addConversionsEvent);
+    if (sc_conv.isFailure()) {
+      error() << "Error while converting EDM4hep to LCIO " << endmsg;
+    } else {
+      info() << "Converted EDM4hep to LCIO event for " << m_processor->name() << endmsg;
+      return sc_conv;
+    }
   }
 
   auto theEvent = static_cast<LCEventWrapper*>(pObject)->getEvent();
