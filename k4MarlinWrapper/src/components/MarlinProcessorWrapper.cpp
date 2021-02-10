@@ -126,7 +126,7 @@ StatusCode MarlinProcessorWrapper::parseConversionParams(
   const Gaudi::Property<std::vector<std::string>>& parameters,
   lcio::LCEventImpl* lcio_event)
 {
-  if (parameters.size() >= 0) {
+  if (parameters.size() > 0) {
     info() << "Converting EDM4hep to LCIO for " << m_processor->name() << endmsg;
     // Convert parameters through tool
     m_conversionTool = tool<IEDM4hep2LcioTool>("EDM4hep2LcioTool/Converter");
@@ -243,35 +243,32 @@ StatusCode MarlinProcessorWrapper::execute() {
   info() << "Getting the event for " << m_processor->name() << endmsg;
   DataObject* pObject = nullptr;
   StatusCode  sc      = eventSvc()->retrieveObject("/Event/LCEvent", pObject);
+
+  lcio::LCEventImpl* lcio_event = nullptr;
+
   if (sc.isFailure()) {
-    auto* lcio_event = new lcio::LCEventImpl();
-    StatusCode sc_conv = parseConversionParams(m_conversion_params, lcio_event);
-    if (sc_conv.isFailure()) {
-      error() << "Failed to retrieve the LCEvent " << endmsg;
-    } else {
-      info() << "Converted EDM4hep to LCIO event for " << m_processor->name() << endmsg;
-      return sc_conv;
+    lcio_event = new lcio::LCEventImpl();
+    // Register empty event
+    debug() << "Registering conversion EDM4hep to LCIO event in TES" << endmsg;
+    auto pO = std::make_unique<LCEventWrapper>(lcio_event);
+    StatusCode reg_sc = evtSvc()->registerObject("/Event/LCEvent", pO.release());
+    if (reg_sc.isFailure()) {
+      error() << "Failed to store the EDM4hep to LCIO event" << endmsg;
+      return reg_sc;
     }
-    return sc;
-  } else if (sc.isSuccess()) {
-    auto addConversionsEvent =
-      static_cast<IMPL::LCEventImpl*>(static_cast<LCEventWrapper*>(pObject)->getEvent());
-    StatusCode sc_conv = parseConversionParams(m_conversion_params, addConversionsEvent);
-    if (sc_conv.isFailure()) {
-      error() << "Error while converting EDM4hep to LCIO " << endmsg;
-    } else {
-      info() << "Converted EDM4hep to LCIO event for " << m_processor->name() << endmsg;
-      return sc_conv;
-    }
+  } else {
+    debug() << "LCEvent retrieved successfully" << endmsg;
+    lcio_event =
+      dynamic_cast<IMPL::LCEventImpl*>(static_cast<LCEventWrapper*>(pObject)->getEvent());
   }
 
-  auto theEvent = static_cast<LCEventWrapper*>(pObject)->getEvent();
+  StatusCode sc_conv = parseConversionParams(m_conversion_params, lcio_event);
 
   // call the refreshSeeds via the processor manager
   // FIXME: this is an overkill, but we need to call this once per event, not once for each execute call
   // how can this be done more efficiently?
   auto* procMgr = marlin::ProcessorMgr::instance();
-  procMgr->modifyEvent(theEvent);
+  procMgr->modifyEvent(lcio_event);
 
   streamlog::logscope scope(streamlog::out);
   scope.setName(name());
@@ -280,9 +277,9 @@ StatusCode MarlinProcessorWrapper::execute() {
   //process the event in the processor
   auto modifier = dynamic_cast<marlin::EventModifier*>(m_processor);
   if (modifier) {
-    modifier->modifyEvent(theEvent);
+    modifier->modifyEvent(lcio_event);
   } else {
-    m_processor->processEvent(theEvent);
+    m_processor->processEvent(lcio_event);
   }
 
   return StatusCode::SUCCESS;
