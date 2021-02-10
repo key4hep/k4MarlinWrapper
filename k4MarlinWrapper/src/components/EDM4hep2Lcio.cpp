@@ -29,6 +29,11 @@ void EDM4hep2LcioTool::addLCIOConvertedTracks(
     lcio_tr->setdEdx( edm_tr.getDEdx() );
     lcio_tr->setdEdxError( edm_tr.getDEdxError() );
     lcio_tr->setRadiusOfInnermostHit( edm_tr.getRadiusOfInnermostHit() );
+    // FIXME, correctly assign hitnumbers
+    lcio_tr->subdetectorHitNumbers().resize(50);
+    for(int i =0;i<50;++i) {
+      lcio_tr->subdetectorHitNumbers()[i] = 0 ;
+    }
 
     // Loop over the track states in the track
     const podio::RelationRange<edm4hep::TrackState> edm_track_states = edm_tr.getTrackStates();
@@ -261,15 +266,6 @@ StatusCode EDM4hep2LcioTool::convertCollections(
         parameters[i+2],
         lcio_event);
     }
-  }
-
-  // Register LCIO event in TES
-  info() << "Registering converted EDM4hep to LCIO event in TES" << endmsg;
-  auto pO = std::make_unique<LCEventWrapper>(lcio_event);
-  const StatusCode sc = evtSvc()->registerObject("/Event/LCEvent", pO.release());
-  if (sc.isFailure()) {
-    error() << "Failed to store the ConvertedLCEvent" << endmsg;
-    return sc;
   }
 
   return StatusCode::SUCCESS;
