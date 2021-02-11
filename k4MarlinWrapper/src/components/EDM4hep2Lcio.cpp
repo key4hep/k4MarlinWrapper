@@ -39,12 +39,7 @@ void EDM4hep2LcioTool::addLCIOConvertedTracks(
     const podio::RelationRange<edm4hep::TrackState> edm_track_states = edm_tr.getTrackStates();
     for (const auto& tr_state : edm_track_states) {
 
-      std::array<float, 15> cov = {}; // zero-init
-      cov[0]  = tr_state.covMatrix[0];
-      cov[2]  = tr_state.covMatrix[5];
-      cov[5]  = tr_state.covMatrix[9];
-      cov[9]  = tr_state.covMatrix[12];
-      cov[14] = tr_state.covMatrix[14];
+      std::array<float, 15> cov = tr_state.covMatrix;
       std::array<float, 3> refP = {
         tr_state.referencePoint.x, tr_state.referencePoint.y, tr_state.referencePoint.z};
 
