@@ -3,6 +3,23 @@
 
 DECLARE_COMPONENT(EDM4hep2LcioTool);
 
+
+EDM4hep2LcioTool::EDM4hep2LcioTool(const std::string& type, const std::string& name, const IInterface* parent)
+    : GaudiTool(type, name, parent) {
+  declareInterface<IEDM4hep2LcioTool>(this);
+}
+
+EDM4hep2LcioTool::~EDM4hep2LcioTool() { ; }
+
+StatusCode EDM4hep2LcioTool::initialize() {
+  return GaudiTool::initialize();
+}
+
+StatusCode EDM4hep2LcioTool::finalize() {
+  return GaudiTool::finalize();
+}
+
+
 // Add EDM4hep to LCIO converted tracks to vector
 void EDM4hep2LcioTool::addLCIOConvertedTracks(
   std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& lcio_tracks_vec,
@@ -201,7 +218,7 @@ void EDM4hep2LcioTool::addLCIOReconstructedParticles(
 }
 
 
-void EDM4hep2LcioTool::convert_add(
+void EDM4hep2LcioTool::convertAdd(
   const std::string& type,
   const std::string& name,
   const std::string& lcio_collection_name,
@@ -227,7 +244,7 @@ void EDM4hep2LcioTool::convert_add(
 }
 
 
-bool EDM4hep2LcioTool::collection_exist(
+bool EDM4hep2LcioTool::collectionExist(
   const std::string& collection_name,
   lcio::LCEventImpl* lcio_event)
 {
@@ -242,24 +259,22 @@ bool EDM4hep2LcioTool::collection_exist(
 
 
 StatusCode EDM4hep2LcioTool::convertCollections(
-  const Gaudi::Property<std::vector<std::string>>& parameters,
   lcio::LCEventImpl* lcio_event)
 {
-  if (parameters.size() % 3 != 0) {
+  if (m_edm2lcio_params.size() % 3 != 0) {
     error() << " Error processing conversion parameters. 3 arguments per collection expected. " << endmsg;
     return StatusCode::FAILURE;
   }
 
-  for (int i = 0; i < parameters.size(); i=i+3) {
-
-    if (collection_exist(parameters[i+2], lcio_event)) {
-      debug() << " Collection " << parameters[i+2] << " already in place, skipping conversion. " << endmsg;
-    } else {
-      convert_add(
-        parameters[i],
-        parameters[i+1],
-        parameters[i+2],
+  for (int i = 0; i < m_edm2lcio_params.size(); i=i+3) {
+    if (! collectionExist(m_edm2lcio_params[i+2], lcio_event)) {
+      convertAdd(
+        m_edm2lcio_params[i],
+        m_edm2lcio_params[i+1],
+        m_edm2lcio_params[i+2],
         lcio_event);
+    } else {
+      debug() << " Collection " << m_edm2lcio_params[i+2] << " already in place, skipping conversion. " << endmsg;
     }
   }
 

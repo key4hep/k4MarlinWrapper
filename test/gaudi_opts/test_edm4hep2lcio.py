@@ -1,6 +1,6 @@
 from Gaudi.Configuration import *
 
-from Configurables import k4DataSvc, ToolSvc, MarlinProcessorWrapper, EDM4hep2LcioTool
+from Configurables import k4DataSvc, ToolSvc, MarlinProcessorWrapper, EDM4hep2LcioTool, k4LCIOReaderWrapper
 
 algList = []
 
@@ -19,25 +19,54 @@ inp.collections = [
     'EFlowTrack'
 ]
 inp.OutputLevel = DEBUG
+
+
+# EDM4hep2lcio Tool
+edmConvTool = EDM4hep2LcioTool("EDM4hep2lcio")
+edmConvTool.EDM2LCIOConversion = [
+    "edm4hep::TrackCollection", "EFlowTrack", "LCIOCollectionName2",
+    "edm4hep::ReconstructedParticleCollection", "ReconstructedParticles", "TightSelectedPandoraPFOs"
+]
+
+# LCIO2EDM4hep Tool
+lcioConvTool = k4LCIOReaderWrapper("LCIO2EDM4hep")
+lcioConvTool.LCIO2EMD4hepConversion = [
+    # "edm4hep::TrackCollection", "EFlowTrack", "LCIOCollectionName2",
+    "edm4hep::ReconstructedParticleCollection", "TightSelectedPandoraPFOs", "ReconstructedParticles"
+]
+
+MyFastJetProcessor = MarlinProcessorWrapper("MyFastJetProcessor")
+MyFastJetProcessor.OutputLevel = WARNING
+MyFastJetProcessor.ProcessorType = "FastJetProcessor"
+MyFastJetProcessor.Parameters = [
+                                 "algorithm", "ValenciaPlugin", "1.2", "1.0", "0.7", END_TAG,
+                                 "clusteringMode", "ExclusiveNJets", "2", END_TAG,
+                                 "jetOut", "JetsAfterGamGamRemoval", END_TAG,
+                                 "recParticleIn", "TightSelectedPandoraPFOs", END_TAG,
+                                 "recParticleOut", "PFOsFromJets", END_TAG,
+                                 "recombinationScheme", "E_scheme", END_TAG,
+                                 "storeParticlesInJets", "true", END_TAG
+                                 ]
+MyFastJetProcessor.EDMConversionTool=edmConvTool
+MyFastJetProcessor.LCIOConversionTool=lcioConvTool
+
+
+Output_DST = MarlinProcessorWrapper("Output_DST")
+Output_DST.OutputLevel = WARNING
+Output_DST.ProcessorType = "LCIOOutputProcessor"
+Output_DST.Parameters = [
+                         "DropCollectionNames", END_TAG,
+                         "DropCollectionTypes", "MCParticle", "LCRelation", "SimCalorimeterHit", "CalorimeterHit", "SimTrackerHit", "TrackerHit", "TrackerHitPlane", "Track", "ReconstructedParticle", "LCFloatVec", "Clusters", END_TAG,
+                         "FullSubsetCollections", "EfficientMCParticles", "InefficientMCParticles", "MCPhysicsParticles", END_TAG,
+                         "KeepCollectionNames", "MCParticlesSkimmed", "MCPhysicsParticles", "RecoMCTruthLink", "SiTracks", "SiTracks_Refitted", "PandoraClusters", "PandoraPFOs", "SelectedPandoraPFOs", "LooseSelectedPandoraPFOs", "TightSelectedPandoraPFOs", "LE_SelectedPandoraPFOs", "LE_LooseSelectedPandoraPFOs", "LE_TightSelectedPandoraPFOs", "LumiCalClusters", "LumiCalRecoParticles", "BeamCalClusters", "BeamCalRecoParticles", "MergedRecoParticles", "MergedClusters", "RefinedVertexJets", "RefinedVertexJets_rel", "RefinedVertexJets_vtx", "RefinedVertexJets_vtx_RP", "BuildUpVertices", "BuildUpVertices_res", "BuildUpVertices_RP", "BuildUpVertices_res_RP", "BuildUpVertices_V0", "BuildUpVertices_V0_res", "BuildUpVertices_V0_RP", "BuildUpVertices_V0_res_RP", "PrimaryVertices", "PrimaryVertices_res", "PrimaryVertices_RP", "PrimaryVertices_res_RP", "RefinedVertices", "RefinedVertices_RP", "PFOsFromJets", END_TAG,
+                         "LCIOOutputFile", "Output_DST.slcio", END_TAG,
+                         "LCIOWriteMode", "WRITE_NEW", END_TAG
+                         ]
+
+
 algList.append(inp)
-
-ToolSvc.LogLevel = DEBUG
-
-procA = MarlinProcessorWrapper("TestProcessor")
-procA.OutputLevel = DEBUG
-procA.ProcessorType = "AIDAProcessor"
-procA.Parameters = ["FileName", "histograms", END_TAG,
-                    "FileType", "root", END_TAG,
-                    "Compress", "1", END_TAG,
-                    "Verbosity", "DEBUG", END_TAG
-                    ]
-procA.Conversion = ["edm4hep::ReconstructedParticleCollection", "ReconstructedParticles", "LCIOCollectionName1",
-                    "edm4hep::TrackCollection", "EFlowTrack", "LCIOCollectionName2",
-                    "edm4hep::ParticleIDCollection", "ParticleIDs", "LCIOCollectionName3"
-                    ]
-procA.addTool(EDM4hep2LcioTool())
-algList.append(procA)
-
+algList.append(MyFastJetProcessor)
+# algList.append(Output_DST)
 
 from Configurables import ApplicationMgr
 ApplicationMgr( TopAlg = algList,

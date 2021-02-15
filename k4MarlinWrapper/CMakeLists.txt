@@ -49,6 +49,7 @@ gaudi_add_module(MarlinWrapper
     GaudiKernel
     ${LCIO_LIBRARIES}
     ${Marlin_LIBRARIES}
+    k4LCIOReader::k4LCIOReader
 )
 
 target_include_directories(MarlinWrapper PUBLIC
@@ -57,7 +58,7 @@ target_include_directories(MarlinWrapper PUBLIC
   ${LCIO_INCLUDE_DIRS}
 )
 
-# LCIO2EDM4hep
+# EDM4hep2lcio
 gaudi_add_module(EDM4hep2Lcio
   SOURCES
     src/components/EDM4hep2Lcio.cpp
@@ -70,6 +71,25 @@ gaudi_add_module(EDM4hep2Lcio
 )
 
 target_include_directories(EDM4hep2Lcio PUBLIC
+  k4FWCore
+  EDM4HEP::edm4hep
+  k4MarlinWrapper/
+  ${LCIO_INCLUDE_DIRS}
+)
+
+# LCIO2EDM4hep
+gaudi_add_module(k4LCIOReaderWrapper
+  SOURCES
+    src/components/k4LCIOReaderWrapper.cpp
+  LINK
+    GaudiAlgLib
+    GaudiKernel
+    ${LCIO_LIBRARIES}
+    EDM4HEP::edm4hep
+    k4LCIOReader::k4LCIOReader
+)
+
+target_include_directories(k4LCIOReaderWrapper PUBLIC
   k4FWCore
   EDM4HEP::edm4hep
   k4MarlinWrapper/
