@@ -1,8 +1,9 @@
 #ifndef K4MARLINWRAPPER_EDM4HEP2LCIO_H
 #define K4MARLINWRAPPER_EDM4HEP2LCIO_H
 
+
 // GAUDI
-#include "GaudiKernel/AlgTool.h"
+#include "GaudiAlg/GaudiTool.h"
 
 // FWCore
 #include "k4FWCore/DataHandle.h"
@@ -30,17 +31,25 @@
 
 #include <vector>
 #include <string>
-#include <chrono>
 
 // Interface
 #include "IEDM4hep2Lcio.h"
 
 
-class EDM4hep2LcioTool : public extends<AlgTool, IEDM4hep2LcioTool> {
+class EDM4hep2LcioTool : public GaudiTool, virtual public IEDM4hep2LcioTool {
 public:
 
-  // Standard constructor
-  using extends::extends;
+  EDM4hep2LcioTool(const std::string& type, const std::string& name, const IInterface* parent);
+  virtual ~EDM4hep2LcioTool();
+  virtual StatusCode initialize();
+  virtual StatusCode finalize();
+
+  StatusCode convertCollections(
+    lcio::LCEventImpl* lcio_event);
+
+private:
+
+  Gaudi::Property<std::vector<std::string>> m_edm2lcio_params{this, "EDM2LCIOConversion", {}};
 
   // Save pointer to converted element, and pointer to original element in a std::pair
   std::vector<std::pair<
@@ -68,18 +77,14 @@ public:
     const std::string& lcio_collection_name,
     lcio::LCEventImpl* lcio_event);
 
-  void convert_add(
+  void convertAdd(
     const std::string& type,
     const std::string& name,
     const std::string& lcio_collection_name,
     lcio::LCEventImpl* lcio_event);
 
-  bool collection_exist(
+  bool collectionExist(
     const std::string& collection_name,
-    lcio::LCEventImpl* lcio_event);
-
-  StatusCode convertCollections(
-    const Gaudi::Property<std::vector<std::string>>& parameters,
     lcio::LCEventImpl* lcio_event);
 };
 

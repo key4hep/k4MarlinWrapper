@@ -22,6 +22,8 @@
 
 #include <GaudiAlg/GaudiAlgorithm.h>
 
+#include "GaudiKernel/ToolHandle.h"
+
 #include <streamlog/logbuffer.h>
 #include <streamlog/streamlog.h>
 
@@ -29,7 +31,11 @@
 
 #include "util/k4MarlinWrapperUtil.h"
 
+#include <converters/IEDM4hep2Lcio.h>
 #include <converters/EDM4hep2Lcio.h>
+
+#include <converters/Ik4LCIOReaderWrapper.h>
+#include <converters/k4LCIOReaderWrapper.h>
 
 namespace marlin {
   class Processor;
@@ -58,10 +64,6 @@ private:
     std::shared_ptr<marlin::StringParameters>& parameters,
     Gaudi::Property<std::string>& processorTypeStr);
 
-  StatusCode parseConversionParams(
-    const Gaudi::Property<std::vector<std::string>>& parameters,
-    lcio::LCEventImpl* lcio_event);
-
   /// Parse the parameters from the Property
   std::shared_ptr<marlin::StringParameters> parseParameters(
     const Gaudi::Property<std::vector<std::string>>& parameters,
@@ -71,10 +73,9 @@ private:
   Gaudi::Property<std::string> m_processorType{this, "ProcessorType", {}};
   /// Parameters: Dictionary of key and list of strings would be nice, but we just use a vector of strings for the moment
   Gaudi::Property<std::vector<std::string>> m_parameters{this, "Parameters", {}};
-  /// Conversion: List of elements to convert indicated by EDM4hep Type, name of collection and ProcessorType
-  Gaudi::Property<std::vector<std::string>> m_conversion_params{this, "Conversion", {}};
 
-  IEDM4hep2LcioTool* m_conversionTool;
+  ToolHandle<IEDM4hep2LcioTool> m_edm_conversionTool{"IEDM4hep2LcioTool/IEDM4hep2LcioTool", this};
+  ToolHandle<Ik4LCIOReaderWrapper> m_lcio_conversionTool{"Ik4LCIOReaderWrapper/Ik4LCIOReaderWrapper", this};
 
   static std::stack<marlin::Processor*>& ProcessorStack();
 };
