@@ -5,6 +5,7 @@
 // GAUDI
 #include "GaudiAlg/GaudiTool.h"
 
+// k4LCIOReader
 #include "k4LCIOReader/k4LCIOReader.h"
 #include "k4LCIOReader/k4LCIOConverter.h"
 
@@ -16,8 +17,11 @@
 #include "edm4hep/Track.h"
 #include "edm4hep/TrackCollection.h"
 #include "edm4hep/VertexConst.h"
-
 #include "edm4hep/EventHeaderCollection.h"
+
+#include "podio/CollectionBase.h"
+
+#include "EDMCollectionWrapper.h"
 
 // Interface
 #include "Ik4LCIOReaderWrapper.h"

@@ -1,6 +1,6 @@
 from Gaudi.Configuration import *
 
-from Configurables import k4DataSvc, ToolSvc, MarlinProcessorWrapper, EDM4hep2LcioTool, k4LCIOReaderWrapper
+from Configurables import k4DataSvc, MarlinProcessorWrapper, EDM4hep2LcioTool, k4LCIOReaderWrapper
 
 algList = []
 
@@ -31,8 +31,8 @@ edmConvTool.EDM2LCIOConversion = [
 # LCIO2EDM4hep Tool
 lcioConvTool = k4LCIOReaderWrapper("LCIO2EDM4hep")
 lcioConvTool.LCIO2EMD4hepConversion = [
-    # "edm4hep::TrackCollection", "EFlowTrack", "LCIOCollectionName2",
-    "edm4hep::ReconstructedParticleCollection", "TightSelectedPandoraPFOs", "ReconstructedParticles"
+    "EVENT::Track", "LCIOCollectionName2", "EFlowTrack",
+    "EVENT::ReconstructedParticle", "TightSelectedPandoraPFOs", "ReconstructedParticles"
 ]
 
 MyFastJetProcessor = MarlinProcessorWrapper("MyFastJetProcessor")
