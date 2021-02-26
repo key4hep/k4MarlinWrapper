@@ -30,7 +30,6 @@ void k4LCIOReaderWrapper::convertAndRegister(
   T* mycoll = dynamic_cast<T*>(lcio_converter->getCollection(collection_name));
 
   if (mycoll == nullptr) {
-    // debug() << m_lcio2edm_params[i] << " collection was not found." << endmsg;
     mycoll = new T();
     mycoll->setID(id_table->add(collection_name));
   }
@@ -67,18 +66,18 @@ StatusCode k4LCIOReaderWrapper::convertCollections(
   // Convert based on parameters
   for (int i = 0; i < m_lcio2edm_params.size(); i=i+3) {
 
-    // Is the type needed?
-    if (m_lcio2edm_params[i] == "EVENT::ReconstructedParticle") {
+    if (m_lcio2edm_params[i] == "ReconstructedParticle") {
       convertAndRegister<edm4hep::ReconstructedParticleCollection>(
-        "/edm4hep/ReconstructedParticleCollection", m_lcio2edm_params[i+1], lcio_converter, id_table);
-    } else if (m_lcio2edm_params[i] == "EVENT::ParticleID") {
+        m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
+    } else if (m_lcio2edm_params[i] == "ParticleID") {
       convertAndRegister<edm4hep::ParticleIDCollection>(
-        "/edm4hep/ParticleIDCollection", m_lcio2edm_params[i+1], lcio_converter, id_table);
-    } else if (m_lcio2edm_params[i] == "EVENT::Track") {
+        m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
+    } else if (m_lcio2edm_params[i] == "Track") {
       convertAndRegister<edm4hep::TrackCollection>(
-        "/edm4hep/TrackCollection", m_lcio2edm_params[i+1], lcio_converter, id_table);
+        m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
     } else {
-      error() << m_lcio2edm_params[i] << " conversion type not supported." << endmsg;
+      error() << m_lcio2edm_params[i] << ": conversion type not supported." << endmsg;
+      error() << "List of supported types: Track, ParticleID, ReconstructedParticle." << endmsg;
     }
 
   }

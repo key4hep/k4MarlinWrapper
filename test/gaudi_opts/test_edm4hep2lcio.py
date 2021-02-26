@@ -24,15 +24,15 @@ inp.OutputLevel = DEBUG
 # EDM4hep2lcio Tool
 edmConvTool = EDM4hep2LcioTool("EDM4hep2lcio")
 edmConvTool.EDM2LCIOConversion = [
-    "edm4hep::TrackCollection", "EFlowTrack", "LCIOCollectionName2",
-    "edm4hep::ReconstructedParticleCollection", "ReconstructedParticles", "TightSelectedPandoraPFOs"
+    "Track", "EFlowTrack", "LCIOCollectionName2",
+    "ReconstructedParticle", "ReconstructedParticles", "TightSelectedPandoraPFOs"
 ]
 
 # LCIO2EDM4hep Tool
 lcioConvTool = k4LCIOReaderWrapper("LCIO2EDM4hep")
 lcioConvTool.LCIO2EMD4hepConversion = [
-    "EVENT::Track", "LCIOCollectionName2", "EFlowTrack",
-    "EVENT::ReconstructedParticle", "TightSelectedPandoraPFOs", "ReconstructedParticles"
+    "Track", "LCIOCollectionName2", "EFlowTrack1",
+    "ReconstructedParticle", "TightSelectedPandoraPFOs", "ReconstructedParticles1"
 ]
 
 MyFastJetProcessor = MarlinProcessorWrapper("MyFastJetProcessor")
