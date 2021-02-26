@@ -42,6 +42,13 @@ private:
 
   Gaudi::Property<std::vector<std::string>> m_lcio2edm_params{this, "LCIO2EMD4hepConversion", {}};
 
+  template <typename T>
+  void convertAndRegister(
+    const std::string& register_name,
+    const std::string& collection_name,
+    k4LCIOConverter* lcio_converter,
+    podio::CollectionIDTable* id_table) const;
+
 };
 
 #endif
