@@ -224,13 +224,15 @@ void EDM4hep2LcioTool::convertAdd(
   const std::string& lcio_collection_name,
   lcio::LCEventImpl* lcio_event)
 {
-  if (type == "edm4hep::TrackCollection") {
+
+  // Types are edm4hep::<Name>Collection
+  if (type == "Track") {
     addLCIOConvertedTracks(lcio_tracks_vec, name, lcio_collection_name, lcio_event);
   } else
-  if (type == "edm4hep::ParticleIDCollection") {
+  if (type == "ParticleID") {
     addLCIOParticleIDs(lcio_particleIDs_vec, name, lcio_collection_name, lcio_event);
   } else
-  if (type == "edm4hep::ReconstructedParticleCollection") {
+  if (type == "ReconstructedParticle") {
     addLCIOReconstructedParticles(
       lcio_rec_particles_vec,
       lcio_particleIDs_vec,
@@ -240,6 +242,7 @@ void EDM4hep2LcioTool::convertAdd(
       lcio_event);
   } else {
     error() << "Error trying to convert requested " << type << " with name " << name << endmsg;
+    error() << "List of supported types: Track, ParticleID, ReconstructedParticle." << endmsg;
   }
 }
 
