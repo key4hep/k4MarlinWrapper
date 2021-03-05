@@ -46,7 +46,7 @@ private:
   std::map<std::string, DataObjectHandleBase*> m_dataHandlesMap;
 
   template <typename T>
-  void convertAndRegister(
+  void covertPut(
     const std::string& register_name,
     const std::string& collection_name,
     k4LCIOConverter* lcio_converter,
