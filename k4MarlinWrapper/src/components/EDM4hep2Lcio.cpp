@@ -22,7 +22,7 @@ StatusCode EDM4hep2LcioTool::finalize() {
 
 // Add EDM4hep to LCIO converted tracks to vector
 void EDM4hep2LcioTool::addLCIOConvertedTracks(
-  std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& lcio_tracks_vec,
+  std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& m_lcio_tracks_vec,
   const std::string& name,
   const std::string& lcio_collection_name,
   lcio::LCEventImpl* lcio_event)
@@ -75,7 +75,7 @@ void EDM4hep2LcioTool::addLCIOConvertedTracks(
     }
 
     // Save intermediate tracks ref
-    lcio_tracks_vec.emplace_back(
+    m_lcio_tracks_vec.emplace_back(
       std::make_pair(lcio_tr, edm_tr)
     );
 
@@ -88,8 +88,62 @@ void EDM4hep2LcioTool::addLCIOConvertedTracks(
 }
 
 
+
+// Add EDM4hep to LCIO converted vertex to vector
+void EDM4hep2LcioTool::addLCIOVertices(
+  std::vector<std::pair<lcio::VertexImpl*, edm4hep::Vertex>>& m_lcio_vertex_vec,
+  const std::string& name,
+  const std::string& lcio_collection_name,
+  lcio::LCEventImpl* lcio_event)
+{
+  DataHandle<edm4hep::VertexCollection> vertex_handle {
+    name, Gaudi::DataHandle::Reader, this};
+  const auto vertex_coll = vertex_handle.get();
+
+  auto* vertices = new lcio::LCCollectionVec(lcio::LCIO::VERTEX);
+
+  // Loop over EDM4hep vertex converting them to lcio vertex
+  for (int i = 0; i < vertex_coll->size(); ++i) {
+
+    const edm4hep::Vertex edm_vertex = (*vertex_coll)[i];
+
+    auto* lcio_vertex = new lcio::VertexImpl();
+    lcio_vertex->setPrimary( edm_vertex.getPrimary() );
+    #warning "AlgoritymType conversion from int to string"
+    lcio_vertex->setAlgorithmType( std::string{edm_vertex.getAlgorithmType()} ); // TODO std::string(int)
+    lcio_vertex->setChi2( edm_vertex.getChi2() );
+    lcio_vertex->setProbability( edm_vertex.getProbability() );
+    lcio_vertex->setPosition( edm_vertex.getPosition()[0], edm_vertex.getPosition()[1], edm_vertex.getPosition()[2]  );
+    lcio_vertex->setCovMatrix( edm_vertex.getCovMatrix().data() );
+
+    // Associated particle to the vertex
+    edm4hep::ConstReconstructedParticle vertex_rp = edm_vertex.getAssociatedParticle();
+    if (vertex_rp.isAvailable()) {
+      // TODO add rp
+    }
+
+    for (int i=0; i < edm_vertex.parameters_size(); ++i) {
+      lcio_vertex->addParameter(edm_vertex.getParameters(i));
+    }
+
+    // Save intermediate vertex ref
+    m_lcio_vertex_vec.emplace_back(
+      std::make_pair(lcio_vertex, edm_vertex)
+    );
+
+    // Add to lcio tracks collection
+    vertices->addElement(lcio_vertex);
+  }
+
+  // Add all tracks to event
+  lcio_event->addCollection(vertices, lcio_collection_name);
+}
+
+
+
+
 void EDM4hep2LcioTool::addLCIOParticleIDs(
-  std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& lcio_particleIDs_vec,
+  std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& m_lcio_particleIDs_vec,
   const std::string& name,
   const std::string& lcio_collection_name,
   lcio::LCEventImpl* lcio_event)
@@ -117,7 +171,7 @@ void EDM4hep2LcioTool::addLCIOParticleIDs(
       lcio_pID->addParameter(param);
     }
 
-    lcio_particleIDs_vec.emplace_back(
+    m_lcio_particleIDs_vec.emplace_back(
       std::make_pair(lcio_pID, edm_pid)
     );
 
@@ -131,9 +185,9 @@ void EDM4hep2LcioTool::addLCIOParticleIDs(
 
 
 void EDM4hep2LcioTool::addLCIOReconstructedParticles(
-  std::vector<std::pair<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>>& lcio_rec_particles_vec,
-  const std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& lcio_particleIDs_vec,
-  const std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& lcio_tracks_vec,
+  std::vector<std::pair<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>>& m_lcio_rec_particles_vec,
+  const std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& m_lcio_particleIDs_vec,
+  const std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& m_lcio_tracks_vec,
   const std::string& name,
   const std::string& lcio_collection_name,
   lcio::LCEventImpl* lcio_event)
@@ -165,7 +219,7 @@ void EDM4hep2LcioTool::addLCIOReconstructedParticles(
       // ParticleID
       edm4hep::ConstParticleID pIDUsed = edm_rp.getParticleIDUsed();
       if (pIDUsed.isAvailable()) {
-        for (auto& particleID : lcio_particleIDs_vec) {
+        for (auto& particleID : m_lcio_particleIDs_vec) {
           if (particleID.second == pIDUsed) {
             lcio_recp->setParticleIDUsed(particleID.first);
             break;
@@ -197,7 +251,7 @@ void EDM4hep2LcioTool::addLCIOReconstructedParticles(
     // Tracks
     for (int j=0; j < edm_rp.tracks_size(); ++j) {
       edm4hep::ConstTrack edm_rp_tr = edm_rp.getTracks(j);
-      for (auto& track : lcio_tracks_vec) {
+      for (auto& track : m_lcio_tracks_vec) {
         if (track.second == edm_rp_tr) {
           lcio_recp->addTrack(track.first);
         }
@@ -205,7 +259,7 @@ void EDM4hep2LcioTool::addLCIOReconstructedParticles(
     }
 
     // Add converted LCIO RecoParticle, and associated EDM4hep RecoParticle
-    lcio_rec_particles_vec.emplace_back(
+    m_lcio_rec_particles_vec.emplace_back(
       std::make_pair(lcio_recp, edm_rp)
     );
 
@@ -227,16 +281,19 @@ void EDM4hep2LcioTool::convertAdd(
 
   // Types are edm4hep::<Name>Collection
   if (type == "Track") {
-    addLCIOConvertedTracks(lcio_tracks_vec, name, lcio_collection_name, lcio_event);
+    addLCIOConvertedTracks(m_lcio_tracks_vec, name, lcio_collection_name, lcio_event);
   } else
   if (type == "ParticleID") {
-    addLCIOParticleIDs(lcio_particleIDs_vec, name, lcio_collection_name, lcio_event);
+    addLCIOParticleIDs(m_lcio_particleIDs_vec, name, lcio_collection_name, lcio_event);
+  } else
+  if (type == "Vertex") {
+    addLCIOVertices(m_lcio_vertex_vec, name, lcio_collection_name, lcio_event);
   } else
   if (type == "ReconstructedParticle") {
     addLCIOReconstructedParticles(
-      lcio_rec_particles_vec,
-      lcio_particleIDs_vec,
-      lcio_tracks_vec,
+      m_lcio_rec_particles_vec,
+      m_lcio_particleIDs_vec,
+      m_lcio_tracks_vec,
       name,
       lcio_collection_name,
       lcio_event);

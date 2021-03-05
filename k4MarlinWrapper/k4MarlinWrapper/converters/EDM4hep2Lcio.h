@@ -15,7 +15,8 @@
 #include "edm4hep/ReconstructedParticleData.h"
 #include "edm4hep/Track.h"
 #include "edm4hep/TrackCollection.h"
-#include "edm4hep/VertexConst.h"
+#include "edm4hep/Vertex.h"
+#include "edm4hep/VertexCollection.h"
 
 // LCIO
 #include <LCEventWrapper.h>
@@ -53,26 +54,36 @@ private:
 
   // Save pointer to converted element, and pointer to original element in a std::pair
   std::vector<std::pair<
-    lcio::TrackImpl*, edm4hep::Track>> lcio_tracks_vec;
+    lcio::TrackImpl*, edm4hep::Track>> m_lcio_tracks_vec;
   std::vector<std::pair<
-    lcio::ParticleIDImpl*, edm4hep::ParticleID>> lcio_particleIDs_vec;
+    lcio::VertexImpl*, edm4hep::Vertex>> m_lcio_vertex_vec;
   std::vector<std::pair<
-    lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>> lcio_rec_particles_vec;
+    lcio::ParticleIDImpl*, edm4hep::ParticleID>> m_lcio_particleIDs_vec;
+  std::vector<std::pair<
+    lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>> m_lcio_rec_particles_vec;
 
   void addLCIOConvertedTracks(
-    std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& lcio_tracks_vec,
+    std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& m_lcio_tracks_vec,
     const std::string& name,
     const std::string& lcio_collection_name,
     lcio::LCEventImpl* lcio_event);
+
+  void addLCIOVertices(
+    std::vector<std::pair<lcio::VertexImpl*, edm4hep::Vertex>>& m_lcio_vertex_vec,
+    const std::string& name,
+    const std::string& lcio_collection_name,
+    lcio::LCEventImpl* lcio_event);
+
   void addLCIOParticleIDs(
-    std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& lcio_particleIDs_vec,
+    std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& m_lcio_particleIDs_vec,
     const std::string& name,
     const std::string& lcio_collection_name,
     lcio::LCEventImpl* lcio_event);
+
   void addLCIOReconstructedParticles(
-    std::vector<std::pair<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>>& lcio_rec_particles_vec,
-    const std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& lcio_particleIDs_vec,
-    const std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& lcio_tracks_vec,
+    std::vector<std::pair<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>>& m_lcio_rec_particles_vec,
+    const std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& m_lcio_particleIDs_vec,
+    const std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& m_lcio_tracks_vec,
     const std::string& name,
     const std::string& lcio_collection_name,
     lcio::LCEventImpl* lcio_event);
