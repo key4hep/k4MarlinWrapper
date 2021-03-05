@@ -18,7 +18,8 @@
 #include "edm4hep/ReconstructedParticleData.h"
 #include "edm4hep/Track.h"
 #include "edm4hep/TrackCollection.h"
-#include "edm4hep/VertexConst.h"
+#include "edm4hep/Vertex.h"
+#include "edm4hep/VertexCollection.h"
 #include "edm4hep/EventHeaderCollection.h"
 
 #include "podio/CollectionBase.h"

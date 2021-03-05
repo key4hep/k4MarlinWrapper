@@ -299,7 +299,7 @@ void EDM4hep2LcioTool::convertAdd(
       lcio_event);
   } else {
     error() << "Error trying to convert requested " << type << " with name " << name << endmsg;
-    error() << "List of supported types: Track, ParticleID, ReconstructedParticle." << endmsg;
+    error() << "List of supported types: Track, Vertex, ParticleID, ReconstructedParticle." << endmsg;
   }
 }
 

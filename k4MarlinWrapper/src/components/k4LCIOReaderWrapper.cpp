@@ -26,12 +26,15 @@ StatusCode k4LCIOReaderWrapper::initialize() {
     } else if (m_lcio2edm_params[i] == "ParticleID") {
       m_dataHandlesMap[m_lcio2edm_params[i+2]] =
         new DataHandle<edm4hep::ParticleIDCollection>(m_lcio2edm_params[i+2], Gaudi::DataHandle::Writer, this);
+    } else if (m_lcio2edm_params[i] == "Vertex") {
+      m_dataHandlesMap[m_lcio2edm_params[i+2]] =
+        new DataHandle<edm4hep::VertexCollection>(m_lcio2edm_params[i+2], Gaudi::DataHandle::Writer, this);
     } else if (m_lcio2edm_params[i] == "Track") {
       m_dataHandlesMap[m_lcio2edm_params[i+2]] =
         new DataHandle<edm4hep::TrackCollection>(m_lcio2edm_params[i+2], Gaudi::DataHandle::Writer, this);
     } else {
       debug() << m_lcio2edm_params[i] << ": conversion type not supported." << endmsg;
-      debug() << "List of supported types: Track, ParticleID, ReconstructedParticle." << endmsg;
+      debug() << "List of supported types: Track, Vertex, ParticleID, ReconstructedParticle." << endmsg;
     }
   }
 
@@ -95,12 +98,15 @@ StatusCode k4LCIOReaderWrapper::convertCollections(
     } else if (m_lcio2edm_params[i] == "ParticleID") {
       convertAndRegister<edm4hep::ParticleIDCollection>(
         m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
+    } else if (m_lcio2edm_params[i] == "Vertex") {
+      convertAndRegister<edm4hep::VertexCollection>(
+        m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
     } else if (m_lcio2edm_params[i] == "Track") {
       convertAndRegister<edm4hep::TrackCollection>(
         m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
     } else {
       error() << m_lcio2edm_params[i] << ": conversion type not supported." << endmsg;
-      error() << "List of supported types: Track, ParticleID, ReconstructedParticle." << endmsg;
+      error() << "List of supported types: Track, Vertex, ParticleID, ReconstructedParticle." << endmsg;
     }
 
   }
