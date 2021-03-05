@@ -2,6 +2,8 @@
 #define K4MARLINWRAPPER_K4LCIOREADERWRAPPER_H
 
 
+#include "k4FWCore/DataHandle.h"
+
 // GAUDI
 #include "GaudiAlg/GaudiTool.h"
 
@@ -20,8 +22,6 @@
 #include "edm4hep/EventHeaderCollection.h"
 
 #include "podio/CollectionBase.h"
-
-#include "EDMCollectionWrapper.h"
 
 // Interface
 #include "Ik4LCIOReaderWrapper.h"
@@ -42,12 +42,14 @@ private:
 
   Gaudi::Property<std::vector<std::string>> m_lcio2edm_params{this, "LCIO2EMD4hepConversion", {}};
 
+  std::map<std::string, DataObjectHandleBase*> m_dataHandlesMap;
+
   template <typename T>
   void convertAndRegister(
     const std::string& register_name,
     const std::string& collection_name,
     k4LCIOConverter* lcio_converter,
-    podio::CollectionIDTable* id_table) const;
+    podio::CollectionIDTable* id_table);
 
 };
 
