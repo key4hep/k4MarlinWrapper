@@ -34,6 +34,7 @@ lcioConvTool.LCIO2EMD4hepConversion = [
     "Track", "LCIOCollectionName2", "EFlowTrack1",
     "ReconstructedParticle", "TightSelectedPandoraPFOs", "ReconstructedParticles1"
 ]
+lcioConvTool.OutputLevel = DEBUG
 
 MyFastJetProcessor = MarlinProcessorWrapper("MyFastJetProcessor")
 MyFastJetProcessor.OutputLevel = WARNING
@@ -64,9 +65,16 @@ Output_DST.Parameters = [
                          ]
 
 
+from Configurables import PodioOutput
+out = PodioOutput("PodioOutput", filename = "output_k4SimDelphes.root")
+out.outputCommands = ["keep *"]
+
+# ApplicationMgr().TopAlg += [out]
+
 algList.append(inp)
 algList.append(MyFastJetProcessor)
 # algList.append(Output_DST)
+algList.append(out)
 
 from Configurables import ApplicationMgr
 ApplicationMgr( TopAlg = algList,

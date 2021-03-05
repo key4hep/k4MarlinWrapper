@@ -86,6 +86,7 @@ gaudi_add_module(k4LCIOReaderWrapper
     GaudiKernel
     ${LCIO_LIBRARIES}
     EDM4HEP::edm4hep
+    k4FWCore::k4FWCore
     k4LCIOReader::k4LCIOReader
 )
 

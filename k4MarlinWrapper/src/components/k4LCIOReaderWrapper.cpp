@@ -12,6 +12,29 @@ k4LCIOReaderWrapper::~k4LCIOReaderWrapper() { ; }
 
 
 StatusCode k4LCIOReaderWrapper::initialize() {
+
+  if (m_lcio2edm_params.size() % 3 != 0) {
+    error() << " Error processing conversion parameters. 3 arguments per collection expected. " << endmsg;
+    return StatusCode::FAILURE;
+  }
+
+  // Initialize DataHandles and add them to vector
+  for (int i = 0; i < m_lcio2edm_params.size(); i=i+3) {
+    if (m_lcio2edm_params[i] == "ReconstructedParticle") {
+      m_dataHandlesMap[m_lcio2edm_params[i+2]] =
+        new DataHandle<edm4hep::ReconstructedParticleCollection>(m_lcio2edm_params[i+2], Gaudi::DataHandle::Writer, this);
+    } else if (m_lcio2edm_params[i] == "ParticleID") {
+      m_dataHandlesMap[m_lcio2edm_params[i+2]] =
+        new DataHandle<edm4hep::ParticleIDCollection>(m_lcio2edm_params[i+2], Gaudi::DataHandle::Writer, this);
+    } else if (m_lcio2edm_params[i] == "Track") {
+      m_dataHandlesMap[m_lcio2edm_params[i+2]] =
+        new DataHandle<edm4hep::TrackCollection>(m_lcio2edm_params[i+2], Gaudi::DataHandle::Writer, this);
+    } else {
+      debug() << m_lcio2edm_params[i] << ": conversion type not supported." << endmsg;
+      debug() << "List of supported types: Track, ParticleID, ReconstructedParticle." << endmsg;
+    }
+  }
+
   return GaudiTool::initialize();
 }
 
@@ -21,23 +44,23 @@ StatusCode k4LCIOReaderWrapper::finalize() {
 
 template <typename T>
 void k4LCIOReaderWrapper::convertAndRegister(
-  const std::string& register_name,
-  const std::string& collection_name,
+  const std::string& edm_name,
+  const std::string& lcio_name,
   k4LCIOConverter* lcio_converter,
-  podio::CollectionIDTable* id_table) const
+  podio::CollectionIDTable* id_table)
 {
   // Pass name of collection to get
-  T* mycoll = dynamic_cast<T*>(lcio_converter->getCollection(collection_name));
+  T* mycoll = dynamic_cast<T*>(lcio_converter->getCollection(lcio_name));
 
-  if (mycoll == nullptr) {
+  auto* handle = dynamic_cast<DataHandle<T>*>( m_dataHandlesMap[edm_name] );
+  if ( mycoll and handle->initialized() ) {
+    handle->put(mycoll);
+  } else {
+    debug() << "Collection conversion for " << lcio_name << " returned nullptr: creating empty collection." << endmsg;
     mycoll = new T();
-    mycoll->setID(id_table->add(collection_name));
+    mycoll->setID(id_table->add(lcio_name));
   }
 
-  // Register collection
-  EDMCollectionWrapper<T> mycoll_wrapper {mycoll};
-  auto pO = std::make_unique<EDMCollectionWrapper<T>>(mycoll_wrapper);
-  StatusCode reg_sc = evtSvc()->registerObject(register_name, pO.release());
 }
 
 
