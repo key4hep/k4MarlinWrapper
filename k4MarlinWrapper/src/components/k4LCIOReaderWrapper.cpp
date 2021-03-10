@@ -50,7 +50,7 @@ StatusCode k4LCIOReaderWrapper::finalize() {
 }
 
 template <typename T>
-void k4LCIOReaderWrapper::covertPut(
+void k4LCIOReaderWrapper::convertPut(
   const std::string& edm_name,
   const std::string& lcio_name,
   k4LCIOConverter* lcio_converter,
@@ -85,23 +85,23 @@ StatusCode k4LCIOReaderWrapper::convertCollections(
   k4LCIOConverter* lcio_converter = new k4LCIOConverter(id_table);
   lcio_converter->set(the_event);
 
-  covertPut<edm4hep::EventHeaderCollection>(
+  convertPut<edm4hep::EventHeaderCollection>(
     "EventHeader", "EventHeader", lcio_converter, id_table);
 
   // Convert based on parameters
   for (int i = 0; i < m_lcio2edm_params.size(); i=i+3) {
 
     if (m_lcio2edm_params[i] == "ReconstructedParticle") {
-      covertPut<edm4hep::ReconstructedParticleCollection>(
+      convertPut<edm4hep::ReconstructedParticleCollection>(
         m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
     } else if (m_lcio2edm_params[i] == "ParticleID") {
-      covertPut<edm4hep::ParticleIDCollection>(
+      convertPut<edm4hep::ParticleIDCollection>(
         m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
     } else if (m_lcio2edm_params[i] == "Vertex") {
-      covertPut<edm4hep::VertexCollection>(
+      convertPut<edm4hep::VertexCollection>(
         m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
     } else if (m_lcio2edm_params[i] == "Track") {
-      covertPut<edm4hep::TrackCollection>(
+      convertPut<edm4hep::TrackCollection>(
         m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
     } else {
       error() << m_lcio2edm_params[i] << ": conversion type not supported." << endmsg;
