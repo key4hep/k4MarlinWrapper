@@ -92,6 +92,7 @@ void EDM4hep2LcioTool::addLCIOConvertedTracks(
 // Add EDM4hep to LCIO converted vertex to vector
 void EDM4hep2LcioTool::addLCIOVertices(
   std::vector<std::pair<lcio::VertexImpl*, edm4hep::Vertex>>& m_lcio_vertex_vec,
+  const std::vector<std::pair<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>>& m_lcio_rec_particles_vec,
   const std::string& name,
   const std::string& lcio_collection_name,
   lcio::LCEventImpl* lcio_event)
@@ -113,13 +114,18 @@ void EDM4hep2LcioTool::addLCIOVertices(
     lcio_vertex->setAlgorithmType( std::string{edm_vertex.getAlgorithmType()} ); // TODO std::string(int)
     lcio_vertex->setChi2( edm_vertex.getChi2() );
     lcio_vertex->setProbability( edm_vertex.getProbability() );
-    lcio_vertex->setPosition( edm_vertex.getPosition()[0], edm_vertex.getPosition()[1], edm_vertex.getPosition()[2]  );
+    lcio_vertex->setPosition( edm_vertex.getPosition()[0], edm_vertex.getPosition()[1], edm_vertex.getPosition()[2] );
     lcio_vertex->setCovMatrix( edm_vertex.getCovMatrix().data() );
 
     // Associated particle to the vertex
     edm4hep::ConstReconstructedParticle vertex_rp = edm_vertex.getAssociatedParticle();
     if (vertex_rp.isAvailable()) {
-      // TODO add rp
+      for (auto& rp : m_lcio_rec_particles_vec) {
+        if (rp.second == vertex_rp) {
+          lcio_vertex->setAssociatedParticle(rp.first);
+          break;
+        }
+      }
     }
 
     for (int i=0; i < edm_vertex.parameters_size(); ++i) {
@@ -331,7 +337,7 @@ void EDM4hep2LcioTool::convertAdd(
     addLCIOParticleIDs(m_lcio_particleIDs_vec, name, lcio_collection_name, lcio_event);
   } else
   if (type == "Vertex") {
-    addLCIOVertices(m_lcio_vertex_vec, name, lcio_collection_name, lcio_event);
+    addLCIOVertices(m_lcio_vertex_vec, m_lcio_rec_particles_vec, name, lcio_collection_name, lcio_event);
   } else
   if (type == "ReconstructedParticle") {
     addLCIOReconstructedParticles(
