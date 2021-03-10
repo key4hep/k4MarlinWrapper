@@ -188,6 +188,7 @@ void EDM4hep2LcioTool::addLCIOReconstructedParticles(
   std::vector<std::pair<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>>& m_lcio_rec_particles_vec,
   const std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& m_lcio_particleIDs_vec,
   const std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& m_lcio_tracks_vec,
+  const std::vector<std::pair<lcio::VertexImpl*, edm4hep::Vertex>>& m_lcio_vertex_vec,
   const std::string& name,
   const std::string& lcio_collection_name,
   lcio::LCEventImpl* lcio_event)
@@ -231,29 +232,19 @@ void EDM4hep2LcioTool::addLCIOReconstructedParticles(
     // Associated Vertex
     edm4hep::ConstVertex vertex = edm_rp.getStartVertex();
     if (vertex.isAvailable()) {
-      auto* lcio_vertex = new lcio::VertexImpl;
-      lcio_vertex->setPrimary( vertex.getPrimary() );
-      #warning "AlgoritymType conversion from int to string"
-      lcio_vertex->setAlgorithmType( std::string{vertex.getAlgorithmType()} ); // TODO std::string(int)
-      lcio_vertex->setChi2( vertex.getChi2() );
-      lcio_vertex->setProbability( vertex.getProbability() );
-      lcio_vertex->setPosition( vertex.getPosition()[0], vertex.getPosition()[1], vertex.getPosition()[2]  );
-      lcio_vertex->setCovMatrix( vertex.getCovMatrix().data() );
-      lcio_recp->setStartVertex(lcio_vertex);
-
-      // Associated particle to the vertex
-      edm4hep::ConstReconstructedParticle vertex_rp = vertex.getAssociatedParticle();
-      if (vertex_rp.isAvailable()) {
-        // TODO add rp
+      for (auto& lcio_vertex : m_lcio_vertex_vec) {
+        if (lcio_vertex.second == vertex) {
+          lcio_recp->setStartVertex(lcio_vertex.first);
+        }
       }
     }
 
-    // Tracks
+    // Associated Tracks
     for (int j=0; j < edm_rp.tracks_size(); ++j) {
       edm4hep::ConstTrack edm_rp_tr = edm_rp.getTracks(j);
-      for (auto& track : m_lcio_tracks_vec) {
-        if (track.second == edm_rp_tr) {
-          lcio_recp->addTrack(track.first);
+      for (auto& lcio_track : m_lcio_tracks_vec) {
+        if (lcio_track.second == edm_rp_tr) {
+          lcio_recp->addTrack(lcio_track.first);
         }
       }
     }
@@ -294,6 +285,7 @@ void EDM4hep2LcioTool::convertAdd(
       m_lcio_rec_particles_vec,
       m_lcio_particleIDs_vec,
       m_lcio_tracks_vec,
+      m_lcio_vertex_vec,
       name,
       lcio_collection_name,
       lcio_event);
