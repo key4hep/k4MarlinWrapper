@@ -304,7 +304,6 @@ void EDM4hep2LcioTool::FillMissingCollections(
     }
 
     // Tracks
-    // Add all tracks if
     if (rp_pair.first->getTracks().size() != rp_pair.second.tracks_size()) {
       assert(rp_pair.first->getTracks().size() == 0);
       for (int i=0; i < rp_pair.second.tracks_size(); ++i) {
@@ -313,6 +312,22 @@ void EDM4hep2LcioTool::FillMissingCollections(
           if (lcio_track.second == edm_rp_tr) {
             rp_pair.first->addTrack(lcio_track.first);
             break;
+          }
+        }
+      }
+    }
+
+  }
+
+  // Fill missing Vertices
+  for (auto& vertex_pair : m_lcio_vertex_vec) {
+
+    // Reconstructed Particle
+    if (vertex_pair.first->getAssociatedParticle() == nullptr) {
+      if (vertex_pair.second.getAssociatedParticle().isAvailable()) {
+        for (auto& rp : m_lcio_rec_particles_vec) {
+          if (rp.second == vertex_pair.second.getAssociatedParticle()) {
+            vertex_pair.first->setAssociatedParticle(rp.first);
           }
         }
       }
