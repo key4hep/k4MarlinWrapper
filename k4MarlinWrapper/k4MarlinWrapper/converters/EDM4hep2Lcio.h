@@ -89,6 +89,12 @@ private:
     const std::string& lcio_collection_name,
     lcio::LCEventImpl* lcio_event);
 
+  void FillMissingCollections(
+    std::vector<std::pair<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>>& m_lcio_rec_particles_vec,
+    const std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& m_lcio_particleIDs_vec,
+    const std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& m_lcio_tracks_vec,
+    const std::vector<std::pair<lcio::VertexImpl*, edm4hep::Vertex>>& m_lcio_vertex_vec);
+
   void convertAdd(
     const std::string& type,
     const std::string& name,
