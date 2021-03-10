@@ -70,6 +70,7 @@ private:
 
   void addLCIOVertices(
     std::vector<std::pair<lcio::VertexImpl*, edm4hep::Vertex>>& m_lcio_vertex_vec,
+    const std::vector<std::pair<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>>& m_lcio_rec_particles_vec,
     const std::string& name,
     const std::string& lcio_collection_name,
     lcio::LCEventImpl* lcio_event);
