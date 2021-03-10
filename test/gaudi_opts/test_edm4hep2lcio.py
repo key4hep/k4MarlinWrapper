@@ -31,8 +31,8 @@ edmConvTool.EDM2LCIOConversion = [
 # LCIO2EDM4hep Tool
 lcioConvTool = k4LCIOReaderWrapper("LCIO2EDM4hep")
 lcioConvTool.LCIO2EMD4hepConversion = [
-    "Track", "LCIOCollectionName2", "EFlowTrack1",
-    "ReconstructedParticle", "TightSelectedPandoraPFOs", "ReconstructedParticles1"
+    "Track", "LCIOCollectionName2", "MYEFlowTrack1",
+    "ReconstructedParticle", "TightSelectedPandoraPFOs", "MYReconstructedParticles1"
 ]
 lcioConvTool.OutputLevel = DEBUG
 
