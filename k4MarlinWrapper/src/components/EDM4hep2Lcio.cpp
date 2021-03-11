@@ -21,14 +21,14 @@ StatusCode EDM4hep2LcioTool::finalize() {
 
 
 // Add EDM4hep to LCIO converted tracks to vector
-void EDM4hep2LcioTool::addLCIOConvertedTracks(
-  std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& m_lcio_tracks_vec,
-  const std::string& name,
-  const std::string& lcio_collection_name,
+void EDM4hep2LcioTool::convertLCIOTracks(
+  std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& tracks_vec,
+  const std::string& e4h_coll_name,
+  const std::string& lcio_coll_name,
   lcio::LCEventImpl* lcio_event)
 {
   DataHandle<edm4hep::TrackCollection> tracks_handle {
-    name, Gaudi::DataHandle::Reader, this};
+    e4h_coll_name, Gaudi::DataHandle::Reader, this};
   const auto tracks_coll = tracks_handle.get();
 
   auto* tracks = new lcio::LCCollectionVec(lcio::LCIO::TRACK);
@@ -75,7 +75,7 @@ void EDM4hep2LcioTool::addLCIOConvertedTracks(
     }
 
     // Save intermediate tracks ref
-    m_lcio_tracks_vec.emplace_back(
+    tracks_vec.emplace_back(
       std::make_pair(lcio_tr, edm_tr)
     );
 
@@ -84,21 +84,21 @@ void EDM4hep2LcioTool::addLCIOConvertedTracks(
   }
 
   // Add all tracks to event
-  lcio_event->addCollection(tracks, lcio_collection_name);
+  lcio_event->addCollection(tracks, lcio_coll_name);
 }
 
 
 
 // Add EDM4hep to LCIO converted vertex to vector
-void EDM4hep2LcioTool::addLCIOVertices(
-  std::vector<std::pair<lcio::VertexImpl*, edm4hep::Vertex>>& m_lcio_vertex_vec,
-  const std::vector<std::pair<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>>& m_lcio_rec_particles_vec,
-  const std::string& name,
-  const std::string& lcio_collection_name,
+void EDM4hep2LcioTool::convertLCIOVertices(
+  std::vector<std::pair<lcio::VertexImpl*, edm4hep::Vertex>>& vertex_vec,
+  const std::vector<std::pair<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>>& recoparticles_vec,
+  const std::string& e4h_name,
+  const std::string& lcio_coll_name,
   lcio::LCEventImpl* lcio_event)
 {
   DataHandle<edm4hep::VertexCollection> vertex_handle {
-    name, Gaudi::DataHandle::Reader, this};
+    e4h_name, Gaudi::DataHandle::Reader, this};
   const auto vertex_coll = vertex_handle.get();
 
   auto* vertices = new lcio::LCCollectionVec(lcio::LCIO::VERTEX);
@@ -120,7 +120,7 @@ void EDM4hep2LcioTool::addLCIOVertices(
     // Associated particle to the vertex
     edm4hep::ConstReconstructedParticle vertex_rp = edm_vertex.getAssociatedParticle();
     if (vertex_rp.isAvailable()) {
-      for (auto& rp : m_lcio_rec_particles_vec) {
+      for (auto& rp : recoparticles_vec) {
         if (rp.second == vertex_rp) {
           lcio_vertex->setAssociatedParticle(rp.first);
           break;
@@ -133,7 +133,7 @@ void EDM4hep2LcioTool::addLCIOVertices(
     }
 
     // Save intermediate vertex ref
-    m_lcio_vertex_vec.emplace_back(
+    vertex_vec.emplace_back(
       std::make_pair(lcio_vertex, edm_vertex)
     );
 
@@ -142,21 +142,21 @@ void EDM4hep2LcioTool::addLCIOVertices(
   }
 
   // Add all tracks to event
-  lcio_event->addCollection(vertices, lcio_collection_name);
+  lcio_event->addCollection(vertices, lcio_coll_name);
 }
 
 
 
 
-void EDM4hep2LcioTool::addLCIOParticleIDs(
-  std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& m_lcio_particleIDs_vec,
-  const std::string& name,
-  const std::string& lcio_collection_name,
+void EDM4hep2LcioTool::convertLCIOParticleIDs(
+  std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& particleIDs_vec,
+  const std::string& e4h_coll_name,
+  const std::string& lcio_coll_name,
   lcio::LCEventImpl* lcio_event)
 {
   // ParticleIDs handle
   DataHandle<edm4hep::ParticleIDCollection> pIDs_handle {
-    name, Gaudi::DataHandle::Reader, this};
+    e4h_coll_name, Gaudi::DataHandle::Reader, this};
   const auto pIDs_coll = pIDs_handle.get();
 
   auto* particleIDs = new lcio::LCCollectionVec(lcio::LCIO::PARTICLEID);
@@ -177,7 +177,7 @@ void EDM4hep2LcioTool::addLCIOParticleIDs(
       lcio_pID->addParameter(param);
     }
 
-    m_lcio_particleIDs_vec.emplace_back(
+    particleIDs_vec.emplace_back(
       std::make_pair(lcio_pID, edm_pid)
     );
 
@@ -186,22 +186,22 @@ void EDM4hep2LcioTool::addLCIOParticleIDs(
   }
 
   // Add all particles to event
-  lcio_event->addCollection(particleIDs, lcio_collection_name);
+  lcio_event->addCollection(particleIDs, lcio_coll_name);
 }
 
 
-void EDM4hep2LcioTool::addLCIOReconstructedParticles(
-  std::vector<std::pair<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>>& m_lcio_rec_particles_vec,
-  const std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& m_lcio_particleIDs_vec,
-  const std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& m_lcio_tracks_vec,
-  const std::vector<std::pair<lcio::VertexImpl*, edm4hep::Vertex>>& m_lcio_vertex_vec,
-  const std::string& name,
-  const std::string& lcio_collection_name,
+void EDM4hep2LcioTool::convertLCIOReconstructedParticles(
+  std::vector<std::pair<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>>& recoparticles_vec,
+  const std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& particleIDs_vec,
+  const std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& tracks_vec,
+  const std::vector<std::pair<lcio::VertexImpl*, edm4hep::Vertex>>& vertex_vec,
+  const std::string& e4h_coll_name,
+  const std::string& lcio_coll_name,
   lcio::LCEventImpl* lcio_event)
 {
   // ReconstructedParticles handle
   DataHandle<edm4hep::ReconstructedParticleCollection> recos_handle {
-    name, Gaudi::DataHandle::Reader, this};
+    e4h_coll_name, Gaudi::DataHandle::Reader, this};
   const auto recos_coll = recos_handle.get();
 
   auto* recops = new lcio::LCCollectionVec(lcio::LCIO::RECONSTRUCTEDPARTICLE);
@@ -223,10 +223,10 @@ void EDM4hep2LcioTool::addLCIOReconstructedParticles(
       lcio_recp->setReferencePoint(rp);
       lcio_recp->setGoodnessOfPID(edm_rp.getGoodnessOfPID());
 
-      // Associated ParticleID
+      // Link associated ParticleID
       edm4hep::ConstParticleID pIDUsed = edm_rp.getParticleIDUsed();
       if (pIDUsed.isAvailable()) {
-        for (auto& particleID : m_lcio_particleIDs_vec) {
+        for (auto& particleID : particleIDs_vec) {
           if (particleID.second == pIDUsed) {
             lcio_recp->setParticleIDUsed(particleID.first);
             break;
@@ -234,10 +234,10 @@ void EDM4hep2LcioTool::addLCIOReconstructedParticles(
         }
       }
 
-      // Associated Vertex
+      // Link associated Vertex
       edm4hep::ConstVertex vertex = edm_rp.getStartVertex();
       if (vertex.isAvailable()) {
-        for (auto& lcio_vertex : m_lcio_vertex_vec) {
+        for (auto& lcio_vertex : vertex_vec) {
           if (lcio_vertex.second == vertex) {
             lcio_recp->setStartVertex(lcio_vertex.first);
             break;
@@ -245,10 +245,10 @@ void EDM4hep2LcioTool::addLCIOReconstructedParticles(
         }
       }
 
-      // Associated Tracks
+      // Link associated Tracks
       for (int j=0; j < edm_rp.tracks_size(); ++j) {
         edm4hep::ConstTrack edm_rp_tr = edm_rp.getTracks(j);
-        for (auto& lcio_track : m_lcio_tracks_vec) {
+        for (auto& lcio_track : tracks_vec) {
           if (lcio_track.second == edm_rp_tr) {
             lcio_recp->addTrack(lcio_track.first);
             break;
@@ -257,8 +257,8 @@ void EDM4hep2LcioTool::addLCIOReconstructedParticles(
       }
     }
 
-    // Add converted LCIO RecoParticle, and associated EDM4hep RecoParticle
-    m_lcio_rec_particles_vec.emplace_back(
+    // Add converted LCIO RecoParticle ptr, and original EDM4hep RecoParticle
+    recoparticles_vec.push_back(
       std::make_pair(lcio_recp, edm_rp)
     );
 
@@ -267,24 +267,21 @@ void EDM4hep2LcioTool::addLCIOReconstructedParticles(
   }
 
   // Add all reconstructed particles to event
-  lcio_event->addCollection(recops, lcio_collection_name);
+  lcio_event->addCollection(recops, lcio_coll_name);
 }
 
 
 void EDM4hep2LcioTool::FillMissingCollections(
-  std::vector<std::pair<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>>& m_lcio_rec_particles_vec,
-  const std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& m_lcio_particleIDs_vec,
-  const std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& m_lcio_tracks_vec,
-  const std::vector<std::pair<lcio::VertexImpl*, edm4hep::Vertex>>& m_lcio_vertex_vec)
+  CollectionsPairVectors& collection_pairs)
 {
 
   // Fill missing ReconstructedParticle collections
-  for (auto& rp_pair : m_lcio_rec_particles_vec) {
+  for (auto& rp_pair : collection_pairs.recoparticles) {
 
-    // Particle ID
+    // Link ParticleID
     if (rp_pair.first->getParticleIDUsed() == nullptr) {
       if (rp_pair.second.getParticleIDUsed().isAvailable()) {
-        for (auto& particleID : m_lcio_particleIDs_vec) {
+        for (auto& particleID : collection_pairs.particleIDs) {
           if (particleID.second == rp_pair.second.getParticleIDUsed()) {
             rp_pair.first->setParticleIDUsed(particleID.first);
           }
@@ -292,10 +289,10 @@ void EDM4hep2LcioTool::FillMissingCollections(
       }
     }
 
-    // Vertex
+    // Link Vertex
     if (rp_pair.first->getStartVertex() == nullptr) {
       if (rp_pair.second.getStartVertex().isAvailable()) {
-        for (auto& vertex : m_lcio_vertex_vec) {
+        for (auto& vertex : collection_pairs.vertices) {
           if (vertex.second == rp_pair.second.getStartVertex()) {
             rp_pair.first->setStartVertex(vertex.first);
           }
@@ -303,12 +300,12 @@ void EDM4hep2LcioTool::FillMissingCollections(
       }
     }
 
-    // Tracks
+    // Link Tracks
     if (rp_pair.first->getTracks().size() != rp_pair.second.tracks_size()) {
       assert(rp_pair.first->getTracks().size() == 0);
       for (int i=0; i < rp_pair.second.tracks_size(); ++i) {
         edm4hep::ConstTrack edm_rp_tr = rp_pair.second.getTracks(i);
-        for (auto& lcio_track : m_lcio_tracks_vec) {
+        for (auto& lcio_track : collection_pairs.tracks) {
           if (lcio_track.second == edm_rp_tr) {
             rp_pair.first->addTrack(lcio_track.first);
             break;
@@ -319,52 +316,66 @@ void EDM4hep2LcioTool::FillMissingCollections(
 
   }
 
-  // Fill missing Vertices
-  for (auto& vertex_pair : m_lcio_vertex_vec) {
+  // Fill missing Vertices collections
+  for (auto& vertex_pair : collection_pairs.vertices) {
 
-    // Reconstructed Particle
+    // Link Reconstructed Particles
     if (vertex_pair.first->getAssociatedParticle() == nullptr) {
       if (vertex_pair.second.getAssociatedParticle().isAvailable()) {
-        for (auto& rp : m_lcio_rec_particles_vec) {
-          if (rp.second == vertex_pair.second.getAssociatedParticle()) {
-            vertex_pair.first->setAssociatedParticle(rp.first);
+        for (auto& rp_pair : collection_pairs.recoparticles) {
+          if (rp_pair.second == vertex_pair.second.getAssociatedParticle()) {
+            vertex_pair.first->setAssociatedParticle(rp_pair.first);
           }
         }
       }
     }
-
   }
+
 }
 
 
 void EDM4hep2LcioTool::convertAdd(
   const std::string& type,
-  const std::string& name,
-  const std::string& lcio_collection_name,
-  lcio::LCEventImpl* lcio_event)
+  const std::string& e4h_coll_name,
+  const std::string& lcio_coll_name,
+  lcio::LCEventImpl* lcio_event,
+  CollectionsPairVectors& collection_pairs)
 {
 
   // Types are edm4hep::<Name>Collection
   if (type == "Track") {
-    addLCIOConvertedTracks(m_lcio_tracks_vec, name, lcio_collection_name, lcio_event);
+    convertLCIOTracks(
+      collection_pairs.tracks,
+      e4h_coll_name,
+      lcio_coll_name,
+      lcio_event);
   } else
   if (type == "ParticleID") {
-    addLCIOParticleIDs(m_lcio_particleIDs_vec, name, lcio_collection_name, lcio_event);
+    convertLCIOParticleIDs(
+      collection_pairs.particleIDs,
+      e4h_coll_name,
+      lcio_coll_name,
+      lcio_event);
   } else
   if (type == "Vertex") {
-    addLCIOVertices(m_lcio_vertex_vec, m_lcio_rec_particles_vec, name, lcio_collection_name, lcio_event);
+    convertLCIOVertices(
+      collection_pairs.vertices,
+      collection_pairs.recoparticles,
+      e4h_coll_name,
+      lcio_coll_name,
+      lcio_event);
   } else
   if (type == "ReconstructedParticle") {
-    addLCIOReconstructedParticles(
-      m_lcio_rec_particles_vec,
-      m_lcio_particleIDs_vec,
-      m_lcio_tracks_vec,
-      m_lcio_vertex_vec,
-      name,
-      lcio_collection_name,
+    convertLCIOReconstructedParticles(
+      collection_pairs.recoparticles,
+      collection_pairs.particleIDs,
+      collection_pairs.tracks,
+      collection_pairs.vertices,
+      e4h_coll_name,
+      lcio_coll_name,
       lcio_event);
   } else {
-    error() << "Error trying to convert requested " << type << " with name " << name << endmsg;
+    error() << "Error trying to convert requested " << type << " with name " << e4h_coll_name << endmsg;
     error() << "List of supported types: Track, Vertex, ParticleID, ReconstructedParticle." << endmsg;
   }
 }
@@ -392,23 +403,23 @@ StatusCode EDM4hep2LcioTool::convertCollections(
     return StatusCode::FAILURE;
   }
 
+  CollectionsPairVectors collection_pairs {};
+
   for (int i = 0; i < m_edm2lcio_params.size(); i=i+3) {
     if (! collectionExist(m_edm2lcio_params[i+2], lcio_event)) {
       convertAdd(
         m_edm2lcio_params[i],
         m_edm2lcio_params[i+1],
         m_edm2lcio_params[i+2],
-        lcio_event);
+        lcio_event,
+        collection_pairs);
     } else {
       debug() << " Collection " << m_edm2lcio_params[i+2] << " already in place, skipping conversion. " << endmsg;
     }
   }
 
   FillMissingCollections(
-    m_lcio_rec_particles_vec,
-    m_lcio_particleIDs_vec,
-    m_lcio_tracks_vec,
-    m_lcio_vertex_vec);
+    collection_pairs);
 
   return StatusCode::SUCCESS;
 }
