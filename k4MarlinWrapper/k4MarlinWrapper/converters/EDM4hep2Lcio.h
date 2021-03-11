@@ -37,6 +37,17 @@
 #include "IEDM4hep2Lcio.h"
 
 
+struct CollectionsPairVectors {
+  std::vector<std::pair<
+    lcio::TrackImpl*, edm4hep::Track>> tracks;
+  std::vector<std::pair<
+    lcio::VertexImpl*, edm4hep::Vertex>> vertices;
+  std::vector<std::pair<
+    lcio::ParticleIDImpl*, edm4hep::ParticleID>> particleIDs;
+  std::vector<std::pair<
+    lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>> recoparticles;
+};
+
 class EDM4hep2LcioTool : public GaudiTool, virtual public IEDM4hep2LcioTool {
 public:
 
@@ -52,55 +63,43 @@ private:
 
   Gaudi::Property<std::vector<std::string>> m_edm2lcio_params{this, "EDM2LCIOConversion", {}};
 
-  // Save pointer to converted element, and pointer to original element in a std::pair
-  std::vector<std::pair<
-    lcio::TrackImpl*, edm4hep::Track>> m_lcio_tracks_vec;
-  std::vector<std::pair<
-    lcio::VertexImpl*, edm4hep::Vertex>> m_lcio_vertex_vec;
-  std::vector<std::pair<
-    lcio::ParticleIDImpl*, edm4hep::ParticleID>> m_lcio_particleIDs_vec;
-  std::vector<std::pair<
-    lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>> m_lcio_rec_particles_vec;
-
-  void addLCIOConvertedTracks(
-    std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& m_lcio_tracks_vec,
-    const std::string& name,
-    const std::string& lcio_collection_name,
+  void convertLCIOTracks(
+    std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& tracks_vec,
+    const std::string& e4h_coll_name,
+    const std::string& lcio_coll_name,
     lcio::LCEventImpl* lcio_event);
 
-  void addLCIOVertices(
-    std::vector<std::pair<lcio::VertexImpl*, edm4hep::Vertex>>& m_lcio_vertex_vec,
-    const std::vector<std::pair<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>>& m_lcio_rec_particles_vec,
-    const std::string& name,
-    const std::string& lcio_collection_name,
+  void convertLCIOVertices(
+    std::vector<std::pair<lcio::VertexImpl*, edm4hep::Vertex>>& vertex_vec,
+    const std::vector<std::pair<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>>& recoparticles_vec,
+    const std::string& e4h_name,
+    const std::string& lcio_coll_name,
     lcio::LCEventImpl* lcio_event);
 
-  void addLCIOParticleIDs(
-    std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& m_lcio_particleIDs_vec,
-    const std::string& name,
-    const std::string& lcio_collection_name,
+  void convertLCIOParticleIDs(
+    std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& particleIDs_vec,
+    const std::string& e4h_coll_name,
+    const std::string& lcio_coll_name,
     lcio::LCEventImpl* lcio_event);
 
-  void addLCIOReconstructedParticles(
-    std::vector<std::pair<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>>& m_lcio_rec_particles_vec,
-    const std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& m_lcio_particleIDs_vec,
-    const std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& m_lcio_tracks_vec,
-    const std::vector<std::pair<lcio::VertexImpl*, edm4hep::Vertex>>& m_lcio_vertex_vec,
-    const std::string& name,
-    const std::string& lcio_collection_name,
+  void convertLCIOReconstructedParticles(
+    std::vector<std::pair<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>>& recoparticles_vec,
+    const std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& particleIDs_vec,
+    const std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& tracks_vec,
+    const std::vector<std::pair<lcio::VertexImpl*, edm4hep::Vertex>>& vertex_vec,
+    const std::string& e4h_coll_name,
+    const std::string& lcio_coll_name,
     lcio::LCEventImpl* lcio_event);
 
   void FillMissingCollections(
-    std::vector<std::pair<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>>& m_lcio_rec_particles_vec,
-    const std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& m_lcio_particleIDs_vec,
-    const std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& m_lcio_tracks_vec,
-    const std::vector<std::pair<lcio::VertexImpl*, edm4hep::Vertex>>& m_lcio_vertex_vec);
+    CollectionsPairVectors& collection_pairs);
 
   void convertAdd(
     const std::string& type,
-    const std::string& name,
-    const std::string& lcio_collection_name,
-    lcio::LCEventImpl* lcio_event);
+    const std::string& e4h_coll_name,
+    const std::string& lcio_coll_name,
+    lcio::LCEventImpl* lcio_event,
+    CollectionsPairVectors& collection_pairs);
 
   bool collectionExist(
     const std::string& collection_name,
