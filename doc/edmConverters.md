@@ -1,0 +1,178 @@
+# Event Data Model converters
+
+The converters are implemented as Gaudi Tools: these can be attached to any Gaudi Algorithm defined in the options file.
+
+## Reading events
+
+Read **EDM4hep** events:
+
+1. Instantiate the Event Service from k4FWCore: `k4DataSvc`
+2. Indicate the event file to read.
+3. Then use the algorithm `PodioInput` to select the collections to read by their name.
+4. Add the algorithm `PodioInput` to the algorithm list.
+
+```python
+from Configurables import k4DataSvc, PodioInput
+
+# 1
+evtsvc = k4DataSvc('EventDataSvc')
+# 2
+evtsvc.input = 'path/to/file.root' 
+
+# 3
+inp = PodioInput('InputReader')
+inp.collections = [
+    'ReconstructedParticles',
+    'EFlowTrack'
+]
+inp.OutputLevel = DEBUG
+
+# 4
+algList.append(inp)
+```
+
+===
+
+Read **LCIO** events:
+
+1. Instantiate the Event Data Service.
+2. Use `LcioEvent` and indicate the event file to read.
+3. Add the algorithm `LcioEvent` to the algorithm list.
+
+```python
+from Configurables import EventDataSvc, LcioEvent
+
+# 1
+evtsvc = EventDataSvc()
+
+# 2
+read = LcioEvent()
+read.OutputLevel = DEBUG
+read.Files = ["path/to/file.slcio"]
+
+# 3
+algList.append(read)
+```
+
+## Writing events
+
+Write **EDM4hep** events:
+
+1. Instantiate `PodioOutput` and indicate event file to write.
+2. Select command for `PodioOutput`.
+3. Add the `PodioOutput` to the algorithm list.
+
+```python
+from Configurables import PodioOutput
+
+# 1
+out = PodioOutput("PodioOutput", filename = "my_output.root")
+# 2
+out.outputCommands = ["keep *"]
+
+# 3
+algList.append(out)
+```
+
+===
+
+Write **LCIO** events: 
+
+1. Instantiate a `MarlinProcessorWrapper` with a relevant name.
+2. Indicate the `ProcessorType` to be `LCIOOutputProcessor`.
+3. Indicate the relevant parameters for the Marlin Processor.
+4. Add the `MarlinProcessorWrapper` to the algorithm list.
+
+```python
+from Configurables import MarlinProcessorWrapper
+
+# 1
+Output_DST = MarlinProcessorWrapper("Output_DST")
+Output_DST.OutputLevel = WARNING
+# 2
+Output_DST.ProcessorType = "LCIOOutputProcessor"
+# 3
+Output_DST.Parameters = [
+                         "DropCollectionNames", END_TAG,
+                         "DropCollectionTypes", "MCParticle", "LCRelation", "SimCalorimeterHit",
+                         ...
+                         ]
+
+# 4                         
+algList.append(Output_DST)                         
+```
+
+
+## Event Data Model converters
+
+Note and review the following when using the converters:
+
+- Collection names must be unique.
+- If using the `PodioInput` to read events: collection names must be indicated both in the `PodioInput` and the `EDM4hep2LcioTool`.
+- The first argument that corresponds to the collection type refers to the underlying data type.
+  + For example: in EDM4hep, `ReconstructedParticle` will be resolved to `edm4hep::ReconstructedParticleCollection`.
+- If a converted collection is used later by a Gaudi Algorithm, and this Gaudi Algorithm indicates the use of that collection in the `Parameters`, the converted collection name must match the name indicated in the Gaudi Algorithm `Parameters`.
+  + For example: A collection may be converted with the following parameters: `"ReconstructedParticle", "ReconstructedParticles", "ReconstructedParticleLCIO"`
+  + A Gaudi Algorithm may indicate in their `Parameters`: `"PFOCollection", "ReconstructedParticleLCIO", END_TAG,`
+
+###  EDM4hep to LCIO converter
+
+Collections from events that are already read, or are produced by a Gaudi Algorithm can be converted from EDM4hep to LCIO format:
+
+1. Instantiate the `EDM4hep2LcioTool` Gaudi Tool.
+2. Indicate the collections to convert in `EDM2LCIOConversion`.
+  + Arguments are read in groups of 3: collection type, name of the collection, name of the converted collection.
+3. Select the Gaudi Algorithm that will convert the indicated collections.
+4. Add the Tool to the Gaudi Algorithm.
+
+```python
+from Configurables import ToolSvc, EDM4hep2LcioTool
+
+# 1
+edmConvTool = EDM4hep2LcioTool("EDM4hep2lcio")
+# 2
+edmConvTool.EDM2LCIOConversion = [
+    "Track", "EFlowTrack", "EFlowTrack_LCIO",
+    "ReconstructedParticle", "ReconstructedParticles", "ReconstructedParticle_LCIO"
+]
+edmConvTool.OutputLevel = DEBUG
+
+# 3
+InitDD4hep = MarlinProcessorWrapper("InitDD4hep")
+
+# 4
+InitDD4hep.EDMConversionTool=edmConvTool
+```
+
+## LCIO to EDM4hep converter
+
+Collections from events that are already read, or are produced by a gaudi Algorithm can be converted from LCIO to EDM4hep format:
+
+1. Instantiate the `k4LCIOReaderWrapper` Gaudi Tool.
+2. Indicate the collections to convert in `LCIO2EMD4hepConversion`.
+  + Arguments are read in groups of 3: collection type, name of the collection, name of the converted collection.
+3. Select the Gaudi Algorithm that will convert the indicated collections.
+4. Add the Tool to the Gaudi Algorithm.
+
+```python
+from Configurables import ToolSvc, k4LCIOReaderWrapper
+
+# 1
+lcioConvTool = k4LCIOReaderWrapper("LCIO2EDM4hep")
+# 2
+lcioConvTool.LCIO2EMD4hepConversion = [
+    "Track", "EFlowTrackConv", "EFlowTrackEDM",
+    "ReconstructedParticle", "ReconstructedParticle", "ReconstructedParticlesEDM",
+    "Vertex", "BuildUpVertices", "BuildUpVerticesEDM",
+    "Vertex", "PrimaryVertices", "PrimaryVerticesEDM"
+]
+lcioConvTool.OutputLevel = DEBUG
+
+# 3
+JetClusteringAndRefiner = MarlinProcessorWrapper("JetClusteringAndRefiner")
+
+# 4
+JetClusteringAndRefiner.LCIOConversionTool=lcioConvTool
+```
+
+
