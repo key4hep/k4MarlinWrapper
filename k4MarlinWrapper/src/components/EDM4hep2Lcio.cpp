@@ -89,9 +89,59 @@ void EDM4hep2LcioTool::convertLCIOTracks(
 
 
 // Add EDM4hep to LCIO converted clusters to vector
+void EDM4hep2LcioTool::convertLCIOCalorimeterHits(
+  std::vector<std::pair<lcio::CalorimeterHitImpl*, edm4hep::CalorimeterHit>>& calo_hits_vec,
+  const std::string& e4h_coll_name,
+  const std::string& lcio_coll_name,
+  lcio::LCEventImpl* lcio_event)
+{
+  DataHandle<edm4hep::CalorimeterHitCollection> calohit_handle {
+    e4h_coll_name, Gaudi::DataHandle::Reader, this};
+  const auto calohit_coll = calohit_handle.get();
+
+  auto* calohits = new lcio::LCCollectionVec(lcio::LCIO::CALORIMETERHIT);
+
+  for (auto i = 0; i < calohit_coll->size(); ++i) {
+
+    const edm4hep::CalorimeterHit edm_calohit = (*calohit_coll)[i];
+
+    auto* lcio_calohit = new lcio::CalorimeterHitImpl();
+
+    #warning "Splitting unsigned long long into two ints"
+    unsigned long long combined_value = edm_calohit.getCellID();
+    int* combined_value_int_ptr = (int*) combined_value;
+    lcio_calohit->setCellID0(combined_value_int_ptr[0]);
+    lcio_calohit->setCellID1(combined_value_int_ptr[1]);
+    lcio_calohit->setEnergy(edm_calohit.getEnergy());
+    lcio_calohit->setEnergyError(edm_calohit.getEnergyError());
+    lcio_calohit->setTime(edm_calohit.getTime());
+    std::array<float, 3> positions {edm_calohit.getPosition()[0], edm_calohit.getPosition()[1], edm_calohit.getPosition()[2]};
+    lcio_calohit->setPosition(positions.data());
+    lcio_calohit->setType(edm_calohit.getType());
+
+    // TODO
+    // lcio_calohit->setRawHit(EVENT::LCObject* rawHit );
+
+    // Save Calorimeter Hits LCIO and EDM4hep collections
+    calo_hits_vec.emplace_back(
+      std::make_pair(lcio_calohit, edm_calohit)
+    );
+
+    // Add to lcio tracks collection
+    calohits->addElement(lcio_calohit);
+  }
+
+  // Add all Calorimeter Hits to event
+  lcio_event->addCollection(calohits, lcio_coll_name);
+}
+
+
+
+// Add EDM4hep to LCIO converted clusters to vector
 void EDM4hep2LcioTool::convertLCIOClusters(
   std::vector<std::pair<lcio::ClusterImpl*, edm4hep::Cluster>>& cluster_vec,
   const std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& particleIDs_vec,
+  const std::vector<std::pair<lcio::CalorimeterHitImpl*, edm4hep::CalorimeterHit>>& calohits_vec,
   const std::string& e4h_coll_name,
   const std::string& lcio_coll_name,
   lcio::LCEventImpl* lcio_event)
@@ -145,8 +195,19 @@ void EDM4hep2LcioTool::convertLCIOClusters(
       }
     }
 
-    // TODO
-    // lcio_cluster->addHit(EVENT::CalorimeterHit* hit  , float contribution) ;
+    // Link associated Calorimeter Hits, and Hit Contributions
+    if (edm_cluster.hits_size() == edm_cluster.hitContributions_size()) {
+      for (int j=0; j < edm_cluster.hits_size(); ++j) {
+        if (edm_cluster.getHits(j).isAvailable()) {
+          for (auto& hit : calohits_vec) {
+            if (hit.second == edm_cluster.getHits(j)) {
+              lcio_cluster->addHit(
+                hit.first, edm_cluster.getHitContributions(j));
+            }
+          }
+        }
+      }
+    }
 
     // Save intermediate cluster ref
     cluster_vec.emplace_back(
@@ -476,6 +537,21 @@ void EDM4hep2LcioTool::FillMissingCollections(
       }
     }
 
+    // Link associated Calorimeter Hits, and Hit Contributions
+    if (cluster_pair.first->getCalorimeterHits().size() != cluster_pair.second.hits_size()) {
+      assert(cluster_pair.first->getCalorimeterHits().size() == 0);
+      for (int i=0; i < cluster_pair.second.hits_size(); ++i) {
+        auto edm_cluster_hit = cluster_pair.second.getHits(i);
+        auto edm_cluster_contribution = cluster_pair.second.getHitContributions(i);
+        for (auto& lcio_hit : collection_pairs.calohits) {
+          if (lcio_hit.second == edm_cluster_hit) {
+            cluster_pair.first->addHit(
+              lcio_hit.first, edm_cluster_contribution);
+          }
+        }
+      }
+    }
+
   } // clusters
 
 }
@@ -497,10 +573,18 @@ void EDM4hep2LcioTool::convertAdd(
       lcio_coll_name,
       lcio_event);
   } else
+  if (type == "CalorimeterHit") {
+    convertLCIOCalorimeterHits(
+      collection_pairs.calohits,
+      e4h_coll_name,
+      lcio_coll_name,
+      lcio_event);
+  } else
   if (type == "Cluster") {
     convertLCIOClusters(
       collection_pairs.clusters,
       collection_pairs.particleIDs,
+      collection_pairs.calohits,
       e4h_coll_name,
       lcio_coll_name,
       lcio_event);
@@ -532,7 +616,7 @@ void EDM4hep2LcioTool::convertAdd(
       lcio_event);
   } else {
     error() << "Error trying to convert requested " << type << " with name " << e4h_coll_name << endmsg;
-    error() << "List of supported types: Track, Cluster, Vertex, ParticleID, ReconstructedParticle." << endmsg;
+    error() << "List of supported types: Track, Cluster, CalorimeterHit, Vertex, ParticleID, ReconstructedParticle." << endmsg;
   }
 }
 
