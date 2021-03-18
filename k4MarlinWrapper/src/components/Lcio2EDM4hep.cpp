@@ -46,6 +46,11 @@ StatusCode Lcio2EDM4hepTool::initialize() {
 }
 
 StatusCode Lcio2EDM4hepTool::finalize() {
+
+  for (const auto& [key, val] : m_dataHandlesMap) {
+    delete val;
+  }
+
   return GaudiTool::finalize();
 }
 
