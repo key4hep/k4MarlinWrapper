@@ -6,7 +6,7 @@ DECLARE_COMPONENT(EDM4hep2LcioTool);
 
 EDM4hep2LcioTool::EDM4hep2LcioTool(const std::string& type, const std::string& name, const IInterface* parent)
     : GaudiTool(type, name, parent) {
-  declareInterface<IEDM4hep2LcioTool>(this);
+  declareInterface<IEDMConverter>(this);
 }
 
 EDM4hep2LcioTool::~EDM4hep2LcioTool() { ; }

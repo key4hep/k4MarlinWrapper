@@ -31,11 +31,9 @@
 
 #include "util/k4MarlinWrapperUtil.h"
 
-#include <converters/IEDM4hep2Lcio.h>
+#include <converters/IEDMConverter.h>
 #include <converters/EDM4hep2Lcio.h>
-
-#include <converters/Ik4LCIOReaderWrapper.h>
-#include <converters/k4LCIOReaderWrapper.h>
+#include <converters/Lcio2EDM4hep.h>
 
 namespace marlin {
   class Processor;
@@ -74,8 +72,8 @@ private:
   /// Parameters: Dictionary of key and list of strings would be nice, but we just use a vector of strings for the moment
   Gaudi::Property<std::vector<std::string>> m_parameters{this, "Parameters", {}};
 
-  ToolHandle<IEDM4hep2LcioTool> m_edm_conversionTool{"IEDM4hep2LcioTool/IEDM4hep2LcioTool", this};
-  ToolHandle<Ik4LCIOReaderWrapper> m_lcio_conversionTool{"Ik4LCIOReaderWrapper/Ik4LCIOReaderWrapper", this};
+  ToolHandle<IEDMConverter> m_edm_conversionTool{"IEDMConverter/EDM4hep2Lcio", this};
+  ToolHandle<IEDMConverter> m_lcio_conversionTool{"IEDMConverter/Lcio2EDM4hep", this};
 
   static std::stack<marlin::Processor*>& ProcessorStack();
 };

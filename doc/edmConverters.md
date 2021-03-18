@@ -117,6 +117,7 @@ Note and review the following when using the converters:
 - If using the `PodioInput` to read events: collection names must be indicated both in the `PodioInput` and the `EDM4hep2LcioTool`.
 - The first argument that corresponds to the collection type refers to the underlying data type.
   + For example: in EDM4hep, `ReconstructedParticle` will be resolved to `edm4hep::ReconstructedParticleCollection`.
+- Collections not indicated to be converted **will not** be converted even if its a dependency from an indicated collection to be converted.
 - If a converted collection is used later by a Gaudi Algorithm, and this Gaudi Algorithm indicates the use of that collection in the `Parameters`, the converted collection name must match the name indicated in the Gaudi Algorithm `Parameters`.
   + For example: A collection may be converted with the following parameters: `"ReconstructedParticle", "ReconstructedParticles", "ReconstructedParticleLCIO"`
   + A Gaudi Algorithm may indicate in their `Parameters`: `"PFOCollection", "ReconstructedParticleLCIO", END_TAG,`

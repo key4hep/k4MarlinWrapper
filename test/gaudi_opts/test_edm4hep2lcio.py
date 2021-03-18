@@ -1,6 +1,6 @@
 from Gaudi.Configuration import *
 
-from Configurables import k4DataSvc, MarlinProcessorWrapper, EDM4hep2LcioTool, k4LCIOReaderWrapper
+from Configurables import k4DataSvc, MarlinProcessorWrapper, EDM4hep2LcioTool, Lcio2EDM4hepTool
 
 algList = []
 
@@ -48,8 +48,8 @@ MyFastJetProcessor.Parameters = [
                                  "recombinationScheme", "E_scheme", END_TAG,
                                  "storeParticlesInJets", "true", END_TAG
                                  ]
-MyFastJetProcessor.EDMConversionTool=edmConvTool
-MyFastJetProcessor.LCIOConversionTool=lcioConvTool
+MyFastJetProcessor.EDM4hep2LcioTool=edmConvTool
+MyFastJetProcessor.Lcio2EDM4hepTool=lcioConvTool
 
 
 Output_DST = MarlinProcessorWrapper("Output_DST")

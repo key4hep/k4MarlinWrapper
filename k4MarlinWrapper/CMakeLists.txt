@@ -78,9 +78,9 @@ target_include_directories(EDM4hep2Lcio PUBLIC
 )
 
 # LCIO2EDM4hep
-gaudi_add_module(k4LCIOReaderWrapper
+gaudi_add_module(Lcio2EDM4hep
   SOURCES
-    src/components/k4LCIOReaderWrapper.cpp
+    src/components/Lcio2EDM4hep.cpp
   LINK
     GaudiAlgLib
     GaudiKernel
@@ -90,7 +90,7 @@ gaudi_add_module(k4LCIOReaderWrapper
     k4LCIOReader::k4LCIOReader
 )
 
-target_include_directories(k4LCIOReaderWrapper PUBLIC
+target_include_directories(Lcio2EDM4hep PUBLIC
   k4FWCore
   EDM4HEP::edm4hep
   k4MarlinWrapper/
