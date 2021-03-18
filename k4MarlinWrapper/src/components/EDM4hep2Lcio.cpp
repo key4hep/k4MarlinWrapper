@@ -356,6 +356,21 @@ void EDM4hep2LcioTool::convertLCIOReconstructedParticles(
     recops->addElement(lcio_recp);
   }
 
+  // Link associated recopartilces after converting all recoparticles
+  for (auto i = 0; i < recos_coll->size(); ++i) {
+    const edm4hep::ReconstructedParticle edm_rp = (*recos_coll)[i];
+
+    for (auto& edm_linked_rp : edm_rp.getParticles()) {
+      if (edm_linked_rp.isAvailable()) {
+        for (auto& rp : recoparticles_vec) {
+          if (rp.second == edm_linked_rp) {
+            rp.first->addParticle(rp.first);
+          }
+        }
+      }
+    }
+  }
+
   // Add all reconstructed particles to event
   lcio_event->addCollection(recops, lcio_coll_name);
 }
