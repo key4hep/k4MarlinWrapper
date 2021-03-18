@@ -34,9 +34,7 @@ void EDM4hep2LcioTool::convertLCIOTracks(
   auto* tracks = new lcio::LCCollectionVec(lcio::LCIO::TRACK);
 
   // Loop over EDM4hep tracks converting them to lcio tracks
-  for (int i = 0; i < tracks_coll->size(); ++i) {
-
-    const edm4hep::Track edm_tr = (*tracks_coll)[i];
+  for (auto& edm_tr : (*tracks_coll)) {
 
     auto* lcio_tr = new lcio::TrackImpl();
 
@@ -101,9 +99,7 @@ void EDM4hep2LcioTool::convertLCIOCalorimeterHits(
 
   auto* calohits = new lcio::LCCollectionVec(lcio::LCIO::CALORIMETERHIT);
 
-  for (auto i = 0; i < calohit_coll->size(); ++i) {
-
-    const edm4hep::CalorimeterHit edm_calohit = (*calohit_coll)[i];
+  for (auto& edm_calohit : (*calohit_coll)) {
 
     auto* lcio_calohit = new lcio::CalorimeterHitImpl();
 
@@ -153,9 +149,7 @@ void EDM4hep2LcioTool::convertLCIOClusters(
   auto* clusters = new lcio::LCCollectionVec(lcio::LCIO::CLUSTER);
 
   // Loop over EDM4hep clusters converting them to lcio clusters
-  for (auto i = 0; i < cluster_coll->size(); ++i) {
-
-    const edm4hep::Cluster edm_cluster = (*cluster_coll)[i];
+  for (auto& edm_cluster : (*cluster_coll)) {
 
     auto* lcio_cluster = new lcio::ClusterImpl();
 
@@ -184,7 +178,7 @@ void EDM4hep2LcioTool::convertLCIOClusters(
     }
     lcio_cluster->setShape(shape_vec);
 
-    // Link associated ParticleID
+    // Link associated ParticleID if found
     for (auto& edm_particleID : edm_cluster.getParticleIDs()) {
       if (edm_particleID.isAvailable()) {
         for (auto& particleID : particleIDs_vec) {
@@ -255,9 +249,7 @@ void EDM4hep2LcioTool::convertLCIOVertices(
   auto* vertices = new lcio::LCCollectionVec(lcio::LCIO::VERTEX);
 
   // Loop over EDM4hep vertex converting them to lcio vertex
-  for (int i = 0; i < vertex_coll->size(); ++i) {
-
-    const edm4hep::Vertex edm_vertex = (*vertex_coll)[i];
+  for (auto& edm_vertex : (*vertex_coll)) {
 
     auto* lcio_vertex = new lcio::VertexImpl();
     lcio_vertex->setPrimary( edm_vertex.getPrimary() );
@@ -312,10 +304,7 @@ void EDM4hep2LcioTool::convertLCIOParticleIDs(
 
   auto* particleIDs = new lcio::LCCollectionVec(lcio::LCIO::PARTICLEID);
 
-  // for (const auto edm_pid = pIDs_coll->begin(); edm_pid != pIDs_coll->end(); ++edm_pid) {
-  for (int i = 0; i < pIDs_coll->size(); ++i) {
-
-    const edm4hep::ParticleID edm_pid = (*pIDs_coll)[i];
+  for (auto& edm_pid : (*pIDs_coll)) {
 
     auto* lcio_pID = new lcio::ParticleIDImpl;
 
@@ -358,9 +347,7 @@ void EDM4hep2LcioTool::convertLCIOReconstructedParticles(
 
   auto* recops = new lcio::LCCollectionVec(lcio::LCIO::RECONSTRUCTEDPARTICLE);
 
-  for (int i = 0; i < recos_coll->size(); ++i) {
-
-    const edm4hep::ReconstructedParticle edm_rp = (*recos_coll)[i];
+  for (auto& edm_rp : (*recos_coll)) {
 
     auto* lcio_recp = new lcio::ReconstructedParticleImpl;
     if (edm_rp.isAvailable()) {
