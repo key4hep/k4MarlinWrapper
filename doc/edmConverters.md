@@ -127,7 +127,7 @@ Note and review the following when using the converters:
 Collections from events that are already read, or are produced by a Gaudi Algorithm can be converted from EDM4hep to LCIO format:
 
 1. Instantiate the `EDM4hep2LcioTool` Gaudi Tool.
-2. Indicate the collections to convert in `EDM2LCIOConversion`.
+2. Indicate the collections to convert in `Parameters`.
   + Arguments are read in groups of 3: collection type, name of the collection, name of the converted collection.
 3. Select the Gaudi Algorithm that will convert the indicated collections.
 4. Add the Tool to the Gaudi Algorithm.
@@ -138,7 +138,7 @@ from Configurables import ToolSvc, EDM4hep2LcioTool
 # 1
 edmConvTool = EDM4hep2LcioTool("EDM4hep2lcio")
 # 2
-edmConvTool.EDM2LCIOConversion = [
+edmConvTool.Parameters = [
     "Track", "EFlowTrack", "EFlowTrack_LCIO",
     "ReconstructedParticle", "ReconstructedParticles", "ReconstructedParticle_LCIO"
 ]
@@ -148,26 +148,26 @@ edmConvTool.OutputLevel = DEBUG
 InitDD4hep = MarlinProcessorWrapper("InitDD4hep")
 
 # 4
-InitDD4hep.EDMConversionTool=edmConvTool
+InitDD4hep.EDM4hep2LcioTool=edmConvTool
 ```
 
-## LCIO to EDM4hep converter
+### LCIO to EDM4hep converter
 
 Collections from events that are already read, or are produced by a gaudi Algorithm can be converted from LCIO to EDM4hep format:
 
-1. Instantiate the `k4LCIOReaderWrapper` Gaudi Tool.
-2. Indicate the collections to convert in `LCIO2EMD4hepConversion`.
+1. Instantiate the `Lcio2EDM4hepTool` Gaudi Tool.
+2. Indicate the collections to convert in `Parameters`.
   + Arguments are read in groups of 3: collection type, name of the collection, name of the converted collection.
 3. Select the Gaudi Algorithm that will convert the indicated collections.
 4. Add the Tool to the Gaudi Algorithm.
 
 ```python
-from Configurables import ToolSvc, k4LCIOReaderWrapper
+from Configurables import ToolSvc, Lcio2EDM4hepTool
 
 # 1
-lcioConvTool = k4LCIOReaderWrapper("LCIO2EDM4hep")
+lcioConvTool = Lcio2EDM4hepTool("LCIO2EDM4hep")
 # 2
-lcioConvTool.LCIO2EMD4hepConversion = [
+lcioConvTool.Parameters = [
     "Track", "EFlowTrackConv", "EFlowTrackEDM",
     "ReconstructedParticle", "ReconstructedParticle", "ReconstructedParticlesEDM",
     "Vertex", "BuildUpVertices", "BuildUpVerticesEDM",
@@ -179,7 +179,7 @@ lcioConvTool.OutputLevel = DEBUG
 JetClusteringAndRefiner = MarlinProcessorWrapper("JetClusteringAndRefiner")
 
 # 4
-JetClusteringAndRefiner.LCIOConversionTool=lcioConvTool
+JetClusteringAndRefiner.Lcio2EDM4hepTool=lcioConvTool
 ```
 
 
