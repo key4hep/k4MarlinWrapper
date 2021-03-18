@@ -285,6 +285,7 @@ void EDM4hep2LcioTool::convertLCIOReconstructedParticles(
   const std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& particleIDs_vec,
   const std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& tracks_vec,
   const std::vector<std::pair<lcio::VertexImpl*, edm4hep::Vertex>>& vertex_vec,
+  const std::vector<std::pair<lcio::ClusterImpl*, edm4hep::Cluster>>& clusters_vec,
   const std::string& e4h_coll_name,
   const std::string& lcio_coll_name,
   lcio::LCEventImpl* lcio_event)
@@ -341,6 +342,16 @@ void EDM4hep2LcioTool::convertLCIOReconstructedParticles(
         for (auto& lcio_track : tracks_vec) {
           if (lcio_track.second == edm_rp_tr) {
             lcio_recp->addTrack(lcio_track.first);
+            break;
+          }
+        }
+      }
+
+      // Link associated Clusters
+      for (auto& edm_cluster : edm_rp.getClusters()) {
+        for (auto& cluster_pair : clusters_vec) {
+          if (cluster_pair.second == edm_cluster) {
+            lcio_recp->addCluster(cluster_pair.first);
             break;
           }
         }
@@ -413,6 +424,19 @@ void EDM4hep2LcioTool::FillMissingCollections(
         for (auto& lcio_track : collection_pairs.tracks) {
           if (lcio_track.second == edm_rp_tr) {
             rp_pair.first->addTrack(lcio_track.first);
+            break;
+          }
+        }
+      }
+    }
+
+    // Link Clusters
+    if (rp_pair.first->getClusters().size() != rp_pair.second.clusters_size()) {
+      assert(rp_pair.first->getClusters().size() == 0);
+      for (auto& edm_rp_cluster : rp_pair.second.getClusters()) { // linked
+        for (auto& lcio_cluster : collection_pairs.clusters) { // converted pairs
+          if (lcio_cluster.second == edm_rp_cluster) {
+            rp_pair.first->addCluster(lcio_cluster.first);
             break;
           }
         }
@@ -504,6 +528,7 @@ void EDM4hep2LcioTool::convertAdd(
       collection_pairs.particleIDs,
       collection_pairs.tracks,
       collection_pairs.vertices,
+      collection_pairs.clusters,
       e4h_coll_name,
       lcio_coll_name,
       lcio_event);

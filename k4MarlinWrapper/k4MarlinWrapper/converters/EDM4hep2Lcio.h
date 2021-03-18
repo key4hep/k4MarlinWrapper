@@ -102,6 +102,7 @@ private:
     const std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& particleIDs_vec,
     const std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& tracks_vec,
     const std::vector<std::pair<lcio::VertexImpl*, edm4hep::Vertex>>& vertex_vec,
+    const std::vector<std::pair<lcio::ClusterImpl*, edm4hep::Cluster>>& clusters_vec,
     const std::string& e4h_coll_name,
     const std::string& lcio_coll_name,
     lcio::LCEventImpl* lcio_event);
