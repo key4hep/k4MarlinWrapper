@@ -15,6 +15,8 @@
 #include "edm4hep/ReconstructedParticleData.h"
 #include "edm4hep/Track.h"
 #include "edm4hep/TrackCollection.h"
+#include "edm4hep/Cluster.h"
+#include "edm4hep/ClusterCollection.h"
 #include "edm4hep/Vertex.h"
 #include "edm4hep/VertexCollection.h"
 
@@ -27,11 +29,15 @@
 #include "IMPL/ReconstructedParticleImpl.h"
 #include "IMPL/TrackImpl.h"
 #include "IMPL/TrackStateImpl.h"
+#include "IMPL/ClusterImpl.h"
 #include "IMPL/VertexImpl.h"
 #include "IMPL/ParticleIDImpl.h"
 
+#include "LCIOSTLTypes.h"
+
 #include <vector>
 #include <string>
+#include <bitset>
 
 // Interface
 #include "IEDMConverter.h"
@@ -40,6 +46,8 @@
 struct CollectionsPairVectors {
   std::vector<std::pair<
     lcio::TrackImpl*, edm4hep::Track>> tracks;
+  std::vector<std::pair<
+      lcio::ClusterImpl*, edm4hep::Cluster>> clusters;
   std::vector<std::pair<
     lcio::VertexImpl*, edm4hep::Vertex>> vertices;
   std::vector<std::pair<
@@ -65,6 +73,13 @@ private:
 
   void convertLCIOTracks(
     std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& tracks_vec,
+    const std::string& e4h_coll_name,
+    const std::string& lcio_coll_name,
+    lcio::LCEventImpl* lcio_event);
+
+  void convertLCIOClusters(
+    std::vector<std::pair<lcio::ClusterImpl*, edm4hep::Cluster>>& cluster_vec,
+    const std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& particleIDs_vec,
     const std::string& e4h_coll_name,
     const std::string& lcio_coll_name,
     lcio::LCEventImpl* lcio_event);

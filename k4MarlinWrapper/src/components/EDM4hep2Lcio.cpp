@@ -88,17 +88,107 @@ void EDM4hep2LcioTool::convertLCIOTracks(
 }
 
 
+// Add EDM4hep to LCIO converted clusters to vector
+void EDM4hep2LcioTool::convertLCIOClusters(
+  std::vector<std::pair<lcio::ClusterImpl*, edm4hep::Cluster>>& cluster_vec,
+  const std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& particleIDs_vec,
+  const std::string& e4h_coll_name,
+  const std::string& lcio_coll_name,
+  lcio::LCEventImpl* lcio_event)
+{
+  DataHandle<edm4hep::ClusterCollection> cluster_handle {
+    e4h_coll_name, Gaudi::DataHandle::Reader, this};
+  const auto cluster_coll = cluster_handle.get();
+
+  auto* clusters = new lcio::LCCollectionVec(lcio::LCIO::CLUSTER);
+
+  // Loop over EDM4hep clusters converting them to lcio clusters
+  for (auto i = 0; i < cluster_coll->size(); ++i) {
+
+    const edm4hep::Cluster edm_cluster = (*cluster_coll)[i];
+
+    auto* lcio_cluster = new lcio::ClusterImpl();
+
+    std::bitset<32> type_bits = edm_cluster.getType();
+    for (int j=0; j<32; j++) {
+      lcio_cluster->setTypeBit(j, (type_bits[j] == 0) ? false : true );
+    }
+    lcio_cluster->setEnergy(edm_cluster.getEnergy());
+    lcio_cluster->setEnergyError(edm_cluster.getEnergyError());
+
+    std::array<float, 3> edm_cluster_pos = {
+      edm_cluster.getPosition().x, edm_cluster.getPosition().y, edm_cluster.getPosition().z};
+    lcio_cluster->setPosition(edm_cluster_pos.data());
+
+    lcio_cluster->setPositionError(edm_cluster.getPositionError().data());
+    lcio_cluster->setITheta(edm_cluster.getITheta());
+    lcio_cluster->setIPhi(edm_cluster.getPhi());
+    // // lcio_cluster->setDirectionError(const EVENT::FloatVec &errdir);
+    std::array<float, 3> edm_cluster_dir_err= {
+      edm_cluster.getPosition().x, edm_cluster.getPosition().y, edm_cluster.getPosition().z};
+    lcio_cluster->setDirectionError(edm_cluster_dir_err.data());
+
+    EVENT::FloatVec shape_vec {};
+    for (auto& param : edm_cluster.getShapeParameters()) {
+      shape_vec.push_back(param);
+    }
+    lcio_cluster->setShape(shape_vec);
+
+    // Link associated ParticleID
+    for (auto& edm_particleID : edm_cluster.getParticleIDs()) {
+      if (edm_particleID.isAvailable()) {
+        for (auto& particleID : particleIDs_vec) {
+          if (particleID.second == edm_particleID) {
+            lcio_cluster->addParticleID(particleID.first);
+          }
+        }
+      }
+    }
+
+    // TODO
+    // lcio_cluster->addHit(EVENT::CalorimeterHit* hit  , float contribution) ;
+
+    // Save intermediate cluster ref
+    cluster_vec.emplace_back(
+      std::make_pair(lcio_cluster, edm_cluster)
+    );
+
+    // Add to lcio tracks collection
+    clusters->addElement(lcio_cluster);
+
+  }
+
+  // Link associated Clusters after converting all clusters
+  for (auto i = 0; i < cluster_coll->size(); ++i) {
+    const edm4hep::Cluster edm_cluster = (*cluster_coll)[i];
+
+    for (auto& edm_linked_cluster : edm_cluster.getClusters()) {
+      if (edm_linked_cluster.isAvailable()) {
+        for (auto& cluster : cluster_vec) {
+          if (cluster.second == edm_linked_cluster) {
+            cluster.first->addCluster(cluster.first);
+          }
+        }
+      }
+    }
+  }
+
+  // Add all tracks to event
+  lcio_event->addCollection(clusters, lcio_coll_name);
+
+}
+
 
 // Add EDM4hep to LCIO converted vertex to vector
 void EDM4hep2LcioTool::convertLCIOVertices(
   std::vector<std::pair<lcio::VertexImpl*, edm4hep::Vertex>>& vertex_vec,
   const std::vector<std::pair<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>>& recoparticles_vec,
-  const std::string& e4h_name,
+  const std::string& e4h_coll_name,
   const std::string& lcio_coll_name,
   lcio::LCEventImpl* lcio_event)
 {
   DataHandle<edm4hep::VertexCollection> vertex_handle {
-    e4h_name, Gaudi::DataHandle::Reader, this};
+    e4h_coll_name, Gaudi::DataHandle::Reader, this};
   const auto vertex_coll = vertex_handle.get();
 
   auto* vertices = new lcio::LCCollectionVec(lcio::LCIO::VERTEX);
@@ -314,7 +404,7 @@ void EDM4hep2LcioTool::FillMissingCollections(
       }
     }
 
-  }
+  } // reconstructed particles
 
   // Fill missing Vertices collections
   for (auto& vertex_pair : collection_pairs.vertices) {
@@ -329,7 +419,27 @@ void EDM4hep2LcioTool::FillMissingCollections(
         }
       }
     }
-  }
+
+  } // vertices
+
+  // Fill missing Cluster collections
+  for (auto& cluster_pair : collection_pairs.clusters) {
+
+    // Link ParticleIDs
+    if (cluster_pair.first->getParticleIDs().size() != cluster_pair.second.particleIDs_size()) {
+      assert(cluster_pair.first->getParticleIDs().size() == 0);
+      for (int i=0; i < cluster_pair.second.particleIDs_size(); ++i) {
+        edm4hep::ConstParticleID edm_cluster_pid = cluster_pair.second.getParticleIDs(i);
+        for (auto& lcio_pid : collection_pairs.particleIDs) {
+          if (lcio_pid.second == edm_cluster_pid) {
+            cluster_pair.first->addParticleID(lcio_pid.first);
+            break;
+          }
+        }
+      }
+    }
+
+  } // clusters
 
 }
 
@@ -346,6 +456,14 @@ void EDM4hep2LcioTool::convertAdd(
   if (type == "Track") {
     convertLCIOTracks(
       collection_pairs.tracks,
+      e4h_coll_name,
+      lcio_coll_name,
+      lcio_event);
+  } else
+  if (type == "Cluster") {
+    convertLCIOClusters(
+      collection_pairs.clusters,
+      collection_pairs.particleIDs,
       e4h_coll_name,
       lcio_coll_name,
       lcio_event);
@@ -376,7 +494,7 @@ void EDM4hep2LcioTool::convertAdd(
       lcio_event);
   } else {
     error() << "Error trying to convert requested " << type << " with name " << e4h_coll_name << endmsg;
-    error() << "List of supported types: Track, Vertex, ParticleID, ReconstructedParticle." << endmsg;
+    error() << "List of supported types: Track, Cluster, Vertex, ParticleID, ReconstructedParticle." << endmsg;
   }
 }
 
