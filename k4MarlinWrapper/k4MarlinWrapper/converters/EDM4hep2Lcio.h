@@ -34,7 +34,7 @@
 #include <string>
 
 // Interface
-#include "IEDM4hep2Lcio.h"
+#include "IEDMConverter.h"
 
 
 struct CollectionsPairVectors {
@@ -48,7 +48,7 @@ struct CollectionsPairVectors {
     lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>> recoparticles;
 };
 
-class EDM4hep2LcioTool : public GaudiTool, virtual public IEDM4hep2LcioTool {
+class EDM4hep2LcioTool : public GaudiTool, virtual public IEDMConverter {
 public:
 
   EDM4hep2LcioTool(const std::string& type, const std::string& name, const IInterface* parent);
@@ -61,7 +61,7 @@ public:
 
 private:
 
-  Gaudi::Property<std::vector<std::string>> m_edm2lcio_params{this, "EDM2LCIOConversion", {}};
+  Gaudi::Property<std::vector<std::string>> m_edm2lcio_params{this, "Parameters", {}};
 
   void convertLCIOTracks(
     std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& tracks_vec,

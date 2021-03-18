@@ -25,14 +25,14 @@
 #include "podio/CollectionBase.h"
 
 // Interface
-#include "Ik4LCIOReaderWrapper.h"
+#include "IEDMConverter.h"
 
 
-class k4LCIOReaderWrapper : public GaudiTool, virtual public Ik4LCIOReaderWrapper {
+class Lcio2EDM4hepTool : public GaudiTool, virtual public IEDMConverter {
 
 public:
-  k4LCIOReaderWrapper(const std::string& type, const std::string& name, const IInterface* parent);
-  virtual ~k4LCIOReaderWrapper();
+  Lcio2EDM4hepTool(const std::string& type, const std::string& name, const IInterface* parent);
+  virtual ~Lcio2EDM4hepTool();
   virtual StatusCode initialize();
   virtual StatusCode finalize();
 
@@ -41,7 +41,7 @@ public:
 
 private:
 
-  Gaudi::Property<std::vector<std::string>> m_lcio2edm_params{this, "LCIO2EMD4hepConversion", {}};
+  Gaudi::Property<std::vector<std::string>> m_lcio2edm_params{this, "Parameters", {}};
 
   std::map<std::string, DataObjectHandleBase*> m_dataHandlesMap;
 

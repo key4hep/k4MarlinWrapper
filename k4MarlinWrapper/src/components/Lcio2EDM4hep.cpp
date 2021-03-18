@@ -1,17 +1,17 @@
-#include "converters/k4LCIOReaderWrapper.h"
+#include "converters/Lcio2EDM4hep.h"
 
 
-DECLARE_COMPONENT(k4LCIOReaderWrapper);
+DECLARE_COMPONENT(Lcio2EDM4hepTool);
 
-k4LCIOReaderWrapper::k4LCIOReaderWrapper(const std::string& type, const std::string& name, const IInterface* parent)
+Lcio2EDM4hepTool::Lcio2EDM4hepTool(const std::string& type, const std::string& name, const IInterface* parent)
     : GaudiTool(type, name, parent) {
-  declareInterface<Ik4LCIOReaderWrapper>(this);
+  declareInterface<IEDMConverter>(this);
 }
 
-k4LCIOReaderWrapper::~k4LCIOReaderWrapper() { ; }
+Lcio2EDM4hepTool::~Lcio2EDM4hepTool() { ; }
 
 
-StatusCode k4LCIOReaderWrapper::initialize() {
+StatusCode Lcio2EDM4hepTool::initialize() {
 
   if (m_lcio2edm_params.size() % 3 != 0) {
     error() << " Error processing conversion parameters. 3 arguments per collection expected. " << endmsg;
@@ -45,12 +45,12 @@ StatusCode k4LCIOReaderWrapper::initialize() {
   return GaudiTool::initialize();
 }
 
-StatusCode k4LCIOReaderWrapper::finalize() {
+StatusCode Lcio2EDM4hepTool::finalize() {
   return GaudiTool::finalize();
 }
 
 template <typename T>
-void k4LCIOReaderWrapper::convertPut(
+void Lcio2EDM4hepTool::convertPut(
   const std::string& edm_name,
   const std::string& lcio_name,
   k4LCIOConverter* lcio_converter,
@@ -71,7 +71,7 @@ void k4LCIOReaderWrapper::convertPut(
 }
 
 
-StatusCode k4LCIOReaderWrapper::convertCollections(
+StatusCode Lcio2EDM4hepTool::convertCollections(
   lcio::LCEventImpl* the_event)
 {
 
