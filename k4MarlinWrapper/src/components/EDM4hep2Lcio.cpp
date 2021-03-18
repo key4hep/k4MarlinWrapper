@@ -337,8 +337,7 @@ void EDM4hep2LcioTool::convertLCIOReconstructedParticles(
       }
 
       // Link associated Tracks
-      for (int j=0; j < edm_rp.tracks_size(); ++j) {
-        edm4hep::ConstTrack edm_rp_tr = edm_rp.getTracks(j);
+      for (auto& edm_rp_tr : edm_rp.getTracks()) {
         for (auto& lcio_track : tracks_vec) {
           if (lcio_track.second == edm_rp_tr) {
             lcio_recp->addTrack(lcio_track.first);
@@ -419,8 +418,7 @@ void EDM4hep2LcioTool::FillMissingCollections(
     // Link Tracks
     if (rp_pair.first->getTracks().size() != rp_pair.second.tracks_size()) {
       assert(rp_pair.first->getTracks().size() == 0);
-      for (int i=0; i < rp_pair.second.tracks_size(); ++i) {
-        edm4hep::ConstTrack edm_rp_tr = rp_pair.second.getTracks(i);
+      for (auto& edm_rp_tr : rp_pair.second.getTracks()) {
         for (auto& lcio_track : collection_pairs.tracks) {
           if (lcio_track.second == edm_rp_tr) {
             rp_pair.first->addTrack(lcio_track.first);
@@ -433,8 +431,8 @@ void EDM4hep2LcioTool::FillMissingCollections(
     // Link Clusters
     if (rp_pair.first->getClusters().size() != rp_pair.second.clusters_size()) {
       assert(rp_pair.first->getClusters().size() == 0);
-      for (auto& edm_rp_cluster : rp_pair.second.getClusters()) { // linked
-        for (auto& lcio_cluster : collection_pairs.clusters) { // converted pairs
+      for (auto& edm_rp_cluster : rp_pair.second.getClusters()) {
+        for (auto& lcio_cluster : collection_pairs.clusters) {
           if (lcio_cluster.second == edm_rp_cluster) {
             rp_pair.first->addCluster(lcio_cluster.first);
             break;
