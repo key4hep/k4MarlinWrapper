@@ -2,6 +2,12 @@
 
 The converters are implemented as Gaudi Tools: these can be attached to any Gaudi Algorithm defined in the options file.
 
+- [Reading events](#reading-events)
+- [Writing events](#writing-events)
+- [Event Data Model converters](#Event-Data-Model-converters)
+  + [EDM4hep to LCIO converter](#EDM4hep-to-LCIO-converter)
+  + [LCIO to EDM4hep converter](#LCIO-to-EDM4hep-converter)
+
 ## Reading events
 
 Read **EDM4hep** events:
