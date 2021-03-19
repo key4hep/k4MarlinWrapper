@@ -20,7 +20,9 @@ StatusCode EDM4hep2LcioTool::finalize() {
 }
 
 
-// Add EDM4hep to LCIO converted tracks to vector
+// Convert EDM4hep Tracks to LCIO
+// Add converted LCIO ptr and original EDM4hep collection to vector of pairs
+// Add LCIO Collection Vector to LCIO event
 void EDM4hep2LcioTool::convertLCIOTracks(
   std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& tracks_vec,
   const std::string& e4h_coll_name,
@@ -34,7 +36,7 @@ void EDM4hep2LcioTool::convertLCIOTracks(
   auto* tracks = new lcio::LCCollectionVec(lcio::LCIO::TRACK);
 
   // Loop over EDM4hep tracks converting them to lcio tracks
-  for (auto& edm_tr : (*tracks_coll)) {
+  for (const auto& edm_tr : (*tracks_coll)) {
 
     auto* lcio_tr = new lcio::TrackImpl();
 
@@ -86,7 +88,9 @@ void EDM4hep2LcioTool::convertLCIOTracks(
 }
 
 
-// Add EDM4hep to LCIO converted clusters to vector
+// Convert EDM4hep Calorimeter Hits to LCIO
+// Add converted LCIO ptr and original EDM4hep collection to vector of pairs
+// Add converted LCIO Collection Vector to LCIO event
 void EDM4hep2LcioTool::convertLCIOCalorimeterHits(
   std::vector<std::pair<lcio::CalorimeterHitImpl*, edm4hep::CalorimeterHit>>& calo_hits_vec,
   const std::string& e4h_coll_name,
@@ -99,7 +103,7 @@ void EDM4hep2LcioTool::convertLCIOCalorimeterHits(
 
   auto* calohits = new lcio::LCCollectionVec(lcio::LCIO::CALORIMETERHIT);
 
-  for (auto& edm_calohit : (*calohit_coll)) {
+  for (const auto& edm_calohit : (*calohit_coll)) {
 
     auto* lcio_calohit = new lcio::CalorimeterHitImpl();
 
@@ -133,7 +137,9 @@ void EDM4hep2LcioTool::convertLCIOCalorimeterHits(
 
 
 
-// Add EDM4hep to LCIO converted clusters to vector
+// Convert EDM4hep Clusters to LCIO
+// Add converted LCIO ptr and original EDM4hep collection to vector of pairs
+// Add converted LCIO Collection Vector to LCIO event
 void EDM4hep2LcioTool::convertLCIOClusters(
   std::vector<std::pair<lcio::ClusterImpl*, edm4hep::Cluster>>& cluster_vec,
   const std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& particleIDs_vec,
@@ -149,7 +155,7 @@ void EDM4hep2LcioTool::convertLCIOClusters(
   auto* clusters = new lcio::LCCollectionVec(lcio::LCIO::CLUSTER);
 
   // Loop over EDM4hep clusters converting them to lcio clusters
-  for (auto& edm_cluster : (*cluster_coll)) {
+  for (const auto& edm_cluster : (*cluster_coll)) {
 
     auto* lcio_cluster = new lcio::ClusterImpl();
 
@@ -167,7 +173,6 @@ void EDM4hep2LcioTool::convertLCIOClusters(
     lcio_cluster->setPositionError(edm_cluster.getPositionError().data());
     lcio_cluster->setITheta(edm_cluster.getITheta());
     lcio_cluster->setIPhi(edm_cluster.getPhi());
-    // // lcio_cluster->setDirectionError(const EVENT::FloatVec &errdir);
     std::array<float, 3> edm_cluster_dir_err= {
       edm_cluster.getPosition().x, edm_cluster.getPosition().y, edm_cluster.getPosition().z};
     lcio_cluster->setDirectionError(edm_cluster_dir_err.data());
@@ -178,32 +183,43 @@ void EDM4hep2LcioTool::convertLCIOClusters(
     }
     lcio_cluster->setShape(shape_vec);
 
-    // Link associated ParticleID if found
+    // Link multiple associated ParticleID if found in converted ones
     for (auto& edm_particleID : edm_cluster.getParticleIDs()) {
       if (edm_particleID.isAvailable()) {
+        bool conv_found = false;
         for (auto& particleID : particleIDs_vec) {
           if (particleID.second == edm_particleID) {
             lcio_cluster->addParticleID(particleID.first);
+            conv_found = true;
+            break;
           }
         }
+        // If particle avilable, but not found in converted vec, add nullptr
+        if (not conv_found) lcio_cluster->addParticleID(nullptr);
       }
     }
 
-    // Link associated Calorimeter Hits, and Hit Contributions
+    // Link multiple associated Calorimeter Hits, and Hit Contributions
+    // There must be same number of Calo Hits and Hit Contributions
     if (edm_cluster.hits_size() == edm_cluster.hitContributions_size()) {
-      for (int j=0; j < edm_cluster.hits_size(); ++j) {
+      for (int j=0; j < edm_cluster.hits_size(); ++j) { // use index to get same hit and contrib
         if (edm_cluster.getHits(j).isAvailable()) {
+          bool conv_found = false;
           for (auto& hit : calohits_vec) {
             if (hit.second == edm_cluster.getHits(j)) {
               lcio_cluster->addHit(
                 hit.first, edm_cluster.getHitContributions(j));
+              conv_found = true;
+              break;
             }
           }
+          // If hit avilable, but not found in converted vec, add nullptr
+          if (not conv_found) lcio_cluster->addHit(nullptr, 0);
         }
       }
     }
 
-    // Save intermediate cluster ref
+    // Add LCIO and EDM4hep pair collections to vec
     cluster_vec.emplace_back(
       std::make_pair(lcio_cluster, edm_cluster)
     );
@@ -214,27 +230,28 @@ void EDM4hep2LcioTool::convertLCIOClusters(
   }
 
   // Link associated Clusters after converting all clusters
-  for (auto i = 0; i < cluster_coll->size(); ++i) {
-    const edm4hep::Cluster edm_cluster = (*cluster_coll)[i];
-
+  for (const auto& edm_cluster : (*cluster_coll)) {
     for (auto& edm_linked_cluster : edm_cluster.getClusters()) {
       if (edm_linked_cluster.isAvailable()) {
         for (auto& cluster : cluster_vec) {
           if (cluster.second == edm_linked_cluster) {
             cluster.first->addCluster(cluster.first);
+            break;
           }
         }
       }
     }
   }
 
-  // Add all tracks to event
+  // Add clusters to event
   lcio_event->addCollection(clusters, lcio_coll_name);
 
 }
 
 
-// Add EDM4hep to LCIO converted vertex to vector
+// Convert EDM4hep Vertices to LCIO
+// Add converted LCIO ptr and original EDM4hep collection to vector of pairs
+// Add converted LCIO Collection Vector to LCIO event
 void EDM4hep2LcioTool::convertLCIOVertices(
   std::vector<std::pair<lcio::VertexImpl*, edm4hep::Vertex>>& vertex_vec,
   const std::vector<std::pair<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>>& recoparticles_vec,
@@ -249,7 +266,7 @@ void EDM4hep2LcioTool::convertLCIOVertices(
   auto* vertices = new lcio::LCCollectionVec(lcio::LCIO::VERTEX);
 
   // Loop over EDM4hep vertex converting them to lcio vertex
-  for (auto& edm_vertex : (*vertex_coll)) {
+  for (const auto& edm_vertex : (*vertex_coll)) {
 
     auto* lcio_vertex = new lcio::VertexImpl();
     lcio_vertex->setPrimary( edm_vertex.getPrimary() );
@@ -260,22 +277,26 @@ void EDM4hep2LcioTool::convertLCIOVertices(
     lcio_vertex->setPosition( edm_vertex.getPosition()[0], edm_vertex.getPosition()[1], edm_vertex.getPosition()[2] );
     lcio_vertex->setCovMatrix( edm_vertex.getCovMatrix().data() );
 
-    // Associated particle to the vertex
+    for (auto& param : edm_vertex.getParameters()) {
+      lcio_vertex->addParameter(param);
+    }
+
+    // Link sinlge associated Particle if found in converted ones
     edm4hep::ConstReconstructedParticle vertex_rp = edm_vertex.getAssociatedParticle();
     if (vertex_rp.isAvailable()) {
+      bool conv_found = false;
       for (auto& rp : recoparticles_vec) {
         if (rp.second == vertex_rp) {
           lcio_vertex->setAssociatedParticle(rp.first);
+          conv_found = true;
           break;
         }
       }
+      // If recoparticle avilable, but not found in converted vec, add nullptr
+      if (not conv_found) lcio_vertex->setAssociatedParticle(nullptr);
     }
 
-    for (int i=0; i < edm_vertex.parameters_size(); ++i) {
-      lcio_vertex->addParameter(edm_vertex.getParameters(i));
-    }
-
-    // Save intermediate vertex ref
+    // Add LCIO and EDM4hep pair collections to vec
     vertex_vec.emplace_back(
       std::make_pair(lcio_vertex, edm_vertex)
     );
@@ -290,7 +311,9 @@ void EDM4hep2LcioTool::convertLCIOVertices(
 
 
 
-
+// Convert EDM4hep ParticleEDs to LCIO
+// Add converted LCIO ptr and original EDM4hep collection to vector of pairs
+// Add converted LCIO Collection Vector to LCIO event
 void EDM4hep2LcioTool::convertLCIOParticleIDs(
   std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& particleIDs_vec,
   const std::string& e4h_coll_name,
@@ -304,7 +327,7 @@ void EDM4hep2LcioTool::convertLCIOParticleIDs(
 
   auto* particleIDs = new lcio::LCCollectionVec(lcio::LCIO::PARTICLEID);
 
-  for (auto& edm_pid : (*pIDs_coll)) {
+  for (const auto& edm_pid : (*pIDs_coll)) {
 
     auto* lcio_pID = new lcio::ParticleIDImpl;
 
@@ -317,6 +340,7 @@ void EDM4hep2LcioTool::convertLCIOParticleIDs(
       lcio_pID->addParameter(param);
     }
 
+    // Add LCIO and EDM4hep pair collections to vec
     particleIDs_vec.emplace_back(
       std::make_pair(lcio_pID, edm_pid)
     );
@@ -329,7 +353,9 @@ void EDM4hep2LcioTool::convertLCIOParticleIDs(
   lcio_event->addCollection(particleIDs, lcio_coll_name);
 }
 
-
+// Convert EDM4hep RecoParticles to LCIO
+// Add converted LCIO ptr and original EDM4hep collection to vector of pairs
+// Add converted LCIO Collection Vector to LCIO event
 void EDM4hep2LcioTool::convertLCIOReconstructedParticles(
   std::vector<std::pair<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>>& recoparticles_vec,
   const std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& particleIDs_vec,
@@ -347,7 +373,7 @@ void EDM4hep2LcioTool::convertLCIOReconstructedParticles(
 
   auto* recops = new lcio::LCCollectionVec(lcio::LCIO::RECONSTRUCTEDPARTICLE);
 
-  for (auto& edm_rp : (*recos_coll)) {
+  for (const auto& edm_rp : (*recos_coll)) {
 
     auto* lcio_recp = new lcio::ReconstructedParticleImpl;
     if (edm_rp.isAvailable()) {
@@ -362,50 +388,70 @@ void EDM4hep2LcioTool::convertLCIOReconstructedParticles(
       lcio_recp->setReferencePoint(rp);
       lcio_recp->setGoodnessOfPID(edm_rp.getGoodnessOfPID());
 
-      // Link associated ParticleID
+      // Link sinlge associated Particle if found in converted ones
       edm4hep::ConstParticleID pIDUsed = edm_rp.getParticleIDUsed();
       if (pIDUsed.isAvailable()) {
+        bool conv_found = false;
         for (auto& particleID : particleIDs_vec) {
           if (particleID.second == pIDUsed) {
             lcio_recp->setParticleIDUsed(particleID.first);
+            conv_found = true;
             break;
           }
         }
+        // If particleID, but not found in converted vec, add nullptr
+        if (not conv_found) lcio_recp->setParticleIDUsed(nullptr);
       }
 
-      // Link associated Vertex
+      // Link sinlge associated Vertex if found in converted ones
       edm4hep::ConstVertex vertex = edm_rp.getStartVertex();
       if (vertex.isAvailable()) {
+        bool conv_found = false;
         for (auto& lcio_vertex : vertex_vec) {
           if (lcio_vertex.second == vertex) {
             lcio_recp->setStartVertex(lcio_vertex.first);
+            conv_found = true;
             break;
           }
         }
+        // If particleID available, but not found in converted vec, add nullptr
+        if (not conv_found) lcio_recp->setStartVertex(nullptr);
       }
 
-      // Link associated Tracks
+      // Link multiple associated Tracks if found in converted ones
       for (auto& edm_rp_tr : edm_rp.getTracks()) {
-        for (auto& lcio_track : tracks_vec) {
-          if (lcio_track.second == edm_rp_tr) {
-            lcio_recp->addTrack(lcio_track.first);
-            break;
+        if (edm_rp_tr.isAvailable()){
+          bool conv_found = false;
+          for (auto& lcio_track : tracks_vec) {
+            if (lcio_track.second == edm_rp_tr) {
+              lcio_recp->addTrack(lcio_track.first);
+              conv_found = true;
+              break;
+            }
           }
+          // If track available, but not found in converted vec, add nullptr
+          if (not conv_found) lcio_recp->addTrack(nullptr);
         }
       }
 
-      // Link associated Clusters
+      // Link multiple associated Clusters if found in converted ones
       for (auto& edm_cluster : edm_rp.getClusters()) {
-        for (auto& cluster_pair : clusters_vec) {
-          if (cluster_pair.second == edm_cluster) {
-            lcio_recp->addCluster(cluster_pair.first);
-            break;
+        if (edm_cluster.isAvailable()) {
+          bool conv_found = false;
+          for (auto& cluster_pair : clusters_vec) {
+            if (cluster_pair.second == edm_cluster) {
+              lcio_recp->addCluster(cluster_pair.first);
+              conv_found = true;
+              break;
+            }
           }
+          // If cluster available, but not found in converted vec, add nullptr
+          if (not conv_found) lcio_recp->addCluster(nullptr);
         }
       }
     }
 
-    // Add converted LCIO RecoParticle ptr, and original EDM4hep RecoParticle
+    // Add LCIO and EDM4hep pair collections to vec
     recoparticles_vec.push_back(
       std::make_pair(lcio_recp, edm_rp)
     );
@@ -415,9 +461,7 @@ void EDM4hep2LcioTool::convertLCIOReconstructedParticles(
   }
 
   // Link associated recopartilces after converting all recoparticles
-  for (auto i = 0; i < recos_coll->size(); ++i) {
-    const edm4hep::ReconstructedParticle edm_rp = (*recos_coll)[i];
-
+  for (const auto& edm_rp : (*recos_coll)) {
     for (auto& edm_linked_rp : edm_rp.getParticles()) {
       if (edm_linked_rp.isAvailable()) {
         for (auto& rp : recoparticles_vec) {
