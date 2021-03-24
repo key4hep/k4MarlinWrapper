@@ -47,6 +47,12 @@ void EDM4hep2LcioTool::convertLCIOTracks(
     lcio_tr->setdEdxError( edm_tr.getDEdxError() );
     lcio_tr->setRadiusOfInnermostHit( edm_tr.getRadiusOfInnermostHit() );
 
+    // Loop over the hit Numbers in the track
+    lcio_tr->subdetectorHitNumbers().resize(edm_tr.subDetectorHitNumbers_size());
+    for (int i=0; i<edm_tr.subDetectorHitNumbers_size(); ++i) {
+      lcio_tr->subdetectorHitNumbers()[i] = edm_tr.getSubDetectorHitNumbers(i);
+    }
+
     // Loop over the Tracker Hits in the track
     for (auto& tr_trackerhit : edm_tr.getTrackerHits()) {
 
