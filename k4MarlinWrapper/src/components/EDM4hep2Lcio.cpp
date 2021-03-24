@@ -46,10 +46,32 @@ void EDM4hep2LcioTool::convertLCIOTracks(
     lcio_tr->setdEdx( edm_tr.getDEdx() );
     lcio_tr->setdEdxError( edm_tr.getDEdxError() );
     lcio_tr->setRadiusOfInnermostHit( edm_tr.getRadiusOfInnermostHit() );
-    // FIXME, correctly assign hitnumbers
-    lcio_tr->subdetectorHitNumbers().resize(50);
-    for(int i =0;i<50;++i) {
-      lcio_tr->subdetectorHitNumbers()[i] = 0 ;
+
+    // Loop over the Tracker Hits in the track
+    for (auto& tr_trackerhit : edm_tr.getTrackerHits()) {
+
+      auto* lcio_tr_trackerhit = new lcio::TrackerHitImpl();
+
+      #warning "Splitting unsigned long long into two ints"
+      unsigned long long combined_value = tr_trackerhit.getCellID();
+      int* combined_value_int_ptr = (int*) combined_value;
+      lcio_tr_trackerhit->setCellID0(combined_value_int_ptr[0]);
+      lcio_tr_trackerhit->setCellID1(combined_value_int_ptr[1]);
+      lcio_tr_trackerhit->setType(tr_trackerhit.getType());
+      std::array<double, 3> positions {
+        tr_trackerhit.getPosition()[0], tr_trackerhit.getPosition()[1], tr_trackerhit.getPosition()[2]};
+      lcio_tr_trackerhit->setPosition(positions.data());
+      lcio_tr_trackerhit->setCovMatrix(tr_trackerhit.getCovMatrix().data() );
+      lcio_tr_trackerhit->setEDep(tr_trackerhit.getEDep() );
+      lcio_tr_trackerhit->setEDepError(tr_trackerhit.getEDepError() );
+      lcio_tr_trackerhit->setTime(tr_trackerhit.getTime() );
+      lcio_tr_trackerhit->setQuality(tr_trackerhit.getQuality() );
+      std::bitset<32> type_bits = tr_trackerhit.getQuality();
+      for (int j=0; j<32; j++) {
+        lcio_tr_trackerhit->setQualityBit(j, (type_bits[j] == 0) ? 0 : 1 );
+      }
+
+      lcio_tr->addHit(lcio_tr_trackerhit);
     }
 
     // Loop over the track states in the track
@@ -81,6 +103,21 @@ void EDM4hep2LcioTool::convertLCIOTracks(
 
     // Add to lcio tracks collection
     tracks->addElement(lcio_tr);
+  }
+
+  // Link associated tracks after converting all tracks
+  for (auto& tr_pair : tracks_vec) {
+    for (auto& edm_linked_tr : tr_pair.second.getTracks()) {
+      if (edm_linked_tr.isAvailable()) {
+        // Search the linked track in the converted vector
+        for (auto& tr_linked_pair : tracks_vec) {
+          if (tr_linked_pair.second == edm_linked_tr) {
+            tr_pair.first->addTrack(tr_linked_pair.first);
+            break;
+          }
+        }
+      }
+    }
   }
 
   // Add all tracks to event
@@ -578,6 +615,7 @@ void EDM4hep2LcioTool::FillMissingCollections(
           if (lcio_hit.second == edm_cluster_hit) {
             cluster_pair.first->addHit(
               lcio_hit.first, edm_cluster_contribution);
+            break;
           }
         }
       }

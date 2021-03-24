@@ -32,6 +32,7 @@
 #include "IMPL/TrackImpl.h"
 #include "IMPL/TrackStateImpl.h"
 #include "IMPL/CalorimeterHitImpl.h"
+#include "IMPL/TrackerHitImpl.h"
 #include "IMPL/ClusterImpl.h"
 #include "IMPL/VertexImpl.h"
 #include "IMPL/ParticleIDImpl.h"
