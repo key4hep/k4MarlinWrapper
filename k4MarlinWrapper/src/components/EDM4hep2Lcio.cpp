@@ -266,13 +266,14 @@ void EDM4hep2LcioTool::convertLCIOClusters(
 
   }
 
-  // Link associated Clusters after converting all clusters
-  for (const auto& edm_cluster : (*cluster_coll)) {
-    for (auto& edm_linked_cluster : edm_cluster.getClusters()) {
+  // Link associated clusters after converting all clusters
+  for (auto& cluster_pair : cluster_vec) {
+    for (auto& edm_linked_cluster : cluster_pair.second.getClusters()) {
       if (edm_linked_cluster.isAvailable()) {
-        for (auto& cluster : cluster_vec) {
-          if (cluster.second == edm_linked_cluster) {
-            cluster.first->addCluster(cluster.first);
+        // Search the linked track in the converted vector
+        for (auto& cluster_linked_pair : cluster_vec) {
+          if (cluster_linked_pair.second == edm_linked_cluster) {
+            cluster_pair.first->addCluster(cluster_linked_pair.first);
             break;
           }
         }
@@ -498,12 +499,14 @@ void EDM4hep2LcioTool::convertLCIOReconstructedParticles(
   }
 
   // Link associated recopartilces after converting all recoparticles
-  for (const auto& edm_rp : (*recos_coll)) {
-    for (auto& edm_linked_rp : edm_rp.getParticles()) {
+  for (auto& rp_pair : recoparticles_vec) {
+    for (auto& edm_linked_rp : rp_pair.second.getParticles()) {
       if (edm_linked_rp.isAvailable()) {
-        for (auto& rp : recoparticles_vec) {
-          if (rp.second == edm_linked_rp) {
-            rp.first->addParticle(rp.first);
+        // Search the linked track in the converted vector
+        for (auto& rp_linked_pair : recoparticles_vec) {
+          if (rp_linked_pair.second == edm_linked_rp) {
+            rp_pair.first->addParticle(rp_linked_pair.first);
+            break;
           }
         }
       }
