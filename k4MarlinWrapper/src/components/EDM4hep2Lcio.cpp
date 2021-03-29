@@ -37,75 +37,87 @@ void EDM4hep2LcioTool::convertLCIOTracks(
 
   // Loop over EDM4hep tracks converting them to lcio tracks
   for (const auto& edm_tr : (*tracks_coll)) {
+    if (edm_tr.isAvailable()) {
 
-    auto* lcio_tr = new lcio::TrackImpl();
+      auto* lcio_tr = new lcio::TrackImpl();
 
-    lcio_tr->setTypeBit( edm_tr.getType() );
-    lcio_tr->setChi2( edm_tr.getChi2() );
-    lcio_tr->setNdf( edm_tr.getNdf() );
-    lcio_tr->setdEdx( edm_tr.getDEdx() );
-    lcio_tr->setdEdxError( edm_tr.getDEdxError() );
-    lcio_tr->setRadiusOfInnermostHit( edm_tr.getRadiusOfInnermostHit() );
+      lcio_tr->setTypeBit( edm_tr.getType() );
+      lcio_tr->setChi2( edm_tr.getChi2() );
+      lcio_tr->setNdf( edm_tr.getNdf() );
+      lcio_tr->setdEdx( edm_tr.getDEdx() );
+      lcio_tr->setdEdxError( edm_tr.getDEdxError() );
+      lcio_tr->setRadiusOfInnermostHit( edm_tr.getRadiusOfInnermostHit() );
 
-    // Loop over the hit Numbers in the track
-    lcio_tr->subdetectorHitNumbers().resize(edm_tr.subDetectorHitNumbers_size());
-    for (int i=0; i<edm_tr.subDetectorHitNumbers_size(); ++i) {
-      lcio_tr->subdetectorHitNumbers()[i] = edm_tr.getSubDetectorHitNumbers(i);
-    }
-
-    // Loop over the Tracker Hits in the track
-    for (auto& tr_trackerhit : edm_tr.getTrackerHits()) {
-
-      auto* lcio_tr_trackerhit = new lcio::TrackerHitImpl();
-
-      #warning "Splitting unsigned long long into two ints"
-      unsigned long long combined_value = tr_trackerhit.getCellID();
-      int* combined_value_int_ptr = (int*) combined_value;
-      lcio_tr_trackerhit->setCellID0(combined_value_int_ptr[0]);
-      lcio_tr_trackerhit->setCellID1(combined_value_int_ptr[1]);
-      lcio_tr_trackerhit->setType(tr_trackerhit.getType());
-      std::array<double, 3> positions {
-        tr_trackerhit.getPosition()[0], tr_trackerhit.getPosition()[1], tr_trackerhit.getPosition()[2]};
-      lcio_tr_trackerhit->setPosition(positions.data());
-      lcio_tr_trackerhit->setCovMatrix(tr_trackerhit.getCovMatrix().data() );
-      lcio_tr_trackerhit->setEDep(tr_trackerhit.getEDep() );
-      lcio_tr_trackerhit->setEDepError(tr_trackerhit.getEDepError() );
-      lcio_tr_trackerhit->setTime(tr_trackerhit.getTime() );
-      lcio_tr_trackerhit->setQuality(tr_trackerhit.getQuality() );
-      std::bitset<32> type_bits = tr_trackerhit.getQuality();
-      for (int j=0; j<32; j++) {
-        lcio_tr_trackerhit->setQualityBit(j, (type_bits[j] == 0) ? 0 : 1 );
+      // Loop over the hit Numbers in the track
+      lcio_tr->subdetectorHitNumbers().resize(edm_tr.subDetectorHitNumbers_size());
+      for (int i=0; i<edm_tr.subDetectorHitNumbers_size(); ++i) {
+        lcio_tr->subdetectorHitNumbers()[i] = edm_tr.getSubDetectorHitNumbers(i);
       }
 
-      lcio_tr->addHit(lcio_tr_trackerhit);
-    }
+      // Pad until 50 hitnumbers are resized
+      const int hit_number_limit = 50;
+      if (edm_tr.subDetectorHitNumbers_size() < hit_number_limit) {
+        lcio_tr->subdetectorHitNumbers().resize(hit_number_limit);
+        for(int i = edm_tr.subDetectorHitNumbers_size();i<hit_number_limit;++i) {
+          lcio_tr->subdetectorHitNumbers()[i] = 0 ;
+        }
+      }
 
-    // Loop over the track states in the track
-    const podio::RelationRange<edm4hep::TrackState> edm_track_states = edm_tr.getTrackStates();
-    for (const auto& tr_state : edm_track_states) {
 
-      std::array<float, 15> cov = tr_state.covMatrix;
-      std::array<float, 3> refP = {
-        tr_state.referencePoint.x, tr_state.referencePoint.y, tr_state.referencePoint.z};
+      // Loop over the Tracker Hits in the track
+      for (auto& tr_trackerhit : edm_tr.getTrackerHits()) {
 
-      auto* lcio_tr_state = new lcio::TrackStateImpl(
-        tr_state.location,
-        tr_state.D0,
-        tr_state.phi ,
-        tr_state.omega,
-        tr_state.Z0,
-        tr_state.tanLambda,
-        cov.data(),
-        refP.data()
+        auto* lcio_tr_trackerhit = new lcio::TrackerHitImpl();
+
+        #warning "Splitting unsigned long long into two ints"
+        unsigned long long combined_value = tr_trackerhit.getCellID();
+        int* combined_value_int_ptr = (int*) combined_value;
+        lcio_tr_trackerhit->setCellID0(combined_value_int_ptr[0]);
+        lcio_tr_trackerhit->setCellID1(combined_value_int_ptr[1]);
+        lcio_tr_trackerhit->setType(tr_trackerhit.getType());
+        std::array<double, 3> positions {
+          tr_trackerhit.getPosition()[0], tr_trackerhit.getPosition()[1], tr_trackerhit.getPosition()[2]};
+        lcio_tr_trackerhit->setPosition(positions.data());
+        lcio_tr_trackerhit->setCovMatrix(tr_trackerhit.getCovMatrix().data() );
+        lcio_tr_trackerhit->setEDep(tr_trackerhit.getEDep() );
+        lcio_tr_trackerhit->setEDepError(tr_trackerhit.getEDepError() );
+        lcio_tr_trackerhit->setTime(tr_trackerhit.getTime() );
+        lcio_tr_trackerhit->setQuality(tr_trackerhit.getQuality() );
+        std::bitset<32> type_bits = tr_trackerhit.getQuality();
+        for (int j=0; j<32; j++) {
+          lcio_tr_trackerhit->setQualityBit(j, (type_bits[j] == 0) ? 0 : 1 );
+        }
+
+        lcio_tr->addHit(lcio_tr_trackerhit);
+      }
+
+      // Loop over the track states in the track
+      const podio::RelationRange<edm4hep::TrackState> edm_track_states = edm_tr.getTrackStates();
+      for (const auto& tr_state : edm_track_states) {
+
+        std::array<float, 15> cov = tr_state.covMatrix;
+        std::array<float, 3> refP = {
+          tr_state.referencePoint.x, tr_state.referencePoint.y, tr_state.referencePoint.z};
+
+        auto* lcio_tr_state = new lcio::TrackStateImpl(
+          tr_state.location,
+          tr_state.D0,
+          tr_state.phi ,
+          tr_state.omega,
+          tr_state.Z0,
+          tr_state.tanLambda,
+          cov.data(),
+          refP.data()
+        );
+
+        lcio_tr->addTrackState( lcio_tr_state ) ;
+      }
+
+      // Save intermediate tracks ref
+      tracks_vec.emplace_back(
+        std::make_pair(lcio_tr, edm_tr)
       );
-
-      lcio_tr->addTrackState( lcio_tr_state ) ;
     }
-
-    // Save intermediate tracks ref
-    tracks_vec.emplace_back(
-      std::make_pair(lcio_tr, edm_tr)
-    );
 
     // Add to lcio tracks collection
     tracks->addElement(lcio_tr);
@@ -147,31 +159,33 @@ void EDM4hep2LcioTool::convertLCIOCalorimeterHits(
   auto* calohits = new lcio::LCCollectionVec(lcio::LCIO::CALORIMETERHIT);
 
   for (const auto& edm_calohit : (*calohit_coll)) {
+    if (edm_calohit.isAvailable()) {
 
-    auto* lcio_calohit = new lcio::CalorimeterHitImpl();
+      auto* lcio_calohit = new lcio::CalorimeterHitImpl();
 
-    #warning "Splitting unsigned long long into two ints"
-    unsigned long long combined_value = edm_calohit.getCellID();
-    int* combined_value_int_ptr = (int*) combined_value;
-    lcio_calohit->setCellID0(combined_value_int_ptr[0]);
-    lcio_calohit->setCellID1(combined_value_int_ptr[1]);
-    lcio_calohit->setEnergy(edm_calohit.getEnergy());
-    lcio_calohit->setEnergyError(edm_calohit.getEnergyError());
-    lcio_calohit->setTime(edm_calohit.getTime());
-    std::array<float, 3> positions {edm_calohit.getPosition()[0], edm_calohit.getPosition()[1], edm_calohit.getPosition()[2]};
-    lcio_calohit->setPosition(positions.data());
-    lcio_calohit->setType(edm_calohit.getType());
+      #warning "Splitting unsigned long long into two ints"
+      unsigned long long combined_value = edm_calohit.getCellID();
+      int* combined_value_int_ptr = (int*) combined_value;
+      lcio_calohit->setCellID0(combined_value_int_ptr[0]);
+      lcio_calohit->setCellID1(combined_value_int_ptr[1]);
+      lcio_calohit->setEnergy(edm_calohit.getEnergy());
+      lcio_calohit->setEnergyError(edm_calohit.getEnergyError());
+      lcio_calohit->setTime(edm_calohit.getTime());
+      std::array<float, 3> positions {edm_calohit.getPosition()[0], edm_calohit.getPosition()[1], edm_calohit.getPosition()[2]};
+      lcio_calohit->setPosition(positions.data());
+      lcio_calohit->setType(edm_calohit.getType());
 
-    // TODO
-    // lcio_calohit->setRawHit(EVENT::LCObject* rawHit );
+      // TODO
+      // lcio_calohit->setRawHit(EVENT::LCObject* rawHit );
 
-    // Save Calorimeter Hits LCIO and EDM4hep collections
-    calo_hits_vec.emplace_back(
-      std::make_pair(lcio_calohit, edm_calohit)
-    );
+      // Save Calorimeter Hits LCIO and EDM4hep collections
+      calo_hits_vec.emplace_back(
+        std::make_pair(lcio_calohit, edm_calohit)
+      );
 
-    // Add to lcio tracks collection
-    calohits->addElement(lcio_calohit);
+      // Add to lcio tracks collection
+      calohits->addElement(lcio_calohit);
+    }
   }
 
   // Add all Calorimeter Hits to event
@@ -199,77 +213,78 @@ void EDM4hep2LcioTool::convertLCIOClusters(
 
   // Loop over EDM4hep clusters converting them to lcio clusters
   for (const auto& edm_cluster : (*cluster_coll)) {
+    if (edm_cluster.isAvailable()) {
 
-    auto* lcio_cluster = new lcio::ClusterImpl();
+      auto* lcio_cluster = new lcio::ClusterImpl();
 
-    std::bitset<32> type_bits = edm_cluster.getType();
-    for (int j=0; j<32; j++) {
-      lcio_cluster->setTypeBit(j, (type_bits[j] == 0) ? false : true );
-    }
-    lcio_cluster->setEnergy(edm_cluster.getEnergy());
-    lcio_cluster->setEnergyError(edm_cluster.getEnergyError());
-
-    std::array<float, 3> edm_cluster_pos = {
-      edm_cluster.getPosition().x, edm_cluster.getPosition().y, edm_cluster.getPosition().z};
-    lcio_cluster->setPosition(edm_cluster_pos.data());
-
-    lcio_cluster->setPositionError(edm_cluster.getPositionError().data());
-    lcio_cluster->setITheta(edm_cluster.getITheta());
-    lcio_cluster->setIPhi(edm_cluster.getPhi());
-    std::array<float, 3> edm_cluster_dir_err= {
-      edm_cluster.getPosition().x, edm_cluster.getPosition().y, edm_cluster.getPosition().z};
-    lcio_cluster->setDirectionError(edm_cluster_dir_err.data());
-
-    EVENT::FloatVec shape_vec {};
-    for (auto& param : edm_cluster.getShapeParameters()) {
-      shape_vec.push_back(param);
-    }
-    lcio_cluster->setShape(shape_vec);
-
-    // Link multiple associated ParticleID if found in converted ones
-    for (auto& edm_particleID : edm_cluster.getParticleIDs()) {
-      if (edm_particleID.isAvailable()) {
-        bool conv_found = false;
-        for (auto& particleID : particleIDs_vec) {
-          if (particleID.second == edm_particleID) {
-            lcio_cluster->addParticleID(particleID.first);
-            conv_found = true;
-            break;
-          }
-        }
-        // If particle avilable, but not found in converted vec, add nullptr
-        if (not conv_found) lcio_cluster->addParticleID(nullptr);
+      std::bitset<32> type_bits = edm_cluster.getType();
+      for (int j=0; j<32; j++) {
+        lcio_cluster->setTypeBit(j, (type_bits[j] == 0) ? false : true );
       }
-    }
+      lcio_cluster->setEnergy(edm_cluster.getEnergy());
+      lcio_cluster->setEnergyError(edm_cluster.getEnergyError());
 
-    // Link multiple associated Calorimeter Hits, and Hit Contributions
-    // There must be same number of Calo Hits and Hit Contributions
-    if (edm_cluster.hits_size() == edm_cluster.hitContributions_size()) {
-      for (int j=0; j < edm_cluster.hits_size(); ++j) { // use index to get same hit and contrib
-        if (edm_cluster.getHits(j).isAvailable()) {
+      std::array<float, 3> edm_cluster_pos = {
+        edm_cluster.getPosition().x, edm_cluster.getPosition().y, edm_cluster.getPosition().z};
+      lcio_cluster->setPosition(edm_cluster_pos.data());
+
+      lcio_cluster->setPositionError(edm_cluster.getPositionError().data());
+      lcio_cluster->setITheta(edm_cluster.getITheta());
+      lcio_cluster->setIPhi(edm_cluster.getPhi());
+      std::array<float, 3> edm_cluster_dir_err= {
+        edm_cluster.getPosition().x, edm_cluster.getPosition().y, edm_cluster.getPosition().z};
+      lcio_cluster->setDirectionError(edm_cluster_dir_err.data());
+
+      EVENT::FloatVec shape_vec {};
+      for (auto& param : edm_cluster.getShapeParameters()) {
+        shape_vec.push_back(param);
+      }
+      lcio_cluster->setShape(shape_vec);
+
+      // Link multiple associated ParticleID if found in converted ones
+      for (auto& edm_particleID : edm_cluster.getParticleIDs()) {
+        if (edm_particleID.isAvailable()) {
           bool conv_found = false;
-          for (auto& hit : calohits_vec) {
-            if (hit.second == edm_cluster.getHits(j)) {
-              lcio_cluster->addHit(
-                hit.first, edm_cluster.getHitContributions(j));
+          for (auto& particleID : particleIDs_vec) {
+            if (particleID.second == edm_particleID) {
+              lcio_cluster->addParticleID(particleID.first);
               conv_found = true;
               break;
             }
           }
-          // If hit avilable, but not found in converted vec, add nullptr
-          if (not conv_found) lcio_cluster->addHit(nullptr, 0);
+          // If particle avilable, but not found in converted vec, add nullptr
+          if (not conv_found) lcio_cluster->addParticleID(nullptr);
         }
       }
+
+      // Link multiple associated Calorimeter Hits, and Hit Contributions
+      // There must be same number of Calo Hits and Hit Contributions
+      if (edm_cluster.hits_size() == edm_cluster.hitContributions_size()) {
+        for (int j=0; j < edm_cluster.hits_size(); ++j) { // use index to get same hit and contrib
+          if (edm_cluster.getHits(j).isAvailable()) {
+            bool conv_found = false;
+            for (auto& hit : calohits_vec) {
+              if (hit.second == edm_cluster.getHits(j)) {
+                lcio_cluster->addHit(
+                  hit.first, edm_cluster.getHitContributions(j));
+                conv_found = true;
+                break;
+              }
+            }
+            // If hit avilable, but not found in converted vec, add nullptr
+            if (not conv_found) lcio_cluster->addHit(nullptr, 0);
+          }
+        }
+      }
+
+      // Add LCIO and EDM4hep pair collections to vec
+      cluster_vec.emplace_back(
+        std::make_pair(lcio_cluster, edm_cluster)
+      );
+
+      // Add to lcio tracks collection
+      clusters->addElement(lcio_cluster);
     }
-
-    // Add LCIO and EDM4hep pair collections to vec
-    cluster_vec.emplace_back(
-      std::make_pair(lcio_cluster, edm_cluster)
-    );
-
-    // Add to lcio tracks collection
-    clusters->addElement(lcio_cluster);
-
   }
 
   // Link associated clusters after converting all clusters
@@ -311,42 +326,44 @@ void EDM4hep2LcioTool::convertLCIOVertices(
 
   // Loop over EDM4hep vertex converting them to lcio vertex
   for (const auto& edm_vertex : (*vertex_coll)) {
+    if (edm_vertex.isAvailable()) {
 
-    auto* lcio_vertex = new lcio::VertexImpl();
-    lcio_vertex->setPrimary( edm_vertex.getPrimary() );
-    #warning "AlgoritymType conversion from int to string"
-    lcio_vertex->setAlgorithmType( std::string{edm_vertex.getAlgorithmType()} ); // TODO std::string(int)
-    lcio_vertex->setChi2( edm_vertex.getChi2() );
-    lcio_vertex->setProbability( edm_vertex.getProbability() );
-    lcio_vertex->setPosition( edm_vertex.getPosition()[0], edm_vertex.getPosition()[1], edm_vertex.getPosition()[2] );
-    lcio_vertex->setCovMatrix( edm_vertex.getCovMatrix().data() );
+      auto* lcio_vertex = new lcio::VertexImpl();
+      lcio_vertex->setPrimary( edm_vertex.getPrimary() );
+      #warning "AlgoritymType conversion from int to string"
+      lcio_vertex->setAlgorithmType( std::string{edm_vertex.getAlgorithmType()} ); // TODO std::string(int)
+      lcio_vertex->setChi2( edm_vertex.getChi2() );
+      lcio_vertex->setProbability( edm_vertex.getProbability() );
+      lcio_vertex->setPosition( edm_vertex.getPosition()[0], edm_vertex.getPosition()[1], edm_vertex.getPosition()[2] );
+      lcio_vertex->setCovMatrix( edm_vertex.getCovMatrix().data() );
 
-    for (auto& param : edm_vertex.getParameters()) {
-      lcio_vertex->addParameter(param);
-    }
-
-    // Link sinlge associated Particle if found in converted ones
-    edm4hep::ConstReconstructedParticle vertex_rp = edm_vertex.getAssociatedParticle();
-    if (vertex_rp.isAvailable()) {
-      bool conv_found = false;
-      for (auto& rp : recoparticles_vec) {
-        if (rp.second == vertex_rp) {
-          lcio_vertex->setAssociatedParticle(rp.first);
-          conv_found = true;
-          break;
-        }
+      for (auto& param : edm_vertex.getParameters()) {
+        lcio_vertex->addParameter(param);
       }
-      // If recoparticle avilable, but not found in converted vec, add nullptr
-      if (not conv_found) lcio_vertex->setAssociatedParticle(nullptr);
+
+      // Link sinlge associated Particle if found in converted ones
+      edm4hep::ConstReconstructedParticle vertex_rp = edm_vertex.getAssociatedParticle();
+      if (vertex_rp.isAvailable()) {
+        bool conv_found = false;
+        for (auto& rp : recoparticles_vec) {
+          if (rp.second == vertex_rp) {
+            lcio_vertex->setAssociatedParticle(rp.first);
+            conv_found = true;
+            break;
+          }
+        }
+        // If recoparticle avilable, but not found in converted vec, add nullptr
+        if (not conv_found) lcio_vertex->setAssociatedParticle(nullptr);
+      }
+
+      // Add LCIO and EDM4hep pair collections to vec
+      vertex_vec.emplace_back(
+        std::make_pair(lcio_vertex, edm_vertex)
+      );
+
+      // Add to lcio tracks collection
+      vertices->addElement(lcio_vertex);
     }
-
-    // Add LCIO and EDM4hep pair collections to vec
-    vertex_vec.emplace_back(
-      std::make_pair(lcio_vertex, edm_vertex)
-    );
-
-    // Add to lcio tracks collection
-    vertices->addElement(lcio_vertex);
   }
 
   // Add all tracks to event
@@ -372,25 +389,27 @@ void EDM4hep2LcioTool::convertLCIOParticleIDs(
   auto* particleIDs = new lcio::LCCollectionVec(lcio::LCIO::PARTICLEID);
 
   for (const auto& edm_pid : (*pIDs_coll)) {
+    if (edm_pid.isAvailable()) {
 
-    auto* lcio_pID = new lcio::ParticleIDImpl;
+      auto* lcio_pID = new lcio::ParticleIDImpl;
 
-    lcio_pID->setType(edm_pid.getType());
-    lcio_pID->setPDG(edm_pid.getPDG());
-    lcio_pID->setLikelihood(edm_pid.getLikelihood());
-    lcio_pID->setAlgorithmType(edm_pid.getAlgorithmType());
-    podio::RelationRange<float> pID_params = edm_pid.getParameters();
-    for (auto& param : pID_params) {
-      lcio_pID->addParameter(param);
+      lcio_pID->setType(edm_pid.getType());
+      lcio_pID->setPDG(edm_pid.getPDG());
+      lcio_pID->setLikelihood(edm_pid.getLikelihood());
+      lcio_pID->setAlgorithmType(edm_pid.getAlgorithmType());
+      podio::RelationRange<float> pID_params = edm_pid.getParameters();
+      for (auto& param : pID_params) {
+        lcio_pID->addParameter(param);
+      }
+
+      // Add LCIO and EDM4hep pair collections to vec
+      particleIDs_vec.emplace_back(
+        std::make_pair(lcio_pID, edm_pid)
+      );
+
+      // Add to lcio particleIDs collection
+      particleIDs->addElement(lcio_pID);
     }
-
-    // Add LCIO and EDM4hep pair collections to vec
-    particleIDs_vec.emplace_back(
-      std::make_pair(lcio_pID, edm_pid)
-    );
-
-    // Add to lcio particleIDs collection
-    particleIDs->addElement(lcio_pID);
   }
 
   // Add all particles to event
@@ -421,6 +440,7 @@ void EDM4hep2LcioTool::convertLCIOReconstructedParticles(
 
     auto* lcio_recp = new lcio::ReconstructedParticleImpl;
     if (edm_rp.isAvailable()) {
+
       lcio_recp->setType(edm_rp.getType());
       float m[3] = {edm_rp.getMomentum()[0], edm_rp.getMomentum()[1], edm_rp.getMomentum()[2]};
       lcio_recp->setMomentum(m);
@@ -493,15 +513,15 @@ void EDM4hep2LcioTool::convertLCIOReconstructedParticles(
           if (not conv_found) lcio_recp->addCluster(nullptr);
         }
       }
+
+      // Add LCIO and EDM4hep pair collections to vec
+      recoparticles_vec.push_back(
+        std::make_pair(lcio_recp, edm_rp)
+      );
+
+      // Add to reconstructed particles collection
+      recops->addElement(lcio_recp);
     }
-
-    // Add LCIO and EDM4hep pair collections to vec
-    recoparticles_vec.push_back(
-      std::make_pair(lcio_recp, edm_rp)
-    );
-
-    // Add to reconstructed particles collection
-    recops->addElement(lcio_recp);
   }
 
   // Link associated recopartilces after converting all recoparticles
