@@ -1,3 +1,28 @@
+# Compile Gaudi algorithm for conversion testing
+gaudi_add_module(TestE4H2L
+  SOURCES
+    src/TestE4H2L.cpp
+  LINK
+    GaudiAlgLib
+    GaudiKernel
+    ${LCIO_LIBRARIES}
+    k4FWCore::k4FWCore
+    EDM4HEP::edm4hep
+    k4LCIOReader::k4LCIOReader
+)
+
+message(STATUS ${CMAKE_SOURCE_DIR}/k4MarlinWrapper/)
+
+target_include_directories(TestE4H2L PUBLIC
+  src/
+  ${CMAKE_SOURCE_DIR}/k4MarlinWrapper/k4MarlinWrapper/
+  k4FWCore
+  EDM4HEP::edm4hep
+  ${LCIO_INCLUDE_DIRS}
+)
+
+# Add test scripts
+
 find_program(BASH_PROGRAM bash)
 
 if (BASH_PROGRAM)
@@ -29,13 +54,11 @@ if (BASH_PROGRAM)
       ENVIRONMENT k4MarlinWrapper_tests_DIR=${CMAKE_CURRENT_SOURCE_DIR}
       PASS_REGULAR_EXPRESSION "INFO Application Manager Terminated successfully")
 
-  # # Test the lcio to edm4hep converter
-  # add_test( test_edm4hep2lcio_conversion ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/test_edm4hep2lcio_converter.sh )
-  # set_tests_properties (test_edm4hep2lcio_conversion
-  #   PROPERTIES
-  #     ENVIRONMENT k4MarlinWrapper_tests_DIR=${CMAKE_CURRENT_SOURCE_DIR}
-  #     PASS_REGULAR_EXPRESSION "INFO Application Manager Terminated successfully"
-  #     REQUIRED_FILES ${CMAKE_CURRENT_SOURCE_DIR}/inputFiles/edm4hep2lcio.root
-  #     TIMEOUT 60)
+  # Test the edm4hep to lcio converter
+  add_test( test_edm_converters ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/test_edm_converters.sh )
+  set_tests_properties (test_edm_converters
+    PROPERTIES
+      ENVIRONMENT k4MarlinWrapper_tests_DIR=${CMAKE_CURRENT_SOURCE_DIR}
+      PASS_REGULAR_EXPRESSION "INFO Application Manager Terminated successfully")
 
 endif(BASH_PROGRAM)
