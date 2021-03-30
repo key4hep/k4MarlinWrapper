@@ -36,6 +36,9 @@ StatusCode Lcio2EDM4hepTool::initialize() {
     } else if (m_lcio2edm_params[i] == "Track") {
       m_dataHandlesMap[m_lcio2edm_params[i+2]] =
         new DataHandle<edm4hep::TrackCollection>(m_lcio2edm_params[i+2], Gaudi::DataHandle::Writer, this);
+    } else if (m_lcio2edm_params[i] == "CalorimeterHit") {
+      m_dataHandlesMap[m_lcio2edm_params[i+2]] =
+        new DataHandle<edm4hep::CalorimeterHitCollection>(m_lcio2edm_params[i+2], Gaudi::DataHandle::Writer, this);
     } else {
       debug() << m_lcio2edm_params[i] << ": conversion type not supported." << endmsg;
       debug() << "List of supported types: Track, Vertex, ParticleID, ReconstructedParticle." << endmsg;
@@ -107,6 +110,9 @@ StatusCode Lcio2EDM4hepTool::convertCollections(
         m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
     } else if (m_lcio2edm_params[i] == "Track") {
       convertPut<edm4hep::TrackCollection>(
+        m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
+    } else if (m_lcio2edm_params[i] == "CalorimeterHit") {
+      convertPut<edm4hep::CalorimeterHitCollection>(
         m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
     } else {
       error() << m_lcio2edm_params[i] << ": conversion type not supported." << endmsg;
