@@ -70,10 +70,10 @@ void EDM4hep2LcioTool::convertLCIOTracks(
         auto* lcio_tr_trackerhit = new lcio::TrackerHitImpl();
 
         #warning "Splitting unsigned long long into two ints"
-        unsigned long long combined_value = tr_trackerhit.getCellID();
-        int* combined_value_int_ptr = (int*) combined_value;
-        lcio_tr_trackerhit->setCellID0(combined_value_int_ptr[0]);
-        lcio_tr_trackerhit->setCellID1(combined_value_int_ptr[1]);
+        uint64_t combined_value = tr_trackerhit.getCellID();
+        uint32_t* combined_value_ptr = reinterpret_cast<uint32_t*>(&combined_value);
+        lcio_tr_trackerhit->setCellID0(combined_value_ptr[0]);
+        lcio_tr_trackerhit->setCellID1(combined_value_ptr[1]);
         lcio_tr_trackerhit->setType(tr_trackerhit.getType());
         std::array<double, 3> positions {
           tr_trackerhit.getPosition()[0], tr_trackerhit.getPosition()[1], tr_trackerhit.getPosition()[2]};
@@ -83,8 +83,8 @@ void EDM4hep2LcioTool::convertLCIOTracks(
         lcio_tr_trackerhit->setEDepError(tr_trackerhit.getEDepError() );
         lcio_tr_trackerhit->setTime(tr_trackerhit.getTime() );
         lcio_tr_trackerhit->setQuality(tr_trackerhit.getQuality() );
-        std::bitset<32> type_bits = tr_trackerhit.getQuality();
-        for (int j=0; j<32; j++) {
+        std::bitset<sizeof(uint32_t)> type_bits = tr_trackerhit.getQuality();
+        for (int j=0; j<sizeof(uint32_t); j++) {
           lcio_tr_trackerhit->setQualityBit(j, (type_bits[j] == 0) ? 0 : 1 );
         }
 
@@ -117,10 +117,10 @@ void EDM4hep2LcioTool::convertLCIOTracks(
       tracks_vec.emplace_back(
         std::make_pair(lcio_tr, edm_tr)
       );
-    }
 
-    // Add to lcio tracks collection
-    tracks->addElement(lcio_tr);
+      // Add to lcio tracks collection
+      tracks->addElement(lcio_tr);
+    }
   }
 
   // Link associated tracks after converting all tracks
@@ -164,10 +164,10 @@ void EDM4hep2LcioTool::convertLCIOCalorimeterHits(
       auto* lcio_calohit = new lcio::CalorimeterHitImpl();
 
       #warning "Splitting unsigned long long into two ints"
-      unsigned long long combined_value = edm_calohit.getCellID();
-      int* combined_value_int_ptr = (int*) combined_value;
-      lcio_calohit->setCellID0(combined_value_int_ptr[0]);
-      lcio_calohit->setCellID1(combined_value_int_ptr[1]);
+      uint64_t combined_value = edm_calohit.getCellID();
+      uint32_t* combined_value_ptr = reinterpret_cast<uint32_t*>(&combined_value);
+      lcio_calohit->setCellID0(combined_value_ptr[0]);
+      lcio_calohit->setCellID1(combined_value_ptr[1]);
       lcio_calohit->setEnergy(edm_calohit.getEnergy());
       lcio_calohit->setEnergyError(edm_calohit.getEnergyError());
       lcio_calohit->setTime(edm_calohit.getTime());
@@ -217,8 +217,8 @@ void EDM4hep2LcioTool::convertLCIOClusters(
 
       auto* lcio_cluster = new lcio::ClusterImpl();
 
-      std::bitset<32> type_bits = edm_cluster.getType();
-      for (int j=0; j<32; j++) {
+      std::bitset<sizeof(uint32_t)> type_bits = edm_cluster.getType();
+      for (int j=0; j<sizeof(uint32_t); j++) {
         lcio_cluster->setTypeBit(j, (type_bits[j] == 0) ? false : true );
       }
       lcio_cluster->setEnergy(edm_cluster.getEnergy());
