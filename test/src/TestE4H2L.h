@@ -8,7 +8,8 @@
 #include "k4FWCore/DataHandle.h"
 
 // EDM4hep
-// #include "edm4hep/ParticleIDCollection.h"
+#include "edm4hep/ParticleID.h"
+#include "edm4hep/ParticleIDCollection.h"
 // #include "edm4hep/ReconstructedParticle.h"
 // #include "edm4hep/ReconstructedParticleCollection.h"
 // #include "edm4hep/ReconstructedParticleData.h"
@@ -43,7 +44,12 @@ private:
   ToolHandle<IEDMConverter> m_lcio_conversionTool{"IEDMConverter/Lcio2EDM4hep", this};
 
   std::map<std::string, DataObjectHandleBase*> m_dataHandlesMap;
+
   const std::string m_edm_callohit_name = "E4H_CaloHitCollection";
+  const std::string m_edm_particleid_name = "E4H_ParticleIDCollection";
+
+  void createFakeCollections();
+  bool isSameEDM4hepEDM4hep();
 
 };
 
