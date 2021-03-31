@@ -11,14 +11,16 @@ END_TAG = "END_TAG"
 edmConvTool = EDM4hep2LcioTool("EDM4hep2lcio")
 edmConvTool.Parameters = [
     "CalorimeterHit", "E4H_CaloHitCollection", "LCIO_CaloHitCollection",
-    "ParticleID", "E4H_ParticleIDCollection", "LCIO_ParticleIDCollection"
+    "ParticleID", "E4H_ParticleIDCollection", "LCIO_ParticleIDCollection",
+    "Track", "E4H_TrackCollection", "LCIO_TrackCollection"
 ]
 
 # LCIO2EDM4hep Tool
 lcioConvTool = Lcio2EDM4hepTool("Lcio2EDM4hep")
 lcioConvTool.Parameters = [
     "CalorimeterHit", "LCIO_CaloHitCollection", "E4H_CaloHitCollection_conv",
-    "ParticleID", "LCIO_ParticleIDCollection", "E4H_ParticleIDCollection_conv"
+    "ParticleID", "LCIO_ParticleIDCollection", "E4H_ParticleIDCollection_conv",
+    "Track", "LCIO_TrackCollection", "E4H_TrackCollection_conv"
 ]
 
 TestConversion = TestE4H2L("TestConversion")

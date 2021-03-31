@@ -13,14 +13,29 @@
 // #include "edm4hep/ReconstructedParticle.h"
 // #include "edm4hep/ReconstructedParticleCollection.h"
 // #include "edm4hep/ReconstructedParticleData.h"
-// #include "edm4hep/Track.h"
-// #include "edm4hep/TrackCollection.h"
+#include "edm4hep/Track.h"
+#include "edm4hep/TrackCollection.h"
 #include "edm4hep/CalorimeterHit.h"
 #include "edm4hep/CalorimeterHitCollection.h"
 // #include "edm4hep/Cluster.h"
 // #include "edm4hep/ClusterCollection.h"
 // #include "edm4hep/Vertex.h"
 // #include "edm4hep/VertexCollection.h"
+
+// LCIO
+#include "lcio.h"
+#include "IMPL/LCEventImpl.h"
+#include "IMPL/LCCollectionVec.h"
+#include "IMPL/ReconstructedParticleImpl.h"
+#include "IMPL/TrackImpl.h"
+#include "IMPL/TrackStateImpl.h"
+#include "IMPL/CalorimeterHitImpl.h"
+#include "IMPL/TrackerHitImpl.h"
+#include "IMPL/ClusterImpl.h"
+#include "IMPL/VertexImpl.h"
+#include "IMPL/ParticleIDImpl.h"
+
+#include "LCIOSTLTypes.h"
 
 // Interface
 #include "converters/IEDMConverter.h"
@@ -45,10 +60,21 @@ private:
 
   std::map<std::string, DataObjectHandleBase*> m_dataHandlesMap;
 
-  const std::string m_edm_callohit_name = "E4H_CaloHitCollection";
+  const std::string m_edm_callohit_name   = "E4H_CaloHitCollection";
   const std::string m_edm_particleid_name = "E4H_ParticleIDCollection";
+  const std::string m_edm_track_name      = "E4H_TrackCollection";
 
+  void createCalorimeterHits(int& int_cnt, float& float_cnt);
+  void createParticleIDs(int& int_cnt, float& float_cnt);
+  void createTracks(int& int_cnt, float& float_cnt);
   void createFakeCollections();
+
+  bool checkEDMTrackLCIOTrack(lcio::LCEventImpl* the_event);
+  bool isSameEDM4hepLCIO(lcio::LCEventImpl* the_event);
+
+  bool checkEDMCaloHitEDMCaloHit();
+  bool checkEDMpIDEDMpID();
+  bool checkEDMTrackEDMTrack();
   bool isSameEDM4hepEDM4hep();
 
 };
