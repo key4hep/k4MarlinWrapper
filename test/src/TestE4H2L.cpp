@@ -82,14 +82,14 @@ void TestE4H2L::createTracks(
   float& float_cnt)
 {
   // edm4hep::Track
-  const int track_elems = 2;
+  const int track_elems = 4;
   auto track_coll = new edm4hep::TrackCollection();
 
   for (int i=0; i < track_elems; ++i) {
 
     auto elem = new edm4hep::Track();
 
-    elem->setType(2); // specific type
+    elem->setType(2); // TODO specific type
     elem->setChi2(float_cnt++);
     elem->setNdf(int_cnt++);
     elem->setDEdx(float_cnt++);
@@ -152,6 +152,19 @@ void TestE4H2L::createTracks(
     track_coll->push_back(*elem);
   }
 
+  // Connect tracks between them
+  if (track_coll->size() >= 4) {
+    // Add 0 with 2
+    track_coll->at(0).addToTracks(track_coll->at(2));
+    // Add 1 with 3
+    track_coll->at(1).addToTracks(track_coll->at(3));
+    // Add 2 with 3 + circular dependency
+    track_coll->at(2).addToTracks(track_coll->at(3));
+    track_coll->at(3).addToTracks(track_coll->at(2));
+    // Add 3 with 0
+    track_coll->at(3).addToTracks(track_coll->at(0));
+  }
+
   auto* track_handle = dynamic_cast<DataHandle<edm4hep::TrackCollection>*>(
     m_dataHandlesMap[m_edm_track_name]);
   track_handle->put(track_coll);
@@ -197,7 +210,6 @@ bool TestE4H2L::checkEDMTrackLCIOTrack(
       track_same = track_same && (edm_track_orig.trackerHits_size() == lcio_track->getTrackerHits().size());
       if ((edm_track_orig.trackerHits_size() == lcio_track->getTrackerHits().size())) {
         for (int j=0; j< edm_track_orig.trackerHits_size(); ++j) {
-
 
           auto edm_trackerhit_orig = edm_track_orig.getTrackerHits(j);
           auto* lcio_trackerhit = lcio_track->getTrackerHits()[j];
@@ -265,6 +277,20 @@ bool TestE4H2L::checkEDMTrackLCIOTrack(
         }
       }
 
+    }
+
+    // // Check track connections
+    if (lcio_coll_size >= 4) {
+      auto* lcio_track0 = dynamic_cast<lcio::TrackImpl*>(lcio_track_coll->getElementAt(0));
+      auto* lcio_track1 = dynamic_cast<lcio::TrackImpl*>(lcio_track_coll->getElementAt(1));
+      auto* lcio_track2 = dynamic_cast<lcio::TrackImpl*>(lcio_track_coll->getElementAt(2));
+      auto* lcio_track3 = dynamic_cast<lcio::TrackImpl*>(lcio_track_coll->getElementAt(3));
+
+      track_same = track_same && (lcio_track0->getTracks()[0] == lcio_track2);
+      track_same = track_same && (lcio_track1->getTracks()[0] == lcio_track3);
+      track_same = track_same && (lcio_track2->getTracks()[0] == lcio_track3);
+      track_same = track_same && (lcio_track3->getTracks()[0] == lcio_track2);
+      track_same = track_same && (lcio_track3->getTracks()[1] == lcio_track0);
     }
   }
 
