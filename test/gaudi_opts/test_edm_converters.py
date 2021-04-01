@@ -6,6 +6,7 @@ algList = []
 
 END_TAG = "END_TAG"
 
+evtsvc = k4DataSvc('EventDataSvc')
 
 # EDM4hep2lcio Tool
 edmConvTool = EDM4hep2LcioTool("EDM4hep2lcio")
@@ -53,5 +54,6 @@ from Configurables import ApplicationMgr
 ApplicationMgr( TopAlg = algList,
                 EvtSel = 'NONE',
                 EvtMax = 1,
+                ExtSvc = [evtsvc],
                 OutputLevel=DEBUG
 )
