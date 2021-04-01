@@ -124,13 +124,13 @@ void EDM4hep2LcioTool::convertLCIOTracks(
   }
 
   // Link associated tracks after converting all tracks
-  for (auto& tr_pair : tracks_vec) {
-    for (auto& edm_linked_tr : tr_pair.second.getTracks()) {
+  for (auto& [lcio_tr, edm_tr] : tracks_vec) {
+    for (const auto& edm_linked_tr : edm_tr.getTracks()) {
       if (edm_linked_tr.isAvailable()) {
         // Search the linked track in the converted vector
-        for (auto& tr_linked_pair : tracks_vec) {
-          if (tr_linked_pair.second == edm_linked_tr) {
-            tr_pair.first->addTrack(tr_linked_pair.first);
+        for (const auto& [lcio_tr_linked, edm_tr_linked] : tracks_vec) {
+          if (edm_tr_linked == edm_linked_tr) {
+            lcio_tr->addTrack(lcio_tr_linked);
             break;
           }
         }
@@ -242,12 +242,12 @@ void EDM4hep2LcioTool::convertLCIOClusters(
       lcio_cluster->setShape(shape_vec);
 
       // Link multiple associated ParticleID if found in converted ones
-      for (auto& edm_particleID : edm_cluster.getParticleIDs()) {
+      for (const auto& edm_particleID : edm_cluster.getParticleIDs()) {
         if (edm_particleID.isAvailable()) {
           bool conv_found = false;
-          for (auto& particleID : particleIDs_vec) {
-            if (particleID.second == edm_particleID) {
-              lcio_cluster->addParticleID(particleID.first);
+          for (const auto& [lcio_pid, edm_pid] : particleIDs_vec) {
+            if (edm_pid == edm_particleID) {
+              lcio_cluster->addParticleID(lcio_pid);
               conv_found = true;
               break;
             }
@@ -263,10 +263,10 @@ void EDM4hep2LcioTool::convertLCIOClusters(
         for (int j=0; j < edm_cluster.hits_size(); ++j) { // use index to get same hit and contrib
           if (edm_cluster.getHits(j).isAvailable()) {
             bool conv_found = false;
-            for (auto& hit : calohits_vec) {
-              if (hit.second == edm_cluster.getHits(j)) {
+            for (const auto& [lcio_hit, edm_hit] : calohits_vec) {
+              if (edm_hit == edm_cluster.getHits(j)) {
                 lcio_cluster->addHit(
-                  hit.first, edm_cluster.getHitContributions(j));
+                  lcio_hit, edm_cluster.getHitContributions(j));
                 conv_found = true;
                 break;
               }
@@ -288,13 +288,13 @@ void EDM4hep2LcioTool::convertLCIOClusters(
   }
 
   // Link associated clusters after converting all clusters
-  for (auto& cluster_pair : cluster_vec) {
-    for (auto& edm_linked_cluster : cluster_pair.second.getClusters()) {
+  for (auto& [lcio_cluter, edm_cluster] : cluster_vec) {
+    for (const auto& edm_linked_cluster : edm_cluster.getClusters()) {
       if (edm_linked_cluster.isAvailable()) {
         // Search the linked track in the converted vector
-        for (auto& cluster_linked_pair : cluster_vec) {
-          if (cluster_linked_pair.second == edm_linked_cluster) {
-            cluster_pair.first->addCluster(cluster_linked_pair.first);
+        for (const auto& [lcio_cluster_linked, edm_cluster_linked] : cluster_vec) {
+          if (edm_cluster_linked == edm_linked_cluster) {
+            lcio_cluter->addCluster(lcio_cluster_linked);
             break;
           }
         }
@@ -345,9 +345,9 @@ void EDM4hep2LcioTool::convertLCIOVertices(
       edm4hep::ConstReconstructedParticle vertex_rp = edm_vertex.getAssociatedParticle();
       if (vertex_rp.isAvailable()) {
         bool conv_found = false;
-        for (auto& rp : recoparticles_vec) {
-          if (rp.second == vertex_rp) {
-            lcio_vertex->setAssociatedParticle(rp.first);
+        for (const auto& [lcio_rp, edm_rp] : recoparticles_vec) {
+          if (edm_rp == vertex_rp) {
+            lcio_vertex->setAssociatedParticle(lcio_rp);
             conv_found = true;
             break;
           }
@@ -456,9 +456,9 @@ void EDM4hep2LcioTool::convertLCIOReconstructedParticles(
       edm4hep::ConstParticleID pIDUsed = edm_rp.getParticleIDUsed();
       if (pIDUsed.isAvailable()) {
         bool conv_found = false;
-        for (auto& particleID : particleIDs_vec) {
-          if (particleID.second == pIDUsed) {
-            lcio_recp->setParticleIDUsed(particleID.first);
+        for (const auto& [lcio_pid, edm_pid] : particleIDs_vec) {
+          if (edm_pid == pIDUsed) {
+            lcio_recp->setParticleIDUsed(lcio_pid);
             conv_found = true;
             break;
           }
@@ -471,9 +471,9 @@ void EDM4hep2LcioTool::convertLCIOReconstructedParticles(
       edm4hep::ConstVertex vertex = edm_rp.getStartVertex();
       if (vertex.isAvailable()) {
         bool conv_found = false;
-        for (auto& lcio_vertex : vertex_vec) {
-          if (lcio_vertex.second == vertex) {
-            lcio_recp->setStartVertex(lcio_vertex.first);
+        for (const auto& [lcio_vertex, edm_vertex] : vertex_vec) {
+          if (edm_vertex == vertex) {
+            lcio_recp->setStartVertex(lcio_vertex);
             conv_found = true;
             break;
           }
@@ -483,12 +483,12 @@ void EDM4hep2LcioTool::convertLCIOReconstructedParticles(
       }
 
       // Link multiple associated Tracks if found in converted ones
-      for (auto& edm_rp_tr : edm_rp.getTracks()) {
+      for (const auto& edm_rp_tr : edm_rp.getTracks()) {
         if (edm_rp_tr.isAvailable()){
           bool conv_found = false;
-          for (auto& lcio_track : tracks_vec) {
-            if (lcio_track.second == edm_rp_tr) {
-              lcio_recp->addTrack(lcio_track.first);
+          for (const auto& [lcio_tr, edm_tr] : tracks_vec) {
+            if (edm_tr == edm_rp_tr) {
+              lcio_recp->addTrack(lcio_tr);
               conv_found = true;
               break;
             }
@@ -499,12 +499,12 @@ void EDM4hep2LcioTool::convertLCIOReconstructedParticles(
       }
 
       // Link multiple associated Clusters if found in converted ones
-      for (auto& edm_cluster : edm_rp.getClusters()) {
-        if (edm_cluster.isAvailable()) {
+      for (const auto& edm_rp_cluster : edm_rp.getClusters()) {
+        if (edm_rp_cluster.isAvailable()) {
           bool conv_found = false;
-          for (auto& cluster_pair : clusters_vec) {
-            if (cluster_pair.second == edm_cluster) {
-              lcio_recp->addCluster(cluster_pair.first);
+          for (const auto& [lcio_cluster, edm_cluster] : clusters_vec) {
+            if (edm_cluster == edm_rp_cluster) {
+              lcio_recp->addCluster(lcio_cluster);
               conv_found = true;
               break;
             }
@@ -525,13 +525,13 @@ void EDM4hep2LcioTool::convertLCIOReconstructedParticles(
   }
 
   // Link associated recopartilces after converting all recoparticles
-  for (auto& rp_pair : recoparticles_vec) {
-    for (auto& edm_linked_rp : rp_pair.second.getParticles()) {
+  for (auto& [lcio_rp, edm_rp] : recoparticles_vec) {
+    for (const auto& edm_linked_rp : edm_rp.getParticles()) {
       if (edm_linked_rp.isAvailable()) {
         // Search the linked track in the converted vector
-        for (auto& rp_linked_pair : recoparticles_vec) {
-          if (rp_linked_pair.second == edm_linked_rp) {
-            rp_pair.first->addParticle(rp_linked_pair.first);
+        for (const auto& [lcio_rp_linked, edm_rp_linked] : recoparticles_vec) {
+          if (edm_rp_linked == edm_linked_rp) {
+            lcio_rp->addParticle(lcio_rp_linked);
             break;
           }
         }
@@ -549,37 +549,37 @@ void EDM4hep2LcioTool::FillMissingCollections(
 {
 
   // Fill missing ReconstructedParticle collections
-  for (auto& rp_pair : collection_pairs.recoparticles) {
+  for (auto& [lcio_rp, edm_rp] : collection_pairs.recoparticles) {
 
     // Link ParticleID
-    if (rp_pair.first->getParticleIDUsed() == nullptr) {
-      if (rp_pair.second.getParticleIDUsed().isAvailable()) {
-        for (auto& particleID : collection_pairs.particleIDs) {
-          if (particleID.second == rp_pair.second.getParticleIDUsed()) {
-            rp_pair.first->setParticleIDUsed(particleID.first);
+    if (lcio_rp->getParticleIDUsed() == nullptr) {
+      if (edm_rp.getParticleIDUsed().isAvailable()) {
+        for (const auto& [lcio_pid, edm_pid] : collection_pairs.particleIDs) {
+          if (edm_pid == edm_rp.getParticleIDUsed()) {
+            lcio_rp->setParticleIDUsed(lcio_pid);
           }
         }
       }
     }
 
     // Link Vertex
-    if (rp_pair.first->getStartVertex() == nullptr) {
-      if (rp_pair.second.getStartVertex().isAvailable()) {
-        for (auto& vertex : collection_pairs.vertices) {
-          if (vertex.second == rp_pair.second.getStartVertex()) {
-            rp_pair.first->setStartVertex(vertex.first);
+    if (lcio_rp->getStartVertex() == nullptr) {
+      if (edm_rp.getStartVertex().isAvailable()) {
+        for (const auto& [lcio_vertex, edm_vertex] : collection_pairs.vertices) {
+          if (edm_vertex == edm_rp.getStartVertex()) {
+            lcio_rp->setStartVertex(lcio_vertex);
           }
         }
       }
     }
 
     // Link Tracks
-    if (rp_pair.first->getTracks().size() != rp_pair.second.tracks_size()) {
-      assert(rp_pair.first->getTracks().size() == 0);
-      for (auto& edm_rp_tr : rp_pair.second.getTracks()) {
-        for (auto& lcio_track : collection_pairs.tracks) {
-          if (lcio_track.second == edm_rp_tr) {
-            rp_pair.first->addTrack(lcio_track.first);
+    if (lcio_rp->getTracks().size() != edm_rp.tracks_size()) {
+      assert(lcio_rp->getTracks().size() == 0);
+      for (const auto& edm_rp_tr : edm_rp.getTracks()) {
+        for (const auto& [lcio_tr, edm_tr] : collection_pairs.tracks) {
+          if (edm_tr == edm_rp_tr) {
+            lcio_rp->addTrack(lcio_tr);
             break;
           }
         }
@@ -587,12 +587,12 @@ void EDM4hep2LcioTool::FillMissingCollections(
     }
 
     // Link Clusters
-    if (rp_pair.first->getClusters().size() != rp_pair.second.clusters_size()) {
-      assert(rp_pair.first->getClusters().size() == 0);
-      for (auto& edm_rp_cluster : rp_pair.second.getClusters()) {
-        for (auto& lcio_cluster : collection_pairs.clusters) {
-          if (lcio_cluster.second == edm_rp_cluster) {
-            rp_pair.first->addCluster(lcio_cluster.first);
+    if (lcio_rp->getClusters().size() != edm_rp.clusters_size()) {
+      assert(lcio_rp->getClusters().size() == 0);
+      for (const auto& edm_rp_cluster : edm_rp.getClusters()) {
+        for (const auto& [lcio_cluster, edm_cluster] : collection_pairs.clusters) {
+          if (edm_cluster == edm_rp_cluster) {
+            lcio_rp->addCluster(lcio_cluster);
             break;
           }
         }
@@ -618,16 +618,15 @@ void EDM4hep2LcioTool::FillMissingCollections(
   } // vertices
 
   // Fill missing Cluster collections
-  for (auto& cluster_pair : collection_pairs.clusters) {
+  for (auto& [lcio_cluster, edm_cluster] : collection_pairs.clusters) {
 
     // Link ParticleIDs
-    if (cluster_pair.first->getParticleIDs().size() != cluster_pair.second.particleIDs_size()) {
-      assert(cluster_pair.first->getParticleIDs().size() == 0);
-      for (int i=0; i < cluster_pair.second.particleIDs_size(); ++i) {
-        edm4hep::ConstParticleID edm_cluster_pid = cluster_pair.second.getParticleIDs(i);
-        for (auto& lcio_pid : collection_pairs.particleIDs) {
-          if (lcio_pid.second == edm_cluster_pid) {
-            cluster_pair.first->addParticleID(lcio_pid.first);
+    if (lcio_cluster->getParticleIDs().size() != edm_cluster.particleIDs_size()) {
+      assert(lcio_cluster->getParticleIDs().size() == 0);
+      for (const auto& edm_cluster_pid : edm_cluster.getParticleIDs()) {
+        for (const auto& [lcio_pid, edm_pid] : collection_pairs.particleIDs) {
+          if (edm_pid == edm_cluster_pid) {
+            lcio_cluster->addParticleID(lcio_pid);
             break;
           }
         }
@@ -635,15 +634,15 @@ void EDM4hep2LcioTool::FillMissingCollections(
     }
 
     // Link associated Calorimeter Hits, and Hit Contributions
-    if (cluster_pair.first->getCalorimeterHits().size() != cluster_pair.second.hits_size()) {
-      assert(cluster_pair.first->getCalorimeterHits().size() == 0);
-      for (int i=0; i < cluster_pair.second.hits_size(); ++i) {
-        auto edm_cluster_hit = cluster_pair.second.getHits(i);
-        auto edm_cluster_contribution = cluster_pair.second.getHitContributions(i);
-        for (auto& lcio_hit : collection_pairs.calohits) {
-          if (lcio_hit.second == edm_cluster_hit) {
-            cluster_pair.first->addHit(
-              lcio_hit.first, edm_cluster_contribution);
+    if (lcio_cluster->getCalorimeterHits().size() != edm_cluster.hits_size()) {
+      assert(lcio_cluster->getCalorimeterHits().size() == 0);
+      for (int i=0; i < edm_cluster.hits_size(); ++i) { // use index for to get same hit and contrib
+        const auto edm_cluster_hit = edm_cluster.getHits(i);
+        const auto edm_cluster_contribution = edm_cluster.getHitContributions(i);
+        for (const auto& [lcio_hit, edm_hit] : collection_pairs.calohits) {
+          if (edm_hit == edm_cluster_hit) {
+            lcio_cluster->addHit(
+              lcio_hit, edm_cluster_contribution);
             break;
           }
         }
