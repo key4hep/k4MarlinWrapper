@@ -1,8 +1,9 @@
 #ifndef K4MARLINWRAPPER_K4LCIOREADERWRAPPER_H
 #define K4MARLINWRAPPER_K4LCIOREADERWRAPPER_H
 
-
+// k4FWCore
 #include "k4FWCore/DataHandle.h"
+#include "k4FWCore/PodioDataSvc.h"
 
 // GAUDI
 #include "GaudiAlg/GaudiTool.h"
@@ -46,6 +47,12 @@ private:
   Gaudi::Property<std::vector<std::string>> m_lcio2edm_params{this, "Parameters", {}};
 
   std::map<std::string, DataObjectHandleBase*> m_dataHandlesMap;
+
+  ServiceHandle<IDataProviderSvc> m_eds;
+  PodioDataSvc* m_podioDataSvc;
+
+  bool collectionExist(
+    const std::string& collection_name);
 
   template <typename T>
   void convertPut(

@@ -4,8 +4,10 @@
 DECLARE_COMPONENT(Lcio2EDM4hepTool);
 
 Lcio2EDM4hepTool::Lcio2EDM4hepTool(const std::string& type, const std::string& name, const IInterface* parent)
-    : GaudiTool(type, name, parent) {
+    : GaudiTool(type, name, parent), m_eds("EventDataSvc", "Lcio2EDM4hepTool") {
   declareInterface<IEDMConverter>(this);
+
+  StatusCode sc = m_eds.retrieve();
 }
 
 Lcio2EDM4hepTool::~Lcio2EDM4hepTool() { ; }
@@ -17,6 +19,9 @@ StatusCode Lcio2EDM4hepTool::initialize() {
     error() << " Error processing conversion parameters. 3 arguments per collection expected. " << endmsg;
     return StatusCode::FAILURE;
   }
+
+  m_podioDataSvc = dynamic_cast<PodioDataSvc*>(m_eds.get());
+  if (nullptr == m_podioDataSvc) return StatusCode::FAILURE;
 
   // Event Header
   m_dataHandlesMap["EventHeader"] =
@@ -82,6 +87,20 @@ void Lcio2EDM4hepTool::convertPut(
 }
 
 
+bool Lcio2EDM4hepTool::collectionExist(
+  const std::string& collection_name)
+{
+  auto collections = m_podioDataSvc->getCollections();
+  for (const auto& [name, coll] : collections) {
+    if (collection_name == name){
+      std::cout << name << std::endl;;
+      return true;
+    }
+  }
+  return false;
+}
+
+
 StatusCode Lcio2EDM4hepTool::convertCollections(
   lcio::LCEventImpl* the_event)
 {
@@ -101,29 +120,31 @@ StatusCode Lcio2EDM4hepTool::convertCollections(
 
   // Convert based on parameters
   for (int i = 0; i < m_lcio2edm_params.size(); i=i+3) {
-
-    if (m_lcio2edm_params[i] == "ReconstructedParticle") {
-      convertPut<edm4hep::ReconstructedParticleCollection>(
-        m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
-    } else if (m_lcio2edm_params[i] == "ParticleID") {
-      convertPut<edm4hep::ParticleIDCollection>(
-        m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
-    } else if (m_lcio2edm_params[i] == "Vertex") {
-      convertPut<edm4hep::VertexCollection>(
-        m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
-    } else if (m_lcio2edm_params[i] == "Track") {
-      convertPut<edm4hep::TrackCollection>(
-        m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
-    } else if (m_lcio2edm_params[i] == "CalorimeterHit") {
-      convertPut<edm4hep::CalorimeterHitCollection>(
-        m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
-    } else if (m_lcio2edm_params[i] == "Cluster") {
-      convertPut<edm4hep::ClusterCollection>(
-        m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
+    if (! collectionExist(m_lcio2edm_params[i+2])) {
+      if (m_lcio2edm_params[i] == "ReconstructedParticle") {
+        convertPut<edm4hep::ReconstructedParticleCollection>(
+          m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
+      } else if (m_lcio2edm_params[i] == "ParticleID") {
+        convertPut<edm4hep::ParticleIDCollection>(
+          m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
+      } else if (m_lcio2edm_params[i] == "Vertex") {
+        convertPut<edm4hep::VertexCollection>(
+          m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
+      } else if (m_lcio2edm_params[i] == "Track") {
+        convertPut<edm4hep::TrackCollection>(
+          m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
+      } else if (m_lcio2edm_params[i] == "CalorimeterHit") {
+        convertPut<edm4hep::CalorimeterHitCollection>(
+          m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
+      } else if (m_lcio2edm_params[i] == "Cluster") {
+        convertPut<edm4hep::ClusterCollection>(
+          m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
+      } else {
+        error() << m_lcio2edm_params[i] << ": conversion type not supported." << endmsg;
+      }
     } else {
-      error() << m_lcio2edm_params[i] << ": conversion type not supported." << endmsg;
+      debug() << " Collection " << m_lcio2edm_params[i+2] << " already in place, skipping conversion. " << endmsg;
     }
-
   }
 
   return StatusCode::SUCCESS;
