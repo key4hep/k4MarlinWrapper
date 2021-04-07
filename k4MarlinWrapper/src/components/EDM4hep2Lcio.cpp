@@ -241,19 +241,21 @@ void EDM4hep2LcioTool::convertLCIOClusters(
       }
       lcio_cluster->setShape(shape_vec);
 
-      // Link multiple associated ParticleID if found in converted ones
-      for (const auto& edm_particleID : edm_cluster.getParticleIDs()) {
-        if (edm_particleID.isAvailable()) {
-          bool conv_found = false;
-          for (const auto& [lcio_pid, edm_pid] : particleIDs_vec) {
-            if (edm_pid == edm_particleID) {
-              lcio_cluster->addParticleID(lcio_pid);
-              conv_found = true;
-              break;
-            }
+
+      // Convert ParticleIDs associated to the recoparticle
+      for (const auto& edm_pid : edm_cluster.getParticleIDs()) {
+        if (edm_pid.isAvailable()) {
+          auto* lcio_pid = new lcio::ParticleIDImpl;
+
+          lcio_pid->setType(edm_pid.getType());
+          lcio_pid->setPDG(edm_pid.getPDG());
+          lcio_pid->setLikelihood(edm_pid.getLikelihood());
+          lcio_pid->setAlgorithmType(edm_pid.getAlgorithmType());
+          for (const auto& param : edm_pid.getParameters()) {
+            lcio_pid->addParameter(param);
           }
-          // If particle avilable, but not found in converted vec, add nullptr
-          if (not conv_found) lcio_cluster->addParticleID(nullptr);
+
+          lcio_cluster->addParticleID(lcio_pid);
         }
       }
 
