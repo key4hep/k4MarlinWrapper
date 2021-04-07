@@ -15,6 +15,8 @@
 #include "edm4hep/ReconstructedParticleData.h"
 #include "edm4hep/Track.h"
 #include "edm4hep/TrackCollection.h"
+#include "edm4hep/TrackerHit.h"
+#include "edm4hep/TrackerHitCollection.h"
 #include "edm4hep/CalorimeterHit.h"
 #include "edm4hep/CalorimeterHitCollection.h"
 #include "edm4hep/Cluster.h"
@@ -51,6 +53,8 @@ struct CollectionsPairVectors {
   std::vector<std::pair<
     lcio::TrackImpl*, edm4hep::Track>> tracks;
   std::vector<std::pair<
+    lcio::TrackerHitImpl*, edm4hep::TrackerHit>> trackerhits;
+  std::vector<std::pair<
     lcio::CalorimeterHitImpl*, edm4hep::CalorimeterHit>> calohits;
   std::vector<std::pair<
       lcio::ClusterImpl*, edm4hep::Cluster>> clusters;
@@ -77,15 +81,22 @@ private:
 
   void convertLCIOTracks(
     std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& tracks_vec,
+    std::vector<std::pair<lcio::TrackerHitImpl*, edm4hep::TrackerHit>>& trackerhits_vec,
     const std::string& e4h_coll_name,
     const std::string& lcio_coll_name,
     lcio::LCEventImpl* lcio_event);
 
-void convertLCIOCalorimeterHits(
-  std::vector<std::pair<lcio::CalorimeterHitImpl*, edm4hep::CalorimeterHit>>& calo_hits_vec,
-  const std::string& e4h_coll_name,
-  const std::string& lcio_coll_name,
-  lcio::LCEventImpl* lcio_event);
+  void convertLCIOTrackerHits(
+    std::vector<std::pair<lcio::TrackerHitImpl*, edm4hep::TrackerHit>>& trackerhits_vec,
+    const std::string& e4h_coll_name,
+    const std::string& lcio_coll_name,
+    lcio::LCEventImpl* lcio_event);
+
+  void convertLCIOCalorimeterHits(
+    std::vector<std::pair<lcio::CalorimeterHitImpl*, edm4hep::CalorimeterHit>>& calo_hits_vec,
+    const std::string& e4h_coll_name,
+    const std::string& lcio_coll_name,
+    lcio::LCEventImpl* lcio_event);
 
   void convertLCIOClusters(
     std::vector<std::pair<lcio::ClusterImpl*, edm4hep::Cluster>>& cluster_vec,
@@ -98,12 +109,6 @@ void convertLCIOCalorimeterHits(
     std::vector<std::pair<lcio::VertexImpl*, edm4hep::Vertex>>& vertex_vec,
     const std::vector<std::pair<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>>& recoparticles_vec,
     const std::string& e4h_name,
-    const std::string& lcio_coll_name,
-    lcio::LCEventImpl* lcio_event);
-
-  void convertLCIOParticleIDs(
-    std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& particleIDs_vec,
-    const std::string& e4h_coll_name,
     const std::string& lcio_coll_name,
     lcio::LCEventImpl* lcio_event);
 

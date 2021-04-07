@@ -25,6 +25,7 @@ StatusCode EDM4hep2LcioTool::finalize() {
 // Add LCIO Collection Vector to LCIO event
 void EDM4hep2LcioTool::convertLCIOTracks(
   std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& tracks_vec,
+  std::vector<std::pair<lcio::TrackerHitImpl*, edm4hep::TrackerHit>>& trackerhits_vec,
   const std::string& e4h_coll_name,
   const std::string& lcio_coll_name,
   lcio::LCEventImpl* lcio_event)
@@ -63,32 +64,20 @@ void EDM4hep2LcioTool::convertLCIOTracks(
         }
       }
 
-
-      // Loop over the Tracker Hits in the track
-      for (auto& tr_trackerhit : edm_tr.getTrackerHits()) {
-
-        auto* lcio_tr_trackerhit = new lcio::TrackerHitImpl();
-
-        #warning "Splitting unsigned long long into two ints"
-        uint64_t combined_value = tr_trackerhit.getCellID();
-        uint32_t* combined_value_ptr = reinterpret_cast<uint32_t*>(&combined_value);
-        lcio_tr_trackerhit->setCellID0(combined_value_ptr[0]);
-        lcio_tr_trackerhit->setCellID1(combined_value_ptr[1]);
-        lcio_tr_trackerhit->setType(tr_trackerhit.getType());
-        std::array<double, 3> positions {
-          tr_trackerhit.getPosition()[0], tr_trackerhit.getPosition()[1], tr_trackerhit.getPosition()[2]};
-        lcio_tr_trackerhit->setPosition(positions.data());
-        lcio_tr_trackerhit->setCovMatrix(tr_trackerhit.getCovMatrix().data() );
-        lcio_tr_trackerhit->setEDep(tr_trackerhit.getEDep() );
-        lcio_tr_trackerhit->setEDepError(tr_trackerhit.getEDepError() );
-        lcio_tr_trackerhit->setTime(tr_trackerhit.getTime() );
-        lcio_tr_trackerhit->setQuality(tr_trackerhit.getQuality() );
-        std::bitset<sizeof(uint32_t)> type_bits = tr_trackerhit.getQuality();
-        for (int j=0; j<sizeof(uint32_t); j++) {
-          lcio_tr_trackerhit->setQualityBit(j, (type_bits[j] == 0) ? 0 : 1 );
+      // Link multiple associated TrackerHits if found in converted ones
+      for (const auto& edm_rp_trh : edm_tr.getTrackerHits()) {
+        if (edm_rp_trh.isAvailable()){
+          bool conv_found = false;
+          for (const auto& [lcio_trh, edm_trh] : trackerhits_vec) {
+            if (edm_trh == edm_rp_trh) {
+              lcio_tr->addHit(lcio_trh);
+              conv_found = true;
+              break;
+            }
+          }
+          // If track available, but not found in converted vec, add nullptr
+          if (not conv_found) lcio_tr->addHit(nullptr);
         }
-
-        lcio_tr->addHit(lcio_tr_trackerhit);
       }
 
       // Loop over the track states in the track
@@ -141,6 +130,62 @@ void EDM4hep2LcioTool::convertLCIOTracks(
   // Add all tracks to event
   lcio_event->addCollection(tracks, lcio_coll_name);
 }
+
+
+// Convert EDM4hep TrackerHits to LCIO
+// Add converted LCIO ptr and original EDM4hep collection to vector of pairs
+// Add LCIO Collection Vector to LCIO event
+void EDM4hep2LcioTool::convertLCIOTrackerHits(
+  std::vector<std::pair<lcio::TrackerHitImpl*, edm4hep::TrackerHit>>& trackerhits_vec,
+  const std::string& e4h_coll_name,
+  const std::string& lcio_coll_name,
+  lcio::LCEventImpl* lcio_event)
+{
+  DataHandle<edm4hep::TrackerHitCollection> trackerhits_handle {
+    e4h_coll_name, Gaudi::DataHandle::Reader, this};
+  const auto trackerhits_coll = trackerhits_handle.get();
+
+  auto* trackerhits = new lcio::LCCollectionVec(lcio::LCIO::TRACKERHIT);
+
+  // Loop over EDM4hep trackerhits converting them to lcio trackerhits
+  for (const auto& edm_trh : (*trackerhits_coll)) {
+    if (edm_trh.isAvailable()) {
+
+      auto* lcio_trh = new lcio::TrackerHitImpl();
+
+      #warning "Splitting unsigned long long into two ints"
+      uint64_t combined_value = edm_trh.getCellID();
+      uint32_t* combined_value_ptr = reinterpret_cast<uint32_t*>(&combined_value);
+      lcio_trh->setCellID0(combined_value_ptr[0]);
+      lcio_trh->setCellID1(combined_value_ptr[1]);
+      lcio_trh->setType(edm_trh.getType());
+      std::array<double, 3> positions {
+        edm_trh.getPosition()[0], edm_trh.getPosition()[1], edm_trh.getPosition()[2]};
+      lcio_trh->setPosition(positions.data());
+      lcio_trh->setCovMatrix(edm_trh.getCovMatrix().data() );
+      lcio_trh->setEDep(edm_trh.getEDep() );
+      lcio_trh->setEDepError(edm_trh.getEDepError() );
+      lcio_trh->setTime(edm_trh.getTime() );
+      lcio_trh->setQuality(edm_trh.getQuality() );
+      std::bitset<sizeof(uint32_t)> type_bits = edm_trh.getQuality();
+      for (int j=0; j<sizeof(uint32_t); j++) {
+        lcio_trh->setQualityBit(j, (type_bits[j] == 0) ? 0 : 1 );
+      }
+
+      // Save intermediate trackerhits ref
+      trackerhits_vec.emplace_back(
+        std::make_pair(lcio_trh, edm_trh)
+      );
+
+      // Add to lcio trackerhits collection
+      trackerhits->addElement(lcio_trh);
+    }
+  }
+
+  // Add all trackerhits to event
+  lcio_event->addCollection(trackerhits, lcio_coll_name);
+}
+
 
 
 // Convert EDM4hep Calorimeter Hits to LCIO
@@ -373,50 +418,6 @@ void EDM4hep2LcioTool::convertLCIOVertices(
 
 
 
-// Convert EDM4hep ParticleEDs to LCIO
-// Add converted LCIO ptr and original EDM4hep collection to vector of pairs
-// Add converted LCIO Collection Vector to LCIO event
-void EDM4hep2LcioTool::convertLCIOParticleIDs(
-  std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& particleIDs_vec,
-  const std::string& e4h_coll_name,
-  const std::string& lcio_coll_name,
-  lcio::LCEventImpl* lcio_event)
-{
-  // ParticleIDs handle
-  DataHandle<edm4hep::ParticleIDCollection> pIDs_handle {
-    e4h_coll_name, Gaudi::DataHandle::Reader, this};
-  const auto pIDs_coll = pIDs_handle.get();
-
-  auto* particleIDs = new lcio::LCCollectionVec(lcio::LCIO::PARTICLEID);
-
-  for (const auto& edm_pid : (*pIDs_coll)) {
-    if (edm_pid.isAvailable()) {
-
-      auto* lcio_pID = new lcio::ParticleIDImpl;
-
-      lcio_pID->setType(edm_pid.getType());
-      lcio_pID->setPDG(edm_pid.getPDG());
-      lcio_pID->setLikelihood(edm_pid.getLikelihood());
-      lcio_pID->setAlgorithmType(edm_pid.getAlgorithmType());
-      podio::RelationRange<float> pID_params = edm_pid.getParameters();
-      for (auto& param : pID_params) {
-        lcio_pID->addParameter(param);
-      }
-
-      // Add LCIO and EDM4hep pair collections to vec
-      particleIDs_vec.emplace_back(
-        std::make_pair(lcio_pID, edm_pid)
-      );
-
-      // Add to lcio particleIDs collection
-      particleIDs->addElement(lcio_pID);
-    }
-  }
-
-  // Add all particles to event
-  lcio_event->addCollection(particleIDs, lcio_coll_name);
-}
-
 // Convert EDM4hep RecoParticles to LCIO
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
 // Add converted LCIO Collection Vector to LCIO event
@@ -569,6 +570,24 @@ void EDM4hep2LcioTool::FillMissingCollections(
   CollectionsPairVectors& collection_pairs)
 {
 
+  // Fill missing Tracks collections
+  for (auto& [lcio_tr, edm_tr] : collection_pairs.tracks) {
+
+    // Link TrackerHits
+    if (lcio_tr->getTrackerHits().size() != edm_tr.trackerHits_size()) {
+      assert(lcio_tr->getTrackerHits().size() == 0);
+      for (const auto& edm_tr_trh : edm_tr.getTrackerHits()) {
+        for (const auto& [lcio_trh, edm_trh] : collection_pairs.trackerhits) {
+          if (edm_trh == edm_tr_trh) {
+            lcio_tr->addHit(lcio_trh);
+            break;
+          }
+        }
+      }
+    }
+
+  }
+
   // Fill missing ReconstructedParticle collections
   for (auto& [lcio_rp, edm_rp] : collection_pairs.recoparticles) {
 
@@ -663,6 +682,14 @@ void EDM4hep2LcioTool::convertAdd(
   if (type == "Track") {
     convertLCIOTracks(
       collection_pairs.tracks,
+      collection_pairs.trackerhits,
+      e4h_coll_name,
+      lcio_coll_name,
+      lcio_event);
+  } else
+  if (type == "TrackerHit") {
+    convertLCIOTrackerHits(
+      collection_pairs.trackerhits,
       e4h_coll_name,
       lcio_coll_name,
       lcio_event);
@@ -701,7 +728,7 @@ void EDM4hep2LcioTool::convertAdd(
       lcio_event);
   } else {
     error() << "Error trying to convert requested " << type << " with name " << e4h_coll_name << endmsg;
-    error() << "List of supported types: Track, Cluster, CalorimeterHit, Vertex, ReconstructedParticle." << endmsg;
+    error() << "List of supported types: Track, TrackerHit, Cluster, CalorimeterHit, Vertex, ReconstructedParticle." << endmsg;
   }
 }
 
