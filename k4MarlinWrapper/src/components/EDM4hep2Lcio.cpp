@@ -452,19 +452,40 @@ void EDM4hep2LcioTool::convertLCIOReconstructedParticles(
       lcio_recp->setReferencePoint(rp);
       lcio_recp->setGoodnessOfPID(edm_rp.getGoodnessOfPID());
 
-      // Link sinlge associated Particle if found in converted ones
-      edm4hep::ConstParticleID pIDUsed = edm_rp.getParticleIDUsed();
-      if (pIDUsed.isAvailable()) {
-        bool conv_found = false;
-        for (const auto& [lcio_pid, edm_pid] : particleIDs_vec) {
-          if (edm_pid == pIDUsed) {
+      // Convert ParticleIDs associated to the recoparticle
+      for (const auto& edm_pid : edm_rp.getParticleIDs()) {
+        if (edm_pid.isAvailable()) {
+          auto* lcio_pid = new lcio::ParticleIDImpl;
+
+          lcio_pid->setType(edm_pid.getType());
+          lcio_pid->setPDG(edm_pid.getPDG());
+          lcio_pid->setLikelihood(edm_pid.getLikelihood());
+          lcio_pid->setAlgorithmType(edm_pid.getAlgorithmType());
+          for (const auto& param : edm_pid.getParameters()) {
+            lcio_pid->addParameter(param);
+          }
+
+          lcio_recp->addParticleID(lcio_pid);
+        }
+      }
+
+      // Link sinlge associated Particle
+      edm4hep::ConstParticleID edm_pid_used = edm_rp.getParticleIDUsed();
+      if (edm_pid_used.isAvailable()) {
+        for (const auto& lcio_pid : lcio_recp->getParticleIDs()) {
+          bool is_same = true;
+          is_same = is_same && (lcio_pid->getType() == edm_pid_used.getType());
+          is_same = is_same && (lcio_pid->getPDG() == edm_pid_used.getPDG());
+          is_same = is_same && (lcio_pid->getLikelihood() == edm_pid_used.getLikelihood());
+          is_same = is_same && (lcio_pid->getAlgorithmType() == edm_pid_used.getAlgorithmType());
+          for (int i=0; i < edm_pid_used.parameters_size(); ++i) {
+            is_same = is_same && (edm_pid_used.getParameters(i) == lcio_pid->getParameters()[i]);
+          }
+          if (is_same) {
             lcio_recp->setParticleIDUsed(lcio_pid);
-            conv_found = true;
             break;
           }
         }
-        // If particleID, but not found in converted vec, add nullptr
-        if (not conv_found) lcio_recp->setParticleIDUsed(nullptr);
       }
 
       // Link sinlge associated Vertex if found in converted ones
