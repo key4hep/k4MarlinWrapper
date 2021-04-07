@@ -199,7 +199,6 @@ void EDM4hep2LcioTool::convertLCIOCalorimeterHits(
 // Add converted LCIO Collection Vector to LCIO event
 void EDM4hep2LcioTool::convertLCIOClusters(
   std::vector<std::pair<lcio::ClusterImpl*, edm4hep::Cluster>>& cluster_vec,
-  const std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& particleIDs_vec,
   const std::vector<std::pair<lcio::CalorimeterHitImpl*, edm4hep::CalorimeterHit>>& calohits_vec,
   const std::string& e4h_coll_name,
   const std::string& lcio_coll_name,
@@ -423,7 +422,6 @@ void EDM4hep2LcioTool::convertLCIOParticleIDs(
 // Add converted LCIO Collection Vector to LCIO event
 void EDM4hep2LcioTool::convertLCIOReconstructedParticles(
   std::vector<std::pair<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>>& recoparticles_vec,
-  const std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& particleIDs_vec,
   const std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& tracks_vec,
   const std::vector<std::pair<lcio::VertexImpl*, edm4hep::Vertex>>& vertex_vec,
   const std::vector<std::pair<lcio::ClusterImpl*, edm4hep::Cluster>>& clusters_vec,
@@ -574,17 +572,6 @@ void EDM4hep2LcioTool::FillMissingCollections(
   // Fill missing ReconstructedParticle collections
   for (auto& [lcio_rp, edm_rp] : collection_pairs.recoparticles) {
 
-    // Link ParticleID
-    if (lcio_rp->getParticleIDUsed() == nullptr) {
-      if (edm_rp.getParticleIDUsed().isAvailable()) {
-        for (const auto& [lcio_pid, edm_pid] : collection_pairs.particleIDs) {
-          if (edm_pid == edm_rp.getParticleIDUsed()) {
-            lcio_rp->setParticleIDUsed(lcio_pid);
-          }
-        }
-      }
-    }
-
     // Link Vertex
     if (lcio_rp->getStartVertex() == nullptr) {
       if (edm_rp.getStartVertex().isAvailable()) {
@@ -643,19 +630,6 @@ void EDM4hep2LcioTool::FillMissingCollections(
   // Fill missing Cluster collections
   for (auto& [lcio_cluster, edm_cluster] : collection_pairs.clusters) {
 
-    // Link ParticleIDs
-    if (lcio_cluster->getParticleIDs().size() != edm_cluster.particleIDs_size()) {
-      assert(lcio_cluster->getParticleIDs().size() == 0);
-      for (const auto& edm_cluster_pid : edm_cluster.getParticleIDs()) {
-        for (const auto& [lcio_pid, edm_pid] : collection_pairs.particleIDs) {
-          if (edm_pid == edm_cluster_pid) {
-            lcio_cluster->addParticleID(lcio_pid);
-            break;
-          }
-        }
-      }
-    }
-
     // Link associated Calorimeter Hits, and Hit Contributions
     if (lcio_cluster->getCalorimeterHits().size() != edm_cluster.hits_size()) {
       assert(lcio_cluster->getCalorimeterHits().size() == 0);
@@ -703,15 +677,7 @@ void EDM4hep2LcioTool::convertAdd(
   if (type == "Cluster") {
     convertLCIOClusters(
       collection_pairs.clusters,
-      collection_pairs.particleIDs,
       collection_pairs.calohits,
-      e4h_coll_name,
-      lcio_coll_name,
-      lcio_event);
-  } else
-  if (type == "ParticleID") {
-    convertLCIOParticleIDs(
-      collection_pairs.particleIDs,
       e4h_coll_name,
       lcio_coll_name,
       lcio_event);
@@ -727,7 +693,6 @@ void EDM4hep2LcioTool::convertAdd(
   if (type == "ReconstructedParticle") {
     convertLCIOReconstructedParticles(
       collection_pairs.recoparticles,
-      collection_pairs.particleIDs,
       collection_pairs.tracks,
       collection_pairs.vertices,
       collection_pairs.clusters,
@@ -736,7 +701,7 @@ void EDM4hep2LcioTool::convertAdd(
       lcio_event);
   } else {
     error() << "Error trying to convert requested " << type << " with name " << e4h_coll_name << endmsg;
-    error() << "List of supported types: Track, Cluster, CalorimeterHit, Vertex, ParticleID, ReconstructedParticle." << endmsg;
+    error() << "List of supported types: Track, Cluster, CalorimeterHit, Vertex, ReconstructedParticle." << endmsg;
   }
 }
 
