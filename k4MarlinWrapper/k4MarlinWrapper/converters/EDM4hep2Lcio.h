@@ -57,8 +57,6 @@ struct CollectionsPairVectors {
   std::vector<std::pair<
     lcio::VertexImpl*, edm4hep::Vertex>> vertices;
   std::vector<std::pair<
-    lcio::ParticleIDImpl*, edm4hep::ParticleID>> particleIDs;
-  std::vector<std::pair<
     lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>> recoparticles;
 };
 
@@ -91,7 +89,6 @@ void convertLCIOCalorimeterHits(
 
   void convertLCIOClusters(
     std::vector<std::pair<lcio::ClusterImpl*, edm4hep::Cluster>>& cluster_vec,
-    const std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& particleIDs_vec,
     const std::vector<std::pair<lcio::CalorimeterHitImpl*, edm4hep::CalorimeterHit>>& calohits_vec,
     const std::string& e4h_coll_name,
     const std::string& lcio_coll_name,
@@ -112,7 +109,6 @@ void convertLCIOCalorimeterHits(
 
   void convertLCIOReconstructedParticles(
     std::vector<std::pair<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>>& recoparticles_vec,
-    const std::vector<std::pair<lcio::ParticleIDImpl*, edm4hep::ParticleID>>& particleIDs_vec,
     const std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& tracks_vec,
     const std::vector<std::pair<lcio::VertexImpl*, edm4hep::Vertex>>& vertex_vec,
     const std::vector<std::pair<lcio::ClusterImpl*, edm4hep::Cluster>>& clusters_vec,
