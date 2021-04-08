@@ -27,6 +27,8 @@
 #include "edm4hep/ClusterCollection.h"
 #include "edm4hep/Vertex.h"
 #include "edm4hep/VertexCollection.h"
+#include "edm4hep/MCParticle.h"
+#include "edm4hep/MCParticleCollection.h"
 
 // LCIO
 #include <LCEventWrapper.h>
@@ -44,6 +46,7 @@
 #include "IMPL/ClusterImpl.h"
 #include "IMPL/VertexImpl.h"
 #include "IMPL/ParticleIDImpl.h"
+#include "IMPL/MCParticleImpl.h"
 
 #include "LCIOSTLTypes.h"
 
@@ -72,6 +75,8 @@ struct CollectionsPairVectors {
     lcio::VertexImpl*, edm4hep::Vertex>> vertices;
   std::vector<std::pair<
     lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>> recoparticles;
+  std::vector<std::pair<
+    lcio::MCParticleImpl*, edm4hep::MCParticle>> mcparticles;
 };
 
 class EDM4hep2LcioTool : public GaudiTool, virtual public IEDMConverter {
@@ -139,6 +144,12 @@ private:
     const std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& tracks_vec,
     const std::vector<std::pair<lcio::VertexImpl*, edm4hep::Vertex>>& vertex_vec,
     const std::vector<std::pair<lcio::ClusterImpl*, edm4hep::Cluster>>& clusters_vec,
+    const std::string& e4h_coll_name,
+    const std::string& lcio_coll_name,
+    lcio::LCEventImpl* lcio_event);
+
+  void convertLCIOMCParticles(
+    std::vector<std::pair<lcio::MCParticleImpl*, edm4hep::MCParticle>>& mc_particles_vec,
     const std::string& e4h_coll_name,
     const std::string& lcio_coll_name,
     lcio::LCEventImpl* lcio_event);

@@ -510,6 +510,90 @@ void EDM4hep2LcioTool::convertLCIOVertices(
 
 
 
+
+// Convert MC Particles to LCIO
+// Add converted LCIO ptr and original EDM4hep collection to vector of pairs
+// Add converted LCIO Collection Vector to LCIO event
+void EDM4hep2LcioTool::convertLCIOMCParticles(
+  std::vector<std::pair<lcio::MCParticleImpl*, edm4hep::MCParticle>>& mc_particles_vec,
+  const std::string& e4h_coll_name,
+  const std::string& lcio_coll_name,
+  lcio::LCEventImpl* lcio_event)
+{
+  // MCParticles handle
+  DataHandle<edm4hep::MCParticleCollection> mcparticle_handle {
+    e4h_coll_name, Gaudi::DataHandle::Reader, this};
+  const auto mcparticle_coll = mcparticle_handle.get();
+
+  auto* mcparticles = new lcio::LCCollectionVec(lcio::LCIO::MCPARTICLE);
+
+  for (const auto& edm_mcp : (*mcparticle_coll)) {
+
+    auto* lcio_mcp = new lcio::MCParticleImpl;
+    if (edm_mcp.isAvailable()) {
+
+      lcio_mcp->setPDG(edm_mcp.getPDG());
+      lcio_mcp->setGeneratorStatus(edm_mcp.getGeneratorStatus());
+      lcio_mcp->setSimulatorStatus(edm_mcp.getSimulatorStatus());
+      double vertex[3] = {edm_mcp.getVertex()[0], edm_mcp.getVertex()[1], edm_mcp.getVertex()[2]};
+      lcio_mcp->setVertex(vertex);
+      lcio_mcp->setTime(edm_mcp.getTime());
+      double endpoint[3] = {edm_mcp.getEndpoint()[0], edm_mcp.getEndpoint()[1], edm_mcp.getEndpoint()[2]};
+      lcio_mcp->setEndpoint(endpoint);
+      double momentum[3] = {edm_mcp.getMomentum()[0], edm_mcp.getMomentum()[1], edm_mcp.getMomentum()[2]};
+      lcio_mcp->setMomentum(momentum);
+      float momentumEndpoint[3] = {edm_mcp.getMomentumAtEndpoint()[0], edm_mcp.getMomentumAtEndpoint()[1], edm_mcp.getMomentumAtEndpoint()[2]};
+      lcio_mcp->setMomentumAtEndpoint(momentumEndpoint);
+      #warning "double to float"
+      lcio_mcp->setMass(edm_mcp.getMass());
+      lcio_mcp->setCharge(edm_mcp.getCharge());
+      float spin[3] = {edm_mcp.getSpin()[0], edm_mcp.getSpin()[1], edm_mcp.getSpin()[2]};
+      lcio_mcp->setSpin(spin);
+      int colorflow[2] = {edm_mcp.getColorFlow()[0], edm_mcp.getColorFlow()[1]};
+      lcio_mcp->setColorFlow(colorflow);
+
+      lcio_mcp->setCreatedInSimulation(edm_mcp.isCreatedInSimulation());
+      lcio_mcp->setBackscatter(edm_mcp.isBackscatter());
+      lcio_mcp->setVertexIsNotEndpointOfParent(edm_mcp.vertexIsNotEndpointOfParent());
+      lcio_mcp->setDecayedInTracker(edm_mcp.isDecayedInTracker());
+      lcio_mcp->setDecayedInCalorimeter(edm_mcp.isDecayedInCalorimeter());
+      lcio_mcp->setHasLeftDetector(edm_mcp.hasLeftDetector());
+      lcio_mcp->setStopped(edm_mcp.isStopped());
+      lcio_mcp->setOverlay(edm_mcp.isOverlay());
+
+      // Add LCIO and EDM4hep pair collections to vec
+      mc_particles_vec.push_back(
+        std::make_pair(lcio_mcp, edm_mcp)
+      );
+
+      // Add to reconstructed particles collection
+      mcparticles->addElement(lcio_mcp);
+    }
+  }
+
+  // Add parent MCParticles after converting all MCparticles
+  for (auto& [lcio_mcp, edm_mcp] : mc_particles_vec) {
+    for (const auto& emd_parent_mcp : edm_mcp.getParents()) {
+      if (emd_parent_mcp.isAvailable()) {
+        // Search for the parent mcparticle in the converted vector
+        for (const auto& [lcio_mcp_linked, edm_mcp_linked] : mc_particles_vec) {
+          if (edm_mcp_linked == emd_parent_mcp) {
+            lcio_mcp->addParent(lcio_mcp_linked);
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  // Add all reconstructed particles to event
+  lcio_event->addCollection(mcparticles, lcio_coll_name);
+}
+
+
+
+
+
 // Convert EDM4hep RecoParticles to LCIO
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
 // Add converted LCIO Collection Vector to LCIO event
@@ -823,6 +907,13 @@ void EDM4hep2LcioTool::convertAdd(
       lcio_coll_name,
       lcio_event);
   } else
+  if (type == "MCParticle") {
+    convertLCIOMCParticles(
+      collection_pairs.mcparticles,
+      e4h_coll_name,
+      lcio_coll_name,
+      lcio_event);
+  } else
   if (type == "ReconstructedParticle") {
     convertLCIOReconstructedParticles(
       collection_pairs.recoparticles,
@@ -835,7 +926,7 @@ void EDM4hep2LcioTool::convertAdd(
   } else {
     error() << "Error trying to convert requested " << type << " with name " << e4h_coll_name << endmsg;
     error() << "List of supported types: " <<
-      "Track, TrackerHit, Cluster, CalorimeterHit, RawCalorimeterHit, Vertex, ReconstructedParticle." << endmsg;
+      "Track, TrackerHit, Cluster, CalorimeterHit, RawCalorimeterHit, Vertex, ReconstructedParticle, MCParticle." << endmsg;
   }
 }
 
