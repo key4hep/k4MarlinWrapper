@@ -60,9 +60,13 @@ private:
 
   std::map<std::string, DataObjectHandleBase*> m_dataHandlesMap;
 
-  const std::string m_edm_callohit_name   = "E4H_CaloHitCollection";
-  const std::string m_edm_trackerhit_name = "E4H_TrackerHitCollection";
-  const std::string m_edm_track_name      = "E4H_TrackCollection";
+  const std::string m_e4h_callohit_name   = "E4H_CaloHitCollection";
+  const std::string m_e4h_trackerhit_name = "E4H_TrackerHitCollection";
+  const std::string m_e4h_track_name      = "E4H_TrackCollection";
+
+  const std::string m_lcio_callohit_name   = "LCIO_CaloHitCollection";
+  const std::string m_lcio_trackerhit_name = "LCIO_TrackerHitCollection";
+  const std::string m_lcio_track_name      = "LCIO_TrackCollection";
 
   void createCalorimeterHits(int& int_cnt, float& float_cnt);
   void createTrackerHits(int& int_cnt, float& float_cnt);

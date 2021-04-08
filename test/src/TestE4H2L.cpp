@@ -9,12 +9,12 @@ TestE4H2L::TestE4H2L(const std::string& name, ISvcLocator* pSL) : GaudiAlgorithm
 
 StatusCode TestE4H2L::initialize() {
 
-  m_dataHandlesMap[m_edm_callohit_name] = new DataHandle<edm4hep::CalorimeterHitCollection>(
-    m_edm_callohit_name, Gaudi::DataHandle::Writer, this);
-  m_dataHandlesMap[m_edm_trackerhit_name] = new DataHandle<edm4hep::TrackerHitCollection>(
-    m_edm_trackerhit_name, Gaudi::DataHandle::Writer, this);
-  m_dataHandlesMap[m_edm_track_name] = new DataHandle<edm4hep::TrackCollection>(
-    m_edm_track_name, Gaudi::DataHandle::Writer, this);
+  m_dataHandlesMap[m_e4h_callohit_name] = new DataHandle<edm4hep::CalorimeterHitCollection>(
+    m_e4h_callohit_name, Gaudi::DataHandle::Writer, this);
+  m_dataHandlesMap[m_e4h_trackerhit_name] = new DataHandle<edm4hep::TrackerHitCollection>(
+    m_e4h_trackerhit_name, Gaudi::DataHandle::Writer, this);
+  m_dataHandlesMap[m_e4h_track_name] = new DataHandle<edm4hep::TrackCollection>(
+    m_e4h_track_name, Gaudi::DataHandle::Writer, this);
 
   return StatusCode::SUCCESS;
 }
@@ -43,7 +43,7 @@ void TestE4H2L::createCalorimeterHits(
   }
 
   auto* calohit_handle = dynamic_cast<DataHandle<edm4hep::CalorimeterHitCollection>*>(
-    m_dataHandlesMap[m_edm_callohit_name]);
+    m_dataHandlesMap[m_e4h_callohit_name]);
   calohit_handle->put(calohit_coll);
 }
 
@@ -77,7 +77,7 @@ void TestE4H2L::createTrackerHits(
   }
 
   auto* trackerhit_handle = dynamic_cast<DataHandle<edm4hep::TrackerHitCollection>*>(
-    m_dataHandlesMap[m_edm_trackerhit_name]);
+    m_dataHandlesMap[m_e4h_trackerhit_name]);
   trackerhit_handle->put(trackerhit_coll);
 }
 
@@ -107,7 +107,7 @@ void TestE4H2L::createTracks(
     }
 
     DataHandle<edm4hep::TrackerHitCollection> trackerhits_handle {
-      m_edm_trackerhit_name, Gaudi::DataHandle::Reader, this};
+      m_e4h_trackerhit_name, Gaudi::DataHandle::Reader, this};
     const auto trackerhits_coll = trackerhits_handle.get();
 
     elem->addToTrackerHits((*trackerhits_coll)[0]);
@@ -155,7 +155,7 @@ void TestE4H2L::createTracks(
   }
 
   auto* track_handle = dynamic_cast<DataHandle<edm4hep::TrackCollection>*>(
-    m_dataHandlesMap[m_edm_track_name]);
+    m_dataHandlesMap[m_e4h_track_name]);
   track_handle->put(track_coll);
 }
 
@@ -175,10 +175,10 @@ bool TestE4H2L::checkEDMTrackerHitLCIOTrackerHit(
   lcio::LCEventImpl* the_event)
 {
   DataHandle<edm4hep::TrackerHitCollection> trackerhit_handle_orig {
-    "E4H_TrackerHitCollection", Gaudi::DataHandle::Reader, this};
+    m_e4h_trackerhit_name, Gaudi::DataHandle::Reader, this};
   const auto trackerhit_coll_orig = trackerhit_handle_orig.get();
 
-  auto lcio_trackerhit_coll = the_event->getCollection("LCIO_TrackerHitCollection");
+  auto lcio_trackerhit_coll = the_event->getCollection(m_lcio_trackerhit_name);
   auto lcio_coll_size = lcio_trackerhit_coll->getNumberOfElements();
 
   bool trackerhit_same = (*trackerhit_coll_orig).size() == lcio_coll_size;
@@ -227,10 +227,10 @@ bool TestE4H2L::checkEDMTrackLCIOTrack(
   lcio::LCEventImpl* the_event)
 {
   DataHandle<edm4hep::TrackCollection> track_handle_orig {
-    "E4H_TrackCollection", Gaudi::DataHandle::Reader, this};
+    m_e4h_track_name, Gaudi::DataHandle::Reader, this};
   const auto track_coll_orig = track_handle_orig.get();
 
-  auto lcio_track_coll = the_event->getCollection("LCIO_TrackCollection");
+  auto lcio_track_coll = the_event->getCollection(m_lcio_track_name);
   auto lcio_coll_size = lcio_track_coll->getNumberOfElements();
 
   bool track_same = (*track_coll_orig).size() == lcio_coll_size;
@@ -261,7 +261,7 @@ bool TestE4H2L::checkEDMTrackLCIOTrack(
           auto* lcio_tr_trackerhit1 = dynamic_cast<lcio::TrackerHitImpl*>(lcio_track->getTrackerHits()[1]);
           auto* lcio_tr_trackerhit2 = dynamic_cast<lcio::TrackerHitImpl*>(lcio_track->getTrackerHits()[2]);
 
-          auto* lcio_trackerhit_coll = the_event->getCollection("LCIO_TrackerHitCollection");
+          auto* lcio_trackerhit_coll = the_event->getCollection(m_lcio_trackerhit_name);
 
           // get trackerhits directly from the collection
           auto* lcio_trackerhit0 = dynamic_cast<lcio::TrackerHitImpl*>(lcio_trackerhit_coll->getElementAt(0));
@@ -358,10 +358,10 @@ bool TestE4H2L::checkEDMCaloHitEDMCaloHit()
 {
   // CalorimeterHit
   DataHandle<edm4hep::CalorimeterHitCollection> calohit_handle_orig {
-    "E4H_CaloHitCollection", Gaudi::DataHandle::Reader, this};
+    m_e4h_callohit_name, Gaudi::DataHandle::Reader, this};
   const auto calohit_coll_orig = calohit_handle_orig.get();
   DataHandle<edm4hep::CalorimeterHitCollection> calohit_handle {
-    "E4H_CaloHitCollection_conv", Gaudi::DataHandle::Reader, this};
+    m_e4h_callohit_name + "_conv", Gaudi::DataHandle::Reader, this};
   const auto calohit_coll = calohit_handle.get();
 
   bool calohit_same = true;
@@ -392,10 +392,10 @@ bool TestE4H2L::checkEDMTrackEDMTrack()
 {
   // Track
   DataHandle<edm4hep::TrackCollection> track_handle_orig {
-    "E4H_TrackCollection", Gaudi::DataHandle::Reader, this};
+    m_e4h_track_name, Gaudi::DataHandle::Reader, this};
   const auto track_coll_orig = track_handle_orig.get();
   DataHandle<edm4hep::TrackCollection> track_handle {
-    "E4H_TrackCollection_conv", Gaudi::DataHandle::Reader, this};
+    m_e4h_track_name + "_conv", Gaudi::DataHandle::Reader, this};
   const auto track_coll = track_handle.get();
 
   bool track_same = (*track_coll_orig).size() == (*track_coll).size();
