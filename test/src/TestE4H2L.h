@@ -60,15 +60,23 @@ private:
 
   std::map<std::string, DataObjectHandleBase*> m_dataHandlesMap;
 
-  const std::string m_e4h_callohit_name   = "E4H_CaloHitCollection";
+  const std::string m_e4h_calohit_name    = "E4H_CaloHitCollection";
+  const std::string m_e4h_tpchit_name     = "E4H_TPCHitCollection";
   const std::string m_e4h_trackerhit_name = "E4H_TrackerHitCollection";
   const std::string m_e4h_track_name      = "E4H_TrackCollection";
 
   const std::string m_lcio_callohit_name   = "LCIO_CaloHitCollection";
+  const std::string m_lcio_tpchit_name     = "LCIO_TPCHitCollection";
   const std::string m_lcio_trackerhit_name = "LCIO_TrackerHitCollection";
   const std::string m_lcio_track_name      = "LCIO_TrackCollection";
 
+  // Fake data creation
   void createCalorimeterHits(const int num_elements, int& int_cnt, float& float_cnt);
+  void createTPCHits(
+    const int num_elements,
+    const int num_rawwords,
+    int& int_cnt,
+    float& float_cnt);
   void createTrackerHits(const int num_elements, int& int_cnt, float& float_cnt);
   void createTracks(
     const int num_elements,
@@ -79,12 +87,15 @@ private:
     int& int_cnt,
     float& float_cnt);
 
+  // EDM4hep -> LCIO checks
+  bool checkEDMTPCHitLCIOTPCHit(lcio::LCEventImpl* the_event);
   bool checkEDMTrackerHitLCIOTrackerHit(lcio::LCEventImpl* the_event);
   bool checkEDMTrackLCIOTrack(
     lcio::LCEventImpl* the_event,
     const std::vector<uint>& link_trackerhits_idx,
     const std::vector<std::pair<uint, uint>>& track_link_tracks_idx);
 
+  // EDM4hep -> LCIO -> EDM4hep checks
   bool checkEDMCaloHitEDMCaloHit();
   bool checkEDMTrackEDMTrack();
 

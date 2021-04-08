@@ -239,6 +239,54 @@ void EDM4hep2LcioTool::convertLCIOCalorimeterHits(
 
 
 
+// Convert EDM4hep TPC Hits to LCIO
+// Add converted LCIO ptr and original EDM4hep collection to vector of pairs
+// Add converted LCIO Collection Vector to LCIO event
+void EDM4hep2LcioTool::convertLCIOTPCHits(
+  std::vector<std::pair<lcio::TPCHitImpl*, edm4hep::TPCHit>>& tpc_hits_vec,
+  const std::string& e4h_coll_name,
+  const std::string& lcio_coll_name,
+  lcio::LCEventImpl* lcio_event)
+{
+  DataHandle<edm4hep::TPCHitCollection> tpchit_handle {
+    e4h_coll_name, Gaudi::DataHandle::Reader, this};
+  const auto tpchit_coll = tpchit_handle.get();
+
+  auto* tpchits = new lcio::LCCollectionVec(lcio::LCIO::TPCHIT);
+
+  for (const auto& edm_tpchit : (*tpchit_coll)) {
+    if (edm_tpchit.isAvailable()) {
+
+      auto* lcio_tpchit = new lcio::TPCHitImpl();
+
+      #warning "unsigned long long conversion to int"
+      lcio_tpchit->setCellID(edm_tpchit.getCellID()) ;
+      lcio_tpchit->setTime(edm_tpchit.getTime());
+      lcio_tpchit->setCharge(edm_tpchit.getCharge());
+      lcio_tpchit->setQuality(edm_tpchit.getQuality());
+
+      std::vector<int> rawdata;
+      for (int i=0; i < edm_tpchit.rawDataWords_size(); ++i) {
+        rawdata.push_back(edm_tpchit.getRawDataWords(i));
+      }
+
+      lcio_tpchit->setRawData(rawdata.data(), edm_tpchit.rawDataWords_size() );
+
+      // Save TPC Hits LCIO and EDM4hep collections
+      tpc_hits_vec.emplace_back(
+        std::make_pair(lcio_tpchit, edm_tpchit)
+      );
+
+      // Add to lcio tracks collection
+      tpchits->addElement(lcio_tpchit);
+    }
+  }
+
+  // Add all TPC Hits to event
+  lcio_event->addCollection(tpchits, lcio_coll_name);
+}
+
+
 // Convert EDM4hep Clusters to LCIO
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
 // Add converted LCIO Collection Vector to LCIO event
@@ -697,6 +745,13 @@ void EDM4hep2LcioTool::convertAdd(
   if (type == "CalorimeterHit") {
     convertLCIOCalorimeterHits(
       collection_pairs.calohits,
+      e4h_coll_name,
+      lcio_coll_name,
+      lcio_event);
+  } else
+  if (type == "TPCHit") {
+    convertLCIOTPCHits(
+      collection_pairs.tpchits,
       e4h_coll_name,
       lcio_coll_name,
       lcio_event);
