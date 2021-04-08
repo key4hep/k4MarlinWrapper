@@ -19,6 +19,8 @@ StatusCode TestE4H2L::initialize() {
     m_e4h_trackerhit_name, Gaudi::DataHandle::Writer, this);
   m_dataHandlesMap[m_e4h_track_name] = new DataHandle<edm4hep::TrackCollection>(
     m_e4h_track_name, Gaudi::DataHandle::Writer, this);
+  m_dataHandlesMap[m_e4h_mcparticle_name] = new DataHandle<edm4hep::MCParticleCollection>(
+    m_e4h_mcparticle_name, Gaudi::DataHandle::Writer, this);
 
   return StatusCode::SUCCESS;
 }
@@ -218,6 +220,62 @@ void TestE4H2L::createTracks(
 
 
 
+void TestE4H2L::createMCParticles(
+  const int num_elements,
+  const std::vector<std::pair<uint, uint>>& mcp_parents_idx,
+  int& int_cnt,
+  float& float_cnt)
+{
+  // edm4hep::MCPartcile
+  auto mcparticle_coll = new edm4hep::MCParticleCollection();
+
+  for (int i=0; i < num_elements; ++i) {
+
+    auto elem = new edm4hep::MCParticle();
+
+    elem->setPDG(int_cnt++);
+    elem->setGeneratorStatus(int_cnt++);
+    // elem->setSimulatorStatus(int_cnt++ % 5);
+    edm4hep::Vector3d vertex_vec {float_cnt++, float_cnt++, float_cnt++};
+    elem->setVertex(vertex_vec);
+    elem->setTime(float_cnt++);
+    edm4hep::Vector3d endpoint_vec {float_cnt++, float_cnt++, float_cnt++};
+    elem->setEndpoint(endpoint_vec);
+    edm4hep::Vector3f momentum_vec {float_cnt++, float_cnt++, float_cnt++};
+    elem->setMomentum(momentum_vec);
+    edm4hep::Vector3f momentumatendpoint_vec {float_cnt++, float_cnt++, float_cnt++};
+    elem->setMomentumAtEndpoint(momentumatendpoint_vec);
+    elem->setMass(float_cnt++);
+    elem->setCharge(float_cnt++);
+    edm4hep::Vector3f spin_vec {float_cnt++, float_cnt++, float_cnt++};
+    elem->setSpin(spin_vec);
+    edm4hep::Vector2i colorflow_vec {int_cnt++, int_cnt++};
+    elem->setColorFlow(colorflow_vec);
+
+    elem->setCreatedInSimulation(1);
+    elem->setBackscatter(0);
+    elem->setVertexIsNotEndpointOfParent(1);
+    elem->setDecayedInTracker(0);
+    elem->setDecayedInCalorimeter(1);
+    elem->setHasLeftDetector(0);
+    elem->setStopped(1);
+    elem->setOverlay(0);
+
+    mcparticle_coll->push_back(*elem);
+  }
+
+  // Connect mcparticles between them with parent relationship
+  for (const auto& [orig_idx, link_idx] : mcp_parents_idx) {
+    mcparticle_coll->at(orig_idx).addToParents(mcparticle_coll->at(link_idx));
+  }
+
+  // Save mcparticle collection with DataHandle
+  auto* mcparticle_handle = dynamic_cast<DataHandle<edm4hep::MCParticleCollection>*>(
+    m_dataHandlesMap[m_e4h_mcparticle_name]);
+  mcparticle_handle->put(mcparticle_coll);
+}
+
+
 
 bool TestE4H2L::checkEDMRawCaloHitLCIORawCaloHit(
   lcio::LCEventImpl* the_event)
@@ -359,6 +417,8 @@ bool TestE4H2L::checkEDMTrackerHitLCIOTrackerHit(
   return trackerhit_same;
 }
 
+
+
 bool TestE4H2L::checkEDMTrackLCIOTrack(
   lcio::LCEventImpl* the_event,
   const std::vector<uint>& link_trackerhits_idx,
@@ -462,6 +522,86 @@ bool TestE4H2L::checkEDMTrackLCIOTrack(
 
   return track_same;
 }
+
+
+
+bool TestE4H2L::checkEDMMCParticleLCIOMCParticle(
+  lcio::LCEventImpl* the_event,
+  const std::vector<std::pair<uint, uint>>& mcp_parents_idx)
+{
+  DataHandle<edm4hep::MCParticleCollection> mcparticle_handle_orig {
+    m_e4h_mcparticle_name, Gaudi::DataHandle::Reader, this};
+  const auto mcparticle_coll_orig = mcparticle_handle_orig.get();
+
+  auto lcio_mcparticle_coll = the_event->getCollection(m_lcio_mcparticle_name);
+  auto lcio_coll_size = lcio_mcparticle_coll->getNumberOfElements();
+
+  bool mcp_same = (*mcparticle_coll_orig).size() == lcio_coll_size;
+
+  if (mcp_same) {
+    for (int i=0; i < (*mcparticle_coll_orig).size(); ++i) {
+      auto edm_mcp_orig = (*mcparticle_coll_orig)[i];
+      auto* lcio_mcp = dynamic_cast<lcio::MCParticleImpl*>(lcio_mcparticle_coll->getElementAt(i));
+
+      mcp_same = mcp_same && (edm_mcp_orig.getPDG() == lcio_mcp->getPDG());
+      mcp_same = mcp_same && (edm_mcp_orig.getGeneratorStatus() == lcio_mcp->getGeneratorStatus());
+      // TODO check how LCIO returns the SimulatorStatus
+      // mcp_same = mcp_same && (edm_mcp_orig.getSimulatorStatus() == lcio_mcp->getSimulatorStatus());
+
+      mcp_same = mcp_same && (edm_mcp_orig.getVertex()[0] == lcio_mcp->getVertex()[0]);
+      mcp_same = mcp_same && (edm_mcp_orig.getVertex()[1] == lcio_mcp->getVertex()[1]);
+      mcp_same = mcp_same && (edm_mcp_orig.getVertex()[2] == lcio_mcp->getVertex()[2]);
+
+      mcp_same = mcp_same && (edm_mcp_orig.getTime() == lcio_mcp->getTime());
+
+      mcp_same = mcp_same && (edm_mcp_orig.getEndpoint()[0] == lcio_mcp->getEndpoint()[0]);
+      mcp_same = mcp_same && (edm_mcp_orig.getEndpoint()[1] == lcio_mcp->getEndpoint()[1]);
+      mcp_same = mcp_same && (edm_mcp_orig.getEndpoint()[2] == lcio_mcp->getEndpoint()[2]);
+
+      mcp_same = mcp_same && (edm_mcp_orig.getMomentum()[0] == lcio_mcp->getMomentum()[0]);
+      mcp_same = mcp_same && (edm_mcp_orig.getMomentum()[1] == lcio_mcp->getMomentum()[1]);
+      mcp_same = mcp_same && (edm_mcp_orig.getMomentum()[2] == lcio_mcp->getMomentum()[2]);
+
+      mcp_same = mcp_same && (edm_mcp_orig.getMomentumAtEndpoint()[0] == lcio_mcp->getMomentumAtEndpoint()[0]);
+      mcp_same = mcp_same && (edm_mcp_orig.getMomentumAtEndpoint()[1] == lcio_mcp->getMomentumAtEndpoint()[1]);
+      mcp_same = mcp_same && (edm_mcp_orig.getMomentumAtEndpoint()[2] == lcio_mcp->getMomentumAtEndpoint()[2]);
+
+      mcp_same = mcp_same && (edm_mcp_orig.getMass() == lcio_mcp->getMass());
+      mcp_same = mcp_same && (edm_mcp_orig.getCharge() == lcio_mcp->getCharge());
+
+      mcp_same = mcp_same && (edm_mcp_orig.getSpin()[0] == lcio_mcp->getSpin()[0]);
+      mcp_same = mcp_same && (edm_mcp_orig.getSpin()[1] == lcio_mcp->getSpin()[1]);
+      mcp_same = mcp_same && (edm_mcp_orig.getSpin()[2] == lcio_mcp->getSpin()[2]);
+
+      mcp_same = mcp_same && (edm_mcp_orig.getColorFlow()[0] == lcio_mcp->getColorFlow()[0]);
+      mcp_same = mcp_same && (edm_mcp_orig.getColorFlow()[1] == lcio_mcp->getColorFlow()[1]);
+
+      mcp_same = mcp_same && (edm_mcp_orig.isCreatedInSimulation() == lcio_mcp->isCreatedInSimulation());
+      mcp_same = mcp_same && (edm_mcp_orig.isBackscatter() == lcio_mcp->isBackscatter());
+      mcp_same = mcp_same && (edm_mcp_orig.vertexIsNotEndpointOfParent() == lcio_mcp->vertexIsNotEndpointOfParent());
+      mcp_same = mcp_same && (edm_mcp_orig.isDecayedInTracker() == lcio_mcp->isDecayedInTracker());
+      mcp_same = mcp_same && (edm_mcp_orig.isDecayedInCalorimeter() == lcio_mcp->isDecayedInCalorimeter());
+      mcp_same = mcp_same && (edm_mcp_orig.hasLeftDetector() == lcio_mcp->hasLeftDetector());
+      mcp_same = mcp_same && (edm_mcp_orig.isStopped() == lcio_mcp->isStopped());
+      mcp_same = mcp_same && (edm_mcp_orig.isOverlay() == lcio_mcp->isOverlay());
+    }
+
+    std::vector<uint> appeared(lcio_coll_size, 0);
+    for (const auto& [orig_idx, link_idx] : mcp_parents_idx) {
+      auto* lcio_mcp_orig = dynamic_cast<lcio::MCParticleImpl*>(lcio_mcparticle_coll->getElementAt(orig_idx));
+      auto* lcio_mcp_link = dynamic_cast<lcio::MCParticleImpl*>(lcio_mcparticle_coll->getElementAt(link_idx));
+      mcp_same = mcp_same && (lcio_mcp_orig->getParents()[appeared[orig_idx]] == lcio_mcp_link);
+      appeared[orig_idx]++;
+    }
+  }
+
+  if (!mcp_same) {
+    debug() << "MCParticles EDM4hep -> LCIO failed." << endmsg;
+  }
+
+  return mcp_same;
+}
+
 
 
 
@@ -612,6 +752,11 @@ StatusCode TestE4H2L::execute() {
   const std::vector<std::pair<uint, uint>> track_link_tracks_idx =
     {{0,2}, {1,3}, {2,3}, {3,2}, {3,0}};
 
+  // MCParticles
+  const int mcparticle_elems = 5;
+  const std::vector<std::pair<uint, uint>> mcp_parents_idx =
+    {{0,4}, {4,1}, {2,3}, {3,0}, {1,3}, {1,2}};
+
 
 
   // Create fake collections based on configuration
@@ -631,6 +776,11 @@ StatusCode TestE4H2L::execute() {
     track_link_tracks_idx,
     int_cnt,
     float_cnt);
+  createMCParticles(
+    mcparticle_elems,
+    mcp_parents_idx,
+    int_cnt,
+    float_cnt);
 
   // Convert from EDM4hep to LCIO
   StatusCode edm_sc = m_edm_conversionTool->convertCollections(the_event);
@@ -643,7 +793,10 @@ StatusCode TestE4H2L::execute() {
       track_link_tracks_idx) &&
     checkEDMTrackerHitLCIOTrackerHit(the_event) &&
     checkEDMTPCHitLCIOTPCHit(the_event) &&
-    checkEDMRawCaloHitLCIORawCaloHit(the_event);
+    checkEDMRawCaloHitLCIORawCaloHit(the_event) &&
+    checkEDMMCParticleLCIOMCParticle(
+      the_event,
+      mcp_parents_idx);
 
   // Convert from LCIO to EDM4hep
   StatusCode lcio_sc =  m_lcio_conversionTool->convertCollections(the_event);
