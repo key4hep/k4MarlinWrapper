@@ -10,13 +10,17 @@
 // EDM4hep
 #include "edm4hep/ParticleID.h"
 #include "edm4hep/ParticleIDCollection.h"
-// #include "edm4hep/ReconstructedParticle.h"
-// #include "edm4hep/ReconstructedParticleCollection.h"
-// #include "edm4hep/ReconstructedParticleData.h"
+#include "edm4hep/ReconstructedParticle.h"
+#include "edm4hep/ReconstructedParticleCollection.h"
+#include "edm4hep/ReconstructedParticleData.h"
 #include "edm4hep/Track.h"
 #include "edm4hep/TrackCollection.h"
 #include "edm4hep/CalorimeterHit.h"
 #include "edm4hep/CalorimeterHitCollection.h"
+#include "edm4hep/RawCalorimeterHit.h"
+#include "edm4hep/RawCalorimeterHitCollection.h"
+#include "edm4hep/TPCHit.h"
+#include "edm4hep/TPCHitCollection.h"
 // #include "edm4hep/Cluster.h"
 // #include "edm4hep/ClusterCollection.h"
 // #include "edm4hep/Vertex.h"
@@ -30,6 +34,8 @@
 #include "IMPL/TrackImpl.h"
 #include "IMPL/TrackStateImpl.h"
 #include "IMPL/CalorimeterHitImpl.h"
+#include "IMPL/RawCalorimeterHitImpl.h"
+#include "IMPL/TPCHitImpl.h"
 #include "IMPL/TrackerHitImpl.h"
 #include "IMPL/ClusterImpl.h"
 #include "IMPL/VertexImpl.h"
@@ -61,17 +67,23 @@ private:
   std::map<std::string, DataObjectHandleBase*> m_dataHandlesMap;
 
   const std::string m_e4h_calohit_name    = "E4H_CaloHitCollection";
+  const std::string m_e4h_rawcalohit_name = "E4H_RawCaloHitCollection";
   const std::string m_e4h_tpchit_name     = "E4H_TPCHitCollection";
   const std::string m_e4h_trackerhit_name = "E4H_TrackerHitCollection";
   const std::string m_e4h_track_name      = "E4H_TrackCollection";
 
-  const std::string m_lcio_callohit_name   = "LCIO_CaloHitCollection";
+  const std::string m_lcio_calohit_name    = "LCIO_CaloHitCollection";
+  const std::string m_lcio_rawcalohit_name = "LCIO_RawCaloHitCollection";
   const std::string m_lcio_tpchit_name     = "LCIO_TPCHitCollection";
   const std::string m_lcio_trackerhit_name = "LCIO_TrackerHitCollection";
   const std::string m_lcio_track_name      = "LCIO_TrackCollection";
 
   // Fake data creation
   void createCalorimeterHits(const int num_elements, int& int_cnt, float& float_cnt);
+  void createRawCalorimeterHits(
+    const int num_elements,
+    int& int_cnt,
+    float& float_cnt);
   void createTPCHits(
     const int num_elements,
     const int num_rawwords,
@@ -88,6 +100,7 @@ private:
     float& float_cnt);
 
   // EDM4hep -> LCIO checks
+  bool checkEDMRawCaloHitLCIORawCaloHit(lcio::LCEventImpl* the_event);
   bool checkEDMTPCHitLCIOTPCHit(lcio::LCEventImpl* the_event);
   bool checkEDMTrackerHitLCIOTrackerHit(lcio::LCEventImpl* the_event);
   bool checkEDMTrackLCIOTrack(
