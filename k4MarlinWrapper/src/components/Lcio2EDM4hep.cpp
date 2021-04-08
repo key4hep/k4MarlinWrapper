@@ -44,12 +44,15 @@ StatusCode Lcio2EDM4hepTool::initialize() {
     } else if (m_lcio2edm_params[i] == "CalorimeterHit") {
       m_dataHandlesMap[m_lcio2edm_params[i+2]] =
         new DataHandle<edm4hep::CalorimeterHitCollection>(m_lcio2edm_params[i+2], Gaudi::DataHandle::Writer, this);
+    } else if (m_lcio2edm_params[i] == "TPCHit") {
+      m_dataHandlesMap[m_lcio2edm_params[i+2]] =
+        new DataHandle<edm4hep::TPCHitCollection>(m_lcio2edm_params[i+2], Gaudi::DataHandle::Writer, this);
     } else if (m_lcio2edm_params[i] == "Cluster") {
       m_dataHandlesMap[m_lcio2edm_params[i+2]] =
         new DataHandle<edm4hep::ClusterCollection>(m_lcio2edm_params[i+2], Gaudi::DataHandle::Writer, this);
     } else {
       debug() << m_lcio2edm_params[i] << ": conversion type not supported." << endmsg;
-      debug() << "List of supported types: Cluster, CalorimeterHit, Track, Vertex, ParticleID, ReconstructedParticle." << endmsg;
+      debug() << "List of supported types: Cluster, CalorimeterHit, TPCHit, Track, Vertex, ParticleID, ReconstructedParticle." << endmsg;
     }
   }
 
@@ -135,6 +138,9 @@ StatusCode Lcio2EDM4hepTool::convertCollections(
           m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
       } else if (m_lcio2edm_params[i] == "CalorimeterHit") {
         convertPut<edm4hep::CalorimeterHitCollection>(
+          m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
+      } else if (m_lcio2edm_params[i] == "TPCHit") {
+        convertPut<edm4hep::TPCHitCollection>(
           m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
       } else if (m_lcio2edm_params[i] == "Cluster") {
         convertPut<edm4hep::ClusterCollection>(
