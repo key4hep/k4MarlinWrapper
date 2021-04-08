@@ -61,11 +61,9 @@ private:
   std::map<std::string, DataObjectHandleBase*> m_dataHandlesMap;
 
   const std::string m_edm_callohit_name   = "E4H_CaloHitCollection";
-  const std::string m_edm_particleid_name = "E4H_ParticleIDCollection";
   const std::string m_edm_track_name      = "E4H_TrackCollection";
 
   void createCalorimeterHits(int& int_cnt, float& float_cnt);
-  void createParticleIDs(int& int_cnt, float& float_cnt);
   void createTracks(int& int_cnt, float& float_cnt);
   void createFakeCollections();
 
@@ -73,7 +71,6 @@ private:
   bool isSameEDM4hepLCIO(lcio::LCEventImpl* the_event);
 
   bool checkEDMCaloHitEDMCaloHit();
-  bool checkEDMpIDEDMpID();
   bool checkEDMTrackEDMTrack();
   bool isSameEDM4hepEDM4hep();
 
