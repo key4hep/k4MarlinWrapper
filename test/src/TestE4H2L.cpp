@@ -20,14 +20,14 @@ StatusCode TestE4H2L::initialize() {
 }
 
 void TestE4H2L::createCalorimeterHits(
+  const int num_elements,
   int& int_cnt,
   float& float_cnt)
 {
   // edm4hep::CalorimeterHits
-  const int calohit_elems = 2;
   auto calohit_coll = new edm4hep::CalorimeterHitCollection();
 
-  for (int i=0; i < calohit_elems; ++i) {
+  for (int i=0; i < num_elements; ++i) {
 
     auto elem = new edm4hep::CalorimeterHit();
 
@@ -49,13 +49,14 @@ void TestE4H2L::createCalorimeterHits(
 
 
 void TestE4H2L::createTrackerHits(
+  const int num_elements,
   int& int_cnt,
   float& float_cnt)
 {
-  const int trackerhits_elems = 5;
+
   auto trackerhit_coll = new edm4hep::TrackerHitCollection();
 
-  for (int i=0; i < trackerhits_elems; ++i) {
+  for (int i=0; i < num_elements; ++i) {
 
     auto elem = new edm4hep::TrackerHit();
 
@@ -83,14 +84,18 @@ void TestE4H2L::createTrackerHits(
 
 
 void TestE4H2L::createTracks(
+  const int num_elements,
+  const int subdetectorhitnumbers,
+  const std::vector<uint>& link_trackerhits_idx,
+  const int num_track_states,
+  const std::vector<std::pair<uint, uint>>& track_link_tracks_idx,
   int& int_cnt,
   float& float_cnt)
 {
   // edm4hep::Track
-  const int track_elems = 4;
   auto track_coll = new edm4hep::TrackCollection();
 
-  for (int i=0; i < track_elems; ++i) {
+  for (int i=0; i < num_elements; ++i) {
 
     auto elem = new edm4hep::Track();
 
@@ -101,8 +106,7 @@ void TestE4H2L::createTracks(
     elem->setDEdxError(float_cnt++);
     elem->setRadiusOfInnermostHit(float_cnt++);
 
-    const int track_subdetectorhitnumbers = 4;
-    for (int j=0; j < track_subdetectorhitnumbers; ++j){
+    for (int j=0; j < subdetectorhitnumbers; ++j){
       elem->addToSubDetectorHitNumbers(int_cnt++);
     }
 
@@ -110,12 +114,11 @@ void TestE4H2L::createTracks(
       m_e4h_trackerhit_name, Gaudi::DataHandle::Reader, this};
     const auto trackerhits_coll = trackerhits_handle.get();
 
-    elem->addToTrackerHits((*trackerhits_coll)[0]);
-    elem->addToTrackerHits((*trackerhits_coll)[2]);
-    elem->addToTrackerHits((*trackerhits_coll)[4]);
+    for (auto& idx : link_trackerhits_idx) {
+      elem->addToTrackerHits((*trackerhits_coll)[idx]);
+    }
 
-    const int track_states = 5;
-    for (int j=0; j < track_states; ++j){
+    for (int j=0; j < num_track_states; ++j){
 
       edm4hep::TrackState trackstate;
 
@@ -142,31 +145,14 @@ void TestE4H2L::createTracks(
   }
 
   // Connect tracks between them
-  if (track_coll->size() >= 4) {
-    // Add 0 with 2
-    track_coll->at(0).addToTracks(track_coll->at(2));
-    // Add 1 with 3
-    track_coll->at(1).addToTracks(track_coll->at(3));
-    // Add 2 with 3 + circular dependency
-    track_coll->at(2).addToTracks(track_coll->at(3));
-    track_coll->at(3).addToTracks(track_coll->at(2));
-    // Add 3 with 0
-    track_coll->at(3).addToTracks(track_coll->at(0));
+  for (const auto& [orig_idx, link_idx] : track_link_tracks_idx) {
+    track_coll->at(orig_idx).addToTracks(track_coll->at(link_idx));
   }
 
+  // Save track collection with DataHandle
   auto* track_handle = dynamic_cast<DataHandle<edm4hep::TrackCollection>*>(
     m_dataHandlesMap[m_e4h_track_name]);
   track_handle->put(track_coll);
-}
-
-void TestE4H2L::createFakeCollections()
-{
-  int int_cnt = 10;
-  float float_cnt = 10.1;
-
-  createCalorimeterHits(int_cnt, float_cnt);
-  createTrackerHits(int_cnt, float_cnt);
-  createTracks(int_cnt, float_cnt);
 }
 
 
@@ -222,9 +208,10 @@ bool TestE4H2L::checkEDMTrackerHitLCIOTrackerHit(
   return trackerhit_same;
 }
 
-
 bool TestE4H2L::checkEDMTrackLCIOTrack(
-  lcio::LCEventImpl* the_event)
+  lcio::LCEventImpl* the_event,
+  const std::vector<uint>& link_trackerhits_idx,
+  const std::vector<std::pair<uint, uint>>& track_link_tracks_idx)
 {
   DataHandle<edm4hep::TrackCollection> track_handle_orig {
     m_e4h_track_name, Gaudi::DataHandle::Reader, this};
@@ -255,22 +242,15 @@ bool TestE4H2L::checkEDMTrackLCIOTrack(
       track_same = track_same && (edm_track_orig.trackerHits_size() == lcio_track->getTrackerHits().size());
       if (track_same) {
         // Check linked trackerhits connections
-        if (lcio_track->getTrackerHits().size() >= 3) {
-          // get linked trackerhits to track
-          auto* lcio_tr_trackerhit0 = dynamic_cast<lcio::TrackerHitImpl*>(lcio_track->getTrackerHits()[0]);
-          auto* lcio_tr_trackerhit1 = dynamic_cast<lcio::TrackerHitImpl*>(lcio_track->getTrackerHits()[1]);
-          auto* lcio_tr_trackerhit2 = dynamic_cast<lcio::TrackerHitImpl*>(lcio_track->getTrackerHits()[2]);
+        if (lcio_track->getTrackerHits().size() >= link_trackerhits_idx.size()) {
 
           auto* lcio_trackerhit_coll = the_event->getCollection(m_lcio_trackerhit_name);
-
-          // get trackerhits directly from the collection
-          auto* lcio_trackerhit0 = dynamic_cast<lcio::TrackerHitImpl*>(lcio_trackerhit_coll->getElementAt(0));
-          auto* lcio_trackerhit2 = dynamic_cast<lcio::TrackerHitImpl*>(lcio_trackerhit_coll->getElementAt(2));
-          auto* lcio_trackerhit4 = dynamic_cast<lcio::TrackerHitImpl*>(lcio_trackerhit_coll->getElementAt(4));
-
-          track_same = track_same && (lcio_tr_trackerhit0 == lcio_trackerhit0);
-          track_same = track_same && (lcio_tr_trackerhit1 == lcio_trackerhit2);
-          track_same = track_same && (lcio_tr_trackerhit2 == lcio_trackerhit4);
+          // Check the trackerhits in this track with the trackerhits from the event to be the same
+          for (int j=0; j<link_trackerhits_idx.size(); ++j) {
+            track_same = track_same &&
+              (dynamic_cast<lcio::TrackerHitImpl*>(lcio_track->getTrackerHits()[j]) ==
+               dynamic_cast<lcio::TrackerHitImpl*>(lcio_trackerhit_coll->getElementAt(link_trackerhits_idx[j])));
+          }
         }
       }
 
@@ -316,18 +296,12 @@ bool TestE4H2L::checkEDMTrackLCIOTrack(
 
     }
 
-    // // Check track connections
-    if (lcio_coll_size >= 4) {
-      auto* lcio_track0 = dynamic_cast<lcio::TrackImpl*>(lcio_track_coll->getElementAt(0));
-      auto* lcio_track1 = dynamic_cast<lcio::TrackImpl*>(lcio_track_coll->getElementAt(1));
-      auto* lcio_track2 = dynamic_cast<lcio::TrackImpl*>(lcio_track_coll->getElementAt(2));
-      auto* lcio_track3 = dynamic_cast<lcio::TrackImpl*>(lcio_track_coll->getElementAt(3));
-
-      track_same = track_same && (lcio_track0->getTracks()[0] == lcio_track2);
-      track_same = track_same && (lcio_track1->getTracks()[0] == lcio_track3);
-      track_same = track_same && (lcio_track2->getTracks()[0] == lcio_track3);
-      track_same = track_same && (lcio_track3->getTracks()[0] == lcio_track2);
-      track_same = track_same && (lcio_track3->getTracks()[1] == lcio_track0);
+    std::vector<uint> appeared(lcio_coll_size, 0);
+    for (const auto& [orig_idx, link_idx] : track_link_tracks_idx) {
+      auto* lcio_track_orig = dynamic_cast<lcio::TrackImpl*>(lcio_track_coll->getElementAt(orig_idx));
+      auto* lcio_track_link = dynamic_cast<lcio::TrackImpl*>(lcio_track_coll->getElementAt(link_idx));
+      track_same = track_same && (lcio_track_orig->getTracks()[appeared[orig_idx]] == lcio_track_link);
+      appeared[orig_idx]++;
     }
   }
 
@@ -336,20 +310,6 @@ bool TestE4H2L::checkEDMTrackLCIOTrack(
   }
 
   return track_same;
-
-}
-
-
-bool TestE4H2L::isSameEDM4hepLCIO(
-  lcio::LCEventImpl* the_event)
-{
-  bool generalCheck = false;
-
-  generalCheck =
-    checkEDMTrackLCIOTrack(the_event) &&
-    checkEDMTrackerHitLCIOTrackerHit(the_event);
-
-  return generalCheck;
 }
 
 
@@ -470,35 +430,62 @@ bool TestE4H2L::checkEDMTrackEDMTrack()
   return track_same;
 }
 
-bool TestE4H2L::isSameEDM4hepEDM4hep()
-{
-
-  bool generalCheck = false;
-
-  // Do general check
-  generalCheck =
-    checkEDMCaloHitEDMCaloHit() &&
-    checkEDMTrackEDMTrack();
-
-  return generalCheck;
-}
-
 
 StatusCode TestE4H2L::execute() {
 
   lcio::LCEventImpl* the_event = new lcio::LCEventImpl();
 
-  createFakeCollections();
+  // Configuration for the test
+  int int_cnt = 10;
+  float float_cnt = 10.1;
+
+  // CaloHit
+  const int calohit_elems = 2;
+
+  // TrackerHits
+  const int trackerhits_elems = 5;
+
+  // Tracks
+  const int track_elems = 4;
+  const int track_subdetectorhitnumbers = 4;
+  const std::vector<uint> track_link_trackerhits_idx =
+    {0, 2, 4};
+  const int track_states = 5;
+  const std::vector<std::pair<uint, uint>> track_link_tracks_idx =
+    {{0,2}, {1,3}, {2,3}, {3,2}, {3,0}};
+
+
+
+  // Create fake collections based on configuration
+  createCalorimeterHits(calohit_elems, int_cnt, float_cnt);
+  createTrackerHits(trackerhits_elems, int_cnt, float_cnt);
+  createTracks(
+    track_elems,
+    track_subdetectorhitnumbers,
+    track_link_trackerhits_idx,
+    track_states,
+    track_link_tracks_idx,
+    int_cnt,
+    float_cnt);
 
   // Convert from EDM4hep to LCIO
   StatusCode edm_sc = m_edm_conversionTool->convertCollections(the_event);
 
-  bool lcio_same = isSameEDM4hepLCIO(the_event);
+  // Check EDM4hep -> LCIO conversion
+  bool lcio_same =
+    checkEDMTrackLCIOTrack(
+      the_event,
+      track_link_trackerhits_idx,
+      track_link_tracks_idx) &&
+    checkEDMTrackerHitLCIOTrackerHit(the_event);
 
   // Convert from LCIO to EDM4hep
   StatusCode lcio_sc =  m_lcio_conversionTool->convertCollections(the_event);
 
-  bool edm_same = isSameEDM4hepEDM4hep();
+  // Check EDM4hep -> LCIO -> EDM4hep conversion
+  bool edm_same =
+    checkEDMCaloHitEDMCaloHit() &&
+    checkEDMTrackEDMTrack();
 
   return (edm_same && lcio_same) ? StatusCode::SUCCESS : StatusCode::FAILURE;
 }
