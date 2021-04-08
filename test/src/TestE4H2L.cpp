@@ -11,6 +11,8 @@ StatusCode TestE4H2L::initialize() {
 
   m_dataHandlesMap[m_e4h_calohit_name] = new DataHandle<edm4hep::CalorimeterHitCollection>(
     m_e4h_calohit_name, Gaudi::DataHandle::Writer, this);
+  m_dataHandlesMap[m_e4h_rawcalohit_name] = new DataHandle<edm4hep::RawCalorimeterHitCollection>(
+    m_e4h_rawcalohit_name, Gaudi::DataHandle::Writer, this);
   m_dataHandlesMap[m_e4h_tpchit_name] = new DataHandle<edm4hep::TPCHitCollection>(
     m_e4h_tpchit_name, Gaudi::DataHandle::Writer, this);
   m_dataHandlesMap[m_e4h_trackerhit_name] = new DataHandle<edm4hep::TrackerHitCollection>(
@@ -27,11 +29,11 @@ void TestE4H2L::createCalorimeterHits(
   float& float_cnt)
 {
   // edm4hep::CalorimeterHits
-  auto calohit_coll = new edm4hep::CalorimeterHitCollection();
+  auto* calohit_coll = new edm4hep::CalorimeterHitCollection();
 
   for (int i=0; i < num_elements; ++i) {
 
-    auto elem = new edm4hep::CalorimeterHit();
+    auto* elem = new edm4hep::CalorimeterHit();
 
     elem->setCellID(int_cnt++);
     elem->setEnergy(float_cnt++);
@@ -50,6 +52,32 @@ void TestE4H2L::createCalorimeterHits(
 }
 
 
+void TestE4H2L::createRawCalorimeterHits(
+  const int num_elements,
+  int& int_cnt,
+  float& float_cnt)
+{
+  // edm4hep::CalorimeterHits
+  auto* rawcalohit_coll = new edm4hep::RawCalorimeterHitCollection();
+
+  for (int i=0; i < num_elements; ++i) {
+
+    auto* elem = new edm4hep::RawCalorimeterHit();
+
+    elem->setCellID(int_cnt++);
+    elem->setAmplitude(int_cnt++);
+    elem->setTimeStamp(int_cnt++);
+
+    rawcalohit_coll->push_back(*elem);
+  }
+
+  auto* rawcalohit_handle = dynamic_cast<DataHandle<edm4hep::RawCalorimeterHitCollection>*>(
+    m_dataHandlesMap[m_e4h_rawcalohit_name]);
+  rawcalohit_handle->put(rawcalohit_coll);
+}
+
+
+
 void TestE4H2L::createTPCHits(
   const int num_elements,
   const int num_rawwords,
@@ -57,7 +85,7 @@ void TestE4H2L::createTPCHits(
   float& float_cnt)
 {
   // edm4hep::CalorimeterHits
-  auto tpchit_coll = new edm4hep::TPCHitCollection();
+  auto* tpchit_coll = new edm4hep::TPCHitCollection();
 
   for (int i=0; i < num_elements; ++i) {
 
@@ -190,6 +218,50 @@ void TestE4H2L::createTracks(
 
 
 
+
+bool TestE4H2L::checkEDMRawCaloHitLCIORawCaloHit(
+  lcio::LCEventImpl* the_event)
+{
+  DataHandle<edm4hep::RawCalorimeterHitCollection> rawcalohit_handle_orig {
+    m_e4h_rawcalohit_name, Gaudi::DataHandle::Reader, this};
+  const auto rawcalohit_coll_orig = rawcalohit_handle_orig.get();
+
+  auto lcio_rawcalohit_coll = the_event->getCollection(m_lcio_rawcalohit_name);
+  auto lcio_coll_size = lcio_rawcalohit_coll->getNumberOfElements();
+
+  bool rawcalohit_same = (*rawcalohit_coll_orig).size() == lcio_coll_size;
+
+  if (rawcalohit_same) {
+    for (int i=0; i < (*rawcalohit_coll_orig).size(); ++i) {
+
+      auto edm_tpchit_orig = (*rawcalohit_coll_orig)[i];
+      auto* lcio_tpchit = dynamic_cast<lcio::RawCalorimeterHitImpl*>(lcio_rawcalohit_coll->getElementAt(i));
+
+      if (lcio_tpchit != nullptr) {
+
+        uint64_t combined_value = 0;
+        uint32_t* combined_value_ptr = reinterpret_cast<uint32_t*>(&combined_value);
+        combined_value_ptr[0] = lcio_tpchit->getCellID0();
+        combined_value_ptr[1] = lcio_tpchit->getCellID1();
+        rawcalohit_same = rawcalohit_same && (edm_tpchit_orig.getCellID() == combined_value);
+        rawcalohit_same = rawcalohit_same && (edm_tpchit_orig.getAmplitude() == lcio_tpchit->getAmplitude());
+        rawcalohit_same = rawcalohit_same && (edm_tpchit_orig.getTimeStamp() == lcio_tpchit->getTimeStamp());
+      }
+
+    }
+  }
+
+  if (!rawcalohit_same) {
+    debug() << "RawCalorimeterHit EDM4hep -> LCIO failed." << endmsg;
+  }
+
+  return rawcalohit_same;
+}
+
+
+
+
+
 bool TestE4H2L::checkEDMTPCHitLCIOTPCHit(
   lcio::LCEventImpl* the_event)
 {
@@ -227,7 +299,7 @@ bool TestE4H2L::checkEDMTPCHitLCIOTPCHit(
   }
 
   if (!tpchit_same) {
-    debug() << "Track EDM4hep -> LCIO failed." << endmsg;
+    debug() << "TPCHit EDM4hep -> LCIO failed." << endmsg;
   }
 
   return tpchit_same;
@@ -521,6 +593,9 @@ StatusCode TestE4H2L::execute() {
   // CaloHit
   const int calohit_elems = 2;
 
+  // RawCaloHit
+  const int rawcalohit_elems = 2;
+
   // TPCHit
   const int tpchit_elems = 4;
   const int tpchit_rawwords = 6;
@@ -541,6 +616,7 @@ StatusCode TestE4H2L::execute() {
 
   // Create fake collections based on configuration
   createCalorimeterHits(calohit_elems, int_cnt, float_cnt);
+  createRawCalorimeterHits(rawcalohit_elems, int_cnt, float_cnt);
   createTPCHits(
     tpchit_elems,
     tpchit_rawwords,
@@ -566,7 +642,8 @@ StatusCode TestE4H2L::execute() {
       track_link_trackerhits_idx,
       track_link_tracks_idx) &&
     checkEDMTrackerHitLCIOTrackerHit(the_event) &&
-    checkEDMTPCHitLCIOTPCHit(the_event);
+    checkEDMTPCHitLCIOTPCHit(the_event) &&
+    checkEDMRawCaloHitLCIORawCaloHit(the_event);
 
   // Convert from LCIO to EDM4hep
   StatusCode lcio_sc =  m_lcio_conversionTool->convertCollections(the_event);

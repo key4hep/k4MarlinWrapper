@@ -239,6 +239,50 @@ void EDM4hep2LcioTool::convertLCIOCalorimeterHits(
 
 
 
+// Convert EDM4hep RAW Calorimeter Hits to LCIO
+// Add converted LCIO ptr and original EDM4hep collection to vector of pairs
+// Add converted LCIO Collection Vector to LCIO event
+void EDM4hep2LcioTool::convertLCIORawCalorimeterHits(
+  std::vector<std::pair<lcio::RawCalorimeterHitImpl*, edm4hep::RawCalorimeterHit>>& raw_calo_hits_vec,
+  const std::string& e4h_coll_name,
+  const std::string& lcio_coll_name,
+  lcio::LCEventImpl* lcio_event)
+{
+  DataHandle<edm4hep::RawCalorimeterHitCollection> raw_calohit_handle {
+    e4h_coll_name, Gaudi::DataHandle::Reader, this};
+  const auto rawcalohit_coll = raw_calohit_handle.get();
+
+  auto* rawcalohits = new lcio::LCCollectionVec(lcio::LCIO::RAWCALORIMETERHIT);
+
+  for (const auto& edm_raw_calohit : (*rawcalohit_coll)) {
+    if (edm_raw_calohit.isAvailable()) {
+
+      auto* lcio_rawcalohit = new lcio::RawCalorimeterHitImpl();
+
+      #warning "Splitting unsigned long long into two ints"
+      uint64_t combined_value = edm_raw_calohit.getCellID();
+      uint32_t* combined_value_ptr = reinterpret_cast<uint32_t*>(&combined_value);
+      lcio_rawcalohit->setCellID0(combined_value_ptr[0]);
+      lcio_rawcalohit->setCellID1(combined_value_ptr[1]);
+      lcio_rawcalohit->setAmplitude(edm_raw_calohit.getAmplitude());
+      lcio_rawcalohit->setTimeStamp(edm_raw_calohit.getTimeStamp());
+
+      // Save Raw Calorimeter Hits LCIO and EDM4hep collections
+      raw_calo_hits_vec.emplace_back(
+        std::make_pair(lcio_rawcalohit, edm_raw_calohit)
+      );
+
+      // Add to lcio tracks collection
+      rawcalohits->addElement(lcio_rawcalohit);
+    }
+  }
+
+  // Add all Raw Calorimeter Hits to event
+  lcio_event->addCollection(rawcalohits, lcio_coll_name);
+}
+
+
+
 // Convert EDM4hep TPC Hits to LCIO
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
 // Add converted LCIO Collection Vector to LCIO event
@@ -749,6 +793,13 @@ void EDM4hep2LcioTool::convertAdd(
       lcio_coll_name,
       lcio_event);
   } else
+  if (type == "RawCalorimeterHit") {
+    convertLCIORawCalorimeterHits(
+      collection_pairs.rawcalohits,
+      e4h_coll_name,
+      lcio_coll_name,
+      lcio_event);
+  } else
   if (type == "TPCHit") {
     convertLCIOTPCHits(
       collection_pairs.tpchits,
@@ -783,7 +834,8 @@ void EDM4hep2LcioTool::convertAdd(
       lcio_event);
   } else {
     error() << "Error trying to convert requested " << type << " with name " << e4h_coll_name << endmsg;
-    error() << "List of supported types: Track, TrackerHit, Cluster, CalorimeterHit, Vertex, ReconstructedParticle." << endmsg;
+    error() << "List of supported types: " <<
+      "Track, TrackerHit, Cluster, CalorimeterHit, RawCalorimeterHit, Vertex, ReconstructedParticle." << endmsg;
   }
 }
 
