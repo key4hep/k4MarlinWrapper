@@ -68,18 +68,25 @@ private:
   const std::string m_lcio_trackerhit_name = "LCIO_TrackerHitCollection";
   const std::string m_lcio_track_name      = "LCIO_TrackCollection";
 
-  void createCalorimeterHits(int& int_cnt, float& float_cnt);
-  void createTrackerHits(int& int_cnt, float& float_cnt);
-  void createTracks(int& int_cnt, float& float_cnt);
-  void createFakeCollections();
+  void createCalorimeterHits(const int num_elements, int& int_cnt, float& float_cnt);
+  void createTrackerHits(const int num_elements, int& int_cnt, float& float_cnt);
+  void createTracks(
+    const int num_elements,
+    const int subdetectorhitnumbers,
+    const std::vector<uint>& link_trackerhits_idx,
+    const int num_track_states,
+    const std::vector<std::pair<uint, uint>>& track_link_tracks_idx,
+    int& int_cnt,
+    float& float_cnt);
 
   bool checkEDMTrackerHitLCIOTrackerHit(lcio::LCEventImpl* the_event);
-  bool checkEDMTrackLCIOTrack(lcio::LCEventImpl* the_event);
-  bool isSameEDM4hepLCIO(lcio::LCEventImpl* the_event);
+  bool checkEDMTrackLCIOTrack(
+    lcio::LCEventImpl* the_event,
+    const std::vector<uint>& link_trackerhits_idx,
+    const std::vector<std::pair<uint, uint>>& track_link_tracks_idx);
 
   bool checkEDMCaloHitEDMCaloHit();
   bool checkEDMTrackEDMTrack();
-  bool isSameEDM4hepEDM4hep();
 
 };
 
