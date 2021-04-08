@@ -11,8 +11,6 @@ StatusCode TestE4H2L::initialize() {
 
   m_dataHandlesMap[m_edm_callohit_name] = new DataHandle<edm4hep::CalorimeterHitCollection>(
     m_edm_callohit_name, Gaudi::DataHandle::Writer, this);
-  m_dataHandlesMap[m_edm_particleid_name] = new DataHandle<edm4hep::ParticleIDCollection>(
-    m_edm_particleid_name, Gaudi::DataHandle::Writer, this);
   m_dataHandlesMap[m_edm_track_name] = new DataHandle<edm4hep::TrackCollection>(
     m_edm_track_name, Gaudi::DataHandle::Writer, this);
 
@@ -47,35 +45,6 @@ void TestE4H2L::createCalorimeterHits(
   calohit_handle->put(calohit_coll);
 }
 
-void TestE4H2L::createParticleIDs(
-  int& int_cnt,
-  float& float_cnt)
-{
-  // edm4hep::ParticleID
-  const int particleID_elems = 2;
-  auto particleid_coll = new edm4hep::ParticleIDCollection();
-
-  for (int i=0; i < particleID_elems; ++i) {
-
-    auto elem = new edm4hep::ParticleID();
-
-    elem->setType(int_cnt++);
-    elem->setPDG(int_cnt++);
-    elem->setAlgorithmType(int_cnt++);
-    elem->setLikelihood(float_cnt++);
-
-    const int particleID_params = 3;
-    for (int j=0; j < particleID_params; ++j){
-      elem->addToParameters(float_cnt++);
-    }
-
-    particleid_coll->push_back(*elem);
-  }
-
-  auto* particleid_handle = dynamic_cast<DataHandle<edm4hep::ParticleIDCollection>*>(
-    m_dataHandlesMap[m_edm_particleid_name]);
-  particleid_handle->put(particleid_coll);
-}
 
 void TestE4H2L::createTracks(
   int& int_cnt,
@@ -176,7 +145,6 @@ void TestE4H2L::createFakeCollections()
   float float_cnt = 10.1;
 
   createCalorimeterHits(int_cnt, float_cnt);
-  createParticleIDs(int_cnt, float_cnt);
   createTracks(int_cnt, float_cnt);
 }
 
@@ -214,26 +182,28 @@ bool TestE4H2L::checkEDMTrackLCIOTrack(
           auto edm_trackerhit_orig = edm_track_orig.getTrackerHits(j);
           auto* lcio_trackerhit = lcio_track->getTrackerHits()[j];
 
-          // TODO handle split CellIDs
-          uint64_t combined_value = 0;
-          uint32_t* combined_value_ptr = reinterpret_cast<uint32_t*>(&combined_value);
-          combined_value_ptr[0] = lcio_trackerhit->getCellID0();
-          combined_value_ptr[1] = lcio_trackerhit->getCellID1();
-          track_same = track_same && (edm_trackerhit_orig.getCellID() == combined_value);
+          if (lcio_trackerhit != nullptr) {
+            // TODO handle split CellIDs
+            uint64_t combined_value = 0;
+            uint32_t* combined_value_ptr = reinterpret_cast<uint32_t*>(&combined_value);
+            combined_value_ptr[0] = lcio_trackerhit->getCellID0();
+            combined_value_ptr[1] = lcio_trackerhit->getCellID1();
+            track_same = track_same && (edm_trackerhit_orig.getCellID() == combined_value);
 
-          track_same = track_same && (edm_trackerhit_orig.getType() == lcio_trackerhit->getType());
-          track_same = track_same && (edm_trackerhit_orig.getQuality() == lcio_trackerhit->getQuality());
-          track_same = track_same && (edm_trackerhit_orig.getTime() == lcio_trackerhit->getTime());
-          track_same = track_same && (edm_trackerhit_orig.getEDep() == lcio_trackerhit->getEDep());
-          track_same = track_same && (edm_trackerhit_orig.getEDepError() == lcio_trackerhit->getEDepError());
-          for (int k=0; k<3; ++k) {
-            track_same = track_same && (edm_trackerhit_orig.getPosition()[k] == lcio_trackerhit->getPosition()[k]);
-          }
-          for (int k=0; k<lcio_trackerhit->getCovMatrix().size(); ++k) {
-            track_same = track_same && (edm_trackerhit_orig.getCovMatrix(k) == lcio_trackerhit->getCovMatrix()[k]);
-          }
+            track_same = track_same && (edm_trackerhit_orig.getType() == lcio_trackerhit->getType());
+            track_same = track_same && (edm_trackerhit_orig.getQuality() == lcio_trackerhit->getQuality());
+            track_same = track_same && (edm_trackerhit_orig.getTime() == lcio_trackerhit->getTime());
+            track_same = track_same && (edm_trackerhit_orig.getEDep() == lcio_trackerhit->getEDep());
+            track_same = track_same && (edm_trackerhit_orig.getEDepError() == lcio_trackerhit->getEDepError());
+            for (int k=0; k<3; ++k) {
+              track_same = track_same && (edm_trackerhit_orig.getPosition()[k] == lcio_trackerhit->getPosition()[k]);
+            }
+            for (int k=0; k<lcio_trackerhit->getCovMatrix().size(); ++k) {
+              track_same = track_same && (edm_trackerhit_orig.getCovMatrix(k) == lcio_trackerhit->getCovMatrix()[k]);
+            }
 
-          // TODO Raw hits
+            // TODO Raw hits
+          }
         }
       }
 
@@ -348,42 +318,6 @@ bool TestE4H2L::checkEDMCaloHitEDMCaloHit()
   return calohit_same;
 }
 
-bool TestE4H2L::checkEDMpIDEDMpID()
-{
-  // ParticleID
-  DataHandle<edm4hep::ParticleIDCollection> particleid_handle_orig {
-    "E4H_ParticleIDCollection", Gaudi::DataHandle::Reader, this};
-  const auto particleid_coll_orig = particleid_handle_orig.get();
-  DataHandle<edm4hep::ParticleIDCollection> particleid_handle {
-    "E4H_ParticleIDCollection_conv", Gaudi::DataHandle::Reader, this};
-  const auto particleid_coll = particleid_handle.get();
-
-  bool pid_same = true;
-
-  if ((*particleid_coll).size() > 0) { // avoid always true problems
-    for (int i=0; i < (*particleid_coll).size(); ++i) {
-      auto edm_pid_orig = (*particleid_coll_orig)[i];
-      auto edm_pid = (*particleid_coll)[i];
-
-      pid_same = pid_same && (edm_pid_orig.getType() == edm_pid.getType());
-      pid_same = pid_same && (edm_pid_orig.getPDG() == edm_pid.getPDG());
-      pid_same = pid_same && (edm_pid_orig.getAlgorithmType() == edm_pid.getAlgorithmType());
-      pid_same = pid_same && (edm_pid_orig.getLikelihood() == edm_pid.getLikelihood());
-
-      pid_same = pid_same && (edm_pid_orig.parameters_size() == edm_pid.parameters_size());
-      for (int j=0; j< edm_pid_orig.parameters_size(); ++j){
-        pid_same = pid_same && (edm_pid_orig.getParameters(j) == edm_pid.getParameters(j));
-      }
-    }
-  }
-
-  if (!pid_same) {
-    debug() << "ParameterID EDM4hep -> LCIO -> EDM4hep failed." << endmsg;
-  }
-
-  return pid_same;
-}
-
 
 bool TestE4H2L::checkEDMTrackEDMTrack()
 {
@@ -475,7 +409,6 @@ bool TestE4H2L::isSameEDM4hepEDM4hep()
   // Do general check
   generalCheck =
     checkEDMCaloHitEDMCaloHit() &&
-    checkEDMpIDEDMpID() &&
     checkEDMTrackEDMTrack();
 
   return generalCheck;
