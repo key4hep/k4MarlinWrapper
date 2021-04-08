@@ -21,6 +21,8 @@
 #include "edm4hep/RawCalorimeterHitCollection.h"
 #include "edm4hep/TPCHit.h"
 #include "edm4hep/TPCHitCollection.h"
+#include "edm4hep/MCParticle.h"
+#include "edm4hep/MCParticleCollection.h"
 // #include "edm4hep/Cluster.h"
 // #include "edm4hep/ClusterCollection.h"
 // #include "edm4hep/Vertex.h"
@@ -40,6 +42,7 @@
 #include "IMPL/ClusterImpl.h"
 #include "IMPL/VertexImpl.h"
 #include "IMPL/ParticleIDImpl.h"
+#include "IMPL/MCParticleImpl.h"
 
 #include "LCIOSTLTypes.h"
 
@@ -71,12 +74,15 @@ private:
   const std::string m_e4h_tpchit_name     = "E4H_TPCHitCollection";
   const std::string m_e4h_trackerhit_name = "E4H_TrackerHitCollection";
   const std::string m_e4h_track_name      = "E4H_TrackCollection";
+  const std::string m_e4h_mcparticle_name = "E4H_MCParticleCollection";
+
 
   const std::string m_lcio_calohit_name    = "LCIO_CaloHitCollection";
   const std::string m_lcio_rawcalohit_name = "LCIO_RawCaloHitCollection";
   const std::string m_lcio_tpchit_name     = "LCIO_TPCHitCollection";
   const std::string m_lcio_trackerhit_name = "LCIO_TrackerHitCollection";
   const std::string m_lcio_track_name      = "LCIO_TrackCollection";
+  const std::string m_lcio_mcparticle_name = "LCIO_MCParticleCollection";
 
   // Fake data creation
   void createCalorimeterHits(const int num_elements, int& int_cnt, float& float_cnt);
@@ -98,6 +104,11 @@ private:
     const std::vector<std::pair<uint, uint>>& track_link_tracks_idx,
     int& int_cnt,
     float& float_cnt);
+  void createMCParticles(
+    const int num_elements,
+    const std::vector<std::pair<uint, uint>>& track_parents_idx,
+    int& int_cnt,
+    float& float_cnt);
 
   // EDM4hep -> LCIO checks
   bool checkEDMRawCaloHitLCIORawCaloHit(lcio::LCEventImpl* the_event);
@@ -107,6 +118,9 @@ private:
     lcio::LCEventImpl* the_event,
     const std::vector<uint>& link_trackerhits_idx,
     const std::vector<std::pair<uint, uint>>& track_link_tracks_idx);
+  bool checkEDMMCParticleLCIOMCParticle(
+    lcio::LCEventImpl* the_event,
+    const std::vector<std::pair<uint, uint>>& mcp_parents_idx);
 
   // EDM4hep -> LCIO -> EDM4hep checks
   bool checkEDMCaloHitEDMCaloHit();
