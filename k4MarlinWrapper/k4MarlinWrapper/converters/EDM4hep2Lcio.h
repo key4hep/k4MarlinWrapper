@@ -19,6 +19,8 @@
 #include "edm4hep/TrackerHitCollection.h"
 #include "edm4hep/CalorimeterHit.h"
 #include "edm4hep/CalorimeterHitCollection.h"
+#include "edm4hep/TPCHit.h"
+#include "edm4hep/TPCHitCollection.h"
 #include "edm4hep/Cluster.h"
 #include "edm4hep/ClusterCollection.h"
 #include "edm4hep/Vertex.h"
@@ -34,6 +36,7 @@
 #include "IMPL/TrackImpl.h"
 #include "IMPL/TrackStateImpl.h"
 #include "IMPL/CalorimeterHitImpl.h"
+#include "IMPL/TPCHitImpl.h"
 #include "IMPL/TrackerHitImpl.h"
 #include "IMPL/ClusterImpl.h"
 #include "IMPL/VertexImpl.h"
@@ -56,6 +59,8 @@ struct CollectionsPairVectors {
     lcio::TrackerHitImpl*, edm4hep::TrackerHit>> trackerhits;
   std::vector<std::pair<
     lcio::CalorimeterHitImpl*, edm4hep::CalorimeterHit>> calohits;
+  std::vector<std::pair<
+    lcio::TPCHitImpl*, edm4hep::TPCHit>> tpchits;
   std::vector<std::pair<
       lcio::ClusterImpl*, edm4hep::Cluster>> clusters;
   std::vector<std::pair<
@@ -94,6 +99,12 @@ private:
 
   void convertLCIOCalorimeterHits(
     std::vector<std::pair<lcio::CalorimeterHitImpl*, edm4hep::CalorimeterHit>>& calo_hits_vec,
+    const std::string& e4h_coll_name,
+    const std::string& lcio_coll_name,
+    lcio::LCEventImpl* lcio_event);
+
+  void convertLCIOTPCHits(
+    std::vector<std::pair<lcio::TPCHitImpl*, edm4hep::TPCHit>>& tpc_hits_vec,
     const std::string& e4h_coll_name,
     const std::string& lcio_coll_name,
     lcio::LCEventImpl* lcio_event);

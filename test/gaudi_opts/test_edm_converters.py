@@ -12,6 +12,7 @@ evtsvc = k4DataSvc('EventDataSvc')
 edmConvTool = EDM4hep2LcioTool("EDM4hep2lcio")
 edmConvTool.Parameters = [
     "CalorimeterHit", "E4H_CaloHitCollection", "LCIO_CaloHitCollection",
+    "TPCHit", "E4H_TPCHitCollection", "LCIO_TPCHitCollection",
     "TrackerHit", "E4H_TrackerHitCollection", "LCIO_TrackerHitCollection",
     "Track", "E4H_TrackCollection", "LCIO_TrackCollection"
 ]

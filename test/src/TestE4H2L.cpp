@@ -9,8 +9,10 @@ TestE4H2L::TestE4H2L(const std::string& name, ISvcLocator* pSL) : GaudiAlgorithm
 
 StatusCode TestE4H2L::initialize() {
 
-  m_dataHandlesMap[m_e4h_callohit_name] = new DataHandle<edm4hep::CalorimeterHitCollection>(
-    m_e4h_callohit_name, Gaudi::DataHandle::Writer, this);
+  m_dataHandlesMap[m_e4h_calohit_name] = new DataHandle<edm4hep::CalorimeterHitCollection>(
+    m_e4h_calohit_name, Gaudi::DataHandle::Writer, this);
+  m_dataHandlesMap[m_e4h_tpchit_name] = new DataHandle<edm4hep::TPCHitCollection>(
+    m_e4h_tpchit_name, Gaudi::DataHandle::Writer, this);
   m_dataHandlesMap[m_e4h_trackerhit_name] = new DataHandle<edm4hep::TrackerHitCollection>(
     m_e4h_trackerhit_name, Gaudi::DataHandle::Writer, this);
   m_dataHandlesMap[m_e4h_track_name] = new DataHandle<edm4hep::TrackCollection>(
@@ -43,8 +45,39 @@ void TestE4H2L::createCalorimeterHits(
   }
 
   auto* calohit_handle = dynamic_cast<DataHandle<edm4hep::CalorimeterHitCollection>*>(
-    m_dataHandlesMap[m_e4h_callohit_name]);
+    m_dataHandlesMap[m_e4h_calohit_name]);
   calohit_handle->put(calohit_coll);
+}
+
+
+void TestE4H2L::createTPCHits(
+  const int num_elements,
+  const int num_rawwords,
+  int& int_cnt,
+  float& float_cnt)
+{
+  // edm4hep::CalorimeterHits
+  auto tpchit_coll = new edm4hep::TPCHitCollection();
+
+  for (int i=0; i < num_elements; ++i) {
+
+    auto* elem = new edm4hep::TPCHit();
+
+    elem->setCellID(int_cnt++);
+    elem->setQuality(int_cnt++);
+    elem->setTime(float_cnt++);
+    elem->setCharge(float_cnt++);
+
+    for (int j=0; j<num_rawwords; ++j) {
+      elem->addToRawDataWords(int_cnt++);
+    }
+
+    tpchit_coll->push_back(*elem);
+  }
+
+  auto* tpchit_handle = dynamic_cast<DataHandle<edm4hep::TPCHitCollection>*>(
+    m_dataHandlesMap[m_e4h_tpchit_name]);
+  tpchit_handle->put(tpchit_coll);
 }
 
 
@@ -154,6 +187,52 @@ void TestE4H2L::createTracks(
     m_dataHandlesMap[m_e4h_track_name]);
   track_handle->put(track_coll);
 }
+
+
+
+bool TestE4H2L::checkEDMTPCHitLCIOTPCHit(
+  lcio::LCEventImpl* the_event)
+{
+  DataHandle<edm4hep::TPCHitCollection> tpchit_handle_orig {
+    m_e4h_tpchit_name, Gaudi::DataHandle::Reader, this};
+  const auto tpchit_coll_orig = tpchit_handle_orig.get();
+
+  auto lcio_tpchit_coll = the_event->getCollection(m_lcio_tpchit_name);
+  auto lcio_coll_size = lcio_tpchit_coll->getNumberOfElements();
+
+  bool tpchit_same = (*tpchit_coll_orig).size() == lcio_coll_size;
+
+  if (tpchit_same) {
+    for (int i=0; i < (*tpchit_coll_orig).size(); ++i) {
+
+      auto edm_tpchit_orig = (*tpchit_coll_orig)[i];
+      auto* lcio_tpchit = dynamic_cast<lcio::TPCHitImpl*>(lcio_tpchit_coll->getElementAt(i));
+
+      if (lcio_tpchit != nullptr) {
+
+        tpchit_same = tpchit_same && (edm_tpchit_orig.getCellID() == lcio_tpchit->getCellID());
+        tpchit_same = tpchit_same && (edm_tpchit_orig.getTime() == lcio_tpchit->getTime());
+        tpchit_same = tpchit_same && (edm_tpchit_orig.getCharge() == lcio_tpchit->getCharge());
+        tpchit_same = tpchit_same && (edm_tpchit_orig.getQuality() == lcio_tpchit->getQuality());
+
+        tpchit_same = tpchit_same && (edm_tpchit_orig.rawDataWords_size() == lcio_tpchit->getNRawDataWords());
+        if (tpchit_same) {
+          for (int j=0; j<lcio_tpchit->getNRawDataWords(); ++j) {
+            tpchit_same = tpchit_same && (edm_tpchit_orig.getRawDataWords(j) == lcio_tpchit->getRawDataWord(j));
+          }
+        }
+      }
+
+    }
+  }
+
+  if (!tpchit_same) {
+    debug() << "Track EDM4hep -> LCIO failed." << endmsg;
+  }
+
+  return tpchit_same;
+}
+
 
 
 
@@ -318,10 +397,10 @@ bool TestE4H2L::checkEDMCaloHitEDMCaloHit()
 {
   // CalorimeterHit
   DataHandle<edm4hep::CalorimeterHitCollection> calohit_handle_orig {
-    m_e4h_callohit_name, Gaudi::DataHandle::Reader, this};
+    m_e4h_calohit_name, Gaudi::DataHandle::Reader, this};
   const auto calohit_coll_orig = calohit_handle_orig.get();
   DataHandle<edm4hep::CalorimeterHitCollection> calohit_handle {
-    m_e4h_callohit_name + "_conv", Gaudi::DataHandle::Reader, this};
+    m_e4h_calohit_name + "_conv", Gaudi::DataHandle::Reader, this};
   const auto calohit_coll = calohit_handle.get();
 
   bool calohit_same = true;
@@ -442,6 +521,10 @@ StatusCode TestE4H2L::execute() {
   // CaloHit
   const int calohit_elems = 2;
 
+  // TPCHit
+  const int tpchit_elems = 4;
+  const int tpchit_rawwords = 6;
+
   // TrackerHits
   const int trackerhits_elems = 5;
 
@@ -458,6 +541,11 @@ StatusCode TestE4H2L::execute() {
 
   // Create fake collections based on configuration
   createCalorimeterHits(calohit_elems, int_cnt, float_cnt);
+  createTPCHits(
+    tpchit_elems,
+    tpchit_rawwords,
+    int_cnt,
+    float_cnt);
   createTrackerHits(trackerhits_elems, int_cnt, float_cnt);
   createTracks(
     track_elems,
@@ -477,7 +565,8 @@ StatusCode TestE4H2L::execute() {
       the_event,
       track_link_trackerhits_idx,
       track_link_tracks_idx) &&
-    checkEDMTrackerHitLCIOTrackerHit(the_event);
+    checkEDMTrackerHitLCIOTrackerHit(the_event) &&
+    checkEDMTPCHitLCIOTPCHit(the_event);
 
   // Convert from LCIO to EDM4hep
   StatusCode lcio_sc =  m_lcio_conversionTool->convertCollections(the_event);
