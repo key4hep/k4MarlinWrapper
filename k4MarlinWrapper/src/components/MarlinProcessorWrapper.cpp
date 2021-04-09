@@ -235,7 +235,7 @@ StatusCode MarlinProcessorWrapper::execute() {
     the_event = new lcio::LCEventImpl();
     // Register empty event
     debug() << "Registering conversion EDM4hep to LCIO event in TES" << endmsg;
-    auto pO = std::make_unique<LCEventWrapper>(the_event);
+    auto pO = std::make_unique<LCEventWrapper>(the_event, true);
     StatusCode reg_sc = evtSvc()->registerObject("/Event/LCEvent", pO.release());
     if (reg_sc.isFailure()) {
       error() << "Failed to store the EDM4hep to LCIO event" << endmsg;
