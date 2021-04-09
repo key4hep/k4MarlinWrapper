@@ -534,7 +534,7 @@ void EDM4hep2LcioTool::convertLCIOMCParticles(
 
       lcio_mcp->setPDG(edm_mcp.getPDG());
       lcio_mcp->setGeneratorStatus(edm_mcp.getGeneratorStatus());
-      lcio_mcp->setSimulatorStatus(edm_mcp.getSimulatorStatus());
+      // lcio_mcp->setSimulatorStatus(edm_mcp.getSimulatorStatus());
       double vertex[3] = {edm_mcp.getVertex()[0], edm_mcp.getVertex()[1], edm_mcp.getVertex()[2]};
       lcio_mcp->setVertex(vertex);
       lcio_mcp->setTime(edm_mcp.getTime());

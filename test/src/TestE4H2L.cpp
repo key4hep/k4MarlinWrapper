@@ -235,7 +235,7 @@ void TestE4H2L::createMCParticles(
 
     elem->setPDG(int_cnt++);
     elem->setGeneratorStatus(int_cnt++);
-    // elem->setSimulatorStatus(int_cnt++ % 5);
+    // elem->setSimulatorStatus(int_cnt++);
     edm4hep::Vector3d vertex_vec {float_cnt++, float_cnt++, float_cnt++};
     elem->setVertex(vertex_vec);
     elem->setTime(float_cnt++);
@@ -545,7 +545,6 @@ bool TestE4H2L::checkEDMMCParticleLCIOMCParticle(
 
       mcp_same = mcp_same && (edm_mcp_orig.getPDG() == lcio_mcp->getPDG());
       mcp_same = mcp_same && (edm_mcp_orig.getGeneratorStatus() == lcio_mcp->getGeneratorStatus());
-      // TODO check how LCIO returns the SimulatorStatus
       // mcp_same = mcp_same && (edm_mcp_orig.getSimulatorStatus() == lcio_mcp->getSimulatorStatus());
 
       mcp_same = mcp_same && (edm_mcp_orig.getVertex()[0] == lcio_mcp->getVertex()[0]);
