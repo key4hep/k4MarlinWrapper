@@ -16,12 +16,8 @@ python \
 
 # Generate slcio file if not present
 if [ ! -f testSimulation.slcio ]; then
-  echo "Input file not found. Generating one..."
-  ddsim \
-    --steeringFile clic_steer.py \
-    --inputFiles ../Tests/yyxyev_000.stdhep -N 4 \
-    --compactFile $LCGEO/CLIC/compact/CLIC_o3_v14/CLIC_o3_v14.xml \
-    --outputFile testSimulation.slcio
+  echo "Input file not found. Getting it from key4hep..."
+  wget https://key4hep.web.cern.ch/testFiles/ddsimOutput/testSimulation.slcio -P $k4MarlinWrapper_tests_DIR/inputFiles/
 fi
 
 
