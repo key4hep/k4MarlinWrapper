@@ -124,7 +124,8 @@ private:
 
   // EDM4hep -> LCIO -> EDM4hep checks
   bool checkEDMCaloHitEDMCaloHit();
-  bool checkEDMTrackEDMTrack();
+  bool checkEDMTrackEDMTrack(
+    const std::vector<std::pair<uint, uint>>& track_link_tracks_idx)  ;
 
 };
 

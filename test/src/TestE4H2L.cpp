@@ -475,6 +475,11 @@ bool TestE4H2L::checkEDMTrackLCIOTrack(
         }
       } else {
         track_same = track_same && (edm_track_orig.subDetectorHitNumbers_size() == lcio_track->getSubdetectorHitNumbers().size());
+        if (track_same) {
+          for (int j=0; j< edm_track_orig.subDetectorHitNumbers_size(); ++j) {
+            track_same = track_same && (edm_track_orig.getSubDetectorHitNumbers(j) == lcio_track->getSubdetectorHitNumbers()[j]);
+          }
+        }
       }
 
 
@@ -638,7 +643,8 @@ bool TestE4H2L::checkEDMCaloHitEDMCaloHit()
 }
 
 
-bool TestE4H2L::checkEDMTrackEDMTrack()
+bool TestE4H2L::checkEDMTrackEDMTrack(
+  const std::vector<std::pair<uint, uint>>& track_link_tracks_idx)
 {
   // Track
   DataHandle<edm4hep::TrackCollection> track_handle_orig {
@@ -663,53 +669,72 @@ bool TestE4H2L::checkEDMTrackEDMTrack()
       track_same = track_same && (edm_track_orig.getDEdxError() == edm_track.getDEdxError());
       track_same = track_same && (edm_track_orig.getRadiusOfInnermostHit() == edm_track.getRadiusOfInnermostHit());
 
-      // track_same = track_same && (edm_track_orig.trackerHits_size() == edm_track.trackerHits_size());
-      // if ((edm_track_orig.trackerHits_size() == edm_track.trackerHits_size())) {
-      //   for (int j=0; j< edm_track_orig.trackerHits_size(); ++j) {
+      track_same = track_same && (edm_track_orig.trackerHits_size() == edm_track.trackerHits_size());
+      if ((edm_track_orig.trackerHits_size() == edm_track.trackerHits_size())) {
+        for (int j=0; j< edm_track_orig.trackerHits_size(); ++j) {
 
-      //     // auto edm_trackerhit_orig = edm_track_orig.getTrackerHits(j);
-      //     // auto edm_trackerhit = edm_track.getTrackerHits(j);
+          auto edm_trackerhit_orig = edm_track_orig.getTrackerHits(j);
+          auto edm_trackerhit = edm_track.getTrackerHits(j);
 
-      //     // track_same = track_same && (edm_trackerhit_orig.getCellID() == edm_trackerhit.getCellID());
-      //     // track_same = track_same && (edm_trackerhit_orig.getType() == edm_trackerhit.getType());
-      //     // track_same = track_same && (edm_trackerhit_orig.getQuality() == edm_trackerhit.getQuality());
-      //     // track_same = track_same && (edm_trackerhit_orig.getTime() == edm_trackerhit.getTime());
-      //     // track_same = track_same && (edm_trackerhit_orig.getEDep() == edm_trackerhit.getEDep());
+          track_same = track_same && (edm_trackerhit_orig.getCellID() == edm_trackerhit.getCellID());
+          track_same = track_same && (edm_trackerhit_orig.getType() == edm_trackerhit.getType());
+          track_same = track_same && (edm_trackerhit_orig.getQuality() == edm_trackerhit.getQuality());
+          track_same = track_same && (edm_trackerhit_orig.getTime() == edm_trackerhit.getTime());
+          track_same = track_same && (edm_trackerhit_orig.getEDep() == edm_trackerhit.getEDep());
 
-      //     // track_same = track_same && (edm_trackerhit_orig.getEDepError() == edm_trackerhit.getEDepError());
-      //     // track_same = track_same && (edm_trackerhit_orig.getPosition() == edm_trackerhit.getPosition());
-      //     // track_same = track_same && (edm_trackerhit_orig.getCovMatrix() == edm_trackerhit.getCovMatrix());
+          track_same = track_same && (edm_trackerhit_orig.getEDepError() == edm_trackerhit.getEDepError());
+          track_same = track_same && (edm_trackerhit_orig.getPosition() == edm_trackerhit.getPosition());
+          track_same = track_same && (edm_trackerhit_orig.getCovMatrix() == edm_trackerhit.getCovMatrix());
 
-      //     // TODO Raw hits
-      //   }
-      // }
+          // TODO Raw hits
+        }
+      }
 
-      // track_same = track_same && (edm_track_orig.subDetectorHitNumbers_size() == edm_track.subDetectorHitNumbers_size());
-      // if ((edm_track_orig.subDetectorHitNumbers_size() == edm_track.subDetectorHitNumbers_size())) {
-      //   for (int j=0; j< edm_track_orig.subDetectorHitNumbers_size(); ++j) {
-      //     track_same = track_same && (edm_track_orig.getSubDetectorHitNumbers(j) == edm_track.getSubDetectorHitNumbers(j));
-      //   }
-      // }
+      // TODO Resizing in EDM4hep to LCIO conversion causes to "have" 50 hits
+      if (edm_track.subDetectorHitNumbers_size() == 50) {
+        for (int j=0; j < edm_track_orig.subDetectorHitNumbers_size(); ++j) {
+          track_same = track_same && (edm_track_orig.getSubDetectorHitNumbers(j) == edm_track.getSubDetectorHitNumbers(j));
+        }
+        for (int j=edm_track_orig.subDetectorHitNumbers_size(); j<50; ++j) {
+          track_same = track_same && (0 == edm_track.getSubDetectorHitNumbers(j));
+        }
+      } else {
+        track_same = track_same && (edm_track_orig.subDetectorHitNumbers_size() == edm_track.subDetectorHitNumbers_size());
+        if ((edm_track_orig.subDetectorHitNumbers_size() == edm_track.subDetectorHitNumbers_size())) {
+          for (int j=0; j< edm_track_orig.subDetectorHitNumbers_size(); ++j) {
+            track_same = track_same && (edm_track_orig.getSubDetectorHitNumbers(j) == edm_track.getSubDetectorHitNumbers(j));
+          }
+        }
+      }
 
-      // track_same = track_same && (edm_track_orig.trackStates_size() == edm_track.trackStates_size());
-      // if ((edm_track_orig.trackStates_size() == edm_track.trackStates_size())) {
-      //   for (int j=0; j< edm_track_orig.trackStates_size(); ++j) {
+      track_same = track_same && (edm_track_orig.trackStates_size() == edm_track.trackStates_size());
+      if ((edm_track_orig.trackStates_size() == edm_track.trackStates_size())) {
+        for (int j=0; j< edm_track_orig.trackStates_size(); ++j) {
 
-      //     auto edm_trackestate_orig = edm_track_orig.getTrackStates(j);
-      //     auto edm_trackestate = edm_track.getTrackStates(j);
+          auto edm_trackestate_orig = edm_track_orig.getTrackStates(j);
+          auto edm_trackestate = edm_track.getTrackStates(j);
 
-      //     track_same = track_same && (edm_trackestate_orig.location == edm_trackestate.location);
-      //     track_same = track_same && (edm_trackestate_orig.D0 == edm_trackestate.D0);
-      //     track_same = track_same && (edm_trackestate_orig.phi == edm_trackestate.phi);
-      //     track_same = track_same && (edm_trackestate_orig.omega == edm_trackestate.omega);
+          track_same = track_same && (edm_trackestate_orig.location == edm_trackestate.location);
+          track_same = track_same && (edm_trackestate_orig.D0 == edm_trackestate.D0);
+          track_same = track_same && (edm_trackestate_orig.phi == edm_trackestate.phi);
+          track_same = track_same && (edm_trackestate_orig.omega == edm_trackestate.omega);
 
-      //     track_same = track_same && (edm_trackestate_orig.Z0 == edm_trackestate.Z0);
-      //     track_same = track_same && (edm_trackestate_orig.tanLambda == edm_trackestate.tanLambda);
-      //     track_same = track_same && (edm_trackestate_orig.referencePoint == edm_trackestate.referencePoint);
-      //     track_same = track_same && (edm_trackestate_orig.covMatrix == edm_trackestate.covMatrix);
-      //   }
-      // }
+          track_same = track_same && (edm_trackestate_orig.Z0 == edm_trackestate.Z0);
+          track_same = track_same && (edm_trackestate_orig.tanLambda == edm_trackestate.tanLambda);
+          track_same = track_same && (edm_trackestate_orig.referencePoint == edm_trackestate.referencePoint);
+          track_same = track_same && (edm_trackestate_orig.covMatrix == edm_trackestate.covMatrix);
+        }
+      }
 
+    }
+
+    // Check linked tracks
+    std::vector<uint> appeared((*track_coll).size(), 0);
+    for (const auto& [orig_idx, link_idx] : track_link_tracks_idx) {
+      auto edm_track_orig = (*track_coll)[orig_idx];
+      auto edm_track_link = (*track_coll)[link_idx];
+      track_same = track_same && (edm_track_orig.getTracks(appeared[orig_idx]) == edm_track_link);
+      appeared[orig_idx]++;
     }
   }
 
@@ -803,7 +828,8 @@ StatusCode TestE4H2L::execute() {
   // Check EDM4hep -> LCIO -> EDM4hep conversion
   bool edm_same =
     checkEDMCaloHitEDMCaloHit() &&
-    checkEDMTrackEDMTrack();
+    checkEDMTrackEDMTrack(
+      track_link_tracks_idx);
 
   return (edm_same && lcio_same) ? StatusCode::SUCCESS : StatusCode::FAILURE;
 }
