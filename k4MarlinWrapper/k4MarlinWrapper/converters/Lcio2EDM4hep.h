@@ -23,6 +23,8 @@
 #include "edm4hep/CalorimeterHitCollection.h"
 #include "edm4hep/RawCalorimeterHit.h"
 #include "edm4hep/RawCalorimeterHitCollection.h"
+#include "edm4hep/SimCalorimeterHit.h"
+#include "edm4hep/SimCalorimeterHitCollection.h"
 #include "edm4hep/TPCHit.h"
 #include "edm4hep/TPCHitCollection.h"
 #include "edm4hep/Vertex.h"
