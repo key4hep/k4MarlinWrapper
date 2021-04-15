@@ -16,7 +16,8 @@ edmConvTool.Parameters = [
     "TPCHit", "E4H_TPCHitCollection", "LCIO_TPCHitCollection",
     "TrackerHit", "E4H_TrackerHitCollection", "LCIO_TrackerHitCollection",
     "Track", "E4H_TrackCollection", "LCIO_TrackCollection",
-    "MCParticle", "E4H_MCParticleCollection", "LCIO_MCParticleCollection"
+    "MCParticle", "E4H_MCParticleCollection", "LCIO_MCParticleCollection",
+    "SimCalorimeterHit", "E4H_SimCaloHitCollection", "LCIO_SimCaloHitCollection"
 ]
 
 # LCIO2EDM4hep Tool

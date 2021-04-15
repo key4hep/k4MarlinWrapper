@@ -19,6 +19,8 @@
 #include "edm4hep/CalorimeterHitCollection.h"
 #include "edm4hep/RawCalorimeterHit.h"
 #include "edm4hep/RawCalorimeterHitCollection.h"
+#include "edm4hep/SimCalorimeterHit.h"
+#include "edm4hep/SimCalorimeterHitCollection.h"
 #include "edm4hep/TPCHit.h"
 #include "edm4hep/TPCHitCollection.h"
 #include "edm4hep/MCParticle.h"
@@ -37,6 +39,7 @@
 #include "IMPL/TrackStateImpl.h"
 #include "IMPL/CalorimeterHitImpl.h"
 #include "IMPL/RawCalorimeterHitImpl.h"
+#include "IMPL/SimCalorimeterHitImpl.h"
 #include "IMPL/TPCHitImpl.h"
 #include "IMPL/TrackerHitImpl.h"
 #include "IMPL/ClusterImpl.h"
@@ -71,14 +74,15 @@ private:
 
   const std::string m_e4h_calohit_name    = "E4H_CaloHitCollection";
   const std::string m_e4h_rawcalohit_name = "E4H_RawCaloHitCollection";
+  const std::string m_e4h_simcalohit_name = "E4H_SimCaloHitCollection";
   const std::string m_e4h_tpchit_name     = "E4H_TPCHitCollection";
   const std::string m_e4h_trackerhit_name = "E4H_TrackerHitCollection";
   const std::string m_e4h_track_name      = "E4H_TrackCollection";
   const std::string m_e4h_mcparticle_name = "E4H_MCParticleCollection";
 
-
   const std::string m_lcio_calohit_name    = "LCIO_CaloHitCollection";
   const std::string m_lcio_rawcalohit_name = "LCIO_RawCaloHitCollection";
+  const std::string m_lcio_simcalohit_name = "LCIO_SimCaloHitCollection";
   const std::string m_lcio_tpchit_name     = "LCIO_TPCHitCollection";
   const std::string m_lcio_trackerhit_name = "LCIO_TrackerHitCollection";
   const std::string m_lcio_track_name      = "LCIO_TrackCollection";
@@ -88,6 +92,12 @@ private:
   void createCalorimeterHits(const int num_elements, int& int_cnt, float& float_cnt);
   void createRawCalorimeterHits(
     const int num_elements,
+    int& int_cnt,
+    float& float_cnt);
+  void createSimCalorimeterHits(
+    const int num_elements,
+    const int num_contributions,
+    const std::vector<std::tuple<uint, uint, uint>>& link_mcparticles_idx,
     int& int_cnt,
     float& float_cnt);
   void createTPCHits(
@@ -121,6 +131,9 @@ private:
   bool checkEDMMCParticleLCIOMCParticle(
     lcio::LCEventImpl* the_event,
     const std::vector<std::pair<uint, uint>>& mcp_parents_idx);
+  bool checkEDMSimCaloHitLCIOSimCaloHit(
+    lcio::LCEventImpl* the_event,
+    const std::vector<std::tuple<uint, uint, uint>>& link_mcparticles_idx);
 
   // EDM4hep -> LCIO -> EDM4hep checks
   bool checkEDMCaloHitEDMCaloHit();
