@@ -925,6 +925,34 @@ void EDM4hep2LcioTool::FillMissingCollections(
 
   } // clusters
 
+  // Fill missing SimCaloHit collections
+  for (auto& [lcio_sch, edm_sch] : collection_pairs.simcalohits) {
+    // Link associated Contributions (MCParticles)
+    if (lcio_sch->getNMCContributions() != edm_sch.contributions_size()) {
+      assert(lcio_sch->getNMCContributions() == 0);
+      for (const auto& contrib : edm_sch.getContributions()) {
+        if (contrib.isAvailable()) {
+          auto edm_contrib_mcp = contrib.getParticle();
+          if (edm_contrib_mcp.isAvailable()) {
+            for (auto& [lcio_mcp, edm_mcp] : collection_pairs.mcparticles) {
+              if (edm_mcp == edm_contrib_mcp) {
+                std::array<float, 3> step_position {
+                  contrib.getStepPosition()[0], contrib.getStepPosition()[1], contrib.getStepPosition()[2]};
+                lcio_sch->addMCParticleContribution(
+                  lcio_mcp,
+                  contrib.getEnergy(),
+                  contrib.getTime(),
+                  contrib.getPDG(),
+                  step_position.data());
+              }
+            }
+          }
+        }
+      }
+    }
+
+  } // SimCaloHit
+
 }
 
 
