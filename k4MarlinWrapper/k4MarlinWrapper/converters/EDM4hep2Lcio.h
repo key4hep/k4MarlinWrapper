@@ -98,59 +98,59 @@ private:
 
   Gaudi::Property<std::vector<std::string>> m_edm2lcio_params{this, "Parameters", {}};
 
-  void convertLCIOTracks(
+  void convertTracks(
     std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& tracks_vec,
     std::vector<std::pair<lcio::TrackerHitImpl*, edm4hep::TrackerHit>>& trackerhits_vec,
     const std::string& e4h_coll_name,
     const std::string& lcio_coll_name,
     lcio::LCEventImpl* lcio_event);
 
-  void convertLCIOTrackerHits(
+  void convertTrackerHits(
     std::vector<std::pair<lcio::TrackerHitImpl*, edm4hep::TrackerHit>>& trackerhits_vec,
     const std::string& e4h_coll_name,
     const std::string& lcio_coll_name,
     lcio::LCEventImpl* lcio_event);
 
-  void convertLCIOCalorimeterHits(
+  void convertCalorimeterHits(
     std::vector<std::pair<lcio::CalorimeterHitImpl*, edm4hep::CalorimeterHit>>& calo_hits_vec,
     const std::string& e4h_coll_name,
     const std::string& lcio_coll_name,
     lcio::LCEventImpl* lcio_event);
 
-  void convertLCIORawCalorimeterHits(
+  void convertRawCalorimeterHits(
     std::vector<std::pair<lcio::RawCalorimeterHitImpl*, edm4hep::RawCalorimeterHit>>& raw_calo_hits_vec,
     const std::string& e4h_coll_name,
     const std::string& lcio_coll_name,
     lcio::LCEventImpl* lcio_event);
 
-  void convertLCIOSimCalorimeterHits(
+  void convertSimCalorimeterHits(
     std::vector<std::pair<lcio::SimCalorimeterHitImpl*, edm4hep::SimCalorimeterHit>>& sim_calo_hits_vec,
     const std::vector<std::pair<lcio::MCParticleImpl*, edm4hep::MCParticle>>& mcparticles,
     const std::string& e4h_coll_name,
     const std::string& lcio_coll_name,
     lcio::LCEventImpl* lcio_event);
 
-  void convertLCIOTPCHits(
+  void convertTPCHits(
     std::vector<std::pair<lcio::TPCHitImpl*, edm4hep::TPCHit>>& tpc_hits_vec,
     const std::string& e4h_coll_name,
     const std::string& lcio_coll_name,
     lcio::LCEventImpl* lcio_event);
 
-  void convertLCIOClusters(
+  void convertClusters(
     std::vector<std::pair<lcio::ClusterImpl*, edm4hep::Cluster>>& cluster_vec,
     const std::vector<std::pair<lcio::CalorimeterHitImpl*, edm4hep::CalorimeterHit>>& calohits_vec,
     const std::string& e4h_coll_name,
     const std::string& lcio_coll_name,
     lcio::LCEventImpl* lcio_event);
 
-  void convertLCIOVertices(
+  void convertVertices(
     std::vector<std::pair<lcio::VertexImpl*, edm4hep::Vertex>>& vertex_vec,
     const std::vector<std::pair<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>>& recoparticles_vec,
     const std::string& e4h_name,
     const std::string& lcio_coll_name,
     lcio::LCEventImpl* lcio_event);
 
-  void convertLCIOReconstructedParticles(
+  void convertReconstructedParticles(
     std::vector<std::pair<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>>& recoparticles_vec,
     const std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& tracks_vec,
     const std::vector<std::pair<lcio::VertexImpl*, edm4hep::Vertex>>& vertex_vec,
@@ -159,7 +159,7 @@ private:
     const std::string& lcio_coll_name,
     lcio::LCEventImpl* lcio_event);
 
-  void convertLCIOMCParticles(
+  void convertMCParticles(
     std::vector<std::pair<lcio::MCParticleImpl*, edm4hep::MCParticle>>& mc_particles_vec,
     const std::string& e4h_coll_name,
     const std::string& lcio_coll_name,

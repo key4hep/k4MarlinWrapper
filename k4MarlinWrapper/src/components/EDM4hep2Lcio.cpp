@@ -23,7 +23,7 @@ StatusCode EDM4hep2LcioTool::finalize() {
 // Convert EDM4hep Tracks to LCIO
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
 // Add LCIO Collection Vector to LCIO event
-void EDM4hep2LcioTool::convertLCIOTracks(
+void EDM4hep2LcioTool::convertTracks(
   std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& tracks_vec,
   std::vector<std::pair<lcio::TrackerHitImpl*, edm4hep::TrackerHit>>& trackerhits_vec,
   const std::string& e4h_coll_name,
@@ -135,7 +135,7 @@ void EDM4hep2LcioTool::convertLCIOTracks(
 // Convert EDM4hep TrackerHits to LCIO
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
 // Add LCIO Collection Vector to LCIO event
-void EDM4hep2LcioTool::convertLCIOTrackerHits(
+void EDM4hep2LcioTool::convertTrackerHits(
   std::vector<std::pair<lcio::TrackerHitImpl*, edm4hep::TrackerHit>>& trackerhits_vec,
   const std::string& e4h_coll_name,
   const std::string& lcio_coll_name,
@@ -191,7 +191,7 @@ void EDM4hep2LcioTool::convertLCIOTrackerHits(
 // Convert EDM4hep Calorimeter Hits to LCIO
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
 // Add converted LCIO Collection Vector to LCIO event
-void EDM4hep2LcioTool::convertLCIOCalorimeterHits(
+void EDM4hep2LcioTool::convertCalorimeterHits(
   std::vector<std::pair<lcio::CalorimeterHitImpl*, edm4hep::CalorimeterHit>>& calo_hits_vec,
   const std::string& e4h_coll_name,
   const std::string& lcio_coll_name,
@@ -242,7 +242,7 @@ void EDM4hep2LcioTool::convertLCIOCalorimeterHits(
 // Convert EDM4hep RAW Calorimeter Hits to LCIO
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
 // Add converted LCIO Collection Vector to LCIO event
-void EDM4hep2LcioTool::convertLCIORawCalorimeterHits(
+void EDM4hep2LcioTool::convertRawCalorimeterHits(
   std::vector<std::pair<lcio::RawCalorimeterHitImpl*, edm4hep::RawCalorimeterHit>>& raw_calo_hits_vec,
   const std::string& e4h_coll_name,
   const std::string& lcio_coll_name,
@@ -287,7 +287,7 @@ void EDM4hep2LcioTool::convertLCIORawCalorimeterHits(
 // Convert EDM4hep Sim Calorimeter Hits to LCIO
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
 // Add converted LCIO Collection Vector to LCIO event
-void EDM4hep2LcioTool::convertLCIOSimCalorimeterHits(
+void EDM4hep2LcioTool::convertSimCalorimeterHits(
   std::vector<std::pair<lcio::SimCalorimeterHitImpl*, edm4hep::SimCalorimeterHit>>& sim_calo_hits_vec,
   const std::vector<std::pair<lcio::MCParticleImpl*, edm4hep::MCParticle>>& mcparticles,
   const std::string& e4h_coll_name,
@@ -368,7 +368,7 @@ void EDM4hep2LcioTool::convertLCIOSimCalorimeterHits(
 // Convert EDM4hep TPC Hits to LCIO
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
 // Add converted LCIO Collection Vector to LCIO event
-void EDM4hep2LcioTool::convertLCIOTPCHits(
+void EDM4hep2LcioTool::convertTPCHits(
   std::vector<std::pair<lcio::TPCHitImpl*, edm4hep::TPCHit>>& tpc_hits_vec,
   const std::string& e4h_coll_name,
   const std::string& lcio_coll_name,
@@ -416,7 +416,7 @@ void EDM4hep2LcioTool::convertLCIOTPCHits(
 // Convert EDM4hep Clusters to LCIO
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
 // Add converted LCIO Collection Vector to LCIO event
-void EDM4hep2LcioTool::convertLCIOClusters(
+void EDM4hep2LcioTool::convertClusters(
   std::vector<std::pair<lcio::ClusterImpl*, edm4hep::Cluster>>& cluster_vec,
   const std::vector<std::pair<lcio::CalorimeterHitImpl*, edm4hep::CalorimeterHit>>& calohits_vec,
   const std::string& e4h_coll_name,
@@ -531,7 +531,7 @@ void EDM4hep2LcioTool::convertLCIOClusters(
 // Convert EDM4hep Vertices to LCIO
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
 // Add converted LCIO Collection Vector to LCIO event
-void EDM4hep2LcioTool::convertLCIOVertices(
+void EDM4hep2LcioTool::convertVertices(
   std::vector<std::pair<lcio::VertexImpl*, edm4hep::Vertex>>& vertex_vec,
   const std::vector<std::pair<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>>& recoparticles_vec,
   const std::string& e4h_coll_name,
@@ -596,7 +596,7 @@ void EDM4hep2LcioTool::convertLCIOVertices(
 // Convert MC Particles to LCIO
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
 // Add converted LCIO Collection Vector to LCIO event
-void EDM4hep2LcioTool::convertLCIOMCParticles(
+void EDM4hep2LcioTool::convertMCParticles(
   std::vector<std::pair<lcio::MCParticleImpl*, edm4hep::MCParticle>>& mc_particles_vec,
   const std::string& e4h_coll_name,
   const std::string& lcio_coll_name,
@@ -679,7 +679,7 @@ void EDM4hep2LcioTool::convertLCIOMCParticles(
 // Convert EDM4hep RecoParticles to LCIO
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
 // Add converted LCIO Collection Vector to LCIO event
-void EDM4hep2LcioTool::convertLCIOReconstructedParticles(
+void EDM4hep2LcioTool::convertReconstructedParticles(
   std::vector<std::pair<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>>& recoparticles_vec,
   const std::vector<std::pair<lcio::TrackImpl*, edm4hep::Track>>& tracks_vec,
   const std::vector<std::pair<lcio::VertexImpl*, edm4hep::Vertex>>& vertex_vec,
@@ -970,7 +970,7 @@ void EDM4hep2LcioTool::convertAdd(
 
   // Types are edm4hep::<Name>Collection
   if (type == "Track") {
-    convertLCIOTracks(
+    convertTracks(
       collection_pairs.tracks,
       collection_pairs.trackerhits,
       e4h_coll_name,
@@ -978,28 +978,28 @@ void EDM4hep2LcioTool::convertAdd(
       lcio_event);
   } else
   if (type == "TrackerHit") {
-    convertLCIOTrackerHits(
+    convertTrackerHits(
       collection_pairs.trackerhits,
       e4h_coll_name,
       lcio_coll_name,
       lcio_event);
   } else
   if (type == "CalorimeterHit") {
-    convertLCIOCalorimeterHits(
+    convertCalorimeterHits(
       collection_pairs.calohits,
       e4h_coll_name,
       lcio_coll_name,
       lcio_event);
   } else
   if (type == "RawCalorimeterHit") {
-    convertLCIORawCalorimeterHits(
+    convertRawCalorimeterHits(
       collection_pairs.rawcalohits,
       e4h_coll_name,
       lcio_coll_name,
       lcio_event);
   } else
   if (type == "SimCalorimeterHit") {
-    convertLCIOSimCalorimeterHits(
+    convertSimCalorimeterHits(
       collection_pairs.simcalohits,
       collection_pairs.mcparticles,
       e4h_coll_name,
@@ -1007,14 +1007,14 @@ void EDM4hep2LcioTool::convertAdd(
       lcio_event);
   } else
   if (type == "TPCHit") {
-    convertLCIOTPCHits(
+    convertTPCHits(
       collection_pairs.tpchits,
       e4h_coll_name,
       lcio_coll_name,
       lcio_event);
   } else
   if (type == "Cluster") {
-    convertLCIOClusters(
+    convertClusters(
       collection_pairs.clusters,
       collection_pairs.calohits,
       e4h_coll_name,
@@ -1022,7 +1022,7 @@ void EDM4hep2LcioTool::convertAdd(
       lcio_event);
   } else
   if (type == "Vertex") {
-    convertLCIOVertices(
+    convertVertices(
       collection_pairs.vertices,
       collection_pairs.recoparticles,
       e4h_coll_name,
@@ -1030,14 +1030,14 @@ void EDM4hep2LcioTool::convertAdd(
       lcio_event);
   } else
   if (type == "MCParticle") {
-    convertLCIOMCParticles(
+    convertMCParticles(
       collection_pairs.mcparticles,
       e4h_coll_name,
       lcio_coll_name,
       lcio_event);
   } else
   if (type == "ReconstructedParticle") {
-    convertLCIOReconstructedParticles(
+    convertReconstructedParticles(
       collection_pairs.recoparticles,
       collection_pairs.tracks,
       collection_pairs.vertices,
