@@ -283,6 +283,88 @@ void EDM4hep2LcioTool::convertLCIORawCalorimeterHits(
 
 
 
+
+// Convert EDM4hep Sim Calorimeter Hits to LCIO
+// Add converted LCIO ptr and original EDM4hep collection to vector of pairs
+// Add converted LCIO Collection Vector to LCIO event
+void EDM4hep2LcioTool::convertLCIOSimCalorimeterHits(
+  std::vector<std::pair<lcio::SimCalorimeterHitImpl*, edm4hep::SimCalorimeterHit>>& sim_calo_hits_vec,
+  const std::vector<std::pair<lcio::MCParticleImpl*, edm4hep::MCParticle>>& mcparticles,
+  const std::string& e4h_coll_name,
+  const std::string& lcio_coll_name,
+  lcio::LCEventImpl* lcio_event)
+{
+  DataHandle<edm4hep::SimCalorimeterHitCollection> sim_calohit_handle {
+    e4h_coll_name, Gaudi::DataHandle::Reader, this};
+  const auto simcalohit_coll = sim_calohit_handle.get();
+
+  auto* simcalohits = new lcio::LCCollectionVec(lcio::LCIO::SIMCALORIMETERHIT);
+
+  for (const auto& edm_sim_calohit : (*simcalohit_coll)) {
+    if (edm_sim_calohit.isAvailable()) {
+
+      auto* lcio_simcalohit = new lcio::SimCalorimeterHitImpl();
+
+      #warning "Splitting unsigned long long into two ints"
+      uint64_t combined_value = edm_sim_calohit.getCellID();
+      uint32_t* combined_value_ptr = reinterpret_cast<uint32_t*>(&combined_value);
+      lcio_simcalohit->setCellID0(combined_value_ptr[0]);
+      lcio_simcalohit->setCellID1(combined_value_ptr[1]);
+      lcio_simcalohit->setEnergy(edm_sim_calohit.getEnergy());
+      std::array<float, 3> positions {
+        edm_sim_calohit.getPosition()[0], edm_sim_calohit.getPosition()[1], edm_sim_calohit.getPosition()[2]};
+      lcio_simcalohit->setPosition(positions.data());
+
+      // Get ConstCaloHitContributions
+      for (const auto& contrib : edm_sim_calohit.getContributions()) {
+        if (contrib.isAvailable()) {
+          auto contrib_mcp = contrib.getParticle();
+          if (contrib_mcp.isAvailable()) {
+            bool conv_found = false;
+            // Search for that particle in mcparticles vector
+            for (auto& [lcio_mcp, edm_mcp] : mcparticles) {
+              if (edm_mcp == contrib_mcp) {
+                std::array<float, 3> step_position {
+                  contrib.getStepPosition()[0], contrib.getStepPosition()[1], contrib.getStepPosition()[2]};
+                lcio_simcalohit->addMCParticleContribution(
+                  lcio_mcp,
+                  contrib.getEnergy(),
+                  contrib.getTime(),
+                  contrib.getPDG(),
+                  step_position.data());
+                conv_found = true;
+                break;
+              }
+            }
+            // If mc particle available, but not found in mcparticle vec, add nullptr
+            if (not conv_found) {
+              lcio_simcalohit->addMCParticleContribution(
+                nullptr,
+                0, 0, 0,
+                nullptr);
+            }
+          }
+        }
+      }
+
+      // Save Sim Calorimeter Hits LCIO and EDM4hep collections
+      sim_calo_hits_vec.emplace_back(
+        std::make_pair(lcio_simcalohit, edm_sim_calohit)
+      );
+
+      // Add to sim calo hits collection
+      simcalohits->addElement(lcio_simcalohit);
+    }
+  }
+
+  // Add all Sim Calorimeter Hits to event
+  lcio_event->addCollection(simcalohits, lcio_coll_name);
+}
+
+
+
+
+
 // Convert EDM4hep TPC Hits to LCIO
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
 // Add converted LCIO Collection Vector to LCIO event
@@ -884,6 +966,14 @@ void EDM4hep2LcioTool::convertAdd(
       lcio_coll_name,
       lcio_event);
   } else
+  if (type == "SimCalorimeterHit") {
+    convertLCIOSimCalorimeterHits(
+      collection_pairs.simcalohits,
+      collection_pairs.mcparticles,
+      e4h_coll_name,
+      lcio_coll_name,
+      lcio_event);
+  } else
   if (type == "TPCHit") {
     convertLCIOTPCHits(
       collection_pairs.tpchits,
@@ -926,7 +1016,9 @@ void EDM4hep2LcioTool::convertAdd(
   } else {
     error() << "Error trying to convert requested " << type << " with name " << e4h_coll_name << endmsg;
     error() << "List of supported types: " <<
-      "Track, TrackerHit, Cluster, CalorimeterHit, RawCalorimeterHit, Vertex, ReconstructedParticle, MCParticle." << endmsg;
+      "Track, TrackerHit, Cluster, " <<
+      "CalorimeterHit, RawCalorimeterHit, SimCalorimeterHit, " <<
+      "Vertex, ReconstructedParticle, MCParticle." << endmsg;
   }
 }
 

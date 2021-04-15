@@ -21,6 +21,8 @@
 #include "edm4hep/CalorimeterHitCollection.h"
 #include "edm4hep/RawCalorimeterHit.h"
 #include "edm4hep/RawCalorimeterHitCollection.h"
+#include "edm4hep/SimCalorimeterHit.h"
+#include "edm4hep/SimCalorimeterHitCollection.h"
 #include "edm4hep/TPCHit.h"
 #include "edm4hep/TPCHitCollection.h"
 #include "edm4hep/Cluster.h"
@@ -41,6 +43,7 @@
 #include "IMPL/TrackStateImpl.h"
 #include "IMPL/CalorimeterHitImpl.h"
 #include "IMPL/RawCalorimeterHitImpl.h"
+#include "IMPL/SimCalorimeterHitImpl.h"
 #include "IMPL/TPCHitImpl.h"
 #include "IMPL/TrackerHitImpl.h"
 #include "IMPL/ClusterImpl.h"
@@ -67,6 +70,8 @@ struct CollectionsPairVectors {
     lcio::CalorimeterHitImpl*, edm4hep::CalorimeterHit>> calohits;
   std::vector<std::pair<
     lcio::RawCalorimeterHitImpl*, edm4hep::RawCalorimeterHit>> rawcalohits;
+  std::vector<std::pair<
+    lcio::SimCalorimeterHitImpl*, edm4hep::SimCalorimeterHit>> simcalohits;
   std::vector<std::pair<
     lcio::TPCHitImpl*, edm4hep::TPCHit>> tpchits;
   std::vector<std::pair<
@@ -115,6 +120,13 @@ private:
 
   void convertLCIORawCalorimeterHits(
     std::vector<std::pair<lcio::RawCalorimeterHitImpl*, edm4hep::RawCalorimeterHit>>& raw_calo_hits_vec,
+    const std::string& e4h_coll_name,
+    const std::string& lcio_coll_name,
+    lcio::LCEventImpl* lcio_event);
+
+  void convertLCIOSimCalorimeterHits(
+    std::vector<std::pair<lcio::SimCalorimeterHitImpl*, edm4hep::SimCalorimeterHit>>& sim_calo_hits_vec,
+    const std::vector<std::pair<lcio::MCParticleImpl*, edm4hep::MCParticle>>& mcparticles,
     const std::string& e4h_coll_name,
     const std::string& lcio_coll_name,
     lcio::LCEventImpl* lcio_event);
