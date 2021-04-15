@@ -13,6 +13,8 @@ StatusCode TestE4H2L::initialize() {
     m_e4h_calohit_name, Gaudi::DataHandle::Writer, this);
   m_dataHandlesMap[m_e4h_rawcalohit_name] = new DataHandle<edm4hep::RawCalorimeterHitCollection>(
     m_e4h_rawcalohit_name, Gaudi::DataHandle::Writer, this);
+  m_dataHandlesMap[m_e4h_simcalohit_name] = new DataHandle<edm4hep::SimCalorimeterHitCollection>(
+    m_e4h_simcalohit_name, Gaudi::DataHandle::Writer, this);
   m_dataHandlesMap[m_e4h_tpchit_name] = new DataHandle<edm4hep::TPCHitCollection>(
     m_e4h_tpchit_name, Gaudi::DataHandle::Writer, this);
   m_dataHandlesMap[m_e4h_trackerhit_name] = new DataHandle<edm4hep::TrackerHitCollection>(
@@ -59,7 +61,6 @@ void TestE4H2L::createRawCalorimeterHits(
   int& int_cnt,
   float& float_cnt)
 {
-  // edm4hep::CalorimeterHits
   auto* rawcalohit_coll = new edm4hep::RawCalorimeterHitCollection();
 
   for (int i=0; i < num_elements; ++i) {
@@ -78,6 +79,55 @@ void TestE4H2L::createRawCalorimeterHits(
   rawcalohit_handle->put(rawcalohit_coll);
 }
 
+
+void TestE4H2L::createSimCalorimeterHits(
+  const int num_elements,
+  const int num_contributions,
+  const std::vector<std::tuple<uint, uint, uint>>& link_mcparticles_idx,
+  int& int_cnt,
+  float& float_cnt)
+{
+  auto* simcalohit_coll = new edm4hep::SimCalorimeterHitCollection();
+
+  // Get MCParticles handle
+  DataHandle<edm4hep::MCParticleCollection> mcparticles_handle {
+    m_e4h_mcparticle_name, Gaudi::DataHandle::Reader, this};
+  const auto mcparticles_coll = mcparticles_handle.get();
+
+  for (int i=0; i < num_elements; ++i) {
+
+    auto* elem = new edm4hep::SimCalorimeterHit();
+
+    elem->setCellID(int_cnt++);
+    elem->setEnergy(float_cnt++);
+    edm4hep::Vector3f test_vec {float_cnt++, float_cnt++, float_cnt++};
+    elem->setPosition(test_vec);
+
+    for (int j=0; j<num_contributions; j++) {
+      auto* contrib = new edm4hep::CaloHitContribution();
+      contrib->setPDG(int_cnt++);
+      contrib->setEnergy(float_cnt++);
+      contrib->setTime(float_cnt++);
+      edm4hep::Vector3f test_step_vec {float_cnt++, float_cnt++, float_cnt++};
+      contrib->setStepPosition(test_step_vec);
+
+      // add the corresponding mcparticle
+      for (const auto& [simch_idx, contrib_idx, mcpart_idx] : link_mcparticles_idx) {
+        if (i ==  simch_idx && j == contrib_idx) {
+          contrib->setParticle(mcparticles_coll->at(mcpart_idx));
+        }
+      }
+
+      elem->addToContributions(*contrib);
+    }
+
+    simcalohit_coll->push_back(*elem);
+  }
+
+  auto* simcalohit_handle = dynamic_cast<DataHandle<edm4hep::SimCalorimeterHitCollection>*>(
+    m_dataHandlesMap[m_e4h_simcalohit_name]);
+  simcalohit_handle->put(simcalohit_coll);
+}
 
 
 void TestE4H2L::createTPCHits(
@@ -292,18 +342,18 @@ bool TestE4H2L::checkEDMRawCaloHitLCIORawCaloHit(
   if (rawcalohit_same) {
     for (int i=0; i < (*rawcalohit_coll_orig).size(); ++i) {
 
-      auto edm_tpchit_orig = (*rawcalohit_coll_orig)[i];
-      auto* lcio_tpchit = dynamic_cast<lcio::RawCalorimeterHitImpl*>(lcio_rawcalohit_coll->getElementAt(i));
+      auto edm_rawcalohit_orig = (*rawcalohit_coll_orig)[i];
+      auto* lcio_rawcalohit = dynamic_cast<lcio::RawCalorimeterHitImpl*>(lcio_rawcalohit_coll->getElementAt(i));
 
-      if (lcio_tpchit != nullptr) {
+      if (lcio_rawcalohit != nullptr) {
 
         uint64_t combined_value = 0;
         uint32_t* combined_value_ptr = reinterpret_cast<uint32_t*>(&combined_value);
-        combined_value_ptr[0] = lcio_tpchit->getCellID0();
-        combined_value_ptr[1] = lcio_tpchit->getCellID1();
-        rawcalohit_same = rawcalohit_same && (edm_tpchit_orig.getCellID() == combined_value);
-        rawcalohit_same = rawcalohit_same && (edm_tpchit_orig.getAmplitude() == lcio_tpchit->getAmplitude());
-        rawcalohit_same = rawcalohit_same && (edm_tpchit_orig.getTimeStamp() == lcio_tpchit->getTimeStamp());
+        combined_value_ptr[0] = lcio_rawcalohit->getCellID0();
+        combined_value_ptr[1] = lcio_rawcalohit->getCellID1();
+        rawcalohit_same = rawcalohit_same && (edm_rawcalohit_orig.getCellID() == combined_value);
+        rawcalohit_same = rawcalohit_same && (edm_rawcalohit_orig.getAmplitude() == lcio_rawcalohit->getAmplitude());
+        rawcalohit_same = rawcalohit_same && (edm_rawcalohit_orig.getTimeStamp() == lcio_rawcalohit->getTimeStamp());
       }
 
     }
@@ -317,6 +367,80 @@ bool TestE4H2L::checkEDMRawCaloHitLCIORawCaloHit(
 }
 
 
+
+
+bool TestE4H2L::checkEDMSimCaloHitLCIOSimCaloHit(
+  lcio::LCEventImpl* the_event,
+  const std::vector<std::tuple<uint, uint, uint>>& link_mcparticles_idx)
+{
+  DataHandle<edm4hep::SimCalorimeterHitCollection> simcalohit_handle_orig {
+    m_e4h_simcalohit_name, Gaudi::DataHandle::Reader, this};
+  const auto simcalohit_coll_orig = simcalohit_handle_orig.get();
+
+  auto lcio_simcalohit_coll = the_event->getCollection(m_lcio_simcalohit_name);
+  auto lcio_coll_size = lcio_simcalohit_coll->getNumberOfElements();
+
+  bool simcalohit_same = (*simcalohit_coll_orig).size() == lcio_coll_size;
+
+  if (simcalohit_same) {
+    for (int i=0; i < (*simcalohit_coll_orig).size(); ++i) {
+
+      auto edm_simcalohit_orig = (*simcalohit_coll_orig)[i];
+      auto* lcio_simcalohit = dynamic_cast<lcio::SimCalorimeterHitImpl*>(lcio_simcalohit_coll->getElementAt(i));
+
+      if (lcio_simcalohit != nullptr) {
+
+        uint64_t combined_value = 0;
+        uint32_t* combined_value_ptr = reinterpret_cast<uint32_t*>(&combined_value);
+        combined_value_ptr[0] = lcio_simcalohit->getCellID0();
+        combined_value_ptr[1] = lcio_simcalohit->getCellID1();
+        simcalohit_same = simcalohit_same && (edm_simcalohit_orig.getCellID() == combined_value);
+
+        // simcalohit_same = simcalohit_same && (edm_simcalohit_orig.getEnergy() == lcio_simcalohit->getEnergy());
+        for (int k=0; k<3; ++k) {
+          simcalohit_same = simcalohit_same && (edm_simcalohit_orig.getPosition()[k] == lcio_simcalohit->getPosition()[k]);
+        }
+
+        auto* lcio_mcparticles_coll = the_event->getCollection(m_lcio_mcparticle_name);
+
+        simcalohit_same = simcalohit_same && (edm_simcalohit_orig.contributions_size() == lcio_simcalohit->getNMCContributions());
+        if (simcalohit_same) {
+          for (int j=0; j < edm_simcalohit_orig.contributions_size(); ++j) {
+            auto edm_calohitcontr = edm_simcalohit_orig.getContributions(j);
+
+            simcalohit_same = simcalohit_same && (edm_calohitcontr.getPDG() == lcio_simcalohit->getPDGCont(j));
+            simcalohit_same = simcalohit_same && (edm_calohitcontr.getEnergy() == lcio_simcalohit->getEnergyCont(j));
+            simcalohit_same = simcalohit_same && (edm_calohitcontr.getTime() == lcio_simcalohit->getTimeCont(j));
+            simcalohit_same = simcalohit_same && (edm_calohitcontr.getTime() == lcio_simcalohit->getTimeCont(j));
+            for (int k=0; k<3; ++k) {
+              simcalohit_same = simcalohit_same && (edm_calohitcontr.getStepPosition()[k] == lcio_simcalohit->getStepPosition(j)[k]);
+            }
+          }
+        }
+      }
+
+    }
+
+    // Check MCParticles linked to Contributions in SimCaloHits
+    // SimCaloHits have all the same number of contributions during creation for this test
+    // The contribution idx can be used directly then (instead of calculation based on how many were added)
+    auto lcio_mcparticles_coll = the_event->getCollection(m_lcio_mcparticle_name);
+    for (const auto& [simch_idx, contrib_idx, mcpart_idx] : link_mcparticles_idx) {
+
+      auto* lcio_simcalohit_orig = dynamic_cast<lcio::SimCalorimeterHitImpl*>(lcio_simcalohit_coll->getElementAt(simch_idx));
+      auto* lcio_mcpart_orig = lcio_simcalohit_orig->getParticleCont(contrib_idx);
+      auto* lcio_mcpart_link = dynamic_cast<lcio::MCParticleImpl*>(lcio_mcparticles_coll->getElementAt(mcpart_idx));
+
+      simcalohit_same = simcalohit_same && (lcio_mcpart_orig == lcio_mcpart_link);
+    }
+  }
+
+  if (!simcalohit_same) {
+    debug() << "SimCalorimeterHit EDM4hep -> LCIO failed." << endmsg;
+  }
+
+  return simcalohit_same;
+}
 
 
 
@@ -772,18 +896,61 @@ StatusCode TestE4H2L::execute() {
   const int track_subdetectorhitnumbers = 4;
   const std::vector<uint> track_link_trackerhits_idx =
     {0, 2, 4};
+  // Check bounds
+  for (const auto& idx : track_link_trackerhits_idx) {
+    assert(idx < trackerhits_elems);
+  }
   const int track_states = 5;
   const std::vector<std::pair<uint, uint>> track_link_tracks_idx =
     {{0,2}, {1,3}, {2,3}, {3,2}, {3,0}};
+  // Check bounds
+  for (const auto& [orig, dest] : track_link_tracks_idx) {
+    assert(orig < track_elems);
+    assert(dest < track_elems);
+  }
 
   // MCParticles
   const int mcparticle_elems = 5;
   const std::vector<std::pair<uint, uint>> mcp_parents_idx =
     {{0,4}, {4,1}, {2,3}, {3,0}, {1,3}, {1,2}};
+  // Check bounds
+  for (const auto& [orig, dest] : mcp_parents_idx) {
+    assert(orig < mcparticle_elems);
+    assert(dest < mcparticle_elems);
+  }
+
+  // SimCaloHit
+  const int simcalohit_elems = 3;
+  // Fixed amount of contributions for every simcalohit
+  const int simcalohit_contributions = 4;
+  // SimCaloHit_idx, Contrib_idx, MCParticle_idx
+  // There must be one MCPartcle per contribution (fill every 1st and 2nd idx)
+  const std::vector<std::tuple<uint, uint, uint>> simcalohit_mcparticles_idx = {
+    {0,0,0}, {0,1,2}, {0,2,1}, {0,3,4},
+    {1,0,1}, {1,1,3}, {1,2,4}, {1,3,4},
+    {2,0,0}, {2,1,3}, {2,2,2}, {2,3,0},
+  };
+  // Check bounds
+  assert(simcalohit_mcparticles_idx.size() == (simcalohit_elems * simcalohit_contributions));
+  // Check correct indices
+  for (int i=0; i < simcalohit_elems; ++i) {
+    for (int j=0; j < simcalohit_contributions; ++j) {
+      uint c_idx = j + i * simcalohit_contributions;
+      assert(std::get<0>(simcalohit_mcparticles_idx[c_idx]) == i);
+      assert(std::get<1>(simcalohit_mcparticles_idx[c_idx]) == j);
+    }
+  }
+  for (const auto& [simch_idx, contrib_idx, mcpart_idx] : simcalohit_mcparticles_idx) {
+    assert (mcpart_idx < mcparticle_elems);
+    assert (contrib_idx < simcalohit_contributions);
+    assert (simch_idx < simcalohit_elems);
+  }
 
 
 
+  /////////////////////////////////////////////////////////////////////
   // Create fake collections based on configuration
+  /////////////////////////////////////////////////////////////////////
   createCalorimeterHits(calohit_elems, int_cnt, float_cnt);
   createRawCalorimeterHits(rawcalohit_elems, int_cnt, float_cnt);
   createTPCHits(
@@ -792,7 +959,7 @@ StatusCode TestE4H2L::execute() {
     int_cnt,
     float_cnt);
   createTrackerHits(trackerhits_elems, int_cnt, float_cnt);
-  createTracks(
+  createTracks( // Depends on TrackerHits
     track_elems,
     track_subdetectorhitnumbers,
     track_link_trackerhits_idx,
@@ -805,11 +972,21 @@ StatusCode TestE4H2L::execute() {
     mcp_parents_idx,
     int_cnt,
     float_cnt);
+  createSimCalorimeterHits( // Depends on createMCParticles()
+    simcalohit_elems,
+    simcalohit_contributions,
+    simcalohit_mcparticles_idx,
+    int_cnt,
+    float_cnt);
+
 
   // Convert from EDM4hep to LCIO
   StatusCode edm_sc = m_edm_conversionTool->convertCollections(the_event);
 
+
+  /////////////////////////////////////////////////////////////////////
   // Check EDM4hep -> LCIO conversion
+  /////////////////////////////////////////////////////////////////////
   bool lcio_same =
     checkEDMTrackLCIOTrack(
       the_event,
@@ -820,12 +997,19 @@ StatusCode TestE4H2L::execute() {
     checkEDMRawCaloHitLCIORawCaloHit(the_event) &&
     checkEDMMCParticleLCIOMCParticle(
       the_event,
-      mcp_parents_idx);
+      mcp_parents_idx) &&
+    checkEDMSimCaloHitLCIOSimCaloHit(
+      the_event,
+      simcalohit_mcparticles_idx);
+
 
   // Convert from LCIO to EDM4hep
   StatusCode lcio_sc =  m_lcio_conversionTool->convertCollections(the_event);
 
+
+  /////////////////////////////////////////////////////////////////////
   // Check EDM4hep -> LCIO -> EDM4hep conversion
+  /////////////////////////////////////////////////////////////////////
   bool edm_same =
     checkEDMCaloHitEDMCaloHit() &&
     checkEDMTrackEDMTrack(
