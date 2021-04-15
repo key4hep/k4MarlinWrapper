@@ -60,7 +60,6 @@
 // Interface
 #include "IEDMConverter.h"
 
-
 struct CollectionsPairVectors {
   std::vector<std::pair<
     lcio::TrackImpl*, edm4hep::Track>> tracks;
