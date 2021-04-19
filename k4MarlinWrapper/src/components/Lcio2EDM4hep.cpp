@@ -35,6 +35,9 @@ StatusCode Lcio2EDM4hepTool::initialize() {
     } else if (m_lcio2edm_params[i] == "ParticleID") {
       m_dataHandlesMap[m_lcio2edm_params[i+2]] =
         new DataHandle<edm4hep::ParticleIDCollection>(m_lcio2edm_params[i+2], Gaudi::DataHandle::Writer, this);
+    } else if (m_lcio2edm_params[i] == "MCParticle") {
+      m_dataHandlesMap[m_lcio2edm_params[i+2]] =
+        new DataHandle<edm4hep::MCParticleCollection>(m_lcio2edm_params[i+2], Gaudi::DataHandle::Writer, this);
     } else if (m_lcio2edm_params[i] == "Vertex") {
       m_dataHandlesMap[m_lcio2edm_params[i+2]] =
         new DataHandle<edm4hep::VertexCollection>(m_lcio2edm_params[i+2], Gaudi::DataHandle::Writer, this);
@@ -55,9 +58,9 @@ StatusCode Lcio2EDM4hepTool::initialize() {
         new DataHandle<edm4hep::ClusterCollection>(m_lcio2edm_params[i+2], Gaudi::DataHandle::Writer, this);
     } else {
       debug() << m_lcio2edm_params[i] << ": conversion type not supported." << endmsg;
-      debug() << "List of supported types: ReconstructedParticle, ParticleID, Vertex, " <<
-        "Track, CalorimeterHit, SimCalorimeterHit, "
-        "TPCHit, Cluster" << endmsg;
+      debug() << "List of supported types: ReconstructedParticle, ParticleID, MCParticle, " <<
+        "Vertex, Track, CalorimeterHit, "
+        "SimCalorimeterHit, TPCHit, Cluster" << endmsg;
     }
   }
 
@@ -134,6 +137,9 @@ StatusCode Lcio2EDM4hepTool::convertCollections(
           m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
       } else if (m_lcio2edm_params[i] == "ParticleID") {
         convertPut<edm4hep::ParticleIDCollection>(
+          m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
+      } else if (m_lcio2edm_params[i] == "MCParticle") {
+        convertPut<edm4hep::MCParticleCollection>(
           m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
       } else if (m_lcio2edm_params[i] == "Vertex") {
         convertPut<edm4hep::VertexCollection>(

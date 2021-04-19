@@ -29,6 +29,8 @@
 #include "edm4hep/TPCHitCollection.h"
 #include "edm4hep/Vertex.h"
 #include "edm4hep/VertexCollection.h"
+#include "edm4hep/MCParticle.h"
+#include "edm4hep/MCParticleCollection.h"
 #include "edm4hep/EventHeaderCollection.h"
 
 #include "podio/CollectionBase.h"
