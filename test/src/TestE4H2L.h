@@ -141,6 +141,8 @@ private:
   bool checkEDMCaloHitEDMCaloHit();
   bool checkEDMTrackEDMTrack(
     const std::vector<std::pair<uint, uint>>& track_link_tracks_idx);
+  bool checkEDMMCParticleEDMMCParticle(
+    const std::vector<std::pair<uint, uint>>& mcp_parents_idx);
   bool checkEDMSimCaloHitEDMSimCaloHit(
     const std::vector<std::tuple<uint, uint, uint>>& link_mcparticles_idx);
 

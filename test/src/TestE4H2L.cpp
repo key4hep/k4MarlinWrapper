@@ -767,6 +767,84 @@ bool TestE4H2L::checkEDMCaloHitEDMCaloHit()
 }
 
 
+bool TestE4H2L::checkEDMMCParticleEDMMCParticle(
+  const std::vector<std::pair<uint, uint>>& mcp_parents_idx)
+{
+  DataHandle<edm4hep::MCParticleCollection> mcparticle_handle_orig {
+    m_e4h_mcparticle_name, Gaudi::DataHandle::Reader, this};
+  const auto mcparticle_coll_orig = mcparticle_handle_orig.get();
+  DataHandle<edm4hep::MCParticleCollection> mcparticle_handle {
+    m_e4h_mcparticle_name + m_conv_tag, Gaudi::DataHandle::Reader, this};
+  const auto mcparticle_coll = mcparticle_handle.get();
+
+  bool mcp_same = (*mcparticle_coll_orig).size() == (*mcparticle_coll).size();
+  if (mcp_same) {
+    for (int i=0; i < (*mcparticle_coll_orig).size(); ++i) {
+
+      auto edm_mcp_orig = (*mcparticle_coll_orig)[i];
+      auto edm_mcp = (*mcparticle_coll)[i];
+
+      mcp_same = mcp_same && (edm_mcp_orig.getPDG() == edm_mcp.getPDG());
+      mcp_same = mcp_same && (edm_mcp_orig.getGeneratorStatus() == edm_mcp.getGeneratorStatus());
+      // mcp_same = mcp_same && (edm_mcp_orig.getSimulatorStatus() == edm_mcp.getSimulatorStatus());
+
+      mcp_same = mcp_same && (edm_mcp_orig.getVertex()[0] == edm_mcp.getVertex()[0]);
+      mcp_same = mcp_same && (edm_mcp_orig.getVertex()[1] == edm_mcp.getVertex()[1]);
+      mcp_same = mcp_same && (edm_mcp_orig.getVertex()[2] == edm_mcp.getVertex()[2]);
+
+      mcp_same = mcp_same && (edm_mcp_orig.getTime() == edm_mcp.getTime());
+
+      mcp_same = mcp_same && (edm_mcp_orig.getEndpoint()[0] == edm_mcp.getEndpoint()[0]);
+      mcp_same = mcp_same && (edm_mcp_orig.getEndpoint()[1] == edm_mcp.getEndpoint()[1]);
+      mcp_same = mcp_same && (edm_mcp_orig.getEndpoint()[2] == edm_mcp.getEndpoint()[2]);
+
+      mcp_same = mcp_same && (edm_mcp_orig.getMomentum()[0] == edm_mcp.getMomentum()[0]);
+      mcp_same = mcp_same && (edm_mcp_orig.getMomentum()[1] == edm_mcp.getMomentum()[1]);
+      mcp_same = mcp_same && (edm_mcp_orig.getMomentum()[2] == edm_mcp.getMomentum()[2]);
+
+      mcp_same = mcp_same && (edm_mcp_orig.getMomentumAtEndpoint()[0] == edm_mcp.getMomentumAtEndpoint()[0]);
+      mcp_same = mcp_same && (edm_mcp_orig.getMomentumAtEndpoint()[1] == edm_mcp.getMomentumAtEndpoint()[1]);
+      mcp_same = mcp_same && (edm_mcp_orig.getMomentumAtEndpoint()[2] == edm_mcp.getMomentumAtEndpoint()[2]);
+
+      mcp_same = mcp_same && (edm_mcp_orig.getMass() == edm_mcp.getMass());
+      mcp_same = mcp_same && (edm_mcp_orig.getCharge() == edm_mcp.getCharge());
+
+      mcp_same = mcp_same && (edm_mcp_orig.getSpin()[0] == edm_mcp.getSpin()[0]);
+      mcp_same = mcp_same && (edm_mcp_orig.getSpin()[1] == edm_mcp.getSpin()[1]);
+      mcp_same = mcp_same && (edm_mcp_orig.getSpin()[2] == edm_mcp.getSpin()[2]);
+
+      mcp_same = mcp_same && (edm_mcp_orig.getColorFlow()[0] == edm_mcp.getColorFlow()[0]);
+      mcp_same = mcp_same && (edm_mcp_orig.getColorFlow()[1] == edm_mcp.getColorFlow()[1]);
+
+      mcp_same = mcp_same && (edm_mcp_orig.isCreatedInSimulation() == edm_mcp.isCreatedInSimulation());
+      mcp_same = mcp_same && (edm_mcp_orig.isBackscatter() == edm_mcp.isBackscatter());
+      mcp_same = mcp_same && (edm_mcp_orig.vertexIsNotEndpointOfParent() == edm_mcp.vertexIsNotEndpointOfParent());
+      mcp_same = mcp_same && (edm_mcp_orig.isDecayedInTracker() == edm_mcp.isDecayedInTracker());
+      mcp_same = mcp_same && (edm_mcp_orig.isDecayedInCalorimeter() == edm_mcp.isDecayedInCalorimeter());
+      mcp_same = mcp_same && (edm_mcp_orig.hasLeftDetector() == edm_mcp.hasLeftDetector());
+      mcp_same = mcp_same && (edm_mcp_orig.isStopped() == edm_mcp.isStopped());
+      mcp_same = mcp_same && (edm_mcp_orig.isOverlay() == edm_mcp.isOverlay());
+
+    }
+
+    // Check links between converted MCParticles
+    std::vector<uint> appeared((*mcparticle_coll).size(), 0);
+    for (const auto& [orig_idx, link_idx] : mcp_parents_idx) {
+      auto edm_mcp_orig = (*mcparticle_coll)[orig_idx];
+      auto edm_mcp_link = (*mcparticle_coll)[link_idx];
+      mcp_same = mcp_same && (edm_mcp_orig.getParents(appeared[orig_idx]) == edm_mcp_link);
+      appeared[orig_idx]++;
+    }
+
+  }
+
+  if (!mcp_same) {
+    debug() << "MCParticle EDM4hep -> LCIO -> EDM4hep failed." << endmsg;
+  }
+
+  return mcp_same;
+}
+
 
 bool TestE4H2L::checkEDMSimCaloHitEDMSimCaloHit(
   const std::vector<std::tuple<uint, uint, uint>>& link_mcparticles_idx)
@@ -979,11 +1057,13 @@ StatusCode TestE4H2L::execute() {
   // MCParticles
   const int mcparticle_elems = 5;
   const std::vector<std::pair<uint, uint>> mcp_parents_idx =
-    {{0,4}, {4,1}, {2,3}, {3,0}, {1,3}, {1,2}};
+    {{4,0}, {4,1}, {3,2}, {3,0}, {3,1}, {2,1}};
   // Check bounds
-  for (const auto& [orig, dest] : mcp_parents_idx) {
-    assert(orig < mcparticle_elems);
-    assert(dest < mcparticle_elems);
+  for (const auto& [daughter, parent] : mcp_parents_idx) {
+    assert(daughter < mcparticle_elems);
+    assert(parent < mcparticle_elems);
+    // TODO daughter id must be higher than parent
+    assert(daughter > parent);
   }
 
   // SimCaloHit
@@ -1081,6 +1161,8 @@ StatusCode TestE4H2L::execute() {
     checkEDMCaloHitEDMCaloHit() &&
     checkEDMTrackEDMTrack(
       track_link_tracks_idx) &&
+    checkEDMMCParticleEDMMCParticle(
+      mcp_parents_idx) &&
     checkEDMSimCaloHitEDMSimCaloHit(
       simcalohit_mcparticles_idx);
 
