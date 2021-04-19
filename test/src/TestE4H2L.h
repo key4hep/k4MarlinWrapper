@@ -88,6 +88,8 @@ private:
   const std::string m_lcio_track_name      = "LCIO_TrackCollection";
   const std::string m_lcio_mcparticle_name = "LCIO_MCParticleCollection";
 
+  const std::string m_conv_tag = "_conv";
+
   // Fake data creation
   void createCalorimeterHits(const int num_elements, int& int_cnt, float& float_cnt);
   void createRawCalorimeterHits(
@@ -138,7 +140,9 @@ private:
   // EDM4hep -> LCIO -> EDM4hep checks
   bool checkEDMCaloHitEDMCaloHit();
   bool checkEDMTrackEDMTrack(
-    const std::vector<std::pair<uint, uint>>& track_link_tracks_idx)  ;
+    const std::vector<std::pair<uint, uint>>& track_link_tracks_idx);
+  bool checkEDMSimCaloHitEDMSimCaloHit(
+    const std::vector<std::tuple<uint, uint, uint>>& link_mcparticles_idx);
 
 };
 
