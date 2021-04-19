@@ -25,7 +25,9 @@ lcioConvTool = Lcio2EDM4hepTool("Lcio2EDM4hep")
 lcioConvTool.Parameters = [
     "CalorimeterHit", "LCIO_CaloHitCollection", "E4H_CaloHitCollection_conv",
     # "TrackerHit", "LCIO_TrackerHitCollection", "E4H_TrackerHitCollection_conv",
-    "Track", "LCIO_TrackCollection", "E4H_TrackCollection_conv"
+    "Track", "LCIO_TrackCollection", "E4H_TrackCollection_conv",
+    "MCParticle", "LCIO_MCParticleCollection", "E4H_MCParticleCollection_conv",
+    "SimCalorimeterHit", "LCIO_SimCaloHitCollection", "E4H_SimCaloHitCollection_conv"
 ]
 
 TestConversion = TestE4H2L("TestConversion")
