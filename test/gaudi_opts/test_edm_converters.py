@@ -14,9 +14,9 @@ edmConvTool.Parameters = [
     "CalorimeterHit", "E4H_CaloHitCollection", "LCIO_CaloHitCollection",
     "RawCalorimeterHit", "E4H_RawCaloHitCollection", "LCIO_RawCaloHitCollection",
     "TPCHit", "E4H_TPCHitCollection", "LCIO_TPCHitCollection",
-    "TrackerHit", "E4H_TrackerHitCollection", "LCIO_TrackerHitCollection",
-    "SimTrackerHit", "E4H_SimTrackerHitCollection", "LCIO_SimTrackerHitCollection",
     "Track", "E4H_TrackCollection", "LCIO_TrackCollection",
+    "SimTrackerHit", "E4H_SimTrackerHitCollection", "LCIO_SimTrackerHitCollection",
+    "TrackerHit", "E4H_TrackerHitCollection", "LCIO_TrackerHitCollection",
     "MCParticle", "E4H_MCParticleCollection", "LCIO_MCParticleCollection",
     "SimCalorimeterHit", "E4H_SimCaloHitCollection", "LCIO_SimCaloHitCollection"
 ]
