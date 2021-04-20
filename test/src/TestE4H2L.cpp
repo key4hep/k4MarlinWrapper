@@ -572,27 +572,95 @@ bool TestE4H2L::checkEDMSimTrackerHitEDMSimTrackerHit(
       strh_same = strh_same && (edm_strh_orig.isProducedBySecondary() == edm_strh.isProducedBySecondary());
     }
 
-    // if (strh_same) {
-    //   // Check MCParticles linked to SimTrackerHits
-    //   DataHandle<edm4hep::MCParticleCollection> mcparticle_handle {
-    //     m_e4h_mcparticle_name + m_conv_tag, Gaudi::DataHandle::Reader, this};
-    //   const auto mcparticle_coll = mcparticle_handle.get();
+    if (strh_same) {
+      // Check MCParticles linked to SimTrackerHits
+      DataHandle<edm4hep::MCParticleCollection> mcparticle_handle {
+        m_e4h_mcparticle_name + m_conv_tag, Gaudi::DataHandle::Reader, this};
+      const auto mcparticle_coll = mcparticle_handle.get();
 
-    //   for (const auto& [strh_idx, mcp_idx] : link_mcparticles_idx) {
+      for (const auto& [strh_idx, mcp_idx] : link_mcparticles_idx) {
+        auto edm_strh = (*simtrackerhit_coll)[strh_idx];
+        auto edm_mcpart = (*mcparticle_coll)[mcp_idx];
+        auto edm_strh_mcpart = edm_strh.getMCParticle();
 
-    //     auto edm_strh = (*simtrackerhit_coll)[strh_idx];
-    //     auto edm_strh_orig = (*simtrackerhit_coll_orig)[strh_idx];
-    //     auto edm_mcpart = (*mcparticle_coll)[mcp_idx];
-    //     auto edm_strh_mcpart = edm_strh.getMCParticle();
-
-    //     strh_same = strh_same && (edm_strh_mcpart == edm_mcpart);
-    //   }
-    // }
+        strh_same = strh_same && (edm_strh_mcpart == edm_mcpart);
+      }
+    }
 
   }
 
   if (!strh_same) {
     debug() << "SimTrackerHit EDM4hep -> LCIO -> EDM4hep failed." << endmsg;
+  }
+
+  return strh_same;
+}
+
+
+
+bool TestE4H2L::checkEDMSimTrackerHitLCIOSimTrackerHit(
+  lcio::LCEventImpl* the_event,
+  const std::vector<std::pair<uint, uint>>& link_mcparticles_idx)
+{
+  DataHandle<edm4hep::SimTrackerHitCollection> simtrackerhit_handle_orig {
+    m_e4h_simtrackerhit_name, Gaudi::DataHandle::Reader, this};
+  const auto simtrackerhit_coll_orig = simtrackerhit_handle_orig.get();
+
+  auto lcio_simtrackerhit_coll = the_event->getCollection(m_lcio_simtrackerhit_name);
+  auto lcio_coll_size = lcio_simtrackerhit_coll->getNumberOfElements();
+
+  bool strh_same = (*simtrackerhit_coll_orig).size() == lcio_coll_size;
+
+  if (strh_same) {
+    for (int i=0; i < (*simtrackerhit_coll_orig).size(); ++i) {
+
+      auto edm_strh_orig = (*simtrackerhit_coll_orig)[i];
+      auto* lcio_strh = dynamic_cast<lcio::SimTrackerHitImpl*>(lcio_simtrackerhit_coll->getElementAt(i));
+
+      if (lcio_strh != nullptr) {
+        // TODO handle split CellIDs
+        uint64_t combined_value = 0;
+        uint32_t* combined_value_ptr = reinterpret_cast<uint32_t*>(&combined_value);
+        combined_value_ptr[0] = lcio_strh->getCellID0();
+        combined_value_ptr[1] = lcio_strh->getCellID1();
+        strh_same = strh_same && (edm_strh_orig.getCellID() == combined_value);
+
+        strh_same = strh_same && (edm_strh_orig.getPosition()[0] == lcio_strh->getPosition()[0]);
+        strh_same = strh_same && (edm_strh_orig.getPosition()[1] == lcio_strh->getPosition()[1]);
+        strh_same = strh_same && (edm_strh_orig.getPosition()[2] == lcio_strh->getPosition()[2]);
+
+        strh_same = strh_same && (edm_strh_orig.getEDep() == lcio_strh->getEDep());
+        strh_same = strh_same && (edm_strh_orig.getTime() == lcio_strh->getTime());
+
+        strh_same = strh_same && (edm_strh_orig.getMomentum()[0] == lcio_strh->getMomentum()[0]);
+        strh_same = strh_same && (edm_strh_orig.getMomentum()[1] == lcio_strh->getMomentum()[1]);
+        strh_same = strh_same && (edm_strh_orig.getMomentum()[2] == lcio_strh->getMomentum()[2]);
+
+        strh_same = strh_same && (edm_strh_orig.getPathLength() == lcio_strh->getPathLength());
+        strh_same = strh_same && (edm_strh_orig.getQuality() == lcio_strh->getQuality());
+        strh_same = strh_same && (edm_strh_orig.isOverlay() == lcio_strh->isOverlay());
+        strh_same = strh_same && (edm_strh_orig.isProducedBySecondary() == lcio_strh->isProducedBySecondary());
+      }
+
+    }
+
+    if (strh_same) {
+      auto* lcio_mcparticle_coll = the_event->getCollection(m_lcio_mcparticle_name);
+      for (const auto& [strh_idx, mcp_idx] : link_mcparticles_idx) {
+
+        auto* lcio_strh = dynamic_cast<lcio::SimTrackerHitImpl*>(lcio_simtrackerhit_coll->getElementAt(strh_idx));
+        auto lcio_strh_mcp = lcio_strh->getMCParticle();
+
+        auto* lcio_mcp_link = dynamic_cast<lcio::MCParticleImpl*>(lcio_mcparticle_coll->getElementAt(mcp_idx));
+
+        strh_same = strh_same && (lcio_strh_mcp == lcio_mcp_link);
+      }
+    }
+
+  }
+
+  if (!strh_same) {
+    debug() << "SimTrackerHit EDM4hep -> LCIO failed." << endmsg;
   }
 
   return strh_same;
@@ -1272,7 +1340,10 @@ StatusCode TestE4H2L::execute() {
       mcp_parents_idx) &&
     checkEDMSimCaloHitLCIOSimCaloHit(
       the_event,
-      simcalohit_mcparticles_idx);
+      simcalohit_mcparticles_idx) &&
+    checkEDMSimTrackerHitLCIOSimTrackerHit(
+      the_event,
+      strh_mcparticles_idx);
 
 
   // Convert from LCIO to EDM4hep

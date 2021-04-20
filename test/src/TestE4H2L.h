@@ -148,6 +148,9 @@ private:
   bool checkEDMSimCaloHitLCIOSimCaloHit(
     lcio::LCEventImpl* the_event,
     const std::vector<std::tuple<uint, uint, uint>>& link_mcparticles_idx);
+  bool checkEDMSimTrackerHitLCIOSimTrackerHit(
+    lcio::LCEventImpl* the_event,
+    const std::vector<std::pair<uint, uint>>& link_mcparticles_idx);
 
   // EDM4hep -> LCIO -> EDM4hep checks
   bool checkEDMCaloHitEDMCaloHit();
