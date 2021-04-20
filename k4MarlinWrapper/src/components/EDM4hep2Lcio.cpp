@@ -187,7 +187,6 @@ void EDM4hep2LcioTool::convertTrackerHits(
 }
 
 
-
 // Convert EDM4hep SimTrackerHits to LCIO
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
 // Add LCIO Collection Vector to LCIO event
@@ -258,7 +257,6 @@ void EDM4hep2LcioTool::convertSimTrackerHits(
 }
 
 
-
 // Convert EDM4hep Calorimeter Hits to LCIO
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
 // Add converted LCIO Collection Vector to LCIO event
@@ -309,7 +307,6 @@ void EDM4hep2LcioTool::convertCalorimeterHits(
 }
 
 
-
 // Convert EDM4hep RAW Calorimeter Hits to LCIO
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
 // Add converted LCIO Collection Vector to LCIO event
@@ -351,8 +348,6 @@ void EDM4hep2LcioTool::convertRawCalorimeterHits(
   // Add all Raw Calorimeter Hits to event
   lcio_event->addCollection(rawcalohits, lcio_coll_name);
 }
-
-
 
 
 // Convert EDM4hep Sim Calorimeter Hits to LCIO
@@ -431,9 +426,6 @@ void EDM4hep2LcioTool::convertSimCalorimeterHits(
   // Add all Sim Calorimeter Hits to event
   lcio_event->addCollection(simcalohits, lcio_coll_name);
 }
-
-
-
 
 
 // Convert EDM4hep TPC Hits to LCIO
@@ -662,8 +654,6 @@ void EDM4hep2LcioTool::convertVertices(
 }
 
 
-
-
 // Convert MC Particles to LCIO
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
 // Add converted LCIO Collection Vector to LCIO event
@@ -742,9 +732,6 @@ void EDM4hep2LcioTool::convertMCParticles(
   // Add all reconstructed particles to event
   lcio_event->addCollection(mcparticles, lcio_coll_name);
 }
-
-
-
 
 
 // Convert EDM4hep RecoParticles to LCIO
@@ -895,6 +882,9 @@ void EDM4hep2LcioTool::convertReconstructedParticles(
 }
 
 
+// Depending on the order of the collections in the parameters,
+// and for the mutual dependencies between some collections,
+// go over the possible missing associated collections and fill them.
 void EDM4hep2LcioTool::FillMissingCollections(
   CollectionsPairVectors& collection_pairs)
 {
@@ -1047,6 +1037,7 @@ void EDM4hep2LcioTool::FillMissingCollections(
 }
 
 
+// Select the appropiate method to convert a collection given its type
 void EDM4hep2LcioTool::convertAdd(
   const std::string& type,
   const std::string& e4h_coll_name,
@@ -1151,6 +1142,7 @@ void EDM4hep2LcioTool::convertAdd(
 }
 
 
+// Check if a collection is already in the event by its name
 bool EDM4hep2LcioTool::collectionExist(
   const std::string& collection_name,
   lcio::LCEventImpl* lcio_event)
@@ -1163,6 +1155,7 @@ bool EDM4hep2LcioTool::collectionExist(
   }
   return false;
 }
+
 
 // Reorder parameters based on dependencies between collections
 // This avoids (partly) the need for FillMissingCollections
@@ -1200,6 +1193,9 @@ void EDM4hep2LcioTool::optimizeOrderParams()
   swap_if_before("ReconstructedParticle", "Cluster");
 }
 
+
+// Parse property parameters and convert the indicated collections.
+// Use the collection names in the parameters to read and write them
 StatusCode EDM4hep2LcioTool::convertCollections(
   lcio::LCEventImpl* lcio_event)
 {
