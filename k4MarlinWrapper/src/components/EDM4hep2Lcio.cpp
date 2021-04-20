@@ -1164,6 +1164,41 @@ bool EDM4hep2LcioTool::collectionExist(
   return false;
 }
 
+// Reorder parameters based on dependencies between collections
+// This avoids (partly) the need for FillMissingCollections
+void EDM4hep2LcioTool::optimizeOrderParams()
+{
+  // Can't run in parallel
+  auto swap_if_before = [&](const std::string& main, const std::string& dependency)
+  {
+    for (int i = 0; i < m_edm2lcio_params.size(); i=i+3) {
+      auto track_found_it = std::find(m_edm2lcio_params.begin(), m_edm2lcio_params.end(), main);
+      if (track_found_it != m_edm2lcio_params.end()) {
+        auto track_index = std::distance(m_edm2lcio_params.begin(), track_found_it);
+
+        auto trackerhit_found_it = std::find(m_edm2lcio_params.begin(), m_edm2lcio_params.end(), dependency);
+        auto trackerhit_index = std::distance(m_edm2lcio_params.begin(), trackerhit_found_it);
+
+        if (track_index < trackerhit_index) {
+          std::swap(m_edm2lcio_params[track_index], m_edm2lcio_params[trackerhit_index]);
+          std::swap(m_edm2lcio_params[track_index+1], m_edm2lcio_params[trackerhit_index+1]);
+          std::swap(m_edm2lcio_params[track_index+2], m_edm2lcio_params[trackerhit_index+2]);
+        }
+      }
+    }
+  };
+
+  // A depends on B converted before to not need FillMissingCollections()
+  swap_if_before("Track", "TrackerHit");
+  swap_if_before("SimTrackerHit", "MCParticle");
+  swap_if_before("SimCalorimeterHit", "MCParticle");
+  swap_if_before("Cluster", "CalorimeterHit");
+  swap_if_before("Vertex", "ReconstructedParticle");
+  swap_if_before("ReconstructedParticle", "Track");
+  // This generates a cycle, but that's fine
+  swap_if_before("ReconstructedParticle", "Vertex");
+  swap_if_before("ReconstructedParticle", "Cluster");
+}
 
 StatusCode EDM4hep2LcioTool::convertCollections(
   lcio::LCEventImpl* lcio_event)
@@ -1174,6 +1209,8 @@ StatusCode EDM4hep2LcioTool::convertCollections(
   }
 
   CollectionsPairVectors collection_pairs {};
+
+  optimizeOrderParams();
 
   for (int i = 0; i < m_edm2lcio_params.size(); i=i+3) {
     if (! collectionExist(m_edm2lcio_params[i+2], lcio_event)) {

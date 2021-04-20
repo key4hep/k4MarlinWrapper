@@ -59,6 +59,7 @@
 #include <vector>
 #include <string>
 #include <bitset>
+#include <algorithm>
 
 // Interface
 #include "IEDMConverter.h"
@@ -182,6 +183,8 @@ private:
   bool collectionExist(
     const std::string& collection_name,
     lcio::LCEventImpl* lcio_event);
+
+  void optimizeOrderParams();
 };
 
 #endif
