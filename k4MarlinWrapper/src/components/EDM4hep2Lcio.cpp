@@ -998,6 +998,7 @@ void EDM4hep2LcioTool::FillMissingCollections(
 
   // Fill missing SimCaloHit collections
   for (auto& [lcio_sch, edm_sch] : collection_pairs.simcalohits) {
+
     // Link associated Contributions (MCParticles)
     if (lcio_sch->getNMCContributions() != edm_sch.contributions_size()) {
       assert(lcio_sch->getNMCContributions() == 0);
@@ -1027,6 +1028,21 @@ void EDM4hep2LcioTool::FillMissingCollections(
     }
 
   } // SimCaloHit
+
+  // Fill missing SimTrackerHit collections
+  for (auto& [lcio_strh, edm_strh] : collection_pairs.simtrackerhits) {
+    const auto lcio_strh_mcp = lcio_strh->getMCParticle();
+    const auto edm_strh_mcp = edm_strh.getMCParticle();
+    if (lcio_strh_mcp == nullptr) {
+      for (const auto& [lcio_mcp, edm_mcp] : collection_pairs.mcparticles) {
+        if (edm_strh_mcp == edm_mcp) {
+          lcio_strh->setMCParticle(lcio_mcp);
+          break;
+        }
+      }
+    }
+
+  } // SimTrackerHits
 
 }
 
