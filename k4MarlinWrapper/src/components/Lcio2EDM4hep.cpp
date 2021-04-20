@@ -56,6 +56,9 @@ StatusCode Lcio2EDM4hepTool::initialize() {
     } else if (m_lcio2edm_params[i] == "SimCalorimeterHit") {
       m_dataHandlesMap[m_lcio2edm_params[i+2]] =
         new DataHandle<edm4hep::SimCalorimeterHitCollection>(m_lcio2edm_params[i+2], Gaudi::DataHandle::Writer, this);
+    } else if (m_lcio2edm_params[i] == "RawCalorimeterHit") {
+      m_dataHandlesMap[m_lcio2edm_params[i+2]] =
+        new DataHandle<edm4hep::RawCalorimeterHitCollection>(m_lcio2edm_params[i+2], Gaudi::DataHandle::Writer, this);
     } else if (m_lcio2edm_params[i] == "TPCHit") {
       m_dataHandlesMap[m_lcio2edm_params[i+2]] =
         new DataHandle<edm4hep::TPCHitCollection>(m_lcio2edm_params[i+2], Gaudi::DataHandle::Writer, this);
@@ -64,10 +67,11 @@ StatusCode Lcio2EDM4hepTool::initialize() {
         new DataHandle<edm4hep::ClusterCollection>(m_lcio2edm_params[i+2], Gaudi::DataHandle::Writer, this);
     } else {
       debug() << m_lcio2edm_params[i] << ": conversion type not supported." << endmsg;
-      debug() << "List of supported types: ReconstructedParticle, ParticleID, MCParticle, " <<
-        "Vertex, Track, TrackerHit, "
-        "SimTrackerHit, CalorimeterHit, SimCalorimeterHit, "
-        "TPCHit, Cluster" << endmsg;
+      debug() << "List of supported types: " <<
+        "ReconstructedParticle, ParticleID, MCParticle, " <<
+        "Vertex, Track, TrackerHit, " <<
+        "SimTrackerHit, CalorimeterHit, SimCalorimeterHit, " <<
+        "RawCalorimeterHit, TPCHit, Cluster." << endmsg;
     }
   }
 
@@ -165,6 +169,9 @@ StatusCode Lcio2EDM4hepTool::convertCollections(
           m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
       } else if (m_lcio2edm_params[i] == "SimCalorimeterHit") {
         convertPut<edm4hep::SimCalorimeterHitCollection>(
+          m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
+      } else if (m_lcio2edm_params[i] == "RawCalorimeterHit") {
+        convertPut<edm4hep::RawCalorimeterHitCollection>(
           m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
       } else if (m_lcio2edm_params[i] == "TPCHit") {
         convertPut<edm4hep::TPCHitCollection>(
