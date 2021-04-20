@@ -188,6 +188,77 @@ void EDM4hep2LcioTool::convertTrackerHits(
 
 
 
+// Convert EDM4hep SimTrackerHits to LCIO
+// Add converted LCIO ptr and original EDM4hep collection to vector of pairs
+// Add LCIO Collection Vector to LCIO event
+void EDM4hep2LcioTool::convertSimTrackerHits(
+  std::vector<std::pair<lcio::SimTrackerHitImpl*, edm4hep::SimTrackerHit>>& simtrackerhits_vec,
+  const std::vector<std::pair<lcio::MCParticleImpl*, edm4hep::MCParticle>>& mcparticles_vec,
+  const std::string& e4h_coll_name,
+  const std::string& lcio_coll_name,
+  lcio::LCEventImpl* lcio_event)
+{
+  DataHandle<edm4hep::SimTrackerHitCollection> simtrackerhits_handle {
+    e4h_coll_name, Gaudi::DataHandle::Reader, this};
+  const auto simtrackerhits_coll = simtrackerhits_handle.get();
+
+  auto* simtrackerhits = new lcio::LCCollectionVec(lcio::LCIO::SIMTRACKERHIT);
+
+  // Loop over EDM4hep simtrackerhits converting them to LCIO simtrackerhits
+  for (const auto& edm_strh : (*simtrackerhits_coll)) {
+    if (edm_strh.isAvailable()) {
+
+      auto* lcio_strh = new lcio::SimTrackerHitImpl();
+
+      #warning "Splitting unsigned long long into two ints"
+      uint64_t combined_value = edm_strh.getCellID();
+      uint32_t* combined_value_ptr = reinterpret_cast<uint32_t*>(&combined_value);
+      lcio_strh->setCellID0(combined_value_ptr[0]);
+      lcio_strh->setCellID1(combined_value_ptr[1]);
+      std::array<double, 3> positions {
+        edm_strh.getPosition()[0], edm_strh.getPosition()[1], edm_strh.getPosition()[2]};
+      lcio_strh->setPosition(positions.data());
+      lcio_strh->setEDep(edm_strh.getEDep());
+      lcio_strh->setTime(edm_strh.getTime());
+      lcio_strh->setMomentum(edm_strh.getMomentum()[0], edm_strh.getMomentum()[1], edm_strh.getMomentum()[2]);
+      lcio_strh->setPathLength(edm_strh.getPathLength());
+      lcio_strh->setQuality(edm_strh.getQuality());
+      // lcio_strh->setQualityBit( int bit , bool val=true ) ;
+      lcio_strh->setOverlay(edm_strh.isOverlay());
+      lcio_strh->setProducedBySecondary(edm_strh.isProducedBySecondary());
+
+
+      // Link converted MCParticle to the SimTrackerHit if found
+      const auto edm_strh_mcp = edm_strh.getMCParticle();
+      if (edm_strh_mcp.isAvailable()) {
+        bool conv_found = false;
+        for (const auto& [lcio_mcp, edm_mcp] : mcparticles_vec) {
+          if (edm_strh_mcp == edm_mcp) {
+            lcio_strh->setMCParticle(lcio_mcp);
+            conv_found = true;
+            break;
+          }
+        }
+        // If MCParticle available, but not found in converted vec, add nullptr
+        if (not conv_found) lcio_strh->setMCParticle(nullptr);
+      }
+
+      // Save intermediate simtrackerhits ref
+      simtrackerhits_vec.emplace_back(
+        std::make_pair(lcio_strh, edm_strh)
+      );
+
+      // Add to lcio simtrackerhits collection
+      simtrackerhits->addElement(lcio_strh);
+    }
+  }
+
+  // Add all simtrackerhits to event
+  lcio_event->addCollection(simtrackerhits, lcio_coll_name);
+}
+
+
+
 // Convert EDM4hep Calorimeter Hits to LCIO
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
 // Add converted LCIO Collection Vector to LCIO event
@@ -984,6 +1055,14 @@ void EDM4hep2LcioTool::convertAdd(
       lcio_coll_name,
       lcio_event);
   } else
+  if (type == "SimTrackerHit") {
+    convertSimTrackerHits(
+      collection_pairs.simtrackerhits,
+      collection_pairs.mcparticles,
+      e4h_coll_name,
+      lcio_coll_name,
+      lcio_event);
+  } else
   if (type == "CalorimeterHit") {
     convertCalorimeterHits(
       collection_pairs.calohits,
@@ -1048,9 +1127,10 @@ void EDM4hep2LcioTool::convertAdd(
   } else {
     error() << "Error trying to convert requested " << type << " with name " << e4h_coll_name << endmsg;
     error() << "List of supported types: " <<
-      "Track, TrackerHit, Cluster, " <<
-      "CalorimeterHit, RawCalorimeterHit, SimCalorimeterHit, " <<
-      "Vertex, ReconstructedParticle, MCParticle." << endmsg;
+      "Track, TrackerHit, SimTrackerHit, " <<
+      "Cluster, CalorimeterHit, RawCalorimeterHit, " <<
+      "SimCalorimeterHit, Vertex, ReconstructedParticle, " <<
+      "MCParticle." << endmsg;
   }
 }
 

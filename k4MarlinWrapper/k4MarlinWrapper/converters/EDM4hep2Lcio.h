@@ -17,6 +17,8 @@
 #include "edm4hep/TrackCollection.h"
 #include "edm4hep/TrackerHit.h"
 #include "edm4hep/TrackerHitCollection.h"
+#include "edm4hep/SimTrackerHit.h"
+#include "edm4hep/SimTrackerHitCollection.h"
 #include "edm4hep/CalorimeterHit.h"
 #include "edm4hep/CalorimeterHitCollection.h"
 #include "edm4hep/RawCalorimeterHit.h"
@@ -46,6 +48,7 @@
 #include "IMPL/SimCalorimeterHitImpl.h"
 #include "IMPL/TPCHitImpl.h"
 #include "IMPL/TrackerHitImpl.h"
+#include "IMPL/SimTrackerHitImpl.h"
 #include "IMPL/ClusterImpl.h"
 #include "IMPL/VertexImpl.h"
 #include "IMPL/ParticleIDImpl.h"
@@ -65,6 +68,8 @@ struct CollectionsPairVectors {
     lcio::TrackImpl*, edm4hep::Track>> tracks;
   std::vector<std::pair<
     lcio::TrackerHitImpl*, edm4hep::TrackerHit>> trackerhits;
+  std::vector<std::pair<
+    lcio::SimTrackerHitImpl*, edm4hep::SimTrackerHit>> simtrackerhits;
   std::vector<std::pair<
     lcio::CalorimeterHitImpl*, edm4hep::CalorimeterHit>> calohits;
   std::vector<std::pair<
@@ -107,6 +112,13 @@ private:
 
   void convertTrackerHits(
     std::vector<std::pair<lcio::TrackerHitImpl*, edm4hep::TrackerHit>>& trackerhits_vec,
+    const std::string& e4h_coll_name,
+    const std::string& lcio_coll_name,
+    lcio::LCEventImpl* lcio_event);
+
+  void convertSimTrackerHits(
+    std::vector<std::pair<lcio::SimTrackerHitImpl*, edm4hep::SimTrackerHit>>& simtrackerhits_vec,
+    const std::vector<std::pair<lcio::MCParticleImpl*, edm4hep::MCParticle>>& mcparticles_vec,
     const std::string& e4h_coll_name,
     const std::string& lcio_coll_name,
     lcio::LCEventImpl* lcio_event);
