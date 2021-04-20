@@ -15,6 +15,10 @@
 #include "edm4hep/ReconstructedParticleData.h"
 #include "edm4hep/Track.h"
 #include "edm4hep/TrackCollection.h"
+#include "edm4hep/TrackerHit.h"
+#include "edm4hep/TrackerHitCollection.h"
+#include "edm4hep/SimTrackerHit.h"
+#include "edm4hep/SimTrackerHitCollection.h"
 #include "edm4hep/CalorimeterHit.h"
 #include "edm4hep/CalorimeterHitCollection.h"
 #include "edm4hep/RawCalorimeterHit.h"
@@ -37,6 +41,7 @@
 #include "IMPL/ReconstructedParticleImpl.h"
 #include "IMPL/TrackImpl.h"
 #include "IMPL/TrackStateImpl.h"
+#include "IMPL/SimTrackerHitImpl.h"
 #include "IMPL/CalorimeterHitImpl.h"
 #include "IMPL/RawCalorimeterHitImpl.h"
 #include "IMPL/SimCalorimeterHitImpl.h"
@@ -72,21 +77,23 @@ private:
 
   std::map<std::string, DataObjectHandleBase*> m_dataHandlesMap;
 
-  const std::string m_e4h_calohit_name    = "E4H_CaloHitCollection";
-  const std::string m_e4h_rawcalohit_name = "E4H_RawCaloHitCollection";
-  const std::string m_e4h_simcalohit_name = "E4H_SimCaloHitCollection";
-  const std::string m_e4h_tpchit_name     = "E4H_TPCHitCollection";
-  const std::string m_e4h_trackerhit_name = "E4H_TrackerHitCollection";
-  const std::string m_e4h_track_name      = "E4H_TrackCollection";
-  const std::string m_e4h_mcparticle_name = "E4H_MCParticleCollection";
+  const std::string m_e4h_calohit_name       = "E4H_CaloHitCollection";
+  const std::string m_e4h_rawcalohit_name    = "E4H_RawCaloHitCollection";
+  const std::string m_e4h_simcalohit_name    = "E4H_SimCaloHitCollection";
+  const std::string m_e4h_tpchit_name        = "E4H_TPCHitCollection";
+  const std::string m_e4h_trackerhit_name    = "E4H_TrackerHitCollection";
+  const std::string m_e4h_simtrackerhit_name = "E4H_SimTrackerHitCollection";
+  const std::string m_e4h_track_name         = "E4H_TrackCollection";
+  const std::string m_e4h_mcparticle_name    = "E4H_MCParticleCollection";
 
-  const std::string m_lcio_calohit_name    = "LCIO_CaloHitCollection";
-  const std::string m_lcio_rawcalohit_name = "LCIO_RawCaloHitCollection";
-  const std::string m_lcio_simcalohit_name = "LCIO_SimCaloHitCollection";
-  const std::string m_lcio_tpchit_name     = "LCIO_TPCHitCollection";
-  const std::string m_lcio_trackerhit_name = "LCIO_TrackerHitCollection";
-  const std::string m_lcio_track_name      = "LCIO_TrackCollection";
-  const std::string m_lcio_mcparticle_name = "LCIO_MCParticleCollection";
+  const std::string m_lcio_calohit_name       = "LCIO_CaloHitCollection";
+  const std::string m_lcio_rawcalohit_name    = "LCIO_RawCaloHitCollection";
+  const std::string m_lcio_simcalohit_name    = "LCIO_SimCaloHitCollection";
+  const std::string m_lcio_tpchit_name        = "LCIO_TPCHitCollection";
+  const std::string m_lcio_trackerhit_name    = "LCIO_TrackerHitCollection";
+  const std::string m_lcio_simtrackerhit_name = "LCIO_SimTrackerHitCollection";
+  const std::string m_lcio_track_name         = "LCIO_TrackCollection";
+  const std::string m_lcio_mcparticle_name    = "LCIO_MCParticleCollection";
 
   const std::string m_conv_tag = "_conv";
 
@@ -108,6 +115,11 @@ private:
     int& int_cnt,
     float& float_cnt);
   void createTrackerHits(const int num_elements, int& int_cnt, float& float_cnt);
+  void createSimTrackerHits(
+    const int num_elements,
+    const std::vector<std::pair<uint, uint>>& link_mcparticles_idx,
+    int& int_cnt,
+    float& float_cnt);
   void createTracks(
     const int num_elements,
     const int subdetectorhitnumbers,
@@ -145,6 +157,8 @@ private:
     const std::vector<std::pair<uint, uint>>& mcp_parents_idx);
   bool checkEDMSimCaloHitEDMSimCaloHit(
     const std::vector<std::tuple<uint, uint, uint>>& link_mcparticles_idx);
+  bool checkEDMSimTrackerHitEDMSimTrackerHit(
+    const std::vector<std::pair<uint, uint>>& link_mcparticles_idx);
 
 };
 

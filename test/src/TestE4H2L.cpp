@@ -19,6 +19,8 @@ StatusCode TestE4H2L::initialize() {
     m_e4h_tpchit_name, Gaudi::DataHandle::Writer, this);
   m_dataHandlesMap[m_e4h_trackerhit_name] = new DataHandle<edm4hep::TrackerHitCollection>(
     m_e4h_trackerhit_name, Gaudi::DataHandle::Writer, this);
+  m_dataHandlesMap[m_e4h_simtrackerhit_name] = new DataHandle<edm4hep::SimTrackerHitCollection>(
+    m_e4h_simtrackerhit_name, Gaudi::DataHandle::Writer, this);
   m_dataHandlesMap[m_e4h_track_name] = new DataHandle<edm4hep::TrackCollection>(
     m_e4h_track_name, Gaudi::DataHandle::Writer, this);
   m_dataHandlesMap[m_e4h_mcparticle_name] = new DataHandle<edm4hep::MCParticleCollection>(
@@ -194,6 +196,52 @@ void TestE4H2L::createTrackerHits(
     m_dataHandlesMap[m_e4h_trackerhit_name]);
   trackerhit_handle->put(trackerhit_coll);
 }
+
+
+
+void TestE4H2L::createSimTrackerHits(
+  const int num_elements,
+  const std::vector<std::pair<uint, uint>>& link_mcparticles_idx,
+  int& int_cnt,
+  float& float_cnt)
+{
+  // Get MCParticles handle
+  DataHandle<edm4hep::MCParticleCollection> mcparticles_handle {
+    m_e4h_mcparticle_name, Gaudi::DataHandle::Reader, this};
+  const auto mcparticles_coll = mcparticles_handle.get();
+
+  auto simtrackerhit_coll = new edm4hep::SimTrackerHitCollection();
+
+  for (int i=0; i < num_elements; ++i) {
+
+    auto elem = new edm4hep::SimTrackerHit();
+
+    elem->setCellID(int_cnt++);
+    elem->setEDep(float_cnt++);
+    elem->setTime(float_cnt++);
+    elem->setPathLength(float_cnt++);
+    elem->setQuality(int_cnt++);
+    edm4hep::Vector3d test_vec {float_cnt++, float_cnt++, float_cnt++};
+    elem->setPosition(test_vec);
+    edm4hep::Vector3f test_vec_mom {float_cnt++, float_cnt++, float_cnt++};
+    elem->setMomentum(test_vec_mom);
+
+    elem->setOverlay(true);
+    elem->setProducedBySecondary(false);
+
+    simtrackerhit_coll->push_back(*elem);
+  }
+
+  // Connect single mcparticles to SimTrackerHits
+  for (const auto& [orig_idx, link_idx] : link_mcparticles_idx) {
+    simtrackerhit_coll->at(orig_idx).setMCParticle(mcparticles_coll->at(link_idx));
+  }
+
+  auto* simtrackerhit_handle = dynamic_cast<DataHandle<edm4hep::SimTrackerHitCollection>*>(
+    m_dataHandlesMap[m_e4h_simtrackerhit_name]);
+  simtrackerhit_handle->put(simtrackerhit_coll);
+}
+
 
 
 void TestE4H2L::createTracks(
@@ -485,6 +533,69 @@ bool TestE4H2L::checkEDMTPCHitLCIOTPCHit(
   }
 
   return tpchit_same;
+}
+
+
+
+
+bool TestE4H2L::checkEDMSimTrackerHitEDMSimTrackerHit(
+  const std::vector<std::pair<uint, uint>>& link_mcparticles_idx)
+{
+  DataHandle<edm4hep::SimTrackerHitCollection> simtrackerhit_handle_orig {
+    m_e4h_simtrackerhit_name, Gaudi::DataHandle::Reader, this};
+  const auto simtrackerhit_coll_orig = simtrackerhit_handle_orig.get();
+
+  DataHandle<edm4hep::SimTrackerHitCollection> simtrackerhit_handle {
+    m_e4h_simtrackerhit_name + m_conv_tag, Gaudi::DataHandle::Reader, this};
+  const auto simtrackerhit_coll = simtrackerhit_handle.get();
+
+  bool strh_same = (*simtrackerhit_coll_orig).size() == (*simtrackerhit_coll).size();
+
+  if (strh_same) {
+    for (int i=0; i < (*simtrackerhit_coll).size(); ++i) {
+
+      auto edm_strh_orig = (*simtrackerhit_coll_orig)[i];
+      auto edm_strh = (*simtrackerhit_coll)[i];
+
+      strh_same = strh_same && (edm_strh_orig.getCellID() == edm_strh.getCellID());
+      for (int k=0; k<3; ++k) {
+        strh_same = strh_same && (edm_strh_orig.getPosition()[k] == edm_strh.getPosition()[k]);
+      }
+      strh_same = strh_same && (edm_strh_orig.getEDep() == edm_strh.getEDep());
+      strh_same = strh_same && (edm_strh_orig.getTime() == edm_strh.getTime());
+      for (int k=0; k<3; ++k) {
+        strh_same = strh_same && (edm_strh_orig.getMomentum()[k] == edm_strh.getMomentum()[k]);
+      }
+      strh_same = strh_same && (edm_strh_orig.getPathLength() == edm_strh.getPathLength());
+      strh_same = strh_same && (edm_strh_orig.getQuality() == edm_strh.getQuality());
+      strh_same = strh_same && (edm_strh_orig.isOverlay() == edm_strh.isOverlay());
+      strh_same = strh_same && (edm_strh_orig.isProducedBySecondary() == edm_strh.isProducedBySecondary());
+    }
+
+    // if (strh_same) {
+    //   // Check MCParticles linked to SimTrackerHits
+    //   DataHandle<edm4hep::MCParticleCollection> mcparticle_handle {
+    //     m_e4h_mcparticle_name + m_conv_tag, Gaudi::DataHandle::Reader, this};
+    //   const auto mcparticle_coll = mcparticle_handle.get();
+
+    //   for (const auto& [strh_idx, mcp_idx] : link_mcparticles_idx) {
+
+    //     auto edm_strh = (*simtrackerhit_coll)[strh_idx];
+    //     auto edm_strh_orig = (*simtrackerhit_coll_orig)[strh_idx];
+    //     auto edm_mcpart = (*mcparticle_coll)[mcp_idx];
+    //     auto edm_strh_mcpart = edm_strh.getMCParticle();
+
+    //     strh_same = strh_same && (edm_strh_mcpart == edm_mcpart);
+    //   }
+    // }
+
+  }
+
+  if (!strh_same) {
+    debug() << "SimTrackerHit EDM4hep -> LCIO -> EDM4hep failed." << endmsg;
+  }
+
+  return strh_same;
 }
 
 
@@ -1093,6 +1204,15 @@ StatusCode TestE4H2L::execute() {
     assert (simch_idx < simcalohit_elems);
   }
 
+  // SimTrackerHits
+  const int simtrackerhit_elems = 5;
+  const std::vector<std::pair<uint, uint>> strh_mcparticles_idx =
+    {{0,0}, {1,2}, {2,1}, {3,4}, {4,1}};
+  for (const auto& [strh, mcp] : strh_mcparticles_idx) {
+    assert (strh < simtrackerhit_elems);
+    assert (mcp < mcparticle_elems);
+  }
+
 
 
   /////////////////////////////////////////////////////////////////////
@@ -1123,6 +1243,11 @@ StatusCode TestE4H2L::execute() {
     simcalohit_elems,
     simcalohit_contributions,
     simcalohit_mcparticles_idx,
+    int_cnt,
+    float_cnt);
+  createSimTrackerHits( // Depends on createMCParticles()
+    simtrackerhit_elems,
+    strh_mcparticles_idx,
     int_cnt,
     float_cnt);
 
@@ -1164,7 +1289,9 @@ StatusCode TestE4H2L::execute() {
     checkEDMMCParticleEDMMCParticle(
       mcp_parents_idx) &&
     checkEDMSimCaloHitEDMSimCaloHit(
-      simcalohit_mcparticles_idx);
+      simcalohit_mcparticles_idx) &&
+    checkEDMSimTrackerHitEDMSimTrackerHit(
+      strh_mcparticles_idx);
 
   return (edm_same && lcio_same) ? StatusCode::SUCCESS : StatusCode::FAILURE;
 }

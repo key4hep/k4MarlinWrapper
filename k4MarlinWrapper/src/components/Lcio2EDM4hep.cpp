@@ -44,6 +44,12 @@ StatusCode Lcio2EDM4hepTool::initialize() {
     } else if (m_lcio2edm_params[i] == "Track") {
       m_dataHandlesMap[m_lcio2edm_params[i+2]] =
         new DataHandle<edm4hep::TrackCollection>(m_lcio2edm_params[i+2], Gaudi::DataHandle::Writer, this);
+    } else if (m_lcio2edm_params[i] == "TrackerHit") {
+      m_dataHandlesMap[m_lcio2edm_params[i+2]] =
+        new DataHandle<edm4hep::TrackerHitCollection>(m_lcio2edm_params[i+2], Gaudi::DataHandle::Writer, this);
+    } else if (m_lcio2edm_params[i] == "SimTrackerHit") {
+      m_dataHandlesMap[m_lcio2edm_params[i+2]] =
+        new DataHandle<edm4hep::SimTrackerHitCollection>(m_lcio2edm_params[i+2], Gaudi::DataHandle::Writer, this);
     } else if (m_lcio2edm_params[i] == "CalorimeterHit") {
       m_dataHandlesMap[m_lcio2edm_params[i+2]] =
         new DataHandle<edm4hep::CalorimeterHitCollection>(m_lcio2edm_params[i+2], Gaudi::DataHandle::Writer, this);
@@ -59,8 +65,9 @@ StatusCode Lcio2EDM4hepTool::initialize() {
     } else {
       debug() << m_lcio2edm_params[i] << ": conversion type not supported." << endmsg;
       debug() << "List of supported types: ReconstructedParticle, ParticleID, MCParticle, " <<
-        "Vertex, Track, CalorimeterHit, "
-        "SimCalorimeterHit, TPCHit, Cluster" << endmsg;
+        "Vertex, Track, TrackerHit, "
+        "SimTrackerHit, CalorimeterHit, SimCalorimeterHit, "
+        "TPCHit, Cluster" << endmsg;
     }
   }
 
@@ -146,6 +153,12 @@ StatusCode Lcio2EDM4hepTool::convertCollections(
           m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
       } else if (m_lcio2edm_params[i] == "Track") {
         convertPut<edm4hep::TrackCollection>(
+          m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
+      } else if (m_lcio2edm_params[i] == "TrackerHit") {
+        convertPut<edm4hep::TrackerHitCollection>(
+          m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
+      } else if (m_lcio2edm_params[i] == "SimTrackerHit") {
+        convertPut<edm4hep::SimTrackerHitCollection>(
           m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
       } else if (m_lcio2edm_params[i] == "CalorimeterHit") {
         convertPut<edm4hep::CalorimeterHitCollection>(
