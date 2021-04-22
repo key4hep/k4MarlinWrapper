@@ -11,11 +11,9 @@ gaudi_add_module(TestE4H2L
     k4LCIOReader::k4LCIOReader
 )
 
-message(STATUS ${CMAKE_SOURCE_DIR}/k4MarlinWrapper/)
-
 target_include_directories(TestE4H2L PUBLIC
-  src/
-  ${CMAKE_SOURCE_DIR}/k4MarlinWrapper/k4MarlinWrapper/
+  src
+  ${CMAKE_SOURCE_DIR}/k4MarlinWrapper
   k4FWCore
   EDM4HEP::edm4hep
   ${LCIO_INCLUDE_DIRS}

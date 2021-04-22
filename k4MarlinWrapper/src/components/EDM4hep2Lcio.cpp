@@ -1,4 +1,4 @@
-#include "converters/EDM4hep2Lcio.h"
+#include "k4MarlinWrapper/converters/EDM4hep2Lcio.h"
 
 
 DECLARE_COMPONENT(EDM4hep2LcioTool);
@@ -153,7 +153,6 @@ void EDM4hep2LcioTool::convertTrackerHits(
 
       auto* lcio_trh = new lcio::TrackerHitImpl();
 
-      #warning "Splitting unsigned long long into two ints"
       uint64_t combined_value = edm_trh.getCellID();
       uint32_t* combined_value_ptr = reinterpret_cast<uint32_t*>(&combined_value);
       lcio_trh->setCellID0(combined_value_ptr[0]);
@@ -209,7 +208,6 @@ void EDM4hep2LcioTool::convertSimTrackerHits(
 
       auto* lcio_strh = new lcio::SimTrackerHitImpl();
 
-      #warning "Splitting unsigned long long into two ints"
       uint64_t combined_value = edm_strh.getCellID();
       uint32_t* combined_value_ptr = reinterpret_cast<uint32_t*>(&combined_value);
       lcio_strh->setCellID0(combined_value_ptr[0]);
@@ -277,7 +275,6 @@ void EDM4hep2LcioTool::convertCalorimeterHits(
 
       auto* lcio_calohit = new lcio::CalorimeterHitImpl();
 
-      #warning "Splitting unsigned long long into two ints"
       uint64_t combined_value = edm_calohit.getCellID();
       uint32_t* combined_value_ptr = reinterpret_cast<uint32_t*>(&combined_value);
       lcio_calohit->setCellID0(combined_value_ptr[0]);
@@ -327,7 +324,6 @@ void EDM4hep2LcioTool::convertRawCalorimeterHits(
 
       auto* lcio_rawcalohit = new lcio::RawCalorimeterHitImpl();
 
-      #warning "Splitting unsigned long long into two ints"
       uint64_t combined_value = edm_raw_calohit.getCellID();
       uint32_t* combined_value_ptr = reinterpret_cast<uint32_t*>(&combined_value);
       lcio_rawcalohit->setCellID0(combined_value_ptr[0]);
@@ -371,7 +367,6 @@ void EDM4hep2LcioTool::convertSimCalorimeterHits(
 
       auto* lcio_simcalohit = new lcio::SimCalorimeterHitImpl();
 
-      #warning "Splitting unsigned long long into two ints"
       uint64_t combined_value = edm_sim_calohit.getCellID();
       uint32_t* combined_value_ptr = reinterpret_cast<uint32_t*>(&combined_value);
       lcio_simcalohit->setCellID0(combined_value_ptr[0]);

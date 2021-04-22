@@ -1,4 +1,4 @@
-#include "converters/Lcio2EDM4hep.h"
+#include "k4MarlinWrapper/converters/Lcio2EDM4hep.h"
 
 
 DECLARE_COMPONENT(Lcio2EDM4hepTool);
