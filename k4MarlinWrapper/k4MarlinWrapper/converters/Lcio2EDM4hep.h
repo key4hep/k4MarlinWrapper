@@ -1,46 +1,19 @@
 #ifndef K4MARLINWRAPPER_K4LCIOREADERWRAPPER_H
 #define K4MARLINWRAPPER_K4LCIOREADERWRAPPER_H
 
-// k4FWCore
-#include "k4FWCore/DataHandle.h"
-#include "k4FWCore/PodioDataSvc.h"
-
 // GAUDI
-#include "GaudiAlg/GaudiTool.h"
+#include <GaudiAlg/GaudiTool.h>
+
+// k4FWCore
+#include <k4FWCore/DataHandle.h>
+#include <k4FWCore/PodioDataSvc.h>
 
 // k4LCIOReader
-#include "k4LCIOReader/k4LCIOReader.h"
-#include "k4LCIOReader/k4LCIOConverter.h"
+#include <k4LCIOReader/k4LCIOReader.h>
+#include <k4LCIOReader/k4LCIOConverter.h>
 
-// EDM4hep
-#include "edm4hep/ParticleIDCollection.h"
-#include "edm4hep/ReconstructedParticle.h"
-#include "edm4hep/ReconstructedParticleCollection.h"
-#include "edm4hep/ReconstructedParticleData.h"
-#include "edm4hep/ClusterCollection.h"
-#include "edm4hep/Track.h"
-#include "edm4hep/TrackCollection.h"
-#include "edm4hep/TrackerHit.h"
-#include "edm4hep/TrackerHitCollection.h"
-#include "edm4hep/SimTrackerHit.h"
-#include "edm4hep/SimTrackerHitCollection.h"
-#include "edm4hep/CalorimeterHitCollection.h"
-#include "edm4hep/RawCalorimeterHit.h"
-#include "edm4hep/RawCalorimeterHitCollection.h"
-#include "edm4hep/SimCalorimeterHit.h"
-#include "edm4hep/SimCalorimeterHitCollection.h"
-#include "edm4hep/TPCHit.h"
-#include "edm4hep/TPCHitCollection.h"
-#include "edm4hep/Vertex.h"
-#include "edm4hep/VertexCollection.h"
-#include "edm4hep/MCParticle.h"
-#include "edm4hep/MCParticleCollection.h"
-#include "edm4hep/EventHeaderCollection.h"
-
-#include "podio/CollectionBase.h"
-
-// Interface
-#include "IEDMConverter.h"
+// Converter Interface
+#include "k4MarlinWrapper/converters/IEDMConverter.h"
 
 
 class Lcio2EDM4hepTool : public GaudiTool, virtual public IEDMConverter {

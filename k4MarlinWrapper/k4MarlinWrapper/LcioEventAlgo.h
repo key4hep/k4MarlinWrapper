@@ -28,12 +28,16 @@
  * LCEventAlgo: place the LCEvent from lcio file in the Gaudi Datastore for later retrieval by wrapped Marlin Processors
  */
 
-#include <IOIMPL/LCFactory.h>
+#include <iostream>
+#include <memory>
 
 #include <GaudiAlg/GaudiAlgorithm.h>
 
-#include <iostream>
-#include <memory>
+#include <EVENT/LCIO.h>
+#include <IOIMPL/LCFactory.h>
+
+#include "k4MarlinWrapper/LCEventWrapper.h"
+
 
 class LcioEvent : public GaudiAlgorithm {
 public:

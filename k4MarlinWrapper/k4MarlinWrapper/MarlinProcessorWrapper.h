@@ -20,20 +20,36 @@
 #ifndef K4MARLINWRAPPER_MARLINPROCESSORWRAPPER_H
 #define K4MARLINWRAPPER_MARLINPROCESSORWRAPPER_H
 
-#include <GaudiAlg/GaudiAlgorithm.h>
-
-#include "GaudiKernel/ToolHandle.h"
-
-#include <streamlog/logbuffer.h>
-#include <streamlog/streamlog.h>
-
+// std
 #include <stack>
+#include <cstdlib>
+#include <iostream>
+#include <string>
 
-#include "util/k4MarlinWrapperUtil.h"
+// Gaudi
+#include <GaudiAlg/GaudiAlgorithm.h>
+#include <GaudiKernel/ToolHandle.h>
+#include <GaudiKernel/MsgStream.h>
 
-#include <converters/IEDMConverter.h>
-#include <converters/EDM4hep2Lcio.h>
-#include <converters/Lcio2EDM4hep.h>
+// LCIO
+#include <EVENT/LCEvent.h>
+#include <EVENT/LCRunHeader.h>
+
+// Marlin
+#include <marlin/Global.h>
+#include <marlin/EventModifier.h>
+#include <marlin/ProcessorEventSeeder.h>
+#include <marlin/ProcessorMgr.h>
+#include <marlin/StringParameters.h>
+
+// ROOT
+#include <TSystem.h>
+
+// k4MarlinWrapper
+#include "k4MarlinWrapper/LCEventWrapper.h"
+#include "k4MarlinWrapper/util/k4MarlinWrapperUtil.h"
+#include "k4MarlinWrapper/converters/IEDMConverter.h"
+
 
 namespace marlin {
   class Processor;
@@ -49,8 +65,6 @@ public:
   virtual StatusCode initialize() override final;
 
 private:
-  streamlog::logstream  m_logstream;
-  streamlog::logbuffer* m_lb        = nullptr;
   std::string           m_verbosity = "MESSAGE";
   marlin::Processor*    m_processor = nullptr;
 

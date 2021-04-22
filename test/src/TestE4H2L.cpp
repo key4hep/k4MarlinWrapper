@@ -1,4 +1,4 @@
-#include <TestE4H2L.h>
+#include "TestE4H2L.h"
 
 DECLARE_COMPONENT(TestE4H2L)
 

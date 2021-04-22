@@ -21,29 +21,7 @@
  *
  */
 
-#include "MarlinProcessorWrapper.h"
-#include <LCEventWrapper.h>
-
-#include <GaudiKernel/MsgStream.h>
-
-#include <EVENT/LCEvent.h>
-#include <EVENT/LCRunHeader.h>
-
-#include <marlin/EventModifier.h>
-#include <marlin/ProcessorEventSeeder.h>
-#include <marlin/ProcessorMgr.h>
-#include <marlin/StringParameters.h>
-
-#include <streamlog/loglevels.h>
-#include <streamlog/streamlog.h>
-
-#include <marlin/Global.h>
-
-#include <TSystem.h>
-
-#include <cstdlib>
-#include <iostream>
-#include <string>
+#include "k4MarlinWrapper/MarlinProcessorWrapper.h"
 
 DECLARE_COMPONENT(MarlinProcessorWrapper)
 
