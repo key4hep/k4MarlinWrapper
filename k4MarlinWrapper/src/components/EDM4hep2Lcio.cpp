@@ -608,8 +608,7 @@ void EDM4hep2LcioTool::convertVertices(
 
       auto* lcio_vertex = new lcio::VertexImpl();
       lcio_vertex->setPrimary( edm_vertex.getPrimary() );
-      #warning "AlgoritymType conversion from int to string"
-      lcio_vertex->setAlgorithmType( std::string{edm_vertex.getAlgorithmType()} ); // TODO std::string(int)
+      lcio_vertex->setAlgorithmType(std::to_string(edm_vertex.getAlgorithmType()));
       lcio_vertex->setChi2( edm_vertex.getChi2() );
       lcio_vertex->setProbability( edm_vertex.getProbability() );
       lcio_vertex->setPosition( edm_vertex.getPosition()[0], edm_vertex.getPosition()[1], edm_vertex.getPosition()[2] );
