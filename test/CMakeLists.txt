@@ -3,8 +3,8 @@ gaudi_add_module(TestE4H2L
   SOURCES
     src/TestE4H2L.cpp
   LINK
-    GaudiAlgLib
-    GaudiKernel
+    Gaudi::GaudiAlgLib
+    Gaudi::GaudiKernel
     ${LCIO_LIBRARIES}
     k4FWCore::k4FWCore
     EDM4HEP::edm4hep
@@ -14,7 +14,7 @@ gaudi_add_module(TestE4H2L
 target_include_directories(TestE4H2L PUBLIC
   src
   ${CMAKE_SOURCE_DIR}/k4MarlinWrapper
-  k4FWCore
+  k4FWCore::k4FWCore
   EDM4HEP::edm4hep
   ${LCIO_INCLUDE_DIRS}
 )
