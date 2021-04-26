@@ -1,3 +1,13 @@
+# v00-03-01
+
+* 2021-04-26 Placido Fernandez Declara ([PR#26](https://github.com/key4hep/k4MarlinWrapper/pull/26))
+  - Implement EDM4hep to LCIO converter on the fly
+  - Add LCIO to EDM4hep converter on the fly through k4LCIOReader
+  - Gaudi Tools to be added to Algorithms on demand on options file
+  - Added testing for EDM4hep -> LCIO conversion and EDM4hep -> LCIO -> EDM4hep conversion, creating the collections artificially, in place.
+  - Changed testing to get input files from HTTP key4hep
+  - Added documentation on usage of converters. Updated documentation.
+
 # v00-03
 
 * 2021-01-19 Placido Fernandez ([PR#25](https://github.com/key4hep/k4MarlinWrapper/pull/25))
