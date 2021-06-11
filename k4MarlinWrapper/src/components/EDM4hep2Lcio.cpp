@@ -1162,14 +1162,16 @@ void EDM4hep2LcioTool::optimizeOrderParams()
       auto track_found_it = std::find(m_edm2lcio_params.begin(), m_edm2lcio_params.end(), main);
       if (track_found_it != m_edm2lcio_params.end()) {
         auto track_index = std::distance(m_edm2lcio_params.begin(), track_found_it);
-
         auto trackerhit_found_it = std::find(m_edm2lcio_params.begin(), m_edm2lcio_params.end(), dependency);
-        auto trackerhit_index = std::distance(m_edm2lcio_params.begin(), trackerhit_found_it);
 
-        if (track_index < trackerhit_index) {
-          std::swap(m_edm2lcio_params[track_index], m_edm2lcio_params[trackerhit_index]);
-          std::swap(m_edm2lcio_params[track_index+1], m_edm2lcio_params[trackerhit_index+1]);
-          std::swap(m_edm2lcio_params[track_index+2], m_edm2lcio_params[trackerhit_index+2]);
+        if (trackerhit_found_it != m_edm2lcio_params.end()) {
+          auto trackerhit_index = std::distance(m_edm2lcio_params.begin(), trackerhit_found_it);
+
+          if (track_index < trackerhit_index) {
+            std::swap(m_edm2lcio_params[track_index], m_edm2lcio_params[trackerhit_index]);
+            std::swap(m_edm2lcio_params[track_index+1], m_edm2lcio_params[trackerhit_index+1]);
+            std::swap(m_edm2lcio_params[track_index+2], m_edm2lcio_params[trackerhit_index+2]);
+          }
         }
       }
     }
