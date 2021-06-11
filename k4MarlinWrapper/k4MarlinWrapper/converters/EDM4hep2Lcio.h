@@ -139,7 +139,9 @@ private:
     const std::string& collection_name,
     lcio::LCEventImpl* lcio_event);
 
-  void optimizeOrderParams();
+  template <typename T>
+  void optimizeOrderParams(
+    T& params) const;
 };
 
 #endif
