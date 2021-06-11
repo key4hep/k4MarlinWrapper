@@ -1158,20 +1158,18 @@ void EDM4hep2LcioTool::optimizeOrderParams()
   // Can't run in parallel
   auto swap_if_before = [&](const std::string& main, const std::string& dependency)
   {
-    for (int i = 0; i < m_edm2lcio_params.size(); i=i+3) {
-      auto track_found_it = std::find(m_edm2lcio_params.begin(), m_edm2lcio_params.end(), main);
-      if (track_found_it != m_edm2lcio_params.end()) {
-        auto track_index = std::distance(m_edm2lcio_params.begin(), track_found_it);
-        auto trackerhit_found_it = std::find(m_edm2lcio_params.begin(), m_edm2lcio_params.end(), dependency);
+    auto track_found_it = std::find(m_edm2lcio_params.begin(), m_edm2lcio_params.end(), main);
+    if (track_found_it != m_edm2lcio_params.end()) {
+      auto track_index = std::distance(m_edm2lcio_params.begin(), track_found_it);
+      auto trackerhit_found_it = std::find(m_edm2lcio_params.begin(), m_edm2lcio_params.end(), dependency);
 
-        if (trackerhit_found_it != m_edm2lcio_params.end()) {
-          auto trackerhit_index = std::distance(m_edm2lcio_params.begin(), trackerhit_found_it);
+      if (trackerhit_found_it != m_edm2lcio_params.end()) {
+        auto trackerhit_index = std::distance(m_edm2lcio_params.begin(), trackerhit_found_it);
 
-          if (track_index < trackerhit_index) {
-            std::swap(m_edm2lcio_params[track_index], m_edm2lcio_params[trackerhit_index]);
-            std::swap(m_edm2lcio_params[track_index+1], m_edm2lcio_params[trackerhit_index+1]);
-            std::swap(m_edm2lcio_params[track_index+2], m_edm2lcio_params[trackerhit_index+2]);
-          }
+        if (track_index < trackerhit_index) {
+          std::swap(m_edm2lcio_params[track_index], m_edm2lcio_params[trackerhit_index]);
+          std::swap(m_edm2lcio_params[track_index+1], m_edm2lcio_params[trackerhit_index+1]);
+          std::swap(m_edm2lcio_params[track_index+2], m_edm2lcio_params[trackerhit_index+2]);
         }
       }
     }
