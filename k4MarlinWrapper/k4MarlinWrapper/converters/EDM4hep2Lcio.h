@@ -16,6 +16,7 @@
 // k4MarlinWrapper
 #include "k4MarlinWrapper/converters/IEDMConverter.h"
 #include "k4MarlinWrapper/LCEventWrapper.h"
+#include "k4MarlinWrapper/util/EDM4hep2LcioUtils.h"
 
 
 
@@ -139,9 +140,6 @@ private:
     const std::string& collection_name,
     lcio::LCEventImpl* lcio_event);
 
-  template <typename T>
-  void optimizeOrderParams(
-    T& params) const;
 };
 
 #endif
