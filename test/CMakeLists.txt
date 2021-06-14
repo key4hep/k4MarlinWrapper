@@ -63,13 +63,19 @@ endif(BASH_PROGRAM)
 
 # Unit testing wiuth Catch2
 
-message("Fetching local copy of Catch2 library for unit-tests...")
-Include(FetchContent)
-FetchContent_Declare(
-  Catch2
-  GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-  GIT_TAG        4b51d0dd3be90f4faf3c10f60d1923ad47a792d7)
-FetchContent_MakeAvailable(Catch2)
+if(USE_EXTERNAL_CATCH2)
+  find_package(Catch2 REQUIRED)
+endif()
+
+if(NOT USE_EXTERNAL_CATCH2)
+  message("Fetching local copy of Catch2 library for unit-tests...")
+  Include(FetchContent)
+  FetchContent_Declare(
+    Catch2
+    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+    GIT_TAG        4b51d0dd3be90f4faf3c10f60d1923ad47a792d7)
+  FetchContent_MakeAvailable(Catch2)
+endif()
 
 add_executable(k4MarlinWrapperUnitTests   src/unit_tests.cpp)
 
