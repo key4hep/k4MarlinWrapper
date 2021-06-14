@@ -19,6 +19,33 @@ target_include_directories(TestE4H2L PUBLIC
   ${LCIO_INCLUDE_DIRS}
 )
 
+# Unit testing with Catch2
+
+if(USE_EXTERNAL_CATCH2)
+  find_package(Catch2 REQUIRED)
+endif()
+
+if(NOT USE_EXTERNAL_CATCH2)
+  message("Fetching local copy of Catch2 library for unit-tests...")
+  Include(FetchContent)
+  FetchContent_Declare(
+    Catch2
+    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+    GIT_TAG        4b51d0dd3be90f4faf3c10f60d1923ad47a792d7)
+  FetchContent_MakeAvailable(Catch2)
+endif()
+
+add_executable(k4MarlinWrapperUnitTests   src/unit_tests.cpp)
+
+target_include_directories(k4MarlinWrapperUnitTests PUBLIC
+  ${CMAKE_SOURCE_DIR}/k4MarlinWrapper
+)
+
+target_link_libraries(k4MarlinWrapperUnitTests
+  Catch2::Catch2
+  Catch2::Catch2WithMain
+)
+
 # Add test scripts
 
 find_program(BASH_PROGRAM bash)
@@ -59,31 +86,10 @@ if (BASH_PROGRAM)
       ENVIRONMENT k4MarlinWrapper_tests_DIR=${CMAKE_CURRENT_SOURCE_DIR}
       PASS_REGULAR_EXPRESSION "INFO Application Manager Terminated successfully")
 
+  # Unit tests
+  add_test( unit_tests ${CMAKE_BINARY_DIR}/test/k4MarlinWrapperUnitTests)
+  set_tests_properties( unit_tests
+    PROPERTIES
+    PASS_REGULAR_EXPRESSION "All tests passed")
+
 endif(BASH_PROGRAM)
-
-# Unit testing wiuth Catch2
-
-if(USE_EXTERNAL_CATCH2)
-  find_package(Catch2 REQUIRED)
-endif()
-
-if(NOT USE_EXTERNAL_CATCH2)
-  message("Fetching local copy of Catch2 library for unit-tests...")
-  Include(FetchContent)
-  FetchContent_Declare(
-    Catch2
-    GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-    GIT_TAG        4b51d0dd3be90f4faf3c10f60d1923ad47a792d7)
-  FetchContent_MakeAvailable(Catch2)
-endif()
-
-add_executable(k4MarlinWrapperUnitTests   src/unit_tests.cpp)
-
-target_include_directories(k4MarlinWrapperUnitTests PUBLIC
-  ${CMAKE_SOURCE_DIR}/k4MarlinWrapper
-)
-
-target_link_libraries(k4MarlinWrapperUnitTests
-  Catch2::Catch2
-  Catch2::Catch2WithMain
-)
