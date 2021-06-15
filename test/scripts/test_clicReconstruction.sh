@@ -27,7 +27,7 @@ echo "Modifying clicReconstruction.py file..."
 sed -i 's|/run/simulation/with/ctest/to/create/a/file.slcio|$k4MarlinWrapper_tests_DIR/inputFiles/testSimulation.slcio|g' clicReconstruction.py
 # Uncomment selected optional processors
 sed -i 's;EvtMax   = 10,;EvtMax   = 3,;' clicReconstruction.py
-sed -i 's;"MaxRecordNumber", "10", END_TAG,;"MaxRecordNumber", "3", END_TAG,;' clicReconstruction.py
+sed -i 's;"MaxRecordNumber": ["10"],;"MaxRecordNumber": ["3"],;' clicReconstruction.py
 sed -i 's;# algList.append(OverlayFalse);algList.append(OverlayFalse);' clicReconstruction.py
 sed -i 's;# algList.append(MyConformalTracking);algList.append(MyConformalTracking);' clicReconstruction.py
 sed -i 's;# algList.append(ClonesAndSplitTracksFinder);algList.append(ClonesAndSplitTracksFinder);' clicReconstruction.py
