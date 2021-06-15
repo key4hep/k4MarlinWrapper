@@ -23,35 +23,47 @@ void optimizeOrderParams(
     // if target before dependency swap all related elements. Multiply indexes by 3 to get correct index from view.
     auto swap_if_before = [&params_view, &params](const std::string& target, const std::string& dependency)
     {
-      auto target_found_it = std::find(params_view.begin(), params_view.end(), target);
-      if (target_found_it != params_view.end()) {
+      const int maxidx = 5;
+      int gidx = 0;
+      // Look for instances of target
+      for (int t_idx=0; t_idx<params_view.size(); ++t_idx) {
+        if (params_view[t_idx] == target) {
+          // Look for instances of dependency
+          for (int d_idx=0; d_idx<params_view.size(); ++d_idx) {
+            if (params_view[d_idx] == dependency) {
+              // If target is before the depenency swap them
+              if (t_idx < d_idx) {
+                const auto real_t_idx = 3 * t_idx;
+                const auto real_d_idx = 3 * d_idx;
 
-        auto target_index = 3 * std::distance(params_view.begin(), target_found_it);
-        auto dependency_found_it = std::find(params_view.begin(), params_view.end(), dependency);
+                std::swap(params[real_t_idx], params[real_d_idx]);
+                std::swap(params[real_t_idx+1], params[real_d_idx+1]);
+                std::swap(params[real_t_idx+2], params[real_d_idx+2]);
+                // swap also the view
+                std::swap(params_view[t_idx], params_view[d_idx]);
+                // reset target index until everything is sorted
+                t_idx = 0;
 
-        if (dependency_found_it != params_view.end()) {
-
-          auto dependency_index = 3 * std::distance(params_view.begin(), dependency_found_it);
-
-          if (target_index < dependency_index) {
-            std::swap(params[target_index], params[dependency_index]);
-            std::swap(params[target_index+1], params[dependency_index+1]);
-            std::swap(params[target_index+2], params[dependency_index+2]);
+                break;
+              }
+            }
           }
         }
       }
     };
 
     // A depends on B converted before to not need FillMissingCollections()
-    swap_if_before("Track", "TrackerHit");
-    swap_if_before("SimTrackerHit", "MCParticle");
-    swap_if_before("SimCalorimeterHit", "MCParticle");
-    swap_if_before("Cluster", "CalorimeterHit");
-    // swap_if_before("Vertex", "ReconstructedParticle");
-    swap_if_before("ReconstructedParticle", "Track");
-    // This generates a cycle, but that's fine
-    // swap_if_before("ReconstructedParticle", "Vertex");
-    swap_if_before("ReconstructedParticle", "Cluster");
+    for (int i=0; i < 2; ++i) {
+      swap_if_before("Track", "TrackerHit");
+      swap_if_before("SimTrackerHit", "MCParticle");
+      swap_if_before("SimCalorimeterHit", "MCParticle");
+      swap_if_before("Cluster", "CalorimeterHit");
+      // swap_if_before("Vertex", "ReconstructedParticle");
+      swap_if_before("ReconstructedParticle", "Track");
+      // This generates a cycle, but that's fine
+      // swap_if_before("ReconstructedParticle", "Vertex");
+      swap_if_before("ReconstructedParticle", "Cluster");
+    }
   }
 }
 
