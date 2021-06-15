@@ -176,7 +176,7 @@ def createHeader(lines):
   lines.append("from k4MarlinWrapper.parseConstants import *")
   lines.append("algList = []")
   lines.append("evtsvc = EventDataSvc()\n")
-  lines.append("END_TAG = \"END_TAG\"\n")
+  # lines.append("END_TAG = \"END_TAG\"\n")
 
 
 def createLcioReader(lines, glob):
@@ -217,20 +217,16 @@ def convertParamters(params, proc, globParams, constants):
   lines = []
   lines.append("%s.OutputLevel = %s " % (proc.replace(".", "_"), verbosityTranslator(globParams.get("Verbosity"))))
   lines.append("%s.ProcessorType = \"%s\" " % (proc.replace(".", "_"), params.get("type")))
-  lines.append("%s.Parameters = [" % proc.replace(".", "_"))
+  lines.append("%s.Parameters = {" % proc.replace(".", "_"))
   for para in sorted(params):
     if para not in ["type", "Verbosity"]:
       value = params[para].replace('\n', ' ')
       value = " ".join(value.split())
-
-      if not value:
-        lines.append("%s\"%s\", END_TAG," % (' ' * (len(proc) + 15), para))
-      else:
-        lines.append("%s\"%s\", %s, END_TAG," % \
-          (' ' * (len(proc) + 15), para, replaceConstants(value, constants)))
+      lines.append("%s\"%s\": [%s]," % \
+        (' ' * (len(proc) + 15), para, replaceConstants(value, constants)))
 
   lines[-1] = lines[-1][:-1]
-  lines.append("%s]\n" % (' ' * (len(proc) + 15)))
+  lines.append("%s}\n" % (' ' * (len(proc) + 15)))
   return lines
 
 
