@@ -78,13 +78,12 @@ private:
 
   /// Parse the parameters from the Property
   std::shared_ptr<marlin::StringParameters> parseParameters(
-    const Gaudi::Property<std::vector<std::string>>& parameters,
+    const Gaudi::Property<std::map<std::string, std::vector<std::string>>>& parameters,
     std::string& verbosity) const;
 
   /// ProcessorType: The Type of the MarlinProcessor to use
   Gaudi::Property<std::string> m_processorType{this, "ProcessorType", {}};
-  /// Parameters: Dictionary of key and list of strings would be nice, but we just use a vector of strings for the moment
-  Gaudi::Property<std::vector<std::string>> m_parameters{this, "Parameters", {}};
+  Gaudi::Property<std::map<std::string, std::vector<std::string>>> m_parameters{this, "Parameters", {}};
 
   ToolHandle<IEDMConverter> m_edm_conversionTool{"IEDMConverter/EDM4hep2Lcio", this};
   ToolHandle<IEDMConverter> m_lcio_conversionTool{"IEDMConverter/Lcio2EDM4hep", this};

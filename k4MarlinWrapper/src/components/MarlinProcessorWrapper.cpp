@@ -104,7 +104,7 @@ StatusCode MarlinProcessorWrapper::loadProcessorLibraries() const {
 
 
 std::shared_ptr<marlin::StringParameters> MarlinProcessorWrapper::parseParameters(
-  const Gaudi::Property<std::vector<std::string>>& parameters,
+  const Gaudi::Property<std::map<std::string, std::vector<std::string>>>& parameters,
   std::string& verbosity) const
 {
   auto parameters_ptr = std::make_shared<marlin::StringParameters>();
@@ -113,38 +113,13 @@ std::shared_ptr<marlin::StringParameters> MarlinProcessorWrapper::parseParameter
   std::vector<std::string> parameterValues = {};
 
   // convert the list of string into parameter name and value
-  for (const auto& parameterString : parameters) {
-    if (parameterString == "END_TAG") {
-      parameters_ptr->add(parameterName, parameterValues);
-
-      info() << parameterName;
-      for (const auto& value : parameterValues) {
-        info() << "  " << value;
-      }
-      info() << endmsg;
-      if (parameterName == "Verbosity") {
-        info() << "Setting verbosity to " << parameterValues[0] << endmsg;
-        verbosity = parameterValues[0];
-      }
-
-      parameterName = "";
-      parameterValues.clear();
-
-      continue;
-    }
-
-    if (parameterName == "") {
-      parameterName = parameterString;
-      continue;
-    }
-
-    auto split_parameter = k4MW::util::split(parameterString);
-    parameterValues.insert(parameterValues.end(), split_parameter.begin(), split_parameter.end());
-
+  for (const auto& [paramName, paramValues] : parameters) {
+    parameters_ptr->add(paramName, paramValues);
   }
 
   return parameters_ptr;
 }
+
 
 StatusCode MarlinProcessorWrapper::instantiateProcessor(
   std::shared_ptr<marlin::StringParameters>& parameters,
