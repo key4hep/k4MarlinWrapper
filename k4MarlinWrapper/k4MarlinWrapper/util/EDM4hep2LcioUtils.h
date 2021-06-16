@@ -51,6 +51,7 @@ void optimizeOrderParams(
     };
 
     // A depends on B converted before to not need FillMissingCollections()
+    // Make two rounds for collections that may go up again in the list in the first round
     for (int i=0; i < 2; ++i) {
       swap_if_before("Track", "TrackerHit");
       swap_if_before("SimTrackerHit", "MCParticle");
