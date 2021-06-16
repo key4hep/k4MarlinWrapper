@@ -23,15 +23,13 @@ void optimizeOrderParams(
     // if target before dependency swap all related elements. Multiply indexes by 3 to get correct index from view.
     auto swap_if_before = [&params_view, &params](const std::string& target, const std::string& dependency)
     {
-      const int maxidx = 5;
-      int gidx = 0;
       // Look for instances of target
       for (int t_idx=0; t_idx<params_view.size(); ++t_idx) {
         if (params_view[t_idx] == target) {
           // Look for instances of dependency
           for (int d_idx=0; d_idx<params_view.size(); ++d_idx) {
             if (params_view[d_idx] == dependency) {
-              // If target is before the depenency swap them
+              // If target is before the dependency swap them
               if (t_idx < d_idx) {
                 const auto real_t_idx = 3 * t_idx;
                 const auto real_d_idx = 3 * d_idx;
