@@ -109,10 +109,10 @@ std::shared_ptr<marlin::StringParameters> MarlinProcessorWrapper::parseParameter
 {
   auto parameters_ptr = std::make_shared<marlin::StringParameters>();
   info() << "Parameter values for: " << name() << " of type " << std::string(m_processorType) << endmsg;
-  std::vector<std::string> parameterValues = {};
 
   // convert the list of string into parameter name and value
   for (const auto& [paramName, paramValues] : parameters) {
+    std::vector<std::string> parameterValues = {};
     if (paramName == "Verbosity") {
       info() << "Setting verbosity to " << paramName << endmsg;
       verbosity = paramName;
@@ -125,7 +125,6 @@ std::shared_ptr<marlin::StringParameters> MarlinProcessorWrapper::parseParameter
     }
 
     parameters_ptr->add(paramName, parameterValues);
-    parameterValues.clear();
   }
 
   return parameters_ptr;
