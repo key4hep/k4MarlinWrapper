@@ -98,11 +98,11 @@ Output_DST.OutputLevel = WARNING
 # 2
 Output_DST.ProcessorType = "LCIOOutputProcessor"
 # 3
-Output_DST.Parameters = [
-                         "DropCollectionNames", END_TAG,
-                         "DropCollectionTypes", "MCParticle", "LCRelation", "SimCalorimeterHit",
+Output_DST.Parameters = {
+                         "DropCollectionNames": [],
+                         "DropCollectionTypes": ["MCParticle", "LCRelation", "SimCalorimeterHit"],
                          ...
-                         ]
+                         }
 
 # 4                         
 algList.append(Output_DST)                         
