@@ -21,6 +21,8 @@
 #include <edm4hep/RawCalorimeterHitCollection.h>
 #include <edm4hep/SimCalorimeterHit.h>
 #include <edm4hep/SimCalorimeterHitCollection.h>
+#include <edm4hep/CaloHitContribution.h>
+#include <edm4hep/CaloHitContributionCollection.h>
 #include <edm4hep/TPCHit.h>
 #include <edm4hep/TPCHitCollection.h>
 #include <edm4hep/Cluster.h>
