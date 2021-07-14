@@ -365,10 +365,12 @@ void EDM4hep2LcioTool::convertSimCalorimeterHits(
     e4h_coll_name, Gaudi::DataHandle::Reader, this};
   const auto simcalohit_coll = sim_calohit_handle.get();
 
+  auto* simcalohits = new lcio::LCCollectionVec(lcio::LCIO::SIMCALORIMETERHIT);
+
   auto collID = simcalohit_coll->getID();
   const auto cellIDstr = sim_calohit_handle.getCollMetadataCellID(collID);
 
-  auto* simcalohits = new lcio::LCCollectionVec(lcio::LCIO::SIMCALORIMETERHIT);
+  lcio::ILDCellIDEncoder<lcio::SimCalorimeterHitImpl> idEnc( cellIDstr, simcalohits );
 
   for (const auto& edm_sim_calohit : (*simcalohit_coll)) {
     if (edm_sim_calohit.isAvailable()) {
