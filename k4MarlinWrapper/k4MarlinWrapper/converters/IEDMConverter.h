@@ -50,6 +50,7 @@
 #include <IMPL/ParticleIDImpl.h>
 #include <IMPL/MCParticleImpl.h>
 #include <LCIOSTLTypes.h>
+#include "UTIL/ILDConf.h"
 
 
 class IEDMConverter : virtual public IAlgTool {
