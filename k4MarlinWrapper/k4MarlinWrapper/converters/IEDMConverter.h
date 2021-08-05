@@ -31,10 +31,13 @@
 #include <edm4hep/VertexCollection.h>
 #include <edm4hep/MCParticle.h>
 #include <edm4hep/MCParticleCollection.h>
+#include <edm4hep/MCRecoTrackerAssociation.h>
+#include <edm4hep/MCRecoTrackerAssociationCollection.h>
 
 // LCIO
 #include <lcio.h>
 #include <IMPL/LCEventImpl.h>
+#include <IMPL/LCRelationImpl.h>
 #include <IMPL/LCCollectionVec.h>
 #include <IMPL/ReconstructedParticleImpl.h>
 #include <IMPL/TrackImpl.h>
