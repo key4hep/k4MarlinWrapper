@@ -11,14 +11,14 @@ evtsvc = k4DataSvc('EventDataSvc')
 # EDM4hep2lcio Tool
 edmConvTool = EDM4hep2LcioTool("EDM4hep2lcio")
 edmConvTool.Parameters = [
-    "CalorimeterHit", "E4H_CaloHitCollection", "LCIO_CaloHitCollection",
-    "RawCalorimeterHit", "E4H_RawCaloHitCollection", "LCIO_RawCaloHitCollection",
-    "TPCHit", "E4H_TPCHitCollection", "LCIO_TPCHitCollection",
-    "Track", "E4H_TrackCollection", "LCIO_TrackCollection",
-    "SimTrackerHit", "E4H_SimTrackerHitCollection", "LCIO_SimTrackerHitCollection",
-    "TrackerHit", "E4H_TrackerHitCollection", "LCIO_TrackerHitCollection",
-    "MCParticle", "E4H_MCParticleCollection", "LCIO_MCParticleCollection",
-    "SimCalorimeterHit", "E4H_SimCaloHitCollection", "LCIO_SimCaloHitCollection"
+    "E4H_CaloHitCollection", "LCIO_CaloHitCollection",
+    "E4H_RawCaloHitCollection", "LCIO_RawCaloHitCollection",
+    "E4H_TPCHitCollection", "LCIO_TPCHitCollection",
+    "E4H_TrackCollection", "LCIO_TrackCollection",
+    "E4H_SimTrackerHitCollection", "LCIO_SimTrackerHitCollection",
+    "E4H_TrackerHitCollection", "LCIO_TrackerHitCollection",
+    "E4H_MCParticleCollection", "LCIO_MCParticleCollection",
+    "E4H_SimCaloHitCollection", "LCIO_SimCaloHitCollection"
 ]
 
 # LCIO2EDM4hep Tool

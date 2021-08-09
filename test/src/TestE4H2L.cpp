@@ -408,7 +408,7 @@ bool TestE4H2L::checkEDMRawCaloHitLCIORawCaloHit(
   }
 
   if (!rawcalohit_same) {
-    debug() << "RawCalorimeterHit EDM4hep -> LCIO failed." << endmsg;
+    error() << "RawCalorimeterHit EDM4hep -> LCIO failed." << endmsg;
   }
 
   return rawcalohit_same;
@@ -484,7 +484,7 @@ bool TestE4H2L::checkEDMSimCaloHitLCIOSimCaloHit(
   }
 
   if (!simcalohit_same) {
-    debug() << "SimCalorimeterHit EDM4hep -> LCIO failed." << endmsg;
+    error() << "SimCalorimeterHit EDM4hep -> LCIO failed." << endmsg;
   }
 
   return simcalohit_same;
@@ -529,7 +529,7 @@ bool TestE4H2L::checkEDMTPCHitLCIOTPCHit(
   }
 
   if (!tpchit_same) {
-    debug() << "TPCHit EDM4hep -> LCIO failed." << endmsg;
+    error() << "TPCHit EDM4hep -> LCIO failed." << endmsg;
   }
 
   return tpchit_same;
@@ -590,7 +590,7 @@ bool TestE4H2L::checkEDMSimTrackerHitEDMSimTrackerHit(
   }
 
   if (!strh_same) {
-    debug() << "SimTrackerHit EDM4hep -> LCIO -> EDM4hep failed." << endmsg;
+    error() << "SimTrackerHit EDM4hep -> LCIO -> EDM4hep failed." << endmsg;
   }
 
   return strh_same;
@@ -660,7 +660,7 @@ bool TestE4H2L::checkEDMSimTrackerHitLCIOSimTrackerHit(
   }
 
   if (!strh_same) {
-    debug() << "SimTrackerHit EDM4hep -> LCIO failed." << endmsg;
+    error() << "SimTrackerHit EDM4hep -> LCIO failed." << endmsg;
   }
 
   return strh_same;
@@ -714,7 +714,7 @@ bool TestE4H2L::checkEDMTrackerHitLCIOTrackerHit(
   }
 
   if (!trackerhit_same) {
-    debug() << "Track EDM4hep -> LCIO failed." << endmsg;
+    error() << "Track EDM4hep -> LCIO failed." << endmsg;
   }
 
   return trackerhit_same;
@@ -825,7 +825,7 @@ bool TestE4H2L::checkEDMTrackLCIOTrack(
   }
 
   if (!track_same) {
-    debug() << "Track EDM4hep -> LCIO failed." << endmsg;
+    error() << "Track EDM4hep -> LCIO failed." << endmsg;
   }
 
   return track_same;
@@ -903,7 +903,7 @@ bool TestE4H2L::checkEDMMCParticleLCIOMCParticle(
   }
 
   if (!mcp_same) {
-    debug() << "MCParticles EDM4hep -> LCIO failed." << endmsg;
+    error() << "MCParticles EDM4hep -> LCIO failed." << endmsg;
   }
 
   return mcp_same;
@@ -939,7 +939,7 @@ bool TestE4H2L::checkEDMCaloHitEDMCaloHit()
   }
 
   if (!calohit_same) {
-    debug() << "CalorimeterHit EDM4hep -> LCIO -> EDM4hep failed." << endmsg;
+    error() << "CalorimeterHit EDM4hep -> LCIO -> EDM4hep failed." << endmsg;
   }
 
   return calohit_same;
@@ -1018,7 +1018,7 @@ bool TestE4H2L::checkEDMMCParticleEDMMCParticle(
   }
 
   if (!mcp_same) {
-    debug() << "MCParticle EDM4hep -> LCIO -> EDM4hep failed." << endmsg;
+    error() << "MCParticle EDM4hep -> LCIO -> EDM4hep failed." << endmsg;
   }
 
   return mcp_same;
@@ -1083,7 +1083,7 @@ bool TestE4H2L::checkEDMSimCaloHitEDMSimCaloHit(
   }
 
   if (!simcalohit_same) {
-    debug() << "SimCalorimeterHit EDM4hep -> LCIO -> EDM4hep failed." << endmsg;
+    error() << "SimCalorimeterHit EDM4hep -> LCIO -> EDM4hep failed." << endmsg;
   }
 
   return simcalohit_same;
@@ -1187,7 +1187,7 @@ bool TestE4H2L::checkEDMTrackEDMTrack(
   }
 
   if (!track_same) {
-    debug() << "Track EDM4hep -> LCIO -> EDM4hep failed." << endmsg;
+    error() << "Track EDM4hep -> LCIO -> EDM4hep failed." << endmsg;
   }
 
   return track_same;
