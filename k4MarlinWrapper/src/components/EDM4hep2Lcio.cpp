@@ -1047,6 +1047,11 @@ void EDM4hep2LcioTool::convertAdd(
     }
   }
 
+  if (fulltype == "") {
+    error() << "Could not get type from collection name: " << e4h_coll_name << endmsg;
+    return;
+  }
+
   if (fulltype == "edm4hep::Track") {
     convertTracks(
       collection_pairs.tracks,
@@ -1169,7 +1174,7 @@ StatusCode EDM4hep2LcioTool::convertCollections(
 
   CollectionsPairVectors collection_pairs {};
 
-  for (int i = 0; i < m_edm2lcio_params.size(); i=i+1) {
+  for (int i = 0; i < m_edm2lcio_params.size(); i=i+2) {
     if (! collectionExist(m_edm2lcio_params[i+1], lcio_event)) {
       convertAdd(
         m_edm2lcio_params[i],
