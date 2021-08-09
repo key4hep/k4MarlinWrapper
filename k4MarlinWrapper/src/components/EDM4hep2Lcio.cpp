@@ -5,13 +5,17 @@ DECLARE_COMPONENT(EDM4hep2LcioTool);
 
 
 EDM4hep2LcioTool::EDM4hep2LcioTool(const std::string& type, const std::string& name, const IInterface* parent)
-    : GaudiTool(type, name, parent) {
+    : GaudiTool(type, name, parent), m_eventDataSvc("EventDataSvc", "EDM4hep2LcioTool") {
   declareInterface<IEDMConverter>(this);
 }
 
 EDM4hep2LcioTool::~EDM4hep2LcioTool() { ; }
 
 StatusCode EDM4hep2LcioTool::initialize() {
+
+  m_eventDataSvc.retrieve().ignore();
+  m_podioDataSvc = dynamic_cast<PodioDataSvc*>( m_eventDataSvc.get());
+
   return GaudiTool::initialize();
 }
 
@@ -67,16 +71,12 @@ void EDM4hep2LcioTool::convertTracks(
       // Link multiple associated TrackerHits if found in converted ones
       for (const auto& edm_rp_trh : edm_tr.getTrackerHits()) {
         if (edm_rp_trh.isAvailable()){
-          bool conv_found = false;
           for (const auto& [lcio_trh, edm_trh] : trackerhits_vec) {
             if (edm_trh == edm_rp_trh) {
               lcio_tr->addHit(lcio_trh);
-              conv_found = true;
               break;
             }
           }
-          // If track available, but not found in converted vec, add nullptr
-          if (not conv_found) lcio_tr->addHit(nullptr);
         }
       }
 
@@ -885,10 +885,7 @@ void EDM4hep2LcioTool::FillMissingCollections(
 
   // Fill missing Tracks collections
   for (auto& [lcio_tr, edm_tr] : collection_pairs.tracks) {
-
-    // Link TrackerHits
-    if (lcio_tr->getTrackerHits().size() != edm_tr.trackerHits_size()) {
-      assert(lcio_tr->getTrackerHits().size() == 0);
+    if (lcio_tr->getTrackerHits().size() == 0) {
       for (const auto& edm_tr_trh : edm_tr.getTrackerHits()) {
         for (const auto& [lcio_trh, edm_trh] : collection_pairs.trackerhits) {
           if (edm_trh == edm_tr_trh) {
@@ -1033,15 +1030,24 @@ void EDM4hep2LcioTool::FillMissingCollections(
 
 // Select the appropiate method to convert a collection given its type
 void EDM4hep2LcioTool::convertAdd(
-  const std::string& type,
   const std::string& e4h_coll_name,
   const std::string& lcio_coll_name,
   lcio::LCEventImpl* lcio_event,
   CollectionsPairVectors& collection_pairs)
 {
 
-  // Types are edm4hep::<Name>Collection
-  if (type == "Track") {
+  // Get the associated type to the collection name
+  const auto evt_store = m_podioDataSvc->getCollections();
+  std::string fulltype = "";
+
+  for (auto& [name, coll] : evt_store) {
+    if (name == e4h_coll_name) {
+      fulltype = coll->getValueTypeName();
+      break;
+    }
+  }
+
+  if (fulltype == "edm4hep::Track") {
     convertTracks(
       collection_pairs.tracks,
       collection_pairs.trackerhits,
@@ -1049,14 +1055,14 @@ void EDM4hep2LcioTool::convertAdd(
       lcio_coll_name,
       lcio_event);
   } else
-  if (type == "TrackerHit") {
+  if (fulltype == "edm4hep::TrackerHit") {
     convertTrackerHits(
       collection_pairs.trackerhits,
       e4h_coll_name,
       lcio_coll_name,
       lcio_event);
   } else
-  if (type == "SimTrackerHit") {
+  if (fulltype == "edm4hep::SimTrackerHit") {
     convertSimTrackerHits(
       collection_pairs.simtrackerhits,
       collection_pairs.mcparticles,
@@ -1064,21 +1070,21 @@ void EDM4hep2LcioTool::convertAdd(
       lcio_coll_name,
       lcio_event);
   } else
-  if (type == "CalorimeterHit") {
+  if (fulltype == "edm4hep::CalorimeterHit") {
     convertCalorimeterHits(
       collection_pairs.calohits,
       e4h_coll_name,
       lcio_coll_name,
       lcio_event);
   } else
-  if (type == "RawCalorimeterHit") {
+  if (fulltype == "edm4hep::RawCalorimeterHit") {
     convertRawCalorimeterHits(
       collection_pairs.rawcalohits,
       e4h_coll_name,
       lcio_coll_name,
       lcio_event);
   } else
-  if (type == "SimCalorimeterHit") {
+  if (fulltype == "edm4hep::SimCalorimeterHit") {
     convertSimCalorimeterHits(
       collection_pairs.simcalohits,
       collection_pairs.mcparticles,
@@ -1086,14 +1092,14 @@ void EDM4hep2LcioTool::convertAdd(
       lcio_coll_name,
       lcio_event);
   } else
-  if (type == "TPCHit") {
+  if (fulltype == "edm4hep::TPCHit") {
     convertTPCHits(
       collection_pairs.tpchits,
       e4h_coll_name,
       lcio_coll_name,
       lcio_event);
   } else
-  if (type == "Cluster") {
+  if (fulltype == "edm4hep::Cluster") {
     convertClusters(
       collection_pairs.clusters,
       collection_pairs.calohits,
@@ -1101,7 +1107,7 @@ void EDM4hep2LcioTool::convertAdd(
       lcio_coll_name,
       lcio_event);
   } else
-  if (type == "Vertex") {
+  if (fulltype == "edm4hep::Vertex") {
     convertVertices(
       collection_pairs.vertices,
       collection_pairs.recoparticles,
@@ -1109,14 +1115,14 @@ void EDM4hep2LcioTool::convertAdd(
       lcio_coll_name,
       lcio_event);
   } else
-  if (type == "MCParticle") {
+  if (fulltype == "edm4hep::MCParticle") {
     convertMCParticles(
       collection_pairs.mcparticles,
       e4h_coll_name,
       lcio_coll_name,
       lcio_event);
   } else
-  if (type == "ReconstructedParticle") {
+  if (fulltype == "edm4hep::ReconstructedParticle") {
     convertReconstructedParticles(
       collection_pairs.recoparticles,
       collection_pairs.tracks,
@@ -1126,7 +1132,7 @@ void EDM4hep2LcioTool::convertAdd(
       lcio_coll_name,
       lcio_event);
   } else {
-    error() << "Error trying to convert requested " << type << " with name " << e4h_coll_name << endmsg;
+    error() << "Error trying to convert requested " << fulltype << " with name " << e4h_coll_name << endmsg;
     error() << "List of supported types: " <<
       "Track, TrackerHit, SimTrackerHit, " <<
       "Cluster, CalorimeterHit, RawCalorimeterHit, " <<
@@ -1156,25 +1162,22 @@ bool EDM4hep2LcioTool::collectionExist(
 StatusCode EDM4hep2LcioTool::convertCollections(
   lcio::LCEventImpl* lcio_event)
 {
-  if (m_edm2lcio_params.size() % 3 != 0) {
-    error() << " Error processing conversion parameters. 3 arguments per collection expected. " << endmsg;
+  if (m_edm2lcio_params.size() % 2 != 0) {
+    error() << " Error processing conversion parameters. 2 arguments (EDM4hep name, LCIO name) per collection expected. " << endmsg;
     return StatusCode::FAILURE;
   }
 
   CollectionsPairVectors collection_pairs {};
 
-  k4MW::util::optimizeOrderParams(m_edm2lcio_params);
-
-  for (int i = 0; i < m_edm2lcio_params.size(); i=i+3) {
-    if (! collectionExist(m_edm2lcio_params[i+2], lcio_event)) {
+  for (int i = 0; i < m_edm2lcio_params.size(); i=i+1) {
+    if (! collectionExist(m_edm2lcio_params[i+1], lcio_event)) {
       convertAdd(
         m_edm2lcio_params[i],
         m_edm2lcio_params[i+1],
-        m_edm2lcio_params[i+2],
         lcio_event,
         collection_pairs);
     } else {
-      debug() << " Collection " << m_edm2lcio_params[i+2] << " already in place, skipping conversion. " << endmsg;
+      debug() << " Collection " << m_edm2lcio_params[i+1] << " already in place, skipping conversion. " << endmsg;
     }
   }
 

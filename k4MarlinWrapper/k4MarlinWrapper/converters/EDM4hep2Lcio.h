@@ -16,7 +16,7 @@
 // k4MarlinWrapper
 #include "k4MarlinWrapper/converters/IEDMConverter.h"
 #include "k4MarlinWrapper/LCEventWrapper.h"
-#include "k4MarlinWrapper/util/EDM4hep2LcioUtils.h"
+#include "k4MarlinWrapper/util/k4MarlinWrapperUtil.h"
 
 
 
@@ -51,6 +51,9 @@ public:
 private:
 
   Gaudi::Property<std::vector<std::string>> m_edm2lcio_params{this, "Parameters", {}};
+
+  PodioDataSvc* m_podioDataSvc;
+  ServiceHandle<IDataProviderSvc> m_eventDataSvc;
 
   void convertTracks(
     vec_pair<lcio::TrackImpl*, edm4hep::Track>& tracks_vec,
@@ -130,7 +133,6 @@ private:
     CollectionsPairVectors& collection_pairs);
 
   void convertAdd(
-    const std::string& type,
     const std::string& e4h_coll_name,
     const std::string& lcio_coll_name,
     lcio::LCEventImpl* lcio_event,
