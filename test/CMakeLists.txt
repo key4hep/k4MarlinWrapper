@@ -59,10 +59,4 @@ if (BASH_PROGRAM)
       ENVIRONMENT k4MarlinWrapper_tests_DIR=${CMAKE_CURRENT_SOURCE_DIR}
       PASS_REGULAR_EXPRESSION "INFO Application Manager Terminated successfully")
 
-  # Unit tests
-  add_test( unit_tests ${CMAKE_BINARY_DIR}/test/k4MarlinWrapperUnitTests)
-  set_tests_properties( unit_tests
-    PROPERTIES
-    PASS_REGULAR_EXPRESSION "All tests passed")
-
 endif(BASH_PROGRAM)
