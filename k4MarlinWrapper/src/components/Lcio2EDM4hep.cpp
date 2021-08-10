@@ -15,65 +15,13 @@ Lcio2EDM4hepTool::~Lcio2EDM4hepTool() { ; }
 
 StatusCode Lcio2EDM4hepTool::initialize() {
 
-  if (m_lcio2edm_params.size() % 3 != 0) {
-    error() << " Error processing conversion parameters. 3 arguments per collection expected. " << endmsg;
+  if (m_lcio2edm_params.size() % 2 != 0) {
+    error() << " Error processing conversion parameters. 2 arguments (LCIO name, EDM4hep name) per collection expected. " << endmsg;
     return StatusCode::FAILURE;
   }
 
   m_podioDataSvc = dynamic_cast<PodioDataSvc*>(m_eds.get());
   if (nullptr == m_podioDataSvc) return StatusCode::FAILURE;
-
-  // Event Header
-  m_dataHandlesMap["EventHeader"] =
-    new DataHandle<edm4hep::EventHeaderCollection>("EventHeader", Gaudi::DataHandle::Writer, this);
-
-  // Add and initialize DataHandles
-  for (int i = 0; i < m_lcio2edm_params.size(); i=i+3) {
-    if (m_lcio2edm_params[i] == "ReconstructedParticle") {
-      m_dataHandlesMap[m_lcio2edm_params[i+2]] =
-        new DataHandle<edm4hep::ReconstructedParticleCollection>(m_lcio2edm_params[i+2], Gaudi::DataHandle::Writer, this);
-    } else if (m_lcio2edm_params[i] == "ParticleID") {
-      m_dataHandlesMap[m_lcio2edm_params[i+2]] =
-        new DataHandle<edm4hep::ParticleIDCollection>(m_lcio2edm_params[i+2], Gaudi::DataHandle::Writer, this);
-    } else if (m_lcio2edm_params[i] == "MCParticle") {
-      m_dataHandlesMap[m_lcio2edm_params[i+2]] =
-        new DataHandle<edm4hep::MCParticleCollection>(m_lcio2edm_params[i+2], Gaudi::DataHandle::Writer, this);
-    } else if (m_lcio2edm_params[i] == "Vertex") {
-      m_dataHandlesMap[m_lcio2edm_params[i+2]] =
-        new DataHandle<edm4hep::VertexCollection>(m_lcio2edm_params[i+2], Gaudi::DataHandle::Writer, this);
-    } else if (m_lcio2edm_params[i] == "Track") {
-      m_dataHandlesMap[m_lcio2edm_params[i+2]] =
-        new DataHandle<edm4hep::TrackCollection>(m_lcio2edm_params[i+2], Gaudi::DataHandle::Writer, this);
-    } else if (m_lcio2edm_params[i] == "TrackerHit") {
-      m_dataHandlesMap[m_lcio2edm_params[i+2]] =
-        new DataHandle<edm4hep::TrackerHitCollection>(m_lcio2edm_params[i+2], Gaudi::DataHandle::Writer, this);
-    } else if (m_lcio2edm_params[i] == "SimTrackerHit") {
-      m_dataHandlesMap[m_lcio2edm_params[i+2]] =
-        new DataHandle<edm4hep::SimTrackerHitCollection>(m_lcio2edm_params[i+2], Gaudi::DataHandle::Writer, this);
-    } else if (m_lcio2edm_params[i] == "CalorimeterHit") {
-      m_dataHandlesMap[m_lcio2edm_params[i+2]] =
-        new DataHandle<edm4hep::CalorimeterHitCollection>(m_lcio2edm_params[i+2], Gaudi::DataHandle::Writer, this);
-    } else if (m_lcio2edm_params[i] == "SimCalorimeterHit") {
-      m_dataHandlesMap[m_lcio2edm_params[i+2]] =
-        new DataHandle<edm4hep::SimCalorimeterHitCollection>(m_lcio2edm_params[i+2], Gaudi::DataHandle::Writer, this);
-    } else if (m_lcio2edm_params[i] == "RawCalorimeterHit") {
-      m_dataHandlesMap[m_lcio2edm_params[i+2]] =
-        new DataHandle<edm4hep::RawCalorimeterHitCollection>(m_lcio2edm_params[i+2], Gaudi::DataHandle::Writer, this);
-    } else if (m_lcio2edm_params[i] == "TPCHit") {
-      m_dataHandlesMap[m_lcio2edm_params[i+2]] =
-        new DataHandle<edm4hep::TPCHitCollection>(m_lcio2edm_params[i+2], Gaudi::DataHandle::Writer, this);
-    } else if (m_lcio2edm_params[i] == "Cluster") {
-      m_dataHandlesMap[m_lcio2edm_params[i+2]] =
-        new DataHandle<edm4hep::ClusterCollection>(m_lcio2edm_params[i+2], Gaudi::DataHandle::Writer, this);
-    } else {
-      debug() << m_lcio2edm_params[i] << ": conversion type not supported." << endmsg;
-      debug() << "List of supported types: " <<
-        "ReconstructedParticle, ParticleID, MCParticle, " <<
-        "Vertex, Track, TrackerHit, " <<
-        "SimTrackerHit, CalorimeterHit, SimCalorimeterHit, " <<
-        "RawCalorimeterHit, TPCHit, Cluster." << endmsg;
-    }
-  }
 
   return GaudiTool::initialize();
 }
@@ -97,15 +45,10 @@ void Lcio2EDM4hepTool::convertPut(
   // Pass name of collection to get
   T* mycoll = dynamic_cast<T*>(lcio_converter->getCollection(lcio_name));
 
-  auto* handle = dynamic_cast<DataHandle<T>*>( m_dataHandlesMap[edm_name] );
-  if ( mycoll and handle->initialized() ) {
-    handle->put(mycoll);
-  } else {
-    debug() << "Collection conversion for " << lcio_name << " returned nullptr: creating empty collection." << endmsg;
-    mycoll = new T();
-    mycoll->setID(id_table->add(lcio_name));
-  }
-
+  // Manually register object instead of using DataHandle
+  DataWrapper<T>* wrapper = new DataWrapper<T>();
+  wrapper->setData(mycoll);
+  m_podioDataSvc->registerObject("/Event", "/" + std::string(edm_name), wrapper).ignore();
 }
 
 
@@ -126,12 +69,6 @@ bool Lcio2EDM4hepTool::collectionExist(
 StatusCode Lcio2EDM4hepTool::convertCollections(
   lcio::LCEventImpl* the_event)
 {
-
-  if (m_lcio2edm_params.size() % 3 != 0) {
-    error() << " Error processing conversion parameters. 3 arguments per collection expected. " << endmsg;
-    return StatusCode::FAILURE;
-  }
-
   // Set the event to the converter
   podio::CollectionIDTable* id_table = new podio::CollectionIDTable();
   k4LCIOConverter* lcio_converter = new k4LCIOConverter(id_table);
@@ -141,49 +78,54 @@ StatusCode Lcio2EDM4hepTool::convertCollections(
     "EventHeader", "EventHeader", lcio_converter, id_table);
 
   // Convert based on parameters
-  for (int i = 0; i < m_lcio2edm_params.size(); i=i+3) {
-    if (! collectionExist(m_lcio2edm_params[i+2])) {
-      if (m_lcio2edm_params[i] == "ReconstructedParticle") {
+  for (int i = 0; i < m_lcio2edm_params.size(); i=i+2) {
+    if (! collectionExist(m_lcio2edm_params[i+1])) {
+
+      // Get type string from collection name
+      auto lcio_coll = the_event->getCollection(m_lcio2edm_params[i]);
+      auto coll_type_str = lcio_coll->getTypeName();
+
+      if (coll_type_str == "ReconstructedParticle") {
         convertPut<edm4hep::ReconstructedParticleCollection>(
-          m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
-      } else if (m_lcio2edm_params[i] == "ParticleID") {
+          m_lcio2edm_params[i+1], m_lcio2edm_params[i], lcio_converter, id_table);
+      } else if (coll_type_str == "ParticleID") {
         convertPut<edm4hep::ParticleIDCollection>(
-          m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
-      } else if (m_lcio2edm_params[i] == "MCParticle") {
+          m_lcio2edm_params[i+1], m_lcio2edm_params[i], lcio_converter, id_table);
+      } else if (coll_type_str == "MCParticle") {
         convertPut<edm4hep::MCParticleCollection>(
-          m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
-      } else if (m_lcio2edm_params[i] == "Vertex") {
+          m_lcio2edm_params[i+1], m_lcio2edm_params[i], lcio_converter, id_table);
+      } else if (coll_type_str == "Vertex") {
         convertPut<edm4hep::VertexCollection>(
-          m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
-      } else if (m_lcio2edm_params[i] == "Track") {
+          m_lcio2edm_params[i+1], m_lcio2edm_params[i], lcio_converter, id_table);
+      } else if (coll_type_str == "Track") {
         convertPut<edm4hep::TrackCollection>(
-          m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
-      } else if (m_lcio2edm_params[i] == "TrackerHit") {
+          m_lcio2edm_params[i+1], m_lcio2edm_params[i], lcio_converter, id_table);
+      } else if (coll_type_str == "TrackerHit") {
         convertPut<edm4hep::TrackerHitCollection>(
-          m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
-      } else if (m_lcio2edm_params[i] == "SimTrackerHit") {
+          m_lcio2edm_params[i+1], m_lcio2edm_params[i], lcio_converter, id_table);
+      } else if (coll_type_str == "SimTrackerHit") {
         convertPut<edm4hep::SimTrackerHitCollection>(
-          m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
-      } else if (m_lcio2edm_params[i] == "CalorimeterHit") {
+          m_lcio2edm_params[i+1], m_lcio2edm_params[i], lcio_converter, id_table);
+      } else if (coll_type_str == "CalorimeterHit") {
         convertPut<edm4hep::CalorimeterHitCollection>(
-          m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
-      } else if (m_lcio2edm_params[i] == "SimCalorimeterHit") {
+          m_lcio2edm_params[i+1], m_lcio2edm_params[i], lcio_converter, id_table);
+      } else if (coll_type_str == "SimCalorimeterHit") {
         convertPut<edm4hep::SimCalorimeterHitCollection>(
-          m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
-      } else if (m_lcio2edm_params[i] == "RawCalorimeterHit") {
+          m_lcio2edm_params[i+1], m_lcio2edm_params[i], lcio_converter, id_table);
+      } else if (coll_type_str == "RawCalorimeterHit") {
         convertPut<edm4hep::RawCalorimeterHitCollection>(
-          m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
-      } else if (m_lcio2edm_params[i] == "TPCHit") {
+          m_lcio2edm_params[i+1], m_lcio2edm_params[i], lcio_converter, id_table);
+      } else if (coll_type_str == "TPCHit") {
         convertPut<edm4hep::TPCHitCollection>(
-          m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
-      } else if (m_lcio2edm_params[i] == "Cluster") {
+          m_lcio2edm_params[i+1], m_lcio2edm_params[i], lcio_converter, id_table);
+      } else if (coll_type_str == "Cluster") {
         convertPut<edm4hep::ClusterCollection>(
-          m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
+          m_lcio2edm_params[i+1], m_lcio2edm_params[i], lcio_converter, id_table);
       } else {
-        error() << m_lcio2edm_params[i] << ": conversion type not supported." << endmsg;
+        error() << coll_type_str << ": conversion type not supported." << endmsg;
       }
     } else {
-      debug() << " Collection " << m_lcio2edm_params[i+2] << " already in place, skipping conversion. " << endmsg;
+      debug() << " Collection " << m_lcio2edm_params[i+1] << " already in place, skipping conversion. " << endmsg;
     }
   }
 
