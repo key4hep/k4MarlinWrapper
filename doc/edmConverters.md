@@ -115,12 +115,10 @@ Note and review the following when using the converters:
 
 - Collection names must be unique.
 - If using the `PodioInput` to read events: collection names must be indicated both in the `PodioInput` and the `EDM4hep2LcioTool`.
-- The first argument that corresponds to the collection type refers to the underlying data type.
-  + For example: in EDM4hep, `ReconstructedParticle` will be resolved to `edm4hep::ReconstructedParticleCollection`.
 - Collections not indicated to be converted **will not** be converted even if its a dependency from an indicated collection to be converted.
 - If a converted collection is used later by a Gaudi Algorithm, and this Gaudi Algorithm indicates the use of that collection in the `Parameters`, the converted collection name must match the name indicated in the Gaudi Algorithm `Parameters`.
-  + For example: A collection may be converted with the following parameters: `"ReconstructedParticle", "ReconstructedParticles", "ReconstructedParticleLCIO"`
-  + A Gaudi Algorithm may indicate in their `Parameters`: `"PFOCollection", "ReconstructedParticleLCIO", END_TAG,`
+  + For example: A collection may be converted with the following parameters: `ReconstructedParticles", "ReconstructedParticleLCIO"`
+  + A Gaudi Algorithm may indicate in their `Parameters`: `"PFOCollection": ["ReconstructedParticleLCIO"]`
 
 ###  EDM4hep to LCIO converter
 
@@ -128,7 +126,7 @@ Collections from events that are already read, or are produced by a Gaudi Algori
 
 1. Instantiate the `EDM4hep2LcioTool` Gaudi Tool.
 2. Indicate the collections to convert in `Parameters`.
-  + Arguments are read in groups of 3: collection type, name of the collection, name of the converted collection.
+  + Arguments are read in groups of 2: name of the EDM4hep collection, name of the LCIO converted collection.
 3. Select the Gaudi Algorithm that will convert the indicated collections.
 4. Add the Tool to the Gaudi Algorithm.
 
@@ -139,8 +137,8 @@ from Configurables import ToolSvc, EDM4hep2LcioTool
 edmConvTool = EDM4hep2LcioTool("EDM4hep2lcio")
 # 2
 edmConvTool.Parameters = [
-    "Track", "EFlowTrack", "EFlowTrack_LCIO",
-    "ReconstructedParticle", "ReconstructedParticles", "ReconstructedParticle_LCIO"
+    "EFlowTrack", "EFlowTrack_LCIO",
+    "ReconstructedParticles", "ReconstructedParticle_LCIO"
 ]
 edmConvTool.OutputLevel = DEBUG
 
@@ -157,7 +155,7 @@ Collections from events that are already read, or are produced by a gaudi Algori
 
 1. Instantiate the `Lcio2EDM4hepTool` Gaudi Tool.
 2. Indicate the collections to convert in `Parameters`.
-  + Arguments are read in groups of 3: collection type, name of the collection, name of the converted collection.
+  + Arguments are read in groups of 2: name of the LCIO collection, name of the EDM4hep converted collection.
 3. Select the Gaudi Algorithm that will convert the indicated collections.
 4. Add the Tool to the Gaudi Algorithm.
 
@@ -168,10 +166,10 @@ from Configurables import ToolSvc, Lcio2EDM4hepTool
 lcioConvTool = Lcio2EDM4hepTool("LCIO2EDM4hep")
 # 2
 lcioConvTool.Parameters = [
-    "Track", "EFlowTrackConv", "EFlowTrackEDM",
-    "ReconstructedParticle", "ReconstructedParticle", "ReconstructedParticlesEDM",
-    "Vertex", "BuildUpVertices", "BuildUpVerticesEDM",
-    "Vertex", "PrimaryVertices", "PrimaryVerticesEDM"
+    "EFlowTrackConv", "EFlowTrackEDM4hep",
+    "ReconstructedParticle", "ReconstructedParticlesEDM4hep",
+    "BuildUpVertices", "BuildUpVerticesEDM4hep",
+    "PrimaryVertices", "PrimaryVerticesEDM4hep"
 ]
 lcioConvTool.OutputLevel = DEBUG
 
