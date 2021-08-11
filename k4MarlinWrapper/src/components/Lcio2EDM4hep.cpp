@@ -115,13 +115,11 @@ StatusCode Lcio2EDM4hepTool::convertCollections(
       } else if (coll_type_str == "SimCalorimeterHit") {
         convertPut<edm4hep::SimCalorimeterHitCollection>(
           m_lcio2edm_params[i+1], m_lcio2edm_params[i], lcio_converter, id_table);
+        // Get associated collections
+        // This collection name is hardcoded in k4LCIOConverter
+        convertPut<edm4hep::CaloHitContributionCollection>(
+          "CaloHitContribution_EXT", "CaloHitContribution_EXT", lcio_converter, id_table);
       } else if (coll_type_str == "RawCalorimeterHit") {
-          m_lcio2edm_params[i+2], m_lcio2edm_params[i+1], lcio_converter, id_table);
-          // Get associated collections
-          // These collection names are hardcoded in k4LCIOConverter
-          convertPut<edm4hep::CaloHitContributionCollection>(
-            "CaloHitContribution_EXT", "CaloHitContribution_EXT", lcio_converter, id_table);
-      } else if (m_lcio2edm_params[i] == "RawCalorimeterHit") {
         convertPut<edm4hep::RawCalorimeterHitCollection>(
           m_lcio2edm_params[i+1], m_lcio2edm_params[i], lcio_converter, id_table);
       } else if (coll_type_str == "TPCHit") {
