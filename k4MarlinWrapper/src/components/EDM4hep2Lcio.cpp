@@ -13,8 +13,13 @@ EDM4hep2LcioTool::~EDM4hep2LcioTool() { ; }
 
 StatusCode EDM4hep2LcioTool::initialize() {
 
-  m_eventDataSvc.retrieve().ignore();
+  StatusCode sc = m_eventDataSvc.retrieve();
   m_podioDataSvc = dynamic_cast<PodioDataSvc*>( m_eventDataSvc.get());
+
+  if (sc == StatusCode::FAILURE) {
+    error() << "Error retrieving Event Data Service" << endmsg;
+    return StatusCode::FAILURE;
+  }
 
   return GaudiTool::initialize();
 }

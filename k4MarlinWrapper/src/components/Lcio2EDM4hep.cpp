@@ -48,7 +48,10 @@ void Lcio2EDM4hepTool::convertPut(
   // Manually register object instead of using DataHandle
   DataWrapper<T>* wrapper = new DataWrapper<T>();
   wrapper->setData(mycoll);
-  m_podioDataSvc->registerObject("/Event", "/" + std::string(edm_name), wrapper).ignore();
+  StatusCode sc = m_podioDataSvc->registerObject("/Event", "/" + std::string(edm_name), wrapper);
+  if (sc == StatusCode::FAILURE) {
+    error() << "Error registering collection " << edm_name << endmsg;
+  }
 }
 
 
