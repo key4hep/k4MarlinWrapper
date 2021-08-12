@@ -108,7 +108,7 @@ StatusCode Lcio2EDM4hepTool::convertCollections(
       } else if (coll_type_str == "Track") {
         convertPut<edm4hep::TrackCollection>(
           m_lcio2edm_params[i+1], m_lcio2edm_params[i], lcio_converter, id_table);
-      } else if (coll_type_str == "TrackerHit") {
+      } else if (coll_type_str == "TrackerHit" or coll_type_str == "TrackerHitPlane") {
         convertPut<edm4hep::TrackerHitCollection>(
           m_lcio2edm_params[i+1], m_lcio2edm_params[i], lcio_converter, id_table);
       } else if (coll_type_str == "SimTrackerHit") {
@@ -135,7 +135,7 @@ StatusCode Lcio2EDM4hepTool::convertCollections(
         // Get associated collection. Name hardcoded in k4LCIOConverter
         convertPut<edm4hep::ParticleIDCollection>(
           "ParticleID_EXT", "ParticleID_EXT", lcio_converter, id_table);
-      } else if (m_lcio2edm_params[i] == "LCRelation") {
+      } else if (coll_type_str == "LCRelation") {
         convertPut<edm4hep::MCRecoTrackerAssociationCollection>(
           m_lcio2edm_params[i+1], m_lcio2edm_params[i], lcio_converter, id_table);
       } else {
