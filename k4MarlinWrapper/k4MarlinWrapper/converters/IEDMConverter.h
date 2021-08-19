@@ -33,6 +33,10 @@
 #include <edm4hep/MCParticleCollection.h>
 #include <edm4hep/MCRecoTrackerAssociation.h>
 #include <edm4hep/MCRecoTrackerAssociationCollection.h>
+#include <edm4hep/MCRecoCaloAssociation.h>
+#include <edm4hep/MCRecoCaloAssociationCollection.h>
+#include <edm4hep/MCRecoParticleAssociation.h>
+#include <edm4hep/MCRecoParticleAssociationCollection.h>
 
 // LCIO
 #include <lcio.h>

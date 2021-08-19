@@ -39,11 +39,15 @@ template <typename T>
 void Lcio2EDM4hepTool::convertPut(
   const std::string& edm_name,
   const std::string& lcio_name,
-  k4LCIOConverter* lcio_converter,
+  podio::CollectionBase* generic_coll,
   podio::CollectionIDTable* id_table)
 {
-  // Pass name of collection to get
-  T* mycoll = dynamic_cast<T*>(lcio_converter->getCollection(lcio_name));
+  T* mycoll = dynamic_cast<T*>(generic_coll);
+
+  if (mycoll == nullptr) {
+    error() << "Collection named " << lcio_name << " was null" << endmsg;
+    return;
+  }
 
   // Manually register object instead of using DataHandle
   DataWrapper<T>* wrapper = new DataWrapper<T>();
@@ -77,8 +81,11 @@ StatusCode Lcio2EDM4hepTool::convertCollections(
   k4LCIOConverter* lcio_converter = new k4LCIOConverter(id_table);
   lcio_converter->set(the_event);
 
-  convertPut<edm4hep::EventHeaderCollection>(
-    "EventHeader", "EventHeader", lcio_converter, id_table);
+  if (! collectionExist("EventHeader")) {
+    auto e4h_generic_coll = lcio_converter->getCollection("EventHeader");
+    convertPut<edm4hep::EventHeaderCollection>(
+      "EventHeader", "EventHeader", e4h_generic_coll, id_table);
+  }
 
   // Convert based on parameters
   for (int i = 0; i < m_lcio2edm_params.size(); i=i+2) {
@@ -86,60 +93,84 @@ StatusCode Lcio2EDM4hepTool::convertCollections(
 
       // Get type string from collection name
       auto lcio_coll = the_event->getCollection(m_lcio2edm_params[i]);
-      auto coll_type_str = lcio_coll->getTypeName();
+      auto lcio_coll_type_str = lcio_coll->getTypeName();
 
-      if (coll_type_str == "ReconstructedParticle") {
+      // Get EDM4hep converted type
+      auto e4h_generic_coll = lcio_converter->getCollection(m_lcio2edm_params[i]);
+
+      if (e4h_generic_coll == nullptr) {
+        error() << "Collection " << m_lcio2edm_params[i] << " failed to convert; returned null" << endmsg;
+      }
+
+      if (lcio_coll_type_str == "ReconstructedParticle") {
         convertPut<edm4hep::ReconstructedParticleCollection>(
-          m_lcio2edm_params[i+1], m_lcio2edm_params[i], lcio_converter, id_table);
+          m_lcio2edm_params[i+1], m_lcio2edm_params[i], e4h_generic_coll, id_table);
         // Get associated collection. Name hardcoded in k4LCIOConverter
         convertPut<edm4hep::ParticleIDCollection>(
-          "ParticleID_EXT", "ParticleID_EXT", lcio_converter, id_table);
+          "ParticleID_EXT", "ParticleID_EXT", e4h_generic_coll, id_table);
         convertPut<edm4hep::VertexCollection>(
-          "Vertex_EXT", "Vertex_EXT", lcio_converter, id_table);
-      } else if (coll_type_str == "ParticleID") {
+          "Vertex_EXT", "Vertex_EXT", e4h_generic_coll, id_table);
+      } else if (lcio_coll_type_str == "ParticleID") {
         convertPut<edm4hep::ParticleIDCollection>(
-          m_lcio2edm_params[i+1], m_lcio2edm_params[i], lcio_converter, id_table);
-      } else if (coll_type_str == "MCParticle") {
+          m_lcio2edm_params[i+1], m_lcio2edm_params[i], e4h_generic_coll, id_table);
+      } else if (lcio_coll_type_str == "MCParticle") {
         convertPut<edm4hep::MCParticleCollection>(
-          m_lcio2edm_params[i+1], m_lcio2edm_params[i], lcio_converter, id_table);
-      } else if (coll_type_str == "Vertex") {
+          m_lcio2edm_params[i+1], m_lcio2edm_params[i], e4h_generic_coll, id_table);
+      } else if (lcio_coll_type_str == "Vertex") {
         convertPut<edm4hep::VertexCollection>(
-          m_lcio2edm_params[i+1], m_lcio2edm_params[i], lcio_converter, id_table);
-      } else if (coll_type_str == "Track") {
+          m_lcio2edm_params[i+1], m_lcio2edm_params[i], e4h_generic_coll, id_table);
+      } else if (lcio_coll_type_str == "Track") {
         convertPut<edm4hep::TrackCollection>(
-          m_lcio2edm_params[i+1], m_lcio2edm_params[i], lcio_converter, id_table);
-      } else if (coll_type_str == "TrackerHit" or coll_type_str == "TrackerHitPlane") {
+          m_lcio2edm_params[i+1], m_lcio2edm_params[i], e4h_generic_coll, id_table);
+      } else if (lcio_coll_type_str == "TrackerHit" or lcio_coll_type_str == "TrackerHitPlane") {
         convertPut<edm4hep::TrackerHitCollection>(
-          m_lcio2edm_params[i+1], m_lcio2edm_params[i], lcio_converter, id_table);
-      } else if (coll_type_str == "SimTrackerHit") {
+          m_lcio2edm_params[i+1], m_lcio2edm_params[i], e4h_generic_coll, id_table);
+      } else if (lcio_coll_type_str == "SimTrackerHit") {
         convertPut<edm4hep::SimTrackerHitCollection>(
-          m_lcio2edm_params[i+1], m_lcio2edm_params[i], lcio_converter, id_table);
-      } else if (coll_type_str == "CalorimeterHit") {
+          m_lcio2edm_params[i+1], m_lcio2edm_params[i], e4h_generic_coll, id_table);
+      } else if (lcio_coll_type_str == "CalorimeterHit") {
         convertPut<edm4hep::CalorimeterHitCollection>(
-          m_lcio2edm_params[i+1], m_lcio2edm_params[i], lcio_converter, id_table);
-      } else if (coll_type_str == "SimCalorimeterHit") {
+          m_lcio2edm_params[i+1], m_lcio2edm_params[i], e4h_generic_coll, id_table);
+      } else if (lcio_coll_type_str == "SimCalorimeterHit") {
         convertPut<edm4hep::SimCalorimeterHitCollection>(
-          m_lcio2edm_params[i+1], m_lcio2edm_params[i], lcio_converter, id_table);
-        // Get associated collection. Name hardcoded in k4LCIOConverter
+          m_lcio2edm_params[i+1], m_lcio2edm_params[i], e4h_generic_coll, id_table);
+        // Get associated collections
+        // This collection name is hardcoded in k4LCIOConverter
         convertPut<edm4hep::CaloHitContributionCollection>(
-          "CaloHitContribution_EXT", "CaloHitContribution_EXT", lcio_converter, id_table);
-      } else if (coll_type_str == "RawCalorimeterHit") {
+          "CaloHitContribution_EXT", "CaloHitContribution_EXT", e4h_generic_coll, id_table);
+      } else if (lcio_coll_type_str == "RawCalorimeterHit") {
         convertPut<edm4hep::RawCalorimeterHitCollection>(
-          m_lcio2edm_params[i+1], m_lcio2edm_params[i], lcio_converter, id_table);
-      } else if (coll_type_str == "TPCHit") {
+          m_lcio2edm_params[i+1], m_lcio2edm_params[i], e4h_generic_coll, id_table);
+      } else if (lcio_coll_type_str == "TPCHit") {
         convertPut<edm4hep::TPCHitCollection>(
-          m_lcio2edm_params[i+1], m_lcio2edm_params[i], lcio_converter, id_table);
-      } else if (coll_type_str == "Cluster") {
+          m_lcio2edm_params[i+1], m_lcio2edm_params[i], e4h_generic_coll, id_table);
+      } else if (lcio_coll_type_str == "Cluster") {
         convertPut<edm4hep::ClusterCollection>(
-          m_lcio2edm_params[i+1], m_lcio2edm_params[i], lcio_converter, id_table);
+          m_lcio2edm_params[i+1], m_lcio2edm_params[i], e4h_generic_coll, id_table);
         // Get associated collection. Name hardcoded in k4LCIOConverter
         convertPut<edm4hep::ParticleIDCollection>(
           "ParticleID_EXT", "ParticleID_EXT", lcio_converter, id_table);
       } else if (coll_type_str == "LCRelation") {
         convertPut<edm4hep::MCRecoTrackerAssociationCollection>(
-          m_lcio2edm_params[i+1], m_lcio2edm_params[i], lcio_converter, id_table);
+          m_lcio2edm_params[i+1], m_lcio2edm_params[i], e4h_generic_coll, id_table);
+      } else if (lcio_coll_type_str == "LCRelation") {
+
+        // Get specific relation type from converted
+        auto e4h_coll_type_str = e4h_generic_coll->getValueTypeName();
+
+        if (e4h_coll_type_str == "edm4hep::MCRecoCaloAssociation") {
+          convertPut<edm4hep::MCRecoCaloAssociationCollection>(
+            m_lcio2edm_params[i+1], m_lcio2edm_params[i], e4h_generic_coll, id_table);
+        } else if (e4h_coll_type_str == "edm4hep::MCRecoTrackerAssociation") {
+          convertPut<edm4hep::MCRecoTrackerAssociationCollection>(
+            m_lcio2edm_params[i+1], m_lcio2edm_params[i], e4h_generic_coll, id_table);
+        } else if (e4h_coll_type_str == "edm4hep::MCRecoParticleAssociation") {
+          convertPut<edm4hep::MCRecoParticleAssociationCollection>(
+            m_lcio2edm_params[i+1], m_lcio2edm_params[i], e4h_generic_coll, id_table);
+        }
+
       } else {
-        error() << coll_type_str << ": conversion type not supported." << endmsg;
+        error() << lcio_coll_type_str << ": conversion type not supported." << endmsg;
       }
     } else {
       debug() << " Collection " << m_lcio2edm_params[i+1] << " already in place, skipping conversion. " << endmsg;
