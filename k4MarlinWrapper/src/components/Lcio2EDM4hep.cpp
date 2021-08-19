@@ -91,9 +91,15 @@ StatusCode Lcio2EDM4hepTool::convertCollections(
   for (int i = 0; i < m_lcio2edm_params.size(); i=i+2) {
     if (! collectionExist(m_lcio2edm_params[i+1])) {
 
-      // Get type string from collection name
-      auto lcio_coll = the_event->getCollection(m_lcio2edm_params[i]);
-      auto lcio_coll_type_str = lcio_coll->getTypeName();
+      std::string lcio_coll_type_str = "";
+      try {
+        // Get type string from collection name
+        auto lcio_coll = the_event->getCollection(m_lcio2edm_params[i]);
+        lcio_coll_type_str = lcio_coll->getTypeName();
+      } catch (const lcio::DataNotAvailableException& ex) {
+        warning() << "Collection " << m_lcio2edm_params[i] << " not found, skipping conversion to EDM4hep" << endmsg;
+        continue;
+      }
 
       // Get EDM4hep converted type
       auto e4h_generic_coll = lcio_converter->getCollection(m_lcio2edm_params[i]);
