@@ -114,8 +114,8 @@ std::shared_ptr<marlin::StringParameters> MarlinProcessorWrapper::parseParameter
   for (const auto& [paramName, paramValues] : parameters) {
     std::vector<std::string> parameterValues = {};
     if (paramName == "Verbosity") {
-      info() << "Setting verbosity to " << paramName << endmsg;
-      verbosity = paramName;
+      info() << "Setting verbosity to " << paramValues[0] << endmsg;
+      verbosity = paramValues[0];
     }
 
     for (auto& value : paramValues) {
