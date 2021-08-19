@@ -41,9 +41,9 @@ private:
 
   template <typename T>
   void convertPut(
-    const std::string& register_name,
-    const std::string& collection_name,
-    k4LCIOConverter* lcio_converter,
+    const std::string& edm_name,
+    const std::string& lcio_name,
+    podio::CollectionBase* generic_coll,
     podio::CollectionIDTable* id_table);
 
 };
