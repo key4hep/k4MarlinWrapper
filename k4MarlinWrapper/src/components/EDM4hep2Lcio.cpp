@@ -1054,7 +1054,7 @@ void EDM4hep2LcioTool::convertAdd(
 {
 
   // Get the associated type to the collection name
-  const auto evt_store = m_podioDataSvc->getCollections();
+  const auto evt_store = m_podioDataSvc->getReadCollections();
   std::string fulltype = "";
 
   for (auto& [name, coll] : evt_store) {
