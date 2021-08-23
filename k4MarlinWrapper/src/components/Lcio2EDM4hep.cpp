@@ -128,8 +128,11 @@ StatusCode Lcio2EDM4hepTool::convertCollections(
       } else if (lcio_coll_type_str == "Track") {
         convertPut<edm4hep::TrackCollection>(
           m_lcio2edm_params[i+1], m_lcio2edm_params[i], e4h_generic_coll, id_table);
-      } else if (lcio_coll_type_str == "TrackerHit" or lcio_coll_type_str == "TrackerHitPlane") {
+      } else if (lcio_coll_type_str == "TrackerHit") {
         convertPut<edm4hep::TrackerHitCollection>(
+          m_lcio2edm_params[i+1], m_lcio2edm_params[i], e4h_generic_coll, id_table);
+      } else if (lcio_coll_type_str == "TrackerHitPlane") {
+        convertPut<edm4hep::TrackerHitPlaneCollection>(
           m_lcio2edm_params[i+1], m_lcio2edm_params[i], e4h_generic_coll, id_table);
       } else if (lcio_coll_type_str == "SimTrackerHit") {
         convertPut<edm4hep::SimTrackerHitCollection>(
@@ -172,6 +175,9 @@ StatusCode Lcio2EDM4hepTool::convertCollections(
             m_lcio2edm_params[i+1], m_lcio2edm_params[i], e4h_generic_coll, id_table);
         } else if (e4h_coll_type_str == "edm4hep::MCRecoParticleAssociation") {
           convertPut<edm4hep::MCRecoParticleAssociationCollection>(
+            m_lcio2edm_params[i+1], m_lcio2edm_params[i], e4h_generic_coll, id_table);
+        } else if (e4h_coll_type_str == "edm4hep::MCRecoCaloParticleAssociation") {
+          convertPut<edm4hep::MCRecoCaloParticleAssociationCollection>(
             m_lcio2edm_params[i+1], m_lcio2edm_params[i], e4h_generic_coll, id_table);
         }
 
