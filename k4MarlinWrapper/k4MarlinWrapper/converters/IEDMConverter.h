@@ -13,6 +13,8 @@
 #include <edm4hep/TrackCollection.h>
 #include <edm4hep/TrackerHit.h>
 #include <edm4hep/TrackerHitCollection.h>
+#include <edm4hep/TrackerHitPlane.h>
+#include <edm4hep/TrackerHitPlaneCollection.h>
 #include <edm4hep/SimTrackerHit.h>
 #include <edm4hep/SimTrackerHitCollection.h>
 #include <edm4hep/CalorimeterHit.h>
@@ -37,6 +39,8 @@
 #include <edm4hep/MCRecoCaloAssociationCollection.h>
 #include <edm4hep/MCRecoParticleAssociation.h>
 #include <edm4hep/MCRecoParticleAssociationCollection.h>
+#include <edm4hep/MCRecoCaloParticleAssociation.h>
+#include <edm4hep/MCRecoCaloParticleAssociationCollection.h>
 
 // LCIO
 #include <lcio.h>
