@@ -91,6 +91,11 @@ StatusCode Lcio2EDM4hepTool::convertCollections(
       if (coll_type_str == "ReconstructedParticle") {
         convertPut<edm4hep::ReconstructedParticleCollection>(
           m_lcio2edm_params[i+1], m_lcio2edm_params[i], lcio_converter, id_table);
+        // Get associated collection. Name hardcoded in k4LCIOConverter
+        convertPut<edm4hep::ParticleIDCollection>(
+          "ParticleID_EXT", "ParticleID_EXT", lcio_converter, id_table);
+        convertPut<edm4hep::VertexCollection>(
+          "Vertex_EXT", "Vertex_EXT", lcio_converter, id_table);
       } else if (coll_type_str == "ParticleID") {
         convertPut<edm4hep::ParticleIDCollection>(
           m_lcio2edm_params[i+1], m_lcio2edm_params[i], lcio_converter, id_table);
@@ -115,8 +120,7 @@ StatusCode Lcio2EDM4hepTool::convertCollections(
       } else if (coll_type_str == "SimCalorimeterHit") {
         convertPut<edm4hep::SimCalorimeterHitCollection>(
           m_lcio2edm_params[i+1], m_lcio2edm_params[i], lcio_converter, id_table);
-        // Get associated collections
-        // This collection name is hardcoded in k4LCIOConverter
+        // Get associated collection. Name hardcoded in k4LCIOConverter
         convertPut<edm4hep::CaloHitContributionCollection>(
           "CaloHitContribution_EXT", "CaloHitContribution_EXT", lcio_converter, id_table);
       } else if (coll_type_str == "RawCalorimeterHit") {
@@ -128,6 +132,9 @@ StatusCode Lcio2EDM4hepTool::convertCollections(
       } else if (coll_type_str == "Cluster") {
         convertPut<edm4hep::ClusterCollection>(
           m_lcio2edm_params[i+1], m_lcio2edm_params[i], lcio_converter, id_table);
+        // Get associated collection. Name hardcoded in k4LCIOConverter
+        convertPut<edm4hep::ParticleIDCollection>(
+          "ParticleID_EXT", "ParticleID_EXT", lcio_converter, id_table);
       } else {
         error() << coll_type_str << ": conversion type not supported." << endmsg;
       }
