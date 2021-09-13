@@ -6,14 +6,7 @@ from copy import deepcopy
 import os
 import re
 
-from xml.etree.ElementTree import ElementTree
-
-
-def getTree(xmlFile):
-  """ parse file and return XML tree """
-  et = ElementTree()
-  et.parse(xmlFile)
-  return et
+from xml.etree.ElementTree import fromstring, ElementTree
 
 
 def getProcessors(tree):
@@ -254,6 +247,10 @@ def generateGaudiSteering(tree):
   return lines
 
 
+def escapeIllegalChars(file_str):
+  return file_str.replace("&", "&amp;")
+
+
 def run():
   args = sys.argv
   if len(args) != 3:
@@ -261,8 +258,11 @@ def run():
     print("convertMarlinSteeringToGaudi.py inputFile.xml outputFile.py")
     exit(1)
 
+  file_str = open(args[1], "r+")
+  escaped_str = escapeIllegalChars(file_str.read())
+
   try:
-    tree = getTree(args[1])
+    tree = ElementTree(fromstring(escaped_str))
   except Exception as ex:
     print("Exception when getting trees: %r " % ex)
     exit(1)
