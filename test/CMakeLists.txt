@@ -59,4 +59,18 @@ if (BASH_PROGRAM)
       ENVIRONMENT k4MarlinWrapper_tests_DIR=${CMAKE_CURRENT_SOURCE_DIR}
       PASS_REGULAR_EXPRESSION "INFO Application Manager Terminated successfully")
 
+  # Test indicating -1 to go over all events
+  add_test( all_events_bounds ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/all_events_bounds.sh )
+  set_tests_properties ( all_events_bounds
+    PROPERTIES
+      ENVIRONMENT k4MarlinWrapper_tests_DIR=${CMAKE_CURRENT_SOURCE_DIR}
+      PASS_REGULAR_EXPRESSION "INFO Application Manager Terminated successfully")
+
+  # Test putting more events than available, stopping on last available event gracefully
+  add_test( over_total_events ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/over_total_events.sh )
+  set_tests_properties ( over_total_events
+    PROPERTIES
+      ENVIRONMENT k4MarlinWrapper_tests_DIR=${CMAKE_CURRENT_SOURCE_DIR}
+      PASS_REGULAR_EXPRESSION "INFO Application Manager Terminated successfully")
+
 endif(BASH_PROGRAM)

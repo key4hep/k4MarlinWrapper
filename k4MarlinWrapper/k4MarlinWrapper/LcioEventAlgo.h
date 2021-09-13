@@ -32,6 +32,7 @@
 #include <memory>
 
 #include <GaudiAlg/GaudiAlgorithm.h>
+#include <GaudiKernel/IEventProcessor.h>
 
 #include <EVENT/LCIO.h>
 #include <IOIMPL/LCFactory.h>
