@@ -248,7 +248,7 @@ def generateGaudiSteering(tree):
 
 
 def escapeIllegalChars(file_str):
-  return file_str.replace("&", "&amp;")
+  return file_str.replace("&&", "&amp;&amp;")
 
 
 def run():
