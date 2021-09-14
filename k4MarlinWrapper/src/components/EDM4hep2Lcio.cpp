@@ -1054,7 +1054,18 @@ void EDM4hep2LcioTool::convertAdd(
 {
 
   // Get the associated type to the collection name
-  const auto evt_store = m_podioDataSvc->getReadCollections();
+  auto evt_store_read = m_podioDataSvc->getReadCollections();
+  auto evt_store = m_podioDataSvc->getCollections();
+
+  // Merge collections and readcollections into one
+  evt_store.insert(evt_store.end(), evt_store_read.begin(), evt_store_read.end());
+  // Remove possible duplicates
+  auto end = evt_store.end();
+  for (auto it = evt_store.begin(); it != end; ++it) {
+    end = std::remove(it + 1, end, *it);
+  }
+  evt_store.erase(end, evt_store.end());
+
   std::string fulltype = "";
 
   for (auto& [name, coll] : evt_store) {
