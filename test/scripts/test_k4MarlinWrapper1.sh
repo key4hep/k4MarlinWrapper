@@ -9,4 +9,4 @@ if [ ! -f $k4MarlinWrapper_tests_DIR/inputFiles/muons.slcio ]; then
   wget https://github.com/AIDASoft/DD4hep/raw/master/DDTest/inputFiles/muons.slcio -P $k4MarlinWrapper_tests_DIR/inputFiles/
 fi
 
-../run gaudirun.py $k4MarlinWrapper_tests_DIR/gaudi_opts/test_k4MarlinWrapper1.py
+../run k4run $k4MarlinWrapper_tests_DIR/gaudi_opts/test_k4MarlinWrapper1.py
