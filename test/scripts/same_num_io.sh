@@ -14,7 +14,7 @@ fi
 input_num_events=$(lcio_event_counter $k4MarlinWrapper_tests_DIR/inputFiles/muons.slcio)
 output_num_events=$(lcio_event_counter Output_DST.slcio)
 
-if [ "$input_num_events" == "$output_num_events" ] || [ "$input_num_events" == 10 ]; then
+if [ "$input_num_events" == "$output_num_events" ]; then
   echo "Input and output have same number of events"
 else
   echo "ERROR: different number of events for input and output"
