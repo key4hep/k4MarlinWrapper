@@ -207,6 +207,11 @@ void EDM4hep2LcioTool::convertSimTrackerHits(
 
   auto* simtrackerhits = new lcio::LCCollectionVec(lcio::LCIO::SIMTRACKERHIT);
 
+  auto collID = simtrackerhits_coll->getID();
+  const auto cellIDstr = simtrackerhits_handle.getCollMetadataCellID(collID);
+
+  lcio::ILDCellIDEncoder<lcio::SimTrackerHitImpl> idEnc( cellIDstr, simtrackerhits);
+
   // Loop over EDM4hep simtrackerhits converting them to LCIO simtrackerhits
   for (const auto& edm_strh : (*simtrackerhits_coll)) {
     if (edm_strh.isAvailable()) {
