@@ -209,8 +209,9 @@ void EDM4hep2LcioTool::convertSimTrackerHits(
 
   auto collID = simtrackerhits_coll->getID();
   const auto cellIDstr = simtrackerhits_handle.getCollMetadataCellID(collID);
-
-  lcio::ILDCellIDEncoder<lcio::SimTrackerHitImpl> idEnc( cellIDstr, simtrackerhits);
+  if (cellIDstr != "") {
+    lcio::ILDCellIDEncoder<lcio::SimTrackerHitImpl> idEnc( cellIDstr, simtrackerhits);
+  }
 
   // Loop over EDM4hep simtrackerhits converting them to LCIO simtrackerhits
   for (const auto& edm_strh : (*simtrackerhits_coll)) {
@@ -374,8 +375,9 @@ void EDM4hep2LcioTool::convertSimCalorimeterHits(
 
   auto collID = simcalohit_coll->getID();
   const auto cellIDstr = sim_calohit_handle.getCollMetadataCellID(collID);
-
-  lcio::ILDCellIDEncoder<lcio::SimCalorimeterHitImpl> idEnc( cellIDstr, simcalohits );
+  if (cellIDstr != "") {
+    lcio::ILDCellIDEncoder<lcio::SimCalorimeterHitImpl> idEnc( cellIDstr, simcalohits );
+  }
 
   for (const auto& edm_sim_calohit : (*simcalohit_coll)) {
     if (edm_sim_calohit.isAvailable()) {
