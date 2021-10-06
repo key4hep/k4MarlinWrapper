@@ -22,4 +22,4 @@ jobs:
     - name: Compile k4MarlinWrapper and run test
       run: |
         source ${{ matrix.SETUP }};\
-        docker exec k4MarlinWrapper_CI /bin/bash -c "./k4MarlinWrapper/.github/scripts/k4MarlinWrapper_build_and_test.sh"
+        docker exec k4MarlinWrapper_CI /bin/bash -c "/k4MarlinWrapper/.github/scripts/k4MarlinWrapper_build_and_test.sh"
