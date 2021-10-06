@@ -5,6 +5,10 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-18.04
+    strategy:
+      fail-fast: false
+      matrix:
+        SETUP: ['/cvmfs/sw.hsf.org/key4hep/setup.sh', '/cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh']
     steps:
     - uses: actions/checkout@v2
     - uses: cvmfs-contrib/github-action-cvmfs@v2
@@ -17,4 +21,5 @@ jobs:
             -d clicdp/cc7-lcg96b /bin/bash
     - name: Compile k4MarlinWrapper and run test
       run: |
+        source ${{ matrix.SETUP }};\
         docker exec k4MarlinWrapper_CI /bin/bash -c "./k4MarlinWrapper/.github/scripts/k4MarlinWrapper_build_and_test.sh"
