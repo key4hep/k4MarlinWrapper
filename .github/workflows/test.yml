@@ -21,7 +21,8 @@ jobs:
           -d clicdp/cc7-lcg /bin/bash
     - name: Setup container
       run: |
-        docker exec k4MW_CI /bin/bash -c 'source ${{ matrix.SETUP }};\
+        docker exec k4MW_CI /bin/bash -c 'ln -s /usr/lib64/liblzma.so.5.2.2 /usr/lib64/liblzma.so;\
+        source ${{ matrix.SETUP }};\
         yum -y install make git wget\
         '
 
