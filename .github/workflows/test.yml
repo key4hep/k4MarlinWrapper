@@ -12,14 +12,31 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: cvmfs-contrib/github-action-cvmfs@v2
-    - name: Start containers
+    - name: Start container
       run: |
         docker run \
-            -it --name k4MarlinWrapper_CI \
-            -v ${{ github.workspace }}:/k4MarlinWrapper \
-            -v /cvmfs:/cvmfs:shared \
-            -d clicdp/cc7-lcg96b /bin/bash
-    - name: Compile k4MarlinWrapper and run test
+          -it --name k4MW_CI \
+          -v ${{ github.workspace }}:/k4MW \
+          -v /cvmfs:/cvmfs:shared \
+          -d clicdp/cc7-lcg /bin/bash
+    - name: Setup container
       run: |
-        source ${{ matrix.SETUP }};\
-        docker exec k4MarlinWrapper_CI /bin/bash -c "/k4MarlinWrapper/.github/scripts/k4MarlinWrapper_build_and_test.sh"
+        docker exec k4MW_CI /bin/bash -c 'source ${{ matrix.SETUP }};\
+        yum -y install make git wget\
+        '
+
+    - name: Compile
+      run: |
+        docker exec k4MW_CI /bin/bash -c 'source ${{ matrix.SETUP }};\
+        cd k4MW;/
+        mkdir build install; cd build;\
+        cmake -G Ninja -D CMAKE_INSTALL_PREFIX=$PWD/../install -D CMAKE_BUILD_TYPE=RelWithDebInfo ..;\
+        ninja install;\
+        '
+
+    - name: Run tests (CTest)
+      run: |
+        docker exec k4MW_CI /bin/bash -c 'source ${{ matrix.SETUP }};\
+        cd k4MW/build;\
+        ctest --verbose --output-on-failure;\
+        '
