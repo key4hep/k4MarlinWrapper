@@ -11,10 +11,14 @@ jobs:
     - name: Start container
       run: |
         docker run \
-          -it --name CI_container \
-          -v ${{ github.workspace }}:/Package \
+          -it --name k4MW_CI \
+          -v ${{ github.workspace }}:/k4MW \
           -v /cvmfs:/cvmfs:shared \
-          -d clicdp/cc7-lcg96b /bin/bash
+          -d clicdp/cc7-lcg /bin/bash
+
     - name: Check Format
       run: |
-        docker exec CI_container /bin/bash -c "./Package/.github/scripts/clang_format_check.sh"
+        docker exec k4MW_CI /bin/bash -c 'source /cvmfs/sft.cern.ch/lcg/releases/clang/10.0.0-62e61/x86_64-centos7/setup.sh\
+        clang-format -Werror --verbose --dry-run --style=file  $(find ./k4MW/ -name "*.cpp" -o -name "*.h" )\
+        exit $?\
+        '
