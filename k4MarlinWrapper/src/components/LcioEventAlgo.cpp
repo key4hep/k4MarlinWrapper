@@ -21,14 +21,14 @@
 
 #include "k4MarlinWrapper/LcioEventAlgo.h"
 
-
 DECLARE_COMPONENT(LcioEvent)
 
 LcioEvent::LcioEvent(const std::string& name, ISvcLocator* pSL) : GaudiAlgorithm(name, pSL) {}
 
 StatusCode LcioEvent::initialize() {
   StatusCode sc = GaudiAlgorithm::initialize();
-  if (sc.isFailure()) return sc;
+  if (sc.isFailure())
+    return sc;
 
   m_reader = IOIMPL::LCFactory::getInstance()->createLCReader();
   m_reader->open(m_fileNames);
@@ -42,15 +42,16 @@ StatusCode LcioEvent::execute() {
   if (theEvent == nullptr) {
     // If no next event, abort execution
     IEventProcessor* eventProcessor;
-    auto sc2 = service("ApplicationMgr", eventProcessor);
-    sc2 = eventProcessor->stopRun();
+    auto             sc2 = service("ApplicationMgr", eventProcessor);
+    sc2                  = eventProcessor->stopRun();
     return sc2;
   }
 
-  // pass theEvent to the DataStore, so we can access them in our processor wrappers
+  // pass theEvent to the DataStore, so we can access them in our processor
+  // wrappers
   info() << "Reading from file: " << m_fileNames[0] << endmsg;
 
-  auto pO = std::make_unique<LCEventWrapper>(theEvent);
+  auto             pO = std::make_unique<LCEventWrapper>(theEvent);
   const StatusCode sc = eventSvc()->registerObject("/Event/LCEvent", pO.release());
   if (sc.isFailure()) {
     error() << "Failed to store the LCEvent" << endmsg;

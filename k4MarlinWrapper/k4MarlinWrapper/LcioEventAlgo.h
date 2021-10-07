@@ -25,7 +25,8 @@
 #define K4MARLINWRAPPER_LCIOEVENTALGO_H
 
 /***
- * LCEventAlgo: place the LCEvent from lcio file in the Gaudi Datastore for later retrieval by wrapped Marlin Processors
+ * LCEventAlgo: place the LCEvent from lcio file in the Gaudi Datastore for
+ * later retrieval by wrapped Marlin Processors
  */
 
 #include <iostream>
@@ -38,7 +39,6 @@
 #include <IOIMPL/LCFactory.h>
 
 #include "k4MarlinWrapper/LCEventWrapper.h"
-
 
 class LcioEvent : public GaudiAlgorithm {
 public:
