@@ -31,10 +31,10 @@
 class LCEventWrapper : public DataObject {
 public:
   // Set delete_event to true when manually creating the LCEvent
-  LCEventWrapper(EVENT::LCEvent* theEvent, bool delete_event=false) :
-    m_event(theEvent), m_delete_event(delete_event) {}
+  LCEventWrapper(EVENT::LCEvent* theEvent, bool delete_event = false)
+      : m_event(theEvent), m_delete_event(delete_event) {}
 
-  ~LCEventWrapper(){
+  ~LCEventWrapper() {
     if (m_delete_event) {
       delete m_event;
     }
@@ -43,8 +43,8 @@ public:
   EVENT::LCEvent* getEvent() const { return m_event; }
 
 private:
-  EVENT::LCEvent* m_event = nullptr;
-  bool m_delete_event = false;
+  EVENT::LCEvent* m_event        = nullptr;
+  bool            m_delete_event = false;
 };
 
 #endif
