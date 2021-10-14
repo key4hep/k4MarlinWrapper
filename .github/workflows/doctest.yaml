@@ -19,11 +19,6 @@ jobs:
     - name: Setup container
       run: |
         docker exec CI_container /bin/bash -c ' ln -s /usr/lib64/liblzma.so.5.2.2 /usr/lib64/liblzma.so;\
-        source ${{ matrix.SETUP }};\
-        pip3 install jupytext;\
-        pip3 install --upgrade jupyter;\
-        python -m ipykernel install --name python3;\
-        python -m ipykernel install --name bash;\
         '
 
     - name: Compile
@@ -40,7 +35,6 @@ jobs:
         docker exec CI_container /bin/bash -c 'cd ./Package;\
         source ${{ matrix.SETUP }};\
         source build/k4marlinwrapperenv.sh;\
-        export PATH=$HOME/.local/bin/:$PATH;\
         cat .github/scripts/yamlheader.md  ${{ matrix.PAGE }}.md > ${{ matrix.PAGE }}-test.md;\
         testfilename=$(basename ${{ matrix.PAGE }}-test.md);\
         testdirname=$(dirname ${{ matrix.PAGE }}-test.md);\
