@@ -53,6 +53,17 @@ void Lcio2EDM4hepTool::convertPut(const std::string& edm_name, const std::string
   }
 }
 
+
+void Lcio2EDM4hepTool::convertMDCellID (
+  lcio::LCCollection* lcio_coll,
+  unsigned int e4h_coll_id
+) {
+  std::string cellid_str = lcio_coll->getParameters().getStringVal(lcio::LCIO::CellIDEncoding);
+  auto& coll_md = m_podioDataSvc->getProvider().getCollectionMetaData(e4h_coll_id);
+  coll_md.setValue("CellIDEncodingString", cellid_str);
+}
+
+
 bool Lcio2EDM4hepTool::collectionExist(const std::string& collection_name) {
   auto collections = m_podioDataSvc->getCollections();
   for (const auto& [name, coll] : collections) {
@@ -80,9 +91,10 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
   for (int i = 0; i < m_lcio2edm_params.size(); i = i + 2) {
     if (!collectionExist(m_lcio2edm_params[i + 1])) {
       std::string lcio_coll_type_str = "";
+      lcio::LCCollection* lcio_coll = nullptr;
       try {
         // Get type string from collection name
-        auto lcio_coll     = the_event->getCollection(m_lcio2edm_params[i]);
+        lcio_coll     = the_event->getCollection(m_lcio2edm_params[i]);
         lcio_coll_type_str = lcio_coll->getTypeName();
       } catch (const lcio::DataNotAvailableException& ex) {
         warning() << "Collection " << m_lcio2edm_params[i] << " not found, skipping conversion to EDM4hep" << endmsg;
@@ -117,18 +129,23 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
       } else if (lcio_coll_type_str == "TrackerHit") {
         convertPut<edm4hep::TrackerHitCollection>(m_lcio2edm_params[i + 1], m_lcio2edm_params[i], e4h_generic_coll,
                                                   id_table);
+        convertMDCellID(lcio_coll, e4h_generic_coll->getID());
       } else if (lcio_coll_type_str == "TrackerHitPlane") {
         convertPut<edm4hep::TrackerHitPlaneCollection>(m_lcio2edm_params[i + 1], m_lcio2edm_params[i], e4h_generic_coll,
                                                        id_table);
+        convertMDCellID(lcio_coll, e4h_generic_coll->getID());
       } else if (lcio_coll_type_str == "SimTrackerHit") {
         convertPut<edm4hep::SimTrackerHitCollection>(m_lcio2edm_params[i + 1], m_lcio2edm_params[i], e4h_generic_coll,
                                                      id_table);
+        convertMDCellID(lcio_coll, e4h_generic_coll->getID());
       } else if (lcio_coll_type_str == "CalorimeterHit") {
         convertPut<edm4hep::CalorimeterHitCollection>(m_lcio2edm_params[i + 1], m_lcio2edm_params[i], e4h_generic_coll,
                                                       id_table);
+        convertMDCellID(lcio_coll, e4h_generic_coll->getID());
       } else if (lcio_coll_type_str == "SimCalorimeterHit") {
         convertPut<edm4hep::SimCalorimeterHitCollection>(m_lcio2edm_params[i + 1], m_lcio2edm_params[i],
                                                          e4h_generic_coll, id_table);
+        convertMDCellID(lcio_coll, e4h_generic_coll->getID());
         // Get associated collections
         // This collection name is hardcoded in k4LCIOConverter
         convertPut<edm4hep::CaloHitContributionCollection>("CaloHitContribution_EXT", "CaloHitContribution_EXT",

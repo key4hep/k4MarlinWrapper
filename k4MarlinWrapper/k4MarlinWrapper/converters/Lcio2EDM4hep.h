@@ -32,6 +32,8 @@ private:
   ServiceHandle<IDataProviderSvc> m_eds;
   PodioDataSvc*                   m_podioDataSvc;
 
+  void convertMDCellID(lcio::LCCollection* lcio_coll, unsigned int e4h_coll_id);
+
   bool collectionExist(const std::string& collection_name);
 
   template <typename T>
