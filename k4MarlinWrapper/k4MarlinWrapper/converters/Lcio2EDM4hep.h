@@ -25,20 +25,18 @@ public:
   StatusCode convertCollections(lcio::LCEventImpl* lcio_event);
 
 private:
-  Gaudi::Property<std::vector<std::string>> m_lcio2edm_params{this, "Parameters", {}};
+  Gaudi::Property<std::vector<std::string>> m_params{this, "Parameters", {}};
 
   std::map<std::string, DataObjectHandleBase*> m_dataHandlesMap;
 
   ServiceHandle<IDataProviderSvc> m_eds;
   PodioDataSvc*                   m_podioDataSvc;
 
-  void convertMDCellID(lcio::LCCollection* lcio_coll, unsigned int e4h_coll_id);
-
   bool collectionExist(const std::string& collection_name);
 
   template <typename T>
-  void convertPut(const std::string& edm_name, const std::string& lcio_name, podio::CollectionBase* generic_coll,
-                  podio::CollectionIDTable* id_table);
+  void convertRegister(const std::string& edm_name, const std::string& lcio_name, k4LCIOConverter* lcio_conver,
+                       const lcio::LCCollection* const lcio_coll, const bool cnv_metadata = false);
 };
 
 #endif
