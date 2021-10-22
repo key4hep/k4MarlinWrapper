@@ -51,9 +51,22 @@ void Lcio2EDM4hepTool::convertRegister(const std::string& edm_name, const std::s
 
   // Convert Metadata
   if (cnv_metadata) {
-    std::string lcio_coll_cellid_str = lcio_coll->getParameters().getStringVal(lcio::LCIO::CellIDEncoding);
-    auto&       e4h_coll_md          = m_podioDataSvc->getProvider().getCollectionMetaData(e4h_generic_coll->getID());
-    e4h_coll_md.setValue("CellIDEncodingString", lcio_coll_cellid_str);
+    // int params_size = lcio_coll->getParameters().size();
+
+    std::vector<std::string> string_keys = {};
+    lcio_coll->getParameters().getStringKeys(string_keys);
+
+    auto& e4h_coll_md = m_podioDataSvc->getProvider().getCollectionMetaData(e4h_generic_coll->getID());
+
+    for (auto& elem : string_keys) {
+      if (elem == "CellIDEncoding") {
+        std::string lcio_coll_cellid_str = lcio_coll->getParameters().getStringVal(lcio::LCIO::CellIDEncoding);
+        e4h_coll_md.setValue(elem.append("String"), lcio_coll_cellid_str);
+      } else {
+        std::string lcio_coll_value = lcio_coll->getParameters().getStringVal(elem);
+        e4h_coll_md.setValue(elem, lcio_coll_value);
+      }
+    }
   }
 
   // Cast to specific type based on typename
