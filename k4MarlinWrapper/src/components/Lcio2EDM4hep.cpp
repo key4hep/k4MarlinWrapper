@@ -109,7 +109,7 @@ bool Lcio2EDM4hepTool::collectionExist(const std::string& collection_name) {
 // **********************************
 StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
   // Set the event to the converter
-  podio::CollectionIDTable* id_table       = new podio::CollectionIDTable();
+  podio::CollectionIDTable* id_table       = m_podioDataSvc->getCollectionIDs();
   k4LCIOConverter*          lcio_converter = new k4LCIOConverter(id_table);
   lcio_converter->set(the_event);
 
