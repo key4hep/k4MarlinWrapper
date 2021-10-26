@@ -60,7 +60,7 @@
 #include <IMPL/TrackerHitImpl.h>
 #include <IMPL/VertexImpl.h>
 #include <LCIOSTLTypes.h>
-#include <UTIL/ILDConf.h>
+#include <UTIL/CellIDEncoder.h>
 #include <lcio.h>
 
 class IEDMConverter : virtual public IAlgTool {
