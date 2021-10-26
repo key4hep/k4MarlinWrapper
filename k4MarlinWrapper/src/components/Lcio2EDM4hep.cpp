@@ -173,9 +173,6 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
         // Get associated collection. Name hardcoded in k4LCIOConverter
         convertRegister<edm4hep::ParticleIDCollection>("ParticleID_EXT", "ParticleID_EXT", lcio_converter, lcio_coll);
       } else if (lcio_coll_type_str == "LCRelation") {
-        convertRegister<edm4hep::MCRecoTrackerAssociationCollection>(m_params[i + 1], m_params[i], lcio_converter,
-                                                                     lcio_coll);
-      } else if (lcio_coll_type_str == "LCRelation") {
         // Get specific relation type from converted
         auto e4h_coll_type_str = lcio_converter->getCollection(m_params[i])->getValueTypeName();
 
