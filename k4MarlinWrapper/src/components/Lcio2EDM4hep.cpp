@@ -42,6 +42,8 @@ template <typename T>
 void Lcio2EDM4hepTool::convertRegister(const std::string& edm_name, const std::string& lcio_name,
                                        k4LCIOConverter* lcio_converter, const lcio::LCCollection* const lcio_coll,
                                        const bool cnv_metadata) {
+  debug() << "Converting collection: " << lcio_name << " from LCIO to EDM4hep " << edm_name << endmsg;
+
   // Convert and get EDM4hep collection
   auto e4h_generic_coll = lcio_converter->getCollection(lcio_name);
   if (e4h_generic_coll == nullptr) {
@@ -80,10 +82,32 @@ void Lcio2EDM4hepTool::convertRegister(const std::string& edm_name, const std::s
   // Manually register object instead of using DataHandle
   DataWrapper<T>* wrapper = new DataWrapper<T>();
   wrapper->setData(mycoll);
-  StatusCode sc = m_podioDataSvc->registerObject("/Event", "/" + std::string(edm_name), wrapper);
-  if (sc == StatusCode::FAILURE) {
-    error() << "Error registering collection " << edm_name << endmsg;
-    return;
+
+  // Check if collection was already registered
+  auto collections      = m_podioDataSvc->getCollections();
+  auto read_collections = m_podioDataSvc->getReadCollections();
+  bool is_registered    = false;
+  for (auto& coll : collections) {
+    if (coll.first == edm_name) {
+      is_registered = true;
+      return;
+    }
+  }
+  for (auto& coll : read_collections) {
+    if (coll.first == edm_name) {
+      is_registered = true;
+      return;
+    }
+  }
+
+  if (is_registered == false) {
+    StatusCode sc = m_podioDataSvc->registerObject("/Event", "/" + std::string(edm_name), wrapper);
+    if (sc == StatusCode::FAILURE) {
+      error() << "Error registering collection " << edm_name << endmsg;
+      return;
+    }
+  } else {
+    debug() << "Collection " << edm_name << " was already registered" << endmsg;
   }
 }
 
@@ -136,8 +160,8 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
         convertRegister<edm4hep::ReconstructedParticleCollection>(m_params[i + 1], m_params[i], lcio_converter,
                                                                   lcio_coll);
         // Get associated collection. Name hardcoded in k4LCIOConverter
-        convertRegister<edm4hep::ParticleIDCollection>("ParticleID_EXT", "ParticleID_EXT", lcio_converter, lcio_coll);
-        convertRegister<edm4hep::VertexCollection>("Vertex_EXT", "Vertex_EXT", lcio_converter, lcio_coll);
+        convertRegister<edm4hep::ParticleIDCollection>("ParticleID_EXT", "ParticleID_EXT", lcio_converter, nullptr);
+        convertRegister<edm4hep::VertexCollection>("Vertex_EXT", "Vertex_EXT", lcio_converter, nullptr);
       } else if (lcio_coll_type_str == "ParticleID") {
         convertRegister<edm4hep::ParticleIDCollection>(m_params[i + 1], m_params[i], lcio_converter, lcio_coll);
       } else if (lcio_coll_type_str == "MCParticle") {
@@ -163,7 +187,7 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
         // Get associated collections
         // This collection name is hardcoded in k4LCIOConverter
         convertRegister<edm4hep::CaloHitContributionCollection>("CaloHitContribution_EXT", "CaloHitContribution_EXT",
-                                                                lcio_converter, lcio_coll);
+                                                                lcio_converter, nullptr);
       } else if (lcio_coll_type_str == "RawCalorimeterHit") {
         convertRegister<edm4hep::RawCalorimeterHitCollection>(m_params[i + 1], m_params[i], lcio_converter, lcio_coll);
       } else if (lcio_coll_type_str == "TPCHit") {
@@ -171,7 +195,7 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
       } else if (lcio_coll_type_str == "Cluster") {
         convertRegister<edm4hep::ClusterCollection>(m_params[i + 1], m_params[i], lcio_converter, lcio_coll);
         // Get associated collection. Name hardcoded in k4LCIOConverter
-        convertRegister<edm4hep::ParticleIDCollection>("ParticleID_EXT", "ParticleID_EXT", lcio_converter, lcio_coll);
+        convertRegister<edm4hep::ParticleIDCollection>("ParticleID_EXT", "ParticleID_EXT", lcio_converter, nullptr);
       } else if (lcio_coll_type_str == "LCRelation") {
         // Get specific relation type from converted
         auto e4h_coll_type_str = lcio_converter->getCollection(m_params[i])->getValueTypeName();
@@ -197,6 +221,8 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
       debug() << "EDM4hep Collection " << m_params[i + 1] << " already in place, skipping conversion." << endmsg;
     }
   }
+
+  delete (lcio_converter);
 
   return StatusCode::SUCCESS;
 }
