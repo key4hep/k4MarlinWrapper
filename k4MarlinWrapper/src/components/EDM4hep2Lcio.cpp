@@ -124,6 +124,12 @@ void EDM4hep2LcioTool::convertTrackerHits(vec_pair<lcio::TrackerHitImpl*, edm4he
 
   auto* trackerhits = new lcio::LCCollectionVec(lcio::LCIO::TRACKERHIT);
 
+  auto       collID    = trackerhits_coll->getID();
+  const auto cellIDstr = trackerhits_handle.getCollMetadataCellID(collID);
+  if (cellIDstr != "") {
+    lcio::CellIDEncoder<lcio::SimCalorimeterHitImpl> idEnc(cellIDstr, trackerhits);
+  }
+
   // Loop over EDM4hep trackerhits converting them to lcio trackerhits
   for (const auto& edm_trh : (*trackerhits_coll)) {
     if (edm_trh.isAvailable()) {
