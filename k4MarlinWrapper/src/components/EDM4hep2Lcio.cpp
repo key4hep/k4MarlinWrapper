@@ -235,6 +235,12 @@ void EDM4hep2LcioTool::convertCalorimeterHits(
 
   auto* calohits = new lcio::LCCollectionVec(lcio::LCIO::CALORIMETERHIT);
 
+  auto       collID    = calohit_coll->getID();
+  const auto cellIDstr = calohit_handle.getCollMetadataCellID(collID);
+  if (cellIDstr != "") {
+    lcio::CellIDEncoder<lcio::SimCalorimeterHitImpl> idEnc(cellIDstr, calohits);
+  }
+
   for (const auto& edm_calohit : (*calohit_coll)) {
     if (edm_calohit.isAvailable()) {
       auto* lcio_calohit = new lcio::CalorimeterHitImpl();
