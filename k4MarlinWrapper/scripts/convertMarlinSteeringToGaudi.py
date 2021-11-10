@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 from __future__ import absolute_import, unicode_literals, print_function
 
-import sys
 from copy import deepcopy
-import os
 import re
+import sys
 
 from xml.etree.ElementTree import fromstring, ElementTree
 
@@ -251,24 +250,25 @@ def escapeIllegalChars(file_str):
   return file_str.replace("&&", "&amp;&amp;")
 
 
-def run():
-  args = sys.argv
-  if len(args) != 3:
-    print("incorrect number of input files, need one marlin steering files as argument")
-    print("convertMarlinSteeringToGaudi.py inputFile.xml outputFile.py")
-    exit(1)
-
-  file_str = open(args[1], "r+")
-  escaped_str = escapeIllegalChars(file_str.read())
+def run(inputfile, outputfile):
+  with open(inputfile, "r+") as infile:
+    escaped_str = escapeIllegalChars(infile.read())
 
   try:
     tree = ElementTree(fromstring(escaped_str))
   except Exception as ex:
     print("Exception when getting trees: %r " % ex)
-    exit(1)
+    sys.exit(1)
 
-  wf_file = open(args[2], 'w')
-  wf_file.write("\n".join(generateGaudiSteering(tree)))
+  with open(outputfile, 'w') as wf_file:
+    wf_file.write("\n".join(generateGaudiSteering(tree)))
+
 
 if __name__ == "__main__":
-  run()
+  import argparse
+  parser = argparse.ArgumentParser(description='Script to convert Marlin XML steering files into Gaudi python option files')
+  parser.add_argument('inputfile', help='Input Marlin XML steering file to convert')
+  parser.add_argument('outputfile', help='Output Gaudi options python file')
+
+  args = parser.parse_args()
+  run(args.inputfile, args.outputfile)
