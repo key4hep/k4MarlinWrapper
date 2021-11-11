@@ -72,8 +72,6 @@ gaudi_add_module(EDM4hep2Lcio
 
 target_include_directories(EDM4hep2Lcio PUBLIC
   ${CMAKE_SOURCE_DIR}/k4MarlinWrapper
-  k4FWCore::k4FWCore
-  EDM4HEP::edm4hep
   ${LCIO_INCLUDE_DIRS}
 )
 
@@ -92,7 +90,5 @@ gaudi_add_module(Lcio2EDM4hep
 
 target_include_directories(Lcio2EDM4hep PUBLIC
   ${CMAKE_SOURCE_DIR}/k4MarlinWrapper
-  k4FWCore::k4FWCore
-  EDM4HEP::edm4hep
   ${LCIO_INCLUDE_DIRS}
 )
