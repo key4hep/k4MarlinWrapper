@@ -48,16 +48,12 @@ include(cmake/compiler_output.cmake)
 
 include(GNUInstallDirs)
 
-find_package(ROOT 6.0 REQUIRED)
+find_package(Gaudi REQUIRED)
 find_package(LCIO REQUIRED)
 find_package(Marlin REQUIRED)
-find_package(Gaudi REQUIRED)
-
-find_package(k4FWCore)
-find_package(podio)
-find_package(EDM4HEP)
-
-find_package(k4LCIOReader)
+find_package(EDM4HEP REQUIRED)
+find_package(k4FWCore REQUIRED)
+find_package(k4LCIOReader REQUIRED)
 
 include(CTest)
 
