@@ -133,7 +133,7 @@ bool Lcio2EDM4hepTool::collectionExist(const std::string& collection_name) {
 // Convert all collections indicated in Tool parameters
 // Some collections implicitly convert associated collections, as for
 // key4hep/k4LCIOReader
-// Convert assoicated collections from LCRelation for existing EDM4hep relations
+// Convert associated collections from LCRelation for existing EDM4hep relations
 // **********************************
 StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
   // Set the event to the converter
