@@ -20,6 +20,7 @@
  *   or submit itself to any jurisdiction.
  *
  */
+#include "GaudiKernel/IRndmEngine.h"
 
 #include "k4MarlinWrapper/MarlinProcessorWrapper.h"
 
@@ -132,7 +133,7 @@ StatusCode MarlinProcessorWrapper::instantiateProcessor(std::shared_ptr<marlin::
                                                         Gaudi::Property<std::string>&              processorTypeStr) {
   auto processorType = marlin::ProcessorMgr::instance()->getProcessor(processorTypeStr);
   if (not processorType) {
-    error() << " Failed to instantiate " << name() << endmsg;
+    error() << " Failed to instantiate " << name() << " because processor type could not be determined" << endmsg;
     return StatusCode::FAILURE;
   }
   m_processor = processorType->newProcessor();
@@ -155,8 +156,25 @@ StatusCode MarlinProcessorWrapper::initialize() {
     streamlog::out.init(std::cout, "k4MarlinWrapper");
     marlin::Global::parameters = new marlin::StringParameters();
     marlin::Global::parameters->add("AllowToModifyEvent", {"true"});
-    marlin::Global::parameters->add("RandomSeed", {"123456"});
-    // marlin::Global::EVENTSEEDER = new marlin::ProcessorEventSeeder() ;
+
+    // From GaudiExamples/EvtColAlg
+    Assert(randSvc() != 0, "Random Service not available");
+    std::vector<long> rngSeeds;
+    if (randSvc()->engine()->seeds(rngSeeds).isFailure()) {
+      error() << "Cannot get seeds from Random Service" << endmsg;
+      return StatusCode::FAILURE;
+    }
+    debug() << "Got the following seeds from the random service: ";
+    for (const auto s : rngSeeds) {
+      debug() << s << " ";
+    }
+    debug() << endmsg;
+
+    if (!rngSeeds.empty()) {
+      info() << "Setting global Marlin random seed to " << rngSeeds[0] << endmsg;
+      marlin::Global::parameters->add("RandomSeed", {std::to_string(rngSeeds[0])});
+    }
+
     if (loadProcessorLibraries().isFailure()) {
       return StatusCode::FAILURE;
     }
