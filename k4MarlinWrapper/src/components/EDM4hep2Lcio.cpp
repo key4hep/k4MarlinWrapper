@@ -936,17 +936,7 @@ void EDM4hep2LcioTool::FillMissingCollections(CollectionsPairVectors& collection
 void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::string& lcio_coll_name,
                                   lcio::LCEventImpl* lcio_event, CollectionsPairVectors& collection_pairs) {
   // Get the associated type to the collection name
-  auto evt_store_read = m_podioDataSvc->getReadCollections();
   auto evt_store      = m_podioDataSvc->getCollections();
-
-  // Merge collections and readcollections into one
-  evt_store.insert(evt_store.end(), evt_store_read.begin(), evt_store_read.end());
-  // Remove possible duplicates
-  auto end = evt_store.end();
-  for (auto it = evt_store.begin(); it != end; ++it) {
-    end = std::remove(it + 1, end, *it);
-  }
-  evt_store.erase(end, evt_store.end());
 
   std::string fulltype = "";
 

@@ -65,15 +65,8 @@ void Lcio2EDM4hepTool::convertRegister(const std::string& edm_name, const std::s
 
   // Check if collection was already registered
   auto collections      = m_podioDataSvc->getCollections();
-  auto read_collections = m_podioDataSvc->getReadCollections();
   bool is_registered    = false;
   for (auto& coll : collections) {
-    if (coll.first == edm_name) {
-      is_registered = true;
-      return;
-    }
-  }
-  for (auto& coll : read_collections) {
     if (coll.first == edm_name) {
       is_registered = true;
       return;
