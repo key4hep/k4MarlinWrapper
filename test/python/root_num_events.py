@@ -1,3 +1,8 @@
+#########################################################
+# Print the number of events of a ROOT file that has an "events" branch,
+# as in edm4hep files
+#########################################################
+
 import ROOT
 import sys
 
