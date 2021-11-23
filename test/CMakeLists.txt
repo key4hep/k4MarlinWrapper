@@ -80,4 +80,11 @@ if (BASH_PROGRAM)
       ENVIRONMENT k4MarlinWrapper_tests_DIR=${CMAKE_CURRENT_SOURCE_DIR}
       PASS_REGULAR_EXPRESSION "Input and output have same number of events")
 
+  # Test clicReconstruction with EDM4hep input and output
+  add_test( clicRec_edm4hep_input ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/test_clicReconstruction_e4hinput.sh )
+  set_tests_properties ( clicRec_edm4hep_input
+    PROPERTIES
+      ENVIRONMENT k4MarlinWrapper_tests_DIR=${CMAKE_CURRENT_SOURCE_DIR}
+      PASS_REGULAR_EXPRESSION "Input and output have same number of events")
+
 endif(BASH_PROGRAM)

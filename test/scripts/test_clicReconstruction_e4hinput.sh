@@ -1,0 +1,27 @@
+#!/bin/bash
+# exit if command or variable fails
+set -eu
+
+# Clone CLICPerformance for input files
+if [ ! -d CLICPerformance ]; then
+  git clone https://github.com/iLCSoft/CLICPerformance
+fi
+
+cd CLICPerformance/clicConfig
+
+# Generate slcio file if not present
+if [ ! -f $k4MarlinWrapper_tests_DIR/inputFiles/ttbar1_edm4hep.root ]; then
+  echo "Input file not found. Getting it from key4hep..."
+  wget https://key4hep.web.cern.ch/testFiles/ddsimOutput/ttbar1_edm4hep.root -P $k4MarlinWrapper_tests_DIR/inputFiles/
+fi
+
+../../../run gaudirun.py $k4MarlinWrapper_tests_DIR/gaudi_opts/clicReconstruction_e4h_input.py
+
+input_num_events=$(python $k4MarlinWrapper_tests_DIR/python/root_num_events.py $k4MarlinWrapper_tests_DIR/inputFiles/ttbar1_edm4hep.root)
+output_num_events=$(python $k4MarlinWrapper_tests_DIR/python/root_num_events.py my_output.root)
+
+if [ "$input_num_events" == "$output_num_events" ]; then
+  echo "Input and output have same number of events"
+else
+  echo "ERROR: different number of events for input and output"
+fi
