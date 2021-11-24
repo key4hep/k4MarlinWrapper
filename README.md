@@ -32,7 +32,7 @@ To copy file and run:
 ```bash
 mkdir ../test/inputFiles
 cp /path/to/muons.slcio ../test/inputFiles/muons.slcio
-./run gaudirun.py ../k4MarlinWrapper/examples/runit.py
+k4run ../k4MarlinWrapper/examples/runit.py
 ```
 
 ## Testing
