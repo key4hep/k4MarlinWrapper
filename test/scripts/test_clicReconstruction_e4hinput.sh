@@ -9,13 +9,13 @@ fi
 
 cd CLICPerformance/clicConfig
 
-# Generate slcio file if not present
+# Download root file if not present
 if [ ! -f $k4MarlinWrapper_tests_DIR/inputFiles/ttbar1_edm4hep.root ]; then
   echo "Input file not found. Getting it from key4hep..."
   wget https://key4hep.web.cern.ch/testFiles/ddsimOutput/ttbar1_edm4hep.root -P $k4MarlinWrapper_tests_DIR/inputFiles/
 fi
 
-../../../run gaudirun.py $k4MarlinWrapper_tests_DIR/gaudi_opts/clicReconstruction_e4h_input.py
+k4run $k4MarlinWrapper_tests_DIR/gaudi_opts/clicReconstruction_e4h_input.py
 
 input_num_events=$(python $k4MarlinWrapper_tests_DIR/python/root_num_events.py $k4MarlinWrapper_tests_DIR/inputFiles/ttbar1_edm4hep.root)
 output_num_events=$(python $k4MarlinWrapper_tests_DIR/python/root_num_events.py my_output.root)
