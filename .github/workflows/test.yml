@@ -26,16 +26,16 @@ jobs:
 
     - name: Compile
       run: |
-        docker exec k4MW_CI /bin/bash -c 'source ${{ matrix.SETUP }};\
-        cd k4MW;/
-        mkdir build install; cd build;\
-        cmake -G Ninja -D CMAKE_INSTALL_PREFIX=$PWD/../install -D CMAKE_BUILD_TYPE=RelWithDebInfo ..;\
-        ninja install;\
+        docker exec k4MW_CI /bin/bash -c 'source ${{ matrix.SETUP }};
+          cd k4MW;
+          mkdir build install; cd build;
+          cmake -G Ninja -D CMAKE_INSTALL_PREFIX=$PWD/../install -D CMAKE_BUILD_TYPE=RelWithDebInfo ..;
+          ninja install;
         '
 
     - name: Run tests (CTest)
       run: |
-        docker exec k4MW_CI /bin/bash -c 'source ${{ matrix.SETUP }};\
-        cd k4MW/build;\
-        ctest --verbose --output-on-failure;\
+        docker exec k4MW_CI /bin/bash -c 'source ${{ matrix.SETUP }};
+          cd k4MW/build;
+          ctest --output-on-failure;
         '
