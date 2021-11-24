@@ -4,7 +4,7 @@
 This assumes that you have access to an installation of the Key4hep-stack, either via ``CVMFS`` or ``spack install``.
 To setup the installation on cvmfs, do:
 
-```
+```bash
 source /cvmfs/sw.hsf.org/key4hep/setup.sh
 ```
 
@@ -21,7 +21,24 @@ git clone https://github.com/iLCSoft/CLICPerformance
 
 ## Simulation
 
-Now we can already simulate a few events:
+Simulating a few events with `ddsim` can produce output in EDM4hep or LCIO format.
+
+- To produce events in **EDM4hep** format one can run indicating `--outputFile <name>_edm4hep.root` to produce the
+output in such format:
+
+
+```bash
+cd CLICPerformance/clicConfig
+
+ddsim --compactFile $LCGEO/CLIC/compact/CLIC_o3_v14/CLIC_o3_v14.xml \
+      --outputFile ttbar_edm4hep.root \
+      --steeringFile clic_steer.py \
+      --inputFiles ../Tests/yyxyev_000.stdhep \
+      --numberOfEvents 3
+```
+
+- To produce events in **LCIO** format one can run indicating `--outputFile <name>.slcio` to produce the output file
+in such format:
 
 ```bash
 cd CLICPerformance/clicConfig
@@ -32,6 +49,7 @@ ddsim --compactFile $LCGEO/CLIC/compact/CLIC_o3_v14/CLIC_o3_v14.xml \
       --inputFiles ../Tests/yyxyev_000.stdhep \
       --numberOfEvents 3
 ```
+
 
 ## Reconstruction
 
@@ -48,9 +66,9 @@ Marlin clicReconstruction.xml \
        --global.MaxRecordNumber=3
 ```
 
-### Reconstruction with with Gaudi
+### Reconstruction with with Gaudi through k4MarlinWrapper
 
-We can convert the ``xml`` steering file to a Gaudi steering file
+We can convert the ``xml`` steering file to a Gaudi steering file (python):
 
 ```bash
 cd CLICPerformance/clicConfig
@@ -58,10 +76,41 @@ cd CLICPerformance/clicConfig
 convertMarlinSteeringToGaudi.py clicReconstruction.xml clicReconstruction.py
 ```
 
-Now we need to modify the ``clicReconstruction.py`` file to point to the ``ttbar.slcio`` input file, and change the
-``DD4hepXMLFile`` parameter for the ``InitDD4hep`` algorithm.  In addition the two processors with the comment ``#
-Config.OverlayFalse`` and ``# Config.TrackingConformal`` should be enabled by uncommenting their line in the ``algList``
-at the end of the file.
+
+Reconstruction can be performed with EDM4hep or LCIO input, depending on the output format of the events produced
+during [Simulation](#simulation).
+
+- When using **EDM4hep** format for the input events to be used in reconstruction, refer to the [**EDM converters**](https://github.com/key4hep/k4MarlinWrapper/blob/master/doc/edmConverters.md)
+included with k4MarlinWrapper. Note that:
+  + *MarlinProcessorWrappers* need input in LCIO format: EDM4hep collections need to be converted to LCIO
+  + The output collections of *MarlinProcessorWrappers* may be used later by other algorithms:
+    * Output collections of *MarlinProcessorWrappers* will be in LCIO format unless these are explicitly converted
+    * Some *MarlinProcessorWrappers* may modify collections instead of producing new ones: the original EDM4hep collection wont be updated in this case and would need conversion from LCIO to EDM4hep.
+
+- To run *clicReconstruction* with EDM4hep format, use the steering file found in the `test` folder of k4MarlinWrapper:
+`test/gaudi_opts/clicReconstruction_e4h_input.py`
+  + Change line `evtsvc.input = '$k4MarlinWrapper_tests_DIR/inputFiles/ttbar1_edm4hep.root'` to point to the location of your input file.
+  + At the bottom of the file, in the `ApplicationMgr` parameters, change `EvtMax   = 3,` to the number of events to run.
+
+
+Reconstruction with EDM4hep input, using k4MarlinWrapper can be run with:
+
+```bash
+cd CLICPerformance/clicConfig
+
+cp <path/to/test/folder/gaudi_opts/clicReconstruction_e4h_input.py> .
+# Modify clicReconstruction_e4h_input.py to point to correct input file
+
+k4run clicReconstruction_e4h_input.py
+```
+
+---
+
+- When using **LCIO** format for the input events to be used in reconstruction:
+  + Modify the ``clicReconstruction.py`` file to point to the ``ttbar.slcio`` input file, and change the
+  ``DD4hepXMLFile`` parameter for the ``InitDD4hep`` algorithm.  In addition the two processors with the comment ``#
+  Config.OverlayFalse`` and ``# Config.TrackingConformal`` should be enabled by uncommenting their line in the ``algList``
+  at the end of the file.
 
 ```bash
 cd CLICPerformance/clicConfig
@@ -77,7 +126,7 @@ sed -i 's;"DD4hepXMLFile": \[".*"\],; "DD4hepXMLFile": \[os.environ["LCGEO"]+"/C
 
 ```
 
-Then the reconstruction using the wrapper can be run with
+Then the reconstruction using the k4MarlinWrapper can be run with
 
 ```bash
 cd CLICPerformance/clicConfig
