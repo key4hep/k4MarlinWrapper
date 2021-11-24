@@ -10,4 +10,4 @@ if [ ! -f $k4MarlinWrapper_tests_DIR/inputFiles/testSimulation.slcio ]; then
   wget https://key4hep.web.cern.ch/testFiles/ddsimOutput/testSimulation.slcio -P $k4MarlinWrapper_tests_DIR/inputFiles/
 fi
 
-../run gaudirun.py $k4MarlinWrapper_tests_DIR/gaudi_opts/test_k4MarlinWrapper2.py
+k4run $k4MarlinWrapper_tests_DIR/gaudi_opts/test_k4MarlinWrapper2.py

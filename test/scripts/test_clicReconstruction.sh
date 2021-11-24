@@ -36,4 +36,4 @@ sed -i 's;"DD4hepXMLFile": \[".*"\],; "DD4hepXMLFile": \[os.environ["LCGEO"]+"/C
 # Change output level for correct test confirmation
 sed -i 's;OutputLevel=WARNING; OutputLevel=DEBUG;' clicReconstruction.py
 
-../../../run gaudirun.py clicReconstruction.py
+k4run clicReconstruction.py
