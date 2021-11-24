@@ -28,63 +28,69 @@ if (BASH_PROGRAM)
   add_test( test_k4MarlinWrapper1 ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/test_k4MarlinWrapper1.sh )
   set_tests_properties ( test_k4MarlinWrapper1
     PROPERTIES
-      ENVIRONMENT k4MarlinWrapper_tests_DIR=${CMAKE_CURRENT_SOURCE_DIR}
       PASS_REGULAR_EXPRESSION "INFO Application Manager Terminated successfully")
 
   # Test k4MarlinWrapper2
   add_test( test_k4MarlinWrapper2 ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/test_k4MarlinWrapper2.sh )
   set_tests_properties ( test_k4MarlinWrapper2
     PROPERTIES
-      ENVIRONMENT k4MarlinWrapper_tests_DIR=${CMAKE_CURRENT_SOURCE_DIR}
       PASS_REGULAR_EXPRESSION "INFO Application Manager Terminated successfully")
 
   # Test clicReconstruction
   add_test( test_clicReconstruction ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/test_clicReconstruction.sh )
   set_tests_properties ( test_clicReconstruction
     PROPERTIES
-      ENVIRONMENT k4MarlinWrapper_tests_DIR=${CMAKE_CURRENT_SOURCE_DIR}
       PASS_REGULAR_EXPRESSION "INFO Application Manager Terminated successfully")
 
   # Test converter constants
   add_test( test_converter_constants ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/test_converter_constants.sh )
   set_tests_properties ( test_converter_constants
     PROPERTIES
-      ENVIRONMENT k4MarlinWrapper_tests_DIR=${CMAKE_CURRENT_SOURCE_DIR}
       PASS_REGULAR_EXPRESSION "INFO Application Manager Terminated successfully")
 
   # Test the edm4hep to lcio converter
   add_test( test_edm_converters ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/test_edm_converters.sh )
   set_tests_properties (test_edm_converters
     PROPERTIES
-      ENVIRONMENT k4MarlinWrapper_tests_DIR=${CMAKE_CURRENT_SOURCE_DIR}
       PASS_REGULAR_EXPRESSION "INFO Application Manager Terminated successfully")
 
   # Test indicating -1 to go over all events
   add_test( all_events_bounds ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/all_events_bounds.sh )
   set_tests_properties ( all_events_bounds
     PROPERTIES
-      ENVIRONMENT k4MarlinWrapper_tests_DIR=${CMAKE_CURRENT_SOURCE_DIR}
       PASS_REGULAR_EXPRESSION "INFO Application Manager Terminated successfully")
 
   # Test putting more events than available, stopping on last available event gracefully
   add_test( over_total_events ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/over_total_events.sh )
   set_tests_properties ( over_total_events
     PROPERTIES
-      ENVIRONMENT k4MarlinWrapper_tests_DIR=${CMAKE_CURRENT_SOURCE_DIR}
       PASS_REGULAR_EXPRESSION "INFO Application Manager Terminated successfully")
 
   # Test putting more events than available, stopping on last available event gracefully
   add_test( same_num_io ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/same_num_io.sh )
   set_tests_properties ( same_num_io
     PROPERTIES
-      ENVIRONMENT k4MarlinWrapper_tests_DIR=${CMAKE_CURRENT_SOURCE_DIR}
       PASS_REGULAR_EXPRESSION "Input and output have same number of events")
 
   # Test clicReconstruction with EDM4hep input and output
   add_test( clicRec_edm4hep_input ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/test_clicReconstruction_e4hinput.sh )
   set_tests_properties ( clicRec_edm4hep_input
     PROPERTIES
-      ENVIRONMENT k4MarlinWrapper_tests_DIR=${CMAKE_CURRENT_SOURCE_DIR}
       PASS_REGULAR_EXPRESSION "Input and output have same number of events")
+
+  set_tests_properties (
+      test_k4MarlinWrapper1
+      test_k4MarlinWrapper2
+      test_clicReconstruction
+      test_converter_constants
+      test_edm_converters
+      all_events_bounds
+      over_total_events
+      same_num_io
+      clicRec_edm4hep_input
+    PROPERTIES
+      ENVIRONMENT "k4MarlinWrapper_tests_DIR=${CMAKE_CURRENT_SOURCE_DIR};LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:${CMAKE_INSTALL_PREFIX}/lib64:$ENV{LD_LIBRARY_PATH};PYTHONPATH=${CMAKE_INSTALL_PREFIX}/python:$ENV{PYTHONPATH}"
+      )
+
 
 endif(BASH_PROGRAM)
