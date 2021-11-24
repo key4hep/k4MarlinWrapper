@@ -15,4 +15,4 @@ python \
   $k4MarlinWrapper_tests_DIR/inputFiles/testConverterConstants.xml \
   $k4MarlinWrapper_tests_DIR/gaudi_opts/testConverterConstants.py
 
-../run gaudirun.py $k4MarlinWrapper_tests_DIR/gaudi_opts/testConverterConstants.py
+k4run $k4MarlinWrapper_tests_DIR/gaudi_opts/testConverterConstants.py
