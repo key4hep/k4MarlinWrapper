@@ -26,45 +26,24 @@ find_program(BASH_PROGRAM bash)
 if (BASH_PROGRAM)
   # Test simple processors
   add_test( simple_processors ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/simple_processors.sh )
-  set_tests_properties ( simple_processors
-    PROPERTIES
-      PASS_REGULAR_EXPRESSION "INFO Application Manager Terminated successfully")
 
   # Test simple_processors2
   add_test( simple_processors2 ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/simple_processors2.sh )
-  set_tests_properties ( simple_processors2
-    PROPERTIES
-      PASS_REGULAR_EXPRESSION "INFO Application Manager Terminated successfully")
 
   # Test clicReconstruction
   add_test( clicRec ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/clicRec.sh )
-  set_tests_properties ( clicRec
-    PROPERTIES
-      PASS_REGULAR_EXPRESSION "INFO Application Manager Terminated successfully")
 
   # Test converter constants
   add_test( converter_constants ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/converter_constants.sh )
-  set_tests_properties ( converter_constants
-    PROPERTIES
-      PASS_REGULAR_EXPRESSION "INFO Application Manager Terminated successfully")
 
   # Test the edm4hep to lcio converter
   add_test( edm_converters ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/edm_converters.sh )
-  set_tests_properties (edm_converters
-    PROPERTIES
-      PASS_REGULAR_EXPRESSION "INFO Application Manager Terminated successfully")
 
   # Test indicating -1 to go over all events
   add_test( all_events_bounds ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/all_events_bounds.sh )
-  set_tests_properties ( all_events_bounds
-    PROPERTIES
-      PASS_REGULAR_EXPRESSION "INFO Application Manager Terminated successfully")
 
   # Test putting more events than available, stopping on last available event gracefully
   add_test( over_total_events ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/over_total_events.sh )
-  set_tests_properties ( over_total_events
-    PROPERTIES
-      PASS_REGULAR_EXPRESSION "INFO Application Manager Terminated successfully")
 
   # Test putting more events than available, stopping on last available event gracefully
   add_test( same_num_io ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/same_num_io.sh )
