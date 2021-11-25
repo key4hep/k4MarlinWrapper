@@ -24,33 +24,33 @@ target_include_directories(TestE4H2L PUBLIC
 find_program(BASH_PROGRAM bash)
 
 if (BASH_PROGRAM)
-  # Test k4MarlinWrapper1
-  add_test( test_k4MarlinWrapper1 ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/test_k4MarlinWrapper1.sh )
-  set_tests_properties ( test_k4MarlinWrapper1
+  # Test simple processors
+  add_test( simple_processors ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/simple_processors.sh )
+  set_tests_properties ( simple_processors
     PROPERTIES
       PASS_REGULAR_EXPRESSION "INFO Application Manager Terminated successfully")
 
-  # Test k4MarlinWrapper2
-  add_test( test_k4MarlinWrapper2 ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/test_k4MarlinWrapper2.sh )
-  set_tests_properties ( test_k4MarlinWrapper2
+  # Test simple_processors2
+  add_test( simple_processors2 ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/simple_processors2.sh )
+  set_tests_properties ( simple_processors2
     PROPERTIES
       PASS_REGULAR_EXPRESSION "INFO Application Manager Terminated successfully")
 
   # Test clicReconstruction
-  add_test( test_clicReconstruction ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/test_clicReconstruction.sh )
-  set_tests_properties ( test_clicReconstruction
+  add_test( clicRec ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/clicRec.sh )
+  set_tests_properties ( clicRec
     PROPERTIES
       PASS_REGULAR_EXPRESSION "INFO Application Manager Terminated successfully")
 
   # Test converter constants
-  add_test( test_converter_constants ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/test_converter_constants.sh )
-  set_tests_properties ( test_converter_constants
+  add_test( converter_constants ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/converter_constants.sh )
+  set_tests_properties ( converter_constants
     PROPERTIES
       PASS_REGULAR_EXPRESSION "INFO Application Manager Terminated successfully")
 
   # Test the edm4hep to lcio converter
-  add_test( test_edm_converters ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/test_edm_converters.sh )
-  set_tests_properties (test_edm_converters
+  add_test( edm_converters ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/edm_converters.sh )
+  set_tests_properties (edm_converters
     PROPERTIES
       PASS_REGULAR_EXPRESSION "INFO Application Manager Terminated successfully")
 
@@ -73,17 +73,17 @@ if (BASH_PROGRAM)
       PASS_REGULAR_EXPRESSION "Input and output have same number of events")
 
   # Test clicReconstruction with EDM4hep input and output
-  add_test( clicRec_edm4hep_input ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/test_clicReconstruction_e4hinput.sh )
+  add_test( clicRec_edm4hep_input ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/clicRec_e4h_input.sh )
   set_tests_properties ( clicRec_edm4hep_input
     PROPERTIES
       PASS_REGULAR_EXPRESSION "Input and output have same number of events")
 
   set_tests_properties (
-      test_k4MarlinWrapper1
-      test_k4MarlinWrapper2
-      test_clicReconstruction
-      test_converter_constants
-      test_edm_converters
+      simple_processors
+      simple_processors2
+      clicRec
+      converter_constants
+      edm_converters
       all_events_bounds
       over_total_events
       same_num_io
