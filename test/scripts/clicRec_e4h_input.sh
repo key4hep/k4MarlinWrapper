@@ -15,7 +15,7 @@ if [ ! -f $k4MarlinWrapper_tests_DIR/inputFiles/ttbar1_edm4hep.root ]; then
   wget https://key4hep.web.cern.ch/testFiles/ddsimOutput/ttbar1_edm4hep.root -P $k4MarlinWrapper_tests_DIR/inputFiles/
 fi
 
-k4run $k4MarlinWrapper_tests_DIR/gaudi_opts/clicReconstruction_e4h_input.py
+k4run $k4MarlinWrapper_tests_DIR/gaudi_opts/clicRec_e4h_input.py
 
 input_num_events=$(python $k4MarlinWrapper_tests_DIR/python/root_num_events.py $k4MarlinWrapper_tests_DIR/inputFiles/ttbar1_edm4hep.root)
 output_num_events=$(python $k4MarlinWrapper_tests_DIR/python/root_num_events.py my_output.root)
