@@ -8,7 +8,7 @@ evtsvc = EventDataSvc()
 
 read = LcioEvent()
 read.OutputLevel = DEBUG
-read.Files = ["$k4MarlinWrapper_tests_DIR/inputFiles/muons.slcio"]
+read.Files = ["$TEST_DIR/inputFiles/muons.slcio"]
 algList.append(read)
 
 # assign parameters by hand, in future parse Marlin.xml file in python

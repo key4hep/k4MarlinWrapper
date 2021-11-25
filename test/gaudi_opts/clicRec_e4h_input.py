@@ -25,7 +25,7 @@ from Configurables import ToolSvc, Lcio2EDM4hepTool, EDM4hep2LcioTool
 
 from Configurables import k4DataSvc, PodioInput
 evtsvc = k4DataSvc('EventDataSvc')
-evtsvc.input = '$k4MarlinWrapper_tests_DIR/inputFiles/ttbar1_edm4hep.root'
+evtsvc.input = '$TEST_DIR/inputFiles/ttbar1_edm4hep.root'
 
 
 inp = PodioInput('InputReader')
