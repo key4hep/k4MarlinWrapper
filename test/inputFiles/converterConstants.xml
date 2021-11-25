@@ -22,7 +22,7 @@
   <!-- ***** Global section ***** -->
   <global>
     <parameter name="LCIOInputFiles">
-      $k4MarlinWrapper_tests_DIR/inputFiles/muons.slcio
+      $TEST_DIR/inputFiles/muons.slcio
     </parameter>
     <parameter name="Verbosity" options="DEBUG0-4,MESSAGE0-4,WARNING0-4,ERROR0-4,SILENT"> DEBUG  </parameter>
   </global>

@@ -89,7 +89,7 @@ included with k4MarlinWrapper. Note that:
 
 - To run *clicReconstruction* with EDM4hep format, use the steering file found in the `test` folder of k4MarlinWrapper:
 `test/gaudi_opts/clicReconstruction_e4h_input.py`
-  + Change line `evtsvc.input = '$k4MarlinWrapper_tests_DIR/inputFiles/ttbar1_edm4hep.root'` to point to the location of your input file.
+  + Change line `evtsvc.input = '$TEST_DIR/inputFiles/ttbar1_edm4hep.root'` to point to the location of your input file.
   + At the bottom of the file, in the `ApplicationMgr` parameters, change `EvtMax   = 3,` to the number of events to run.
 
 
