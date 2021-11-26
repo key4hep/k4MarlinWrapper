@@ -19,6 +19,8 @@
  *
  */
 
+#include <csignal>
+
 #include "k4MarlinWrapper/LcioEventAlgo.h"
 
 DECLARE_COMPONENT(LcioEvent)
@@ -40,22 +42,28 @@ StatusCode LcioEvent::execute() {
   auto theEvent = m_reader->readNextEvent(EVENT::LCIO::UPDATE);
 
   if (theEvent == nullptr) {
-    // If no next event, abort execution
-    IEventProcessor* eventProcessor;
-    auto             sc2 = service("ApplicationMgr", eventProcessor);
-    sc2                  = eventProcessor->stopRun();
-    return sc2;
-  }
 
-  // pass theEvent to the DataStore, so we can access them in our processor
-  // wrappers
-  info() << "Reading from file: " << m_fileNames[0] << endmsg;
+    std::raise(SIGINT);
 
-  auto             pO = std::make_unique<LCEventWrapper>(theEvent);
-  const StatusCode sc = eventSvc()->registerObject("/Event/LCEvent", pO.release());
-  if (sc.isFailure()) {
-    error() << "Failed to store the LCEvent" << endmsg;
-    return sc;
+    IEventProcessor* evt = nullptr;
+    if ( service( "ApplicationMgr", evt, true ).isSuccess() ) {
+      evt->stopRun().ignore();
+      evt->release();
+    } else {
+      abort();
+    }
+  } else {
+
+    // pass theEvent to the DataStore, so we can access them in our processor
+    // wrappers
+    info() << "Reading from file: " << m_fileNames[0] << endmsg;
+
+    auto             pO = std::make_unique<LCEventWrapper>(theEvent);
+    const StatusCode sc = eventSvc()->registerObject("/Event/LCEvent", pO.release());
+    if (sc.isFailure()) {
+      error() << "Failed to store the LCEvent" << endmsg;
+      return sc;
+    }
   }
 
   return StatusCode::SUCCESS;
