@@ -42,18 +42,16 @@ StatusCode LcioEvent::execute() {
   auto theEvent = m_reader->readNextEvent(EVENT::LCIO::UPDATE);
 
   if (theEvent == nullptr) {
-
     std::raise(SIGINT);
 
     IEventProcessor* evt = nullptr;
-    if ( service( "ApplicationMgr", evt, true ).isSuccess() ) {
+    if (service("ApplicationMgr", evt, true).isSuccess()) {
       evt->stopRun().ignore();
       evt->release();
     } else {
       abort();
     }
   } else {
-
     // pass theEvent to the DataStore, so we can access them in our processor
     // wrappers
     info() << "Reading from file: " << m_fileNames[0] << endmsg;
