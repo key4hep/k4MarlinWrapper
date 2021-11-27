@@ -181,6 +181,17 @@ StatusCode MarlinProcessorWrapper::initialize() {
 }
 
 StatusCode MarlinProcessorWrapper::execute() {
+  // Get flag to know if there was an underlying LCEvent
+  DataObject* pStatus  = nullptr;
+  StatusCode  scStatus = eventSvc()->retrieveObject("/Event/LCEventStatus", pStatus);
+  if (scStatus.isSuccess()) {
+    bool hasLCEvent = static_cast<LCEventWrapperStatus*>(pStatus)->hasLCEvent;
+    if (not hasLCEvent) {
+      warning() << "An LCEvent reading returned nullptr, so MarlinProcessorWrapper won't execute" << endmsg;
+      return StatusCode::SUCCESS;
+    }
+  }
+
   // Get Event
   info() << "Getting the event for " << m_processor->name() << endmsg;
   DataObject* pObject = nullptr;

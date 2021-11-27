@@ -47,4 +47,12 @@ private:
   bool            m_delete_event = false;
 };
 
+// Event Status Data Object to indicate if there was underlying LCEvent
+class LCEventWrapperStatus : public DataObject {
+public:
+  LCEventWrapperStatus(bool has_event = false) : hasLCEvent(has_event) {}
+
+  bool hasLCEvent = false;
+};
+
 #endif
