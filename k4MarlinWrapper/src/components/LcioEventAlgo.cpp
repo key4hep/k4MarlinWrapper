@@ -19,8 +19,6 @@
  *
  */
 
-#include <csignal>
-
 #include "k4MarlinWrapper/LcioEventAlgo.h"
 
 DECLARE_COMPONENT(LcioEvent)
@@ -42,7 +40,16 @@ StatusCode LcioEvent::execute() {
   auto theEvent = m_reader->readNextEvent(EVENT::LCIO::UPDATE);
 
   if (theEvent == nullptr) {
-    std::raise(SIGINT);
+    // Store flag to indicate there was NOT a LCEvent
+    auto pStatus = std::make_unique<LCEventWrapperStatus>(false);
+    std::cout << "Saving status: " << pStatus->hasLCEvent << std::endl;
+    const StatusCode scStatus = eventSvc()->registerObject("/Event/LCEventStatus", pStatus.release());
+    if (scStatus.isFailure()) {
+      error() << "Failed to store flag for underlying LCEvent: MarlinProcessorWrapper may try to run over non existing "
+                 "event"
+              << endmsg;
+      return scStatus;
+    }
 
     IEventProcessor* evt = nullptr;
     if (service("ApplicationMgr", evt, true).isSuccess()) {
@@ -61,6 +68,17 @@ StatusCode LcioEvent::execute() {
     if (sc.isFailure()) {
       error() << "Failed to store the LCEvent" << endmsg;
       return sc;
+    } else {
+      // Store flag to indicate there was a LCEvent
+      auto pStatus = std::make_unique<LCEventWrapperStatus>(true);
+      std::cout << "Saving status: " << pStatus->hasLCEvent << std::endl;
+      const StatusCode scStatus = eventSvc()->registerObject("/Event/LCEventStatus", pStatus.release());
+      if (scStatus.isFailure()) {
+        error() << "Failed to store flag for underlying LCEvent: MarlinProcessorWrapper may try to run over non "
+                   "existing event"
+                << endmsg;
+        return scStatus;
+      }
     }
   }
 
