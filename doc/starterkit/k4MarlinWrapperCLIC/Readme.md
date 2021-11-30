@@ -98,10 +98,9 @@ Reconstruction with EDM4hep input, using k4MarlinWrapper can be run with:
 ```bash
 cd CLICPerformance/clicConfig
 
-cp <path/to/test/folder/gaudi_opts/clicReconstruction_e4h_input.py> .
-# Modify clicReconstruction_e4h_input.py to point to correct input file
+cp ../../../test/gaudi_opts/clicRec_e4h_input.py .
 
-k4run clicReconstruction_e4h_input.py
+k4run clicRec_e4h_input.py --EventDataSvc.input ttbar_edm4hep.root
 ```
 
 ---
