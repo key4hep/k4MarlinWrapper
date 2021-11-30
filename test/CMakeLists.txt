@@ -58,10 +58,16 @@ if (BASH_PROGRAM)
       PASS_REGULAR_EXPRESSION "Input and output have same number of events")
 
   # Test clicReconstruction with EDM4hep input and output
-  add_test( clicRec_edm4hep_input ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/clicRec_e4h_input.sh )
-  set_tests_properties ( clicRec_edm4hep_input
-    PROPERTIES
+  # Disabled for current version in k4lcioreader
+  get_target_property(k4lcioreader_PATH  k4LCIOReader::k4LCIOReader LOCATION)
+  if(${k4lcioreader_PATH} MATCHES  "/sw-nightly.hsf.org/")
+    MESSAGE(FATAL_ERROR "we must be here ${k4lcioreader_PATH}")
+    add_test( clicRec_edm4hep_input ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/clicRec_e4h_input.sh )
+    set_tests_properties ( clicRec_edm4hep_input
+      PROPERTIES
       PASS_REGULAR_EXPRESSION "Input and output have same number of events")
+    LIST(ADD OPTIONAL_TESTS clicRec_edm4hep_input)
+  endif()
 
   set_tests_properties (
       simple_processors
@@ -72,7 +78,7 @@ if (BASH_PROGRAM)
       all_events_bounds
       over_total_events
       same_num_io
-      clicRec_edm4hep_input
+      ${OPTIONAL_TESTS}
     PROPERTIES
       ENVIRONMENT "TEST_DIR=${CMAKE_CURRENT_SOURCE_DIR};LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:${CMAKE_INSTALL_PREFIX}/lib64:$ENV{LD_LIBRARY_PATH};PYTHONPATH=${CMAKE_INSTALL_PREFIX}/python:$ENV{PYTHONPATH}"
       )
