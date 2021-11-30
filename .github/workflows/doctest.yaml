@@ -32,12 +32,11 @@ jobs:
 
     - name: CheckPage  
       run: |
-        docker exec CI_container /bin/bash -c 'cd ./Package;\
-        source ${{ matrix.SETUP }};\
-        source build/k4marlinwrapperenv.sh;\
-        cat .github/scripts/yamlheader.md  ${{ matrix.PAGE }}.md > ${{ matrix.PAGE }}-test.md;\
-        testfilename=$(basename ${{ matrix.PAGE }}-test.md);\
-        testdirname=$(dirname ${{ matrix.PAGE }}-test.md);\
-        cd $testdirname;\
-        jupytext $testfilename -o ${testfilename/-test.md/.ipynb} --execute;\
+        docker exec CI_container /bin/bash -c 'cd ./Package;
+        source ${{ matrix.SETUP }};
+        source build/k4marlinwrapperenv.sh;
+        mkdir testdir;
+        cat .github/scripts/yamlheader.md  ${{ matrix.PAGE }}.md > testdir/test.md;
+        cd testdir;
+        jupytext test.md -o test.ipynb --execute;
         '
