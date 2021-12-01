@@ -36,7 +36,7 @@
 #include <GaudiKernel/IEventProcessor.h>
 
 #include <EVENT/LCIO.h>
-#include <IOIMPL/LCFactory.h>
+#include <MT/LCReader.h>
 
 #include "k4MarlinWrapper/LCEventWrapper.h"
 
@@ -49,7 +49,7 @@ public:
 
 private:
   Gaudi::Property<std::vector<std::string>> m_fileNames{this, "Files", {}};
-  IO::LCReader*                             m_reader = nullptr;
+  MT::LCReader*                             m_reader = nullptr;
 };
 
 #endif

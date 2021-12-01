@@ -30,7 +30,7 @@ StatusCode LcioEvent::initialize() {
   if (sc.isFailure())
     return sc;
 
-  m_reader = IOIMPL::LCFactory::getInstance()->createLCReader();
+  m_reader = new MT::LCReader(0);
   m_reader->open(m_fileNames);
   info() << "Initialized the LcioEvent Algo: " << m_fileNames[0] << endmsg;
   return StatusCode::SUCCESS;
@@ -62,8 +62,8 @@ StatusCode LcioEvent::execute() {
     // wrappers
     info() << "Reading from file: " << m_fileNames[0] << endmsg;
 
-    auto             pO = std::make_unique<LCEventWrapper>(theEvent);
-    const StatusCode sc = eventSvc()->registerObject("/Event/LCEvent", pO.release());
+    auto             myEvWr = new LCEventWrapper(theEvent.release());
+    const StatusCode sc     = eventSvc()->registerObject("/Event/LCEvent", myEvWr);
     if (sc.isFailure()) {
       error() << "Failed to store the LCEvent" << endmsg;
       return sc;
