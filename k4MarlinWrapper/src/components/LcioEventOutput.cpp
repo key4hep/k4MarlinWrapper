@@ -33,8 +33,8 @@ StatusCode LcioEventOutput::initialize() {
   // Init writer
   m_writer = new MT::LCWriter();
   // m_writer->setCompressionLevel();
-  
-  if(m_write_mode == "WRITE_APPEND") {
+
+  if (m_write_mode == "WRITE_APPEND") {
     m_writer->open(m_filename, EVENT::LCIO::WRITE_APPEND);
   } else if (m_write_mode == "WRITE_NEW") {
     m_writer->open(m_filename, EVENT::LCIO::WRITE_NEW);
@@ -46,12 +46,11 @@ StatusCode LcioEventOutput::initialize() {
 }
 
 StatusCode LcioEventOutput::execute() {
-
   // TODO filer collections
 
   // Get event
   DataObject* pObject = nullptr;
-  StatusCode sc = evtSvc()->retrieveObject("/Event/LCEvent", pObject);
+  StatusCode  sc      = evtSvc()->retrieveObject("/Event/LCEvent", pObject);
 
   lcio::LCEventImpl* the_event = dynamic_cast<IMPL::LCEventImpl*>(static_cast<LCEventWrapper*>(pObject)->getEvent());
 
@@ -62,9 +61,8 @@ StatusCode LcioEventOutput::execute() {
 }
 
 StatusCode LcioEventOutput::finalize() {
-
   // Cleanup
-  delete(m_writer);
+  delete (m_writer);
 
   return StatusCode::SUCCESS;
 }

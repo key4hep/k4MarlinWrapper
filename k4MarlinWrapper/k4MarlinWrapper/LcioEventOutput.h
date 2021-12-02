@@ -26,18 +26,16 @@
 // LCEventOutput: Write out LCIO events
 // ***
 
-
 #include <iostream>
 
 #include <GaudiAlg/GaudiAlgorithm.h>
 
 #include <EVENT/LCIO.h>
-#include <MT/LCWriter.h>
 #include <IMPL/LCEventImpl.h>
+#include <MT/LCWriter.h>
 #include <lcio.h>
 
 #include "k4MarlinWrapper/LCEventWrapper.h"
-
 
 class LcioEventOutput : public GaudiAlgorithm {
 public:
@@ -48,12 +46,10 @@ public:
   virtual StatusCode finalize() override final;
 
 private:
-
   MT::LCWriter* m_writer = nullptr;
-  
+
   Gaudi::Property<std::string> m_write_mode{this, "WriteMode", ""};
   Gaudi::Property<std::string> m_filename{this, "OutputFileName", ""};
-  
 };
 
 #endif
