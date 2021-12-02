@@ -26,6 +26,7 @@ gaudi_install(SCRIPTS)
 gaudi_add_module(k4MarlinWrapperPlugins
   SOURCES
     src/components/LcioEventAlgo.cpp
+    src/components/LcioEventOutput.cpp
   LINK
     Gaudi::GaudiAlgLib
     ${Marlin_LIBRARIES}
