@@ -1434,7 +1434,7 @@ seq = GaudiSequencer(
 from Configurables import ApplicationMgr
 ApplicationMgr( TopAlg = [seq],
                 EvtSel = 'NONE',
-                EvtMax = 10,
+                EvtMax = 4,
                 ExtSvc = [whiteboard],
                 EventLoop=slimeventloopmgr,
                 MessageSvcType="InertMessageSvc"
