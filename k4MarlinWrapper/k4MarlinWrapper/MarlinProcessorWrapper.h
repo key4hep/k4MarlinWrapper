@@ -28,6 +28,7 @@
 
 // Gaudi
 #include <GaudiAlg/GaudiAlgorithm.h>
+#include <GaudiKernel/IEventProcessor.h>
 #include <GaudiKernel/MsgStream.h>
 #include <GaudiKernel/ToolHandle.h>
 
@@ -37,6 +38,7 @@
 
 // Marlin
 #include <marlin/EventModifier.h>
+#include <marlin/Exceptions.h>
 #include <marlin/Global.h>
 #include <marlin/ProcessorEventSeeder.h>
 #include <marlin/ProcessorMgr.h>
