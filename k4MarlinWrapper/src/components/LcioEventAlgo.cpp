@@ -41,8 +41,7 @@ StatusCode LcioEvent::execute() {
 
   if (theEvent == nullptr) {
     // Store flag to indicate there was NOT a LCEvent
-    auto pStatus = std::make_unique<LCEventWrapperStatus>(false);
-    std::cout << "Saving status: " << pStatus->hasLCEvent << std::endl;
+    auto             pStatus  = std::make_unique<LCEventWrapperStatus>(false);
     const StatusCode scStatus = eventSvc()->registerObject("/Event/LCEventStatus", pStatus.release());
     if (scStatus.isFailure()) {
       error() << "Failed to store flag for underlying LCEvent: MarlinProcessorWrapper may try to run over non existing "

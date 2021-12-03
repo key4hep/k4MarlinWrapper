@@ -214,7 +214,7 @@ StatusCode MarlinProcessorWrapper::execute() {
     the_event = dynamic_cast<IMPL::LCEventImpl*>(static_cast<LCEventWrapper*>(pObject)->getEvent());
   }
 
-  // Found EDM Conversion tool
+  // EDM4hep->LCIO conversion
   if (!m_edm_conversionTool.empty()) {
     StatusCode edm_sc = m_edm_conversionTool->convertCollections(the_event);
     if (edm_sc.isFailure()) {
@@ -226,22 +226,61 @@ StatusCode MarlinProcessorWrapper::execute() {
   // FIXME: this is an overkill, but we need to call this once per event, not
   // once for each execute call
   // how can this be done more efficiently?
-  auto* procMgr = marlin::ProcessorMgr::instance();
-  procMgr->modifyEvent(the_event);
+  try {
+    auto* procMgr = marlin::ProcessorMgr::instance();
+    procMgr->modifyEvent(the_event);
 
-  streamlog::logscope scope(streamlog::out);
-  scope.setName(name());
-  scope.setLevel(m_verbosity);
+    streamlog::logscope scope(streamlog::out);
+    scope.setName(name());
+    scope.setLevel(m_verbosity);
 
-  // process the event in the processor
-  auto modifier = dynamic_cast<marlin::EventModifier*>(m_processor);
-  if (modifier) {
-    modifier->modifyEvent(the_event);
-  } else {
-    m_processor->processEvent(the_event);
+    // process the event in the processor
+    auto modifier = dynamic_cast<marlin::EventModifier*>(m_processor);
+    if (modifier) {
+      modifier->modifyEvent(the_event);
+    } else {
+      m_processor->processEvent(the_event);
+    }
+  }
+  // Handle exceptions that may come from Marlin
+  catch (marlin::SkipEventException& e) {
+    // Store flag to prevent the rest of the event from processing
+    auto             pStatus  = std::make_unique<LCEventWrapperStatus>(false);
+    const StatusCode scStatus = eventSvc()->registerObject("/Event/LCEventStatus", pStatus.release());
+    if (scStatus.isFailure()) {
+      error() << "Failed to store flag to skip event on Marlin marlin::SkipEventException" << endmsg;
+      return scStatus;
+    }
+
+    error() << e.what() << endmsg;
+    return StatusCode::FAILURE;
+  } catch (marlin::StopProcessingException& e) {
+    // Store flag to prevent the rest of the event from processing
+    auto             pStatus  = std::make_unique<LCEventWrapperStatus>(false);
+    const StatusCode scStatus = eventSvc()->registerObject("/Event/LCEventStatus", pStatus.release());
+    if (scStatus.isFailure()) {
+      error() << "Failed to store flag to skip event on Marlin marlin::StopProcessingException" << endmsg;
+      return scStatus;
+    }
+
+    error() << e.what() << endmsg;
+
+    // Send stop to EventProcessor
+    IEventProcessor* evt = nullptr;
+    if (service("ApplicationMgr", evt, true).isSuccess()) {
+      evt->stopRun().ignore();
+      evt->release();
+    } else {
+      abort();
+    }
+
+    return StatusCode::FAILURE;
+  } catch (lcio::Exception& e) {
+    error() << "There was an exception while processing " << m_processor->name() << ": " << e.what() << endmsg;
+    return StatusCode::FAILURE;
   }
 
-  // Found LCIO Conversion tool
+  // LCIO->EDM4hep conversion
   if (!m_lcio_conversionTool.empty()) {
     StatusCode lcio_sc = m_lcio_conversionTool->convertCollections(the_event);
     if (lcio_sc.isFailure()) {
