@@ -979,8 +979,8 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
     convertReconstructedParticles(collection_pairs.recoparticles, collection_pairs.tracks, collection_pairs.vertices,
                                   collection_pairs.clusters, e4h_coll_name, lcio_coll_name, lcio_event);
   } else {
-    error() << "Error trying to convert requested " << fulltype << " with name " << e4h_coll_name << endmsg;
-    error() << "List of supported types: "
+    warning() << "Error trying to convert requested " << fulltype << " with name " << e4h_coll_name << endmsg;
+    warning() << "List of supported types: "
             << "Track, TrackerHit, SimTrackerHit, "
             << "Cluster, CalorimeterHit, RawCalorimeterHit, "
             << "SimCalorimeterHit, Vertex, ReconstructedParticle, "
@@ -1023,7 +1023,6 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
 
     const auto& collections = m_podioDataSvc->getCollections();
     for (auto& [name, collection] : collections) {
-      std::cout << "Converting " << name << std::endl;
       convertAdd(name, name, lcio_event, collection_pairs);
     }
   } else {

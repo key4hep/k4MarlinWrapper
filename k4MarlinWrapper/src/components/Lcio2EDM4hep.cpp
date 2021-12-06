@@ -12,12 +12,12 @@ Lcio2EDM4hepTool::Lcio2EDM4hepTool(const std::string& type, const std::string& n
 Lcio2EDM4hepTool::~Lcio2EDM4hepTool() { ; }
 
 StatusCode Lcio2EDM4hepTool::initialize() {
-  if (m_params.size() % 2 != 0) {
+  if (!((m_params.size() > 1 && m_params.size() % 2 == 0) || (m_params.size() == 1 && m_params[0] == "*"))) {
     error() << " Error processing conversion parameters. 2 arguments (LCIO "
-               "name, EDM4hep name) per collection expected. "
+               "name, EDM4hep name) per collection, or 1 argument \"*\" expected."
             << endmsg;
     return StatusCode::FAILURE;
-  }
+   }
 
   m_podioDataSvc = dynamic_cast<PodioDataSvc*>(m_eds.get());
   if (nullptr == m_podioDataSvc)
@@ -134,6 +134,24 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
   k4LCIOConverter*          lcio_converter = new k4LCIOConverter(id_table);
   lcio_converter->set(the_event);
 
+  // Add all collections to params to convert all of them
+  if (m_params.size() == 1 && m_params[0] == "*") {
+    const auto* collections = the_event->getCollectionNames();
+
+    const std::string ext = "_EXT";
+    int index_str;
+
+    for (auto& coll : *collections) {
+      auto found = coll.find(ext);
+      if (found != std::string::npos) {
+        warning() << "Skipping conversion of collection named " << coll << ": contains special pattern: " << ext << std::endl;
+      } else {
+        m_params.value().emplace_back(coll);
+        m_params.value().emplace_back(coll);
+      }
+    }
+  }
+
   // Convert Event Header outside the collections loop
   if (!collectionExist("EventHeader")) {
     convertRegister<edm4hep::EventHeaderCollection>("EventHeader", "EventHeader", lcio_converter, nullptr);
@@ -209,6 +227,8 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
         } else if (e4h_coll_type_str == "edm4hep::MCRecoCaloParticleAssociation") {
           convertRegister<edm4hep::MCRecoCaloParticleAssociationCollection>(m_params[i + 1], m_params[i],
                                                                             lcio_converter, lcio_coll);
+        } else {
+          error() << "Unsuported LCRelation for collection " << m_params[i] << std::endl;
         }
 
       } else {
