@@ -69,36 +69,7 @@ MyAIDAProcessor.Parameters = {
 
 # EDM4hep to LCIO converter
 edmConvTool = EDM4hep2LcioTool("EDM4hep2lcio")
-edmConvTool.Parameters = [
-  "MCParticles", "MCParticle",
-  "VertexBarrelCollection", "VertexBarrelCollection",
-  "VertexEndcapCollection", "VertexEndcapCollection",
-  "InnerTrackerBarrelCollection", "InnerTrackerBarrelCollection",
-  "OuterTrackerBarrelCollection", "OuterTrackerBarrelCollection",
-  "ECalEndcapCollection", "ECalEndcapCollection",
-  # CaloHitContribution
-  # "ECalEndcapCollectionContributions", "ECalEndcapCollectionContributions",
-  "ECalBarrelCollection", "ECalBarrelCollection",
-  "ECalPlugCollection", "ECalPlugCollection",
-  "HCalBarrelCollection", "HCalBarrelCollection",
-  # "CaloHitContribution"
-  # HCalBarrelCollectionContributions", "HCalBarrelCollectionContributions",
-  "InnerTrackerEndcapCollection", "InnerTrackerEndcapCollection",
-  "OuterTrackerEndcapCollection", "OuterTrackerEndcapCollection",
-  "HCalEndcapCollection", "HCalEndcapCollection",
-  # "CaloHitContribution"
-  # "HCalEndcapCollectionContributions", "HCalEndcapCollectionContributions",
-  "HCalRingCollection", "HCalRingCollection",
-  # "CaloHitContribution"
-  # "HCalRingCollectionContributions", "HCalRingCollectionContributions",
-  'YokeBarrelCollection', "YokeBarrelCollection",
-  "YokeEndcapCollection", "YokeEndcapCollection",
-  # "CaloHitContribution",
-  # "YokeEndcapCollectionContributions", "YokeEndcapCollectionContributions",
-  "LumiCalCollection", "LumiCalCollection",
-  # "CaloHitContribution", 
-  # "LumiCalCollectionContributions", "LumiCalCollectionContributions",
-  ]
+edmConvTool.Parameters = ["*"]
 edmConvTool.OutputLevel = DEBUG
 MyAIDAProcessor.EDM4hep2LcioTool=edmConvTool
 
