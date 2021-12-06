@@ -17,7 +17,7 @@ StatusCode Lcio2EDM4hepTool::initialize() {
                "name, EDM4hep name) per collection, or 1 argument \"*\" expected."
             << endmsg;
     return StatusCode::FAILURE;
-   }
+  }
 
   m_podioDataSvc = dynamic_cast<PodioDataSvc*>(m_eds.get());
   if (nullptr == m_podioDataSvc)
@@ -139,12 +139,13 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
     const auto* collections = the_event->getCollectionNames();
 
     const std::string ext = "_EXT";
-    int index_str;
+    int               index_str;
 
     for (auto& coll : *collections) {
       auto found = coll.find(ext);
       if (found != std::string::npos) {
-        warning() << "Skipping conversion of collection named " << coll << ": contains special pattern: " << ext << std::endl;
+        warning() << "Skipping conversion of collection named " << coll << ": contains special pattern: " << ext
+                  << std::endl;
       } else {
         m_params.value().emplace_back(coll);
         m_params.value().emplace_back(coll);
