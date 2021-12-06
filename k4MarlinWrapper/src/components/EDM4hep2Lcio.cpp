@@ -1002,24 +1002,36 @@ bool EDM4hep2LcioTool::collectionExist(const std::string& collection_name, lcio:
 // Parse property parameters and convert the indicated collections.
 // Use the collection names in the parameters to read and write them
 StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
-  if (m_edm2lcio_params.size() % 2 != 0) {
+  CollectionsPairVectors collection_pairs{};
+
+  // Convert collections from parameters
+  if (m_edm2lcio_params.size() > 1 && m_edm2lcio_params.size() % 2 == 0) {
+    for (int i = 0; i < m_edm2lcio_params.size(); i = i + 2) {
+      if (!collectionExist(m_edm2lcio_params[i + 1], lcio_event)) {
+        convertAdd(m_edm2lcio_params[i], m_edm2lcio_params[i + 1], lcio_event, collection_pairs);
+      } else {
+        debug() << " Collection " << m_edm2lcio_params[i + 1] << " already in place, skipping conversion. " << endmsg;
+      }
+    }
+
+    FillMissingCollections(collection_pairs);
+  }
+
+  // Convert all collections if the only parameter is "*"
+  else if (m_edm2lcio_params.size() == 1 && m_edm2lcio_params[0] == "*") {
+    info() << "Converting all collections from EDM4hep to LCIO" << endmsg;
+
+    const auto& collections = m_podioDataSvc->getCollections();
+    for (auto& [name, collection] : collections) {
+      std::cout << "Converting " << name << std::endl;
+      convertAdd(name, name, lcio_event, collection_pairs);
+    }
+  } else {
     error() << " Error processing conversion parameters. 2 arguments (EDM4hep "
-               "name, LCIO name) per collection expected. "
+               "name, LCIO name) per collection, or 1 argument \"*\" to convert all collections expected. "
             << endmsg;
     return StatusCode::FAILURE;
   }
-
-  CollectionsPairVectors collection_pairs{};
-
-  for (int i = 0; i < m_edm2lcio_params.size(); i = i + 2) {
-    if (!collectionExist(m_edm2lcio_params[i + 1], lcio_event)) {
-      convertAdd(m_edm2lcio_params[i], m_edm2lcio_params[i + 1], lcio_event, collection_pairs);
-    } else {
-      debug() << " Collection " << m_edm2lcio_params[i + 1] << " already in place, skipping conversion. " << endmsg;
-    }
-  }
-
-  FillMissingCollections(collection_pairs);
 
   return StatusCode::SUCCESS;
 }
