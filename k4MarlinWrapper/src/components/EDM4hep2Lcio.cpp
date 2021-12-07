@@ -26,8 +26,8 @@ StatusCode EDM4hep2LcioTool::finalize() { return GaudiTool::finalize(); }
 // Convert EDM4hep Tracks to LCIO
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
 // Add LCIO Collection Vector to LCIO event
-void EDM4hep2LcioTool::convertTracks(vec_pair<lcio::TrackImpl*, edm4hep::ConstTrack>&           tracks_vec,
-                                     vec_pair<lcio::TrackerHitImpl*, edm4hep::ConstTrackerHit>& trackerhits_vec,
+void EDM4hep2LcioTool::convertTracks(vec_pair<lcio::TrackImpl*, edm4hep::Track>&           tracks_vec,
+                                     vec_pair<lcio::TrackerHitImpl*, edm4hep::TrackerHit>& trackerhits_vec,
                                      const std::string& e4h_coll_name, const std::string& lcio_coll_name,
                                      lcio::LCEventImpl* lcio_event) {
   DataHandle<edm4hep::TrackCollection> tracks_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
@@ -116,7 +116,7 @@ void EDM4hep2LcioTool::convertTracks(vec_pair<lcio::TrackImpl*, edm4hep::ConstTr
 // Convert EDM4hep TrackerHits to LCIO
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
 // Add LCIO Collection Vector to LCIO event
-void EDM4hep2LcioTool::convertTrackerHits(vec_pair<lcio::TrackerHitImpl*, edm4hep::ConstTrackerHit>& trackerhits_vec,
+void EDM4hep2LcioTool::convertTrackerHits(vec_pair<lcio::TrackerHitImpl*, edm4hep::TrackerHit>& trackerhits_vec,
                                           const std::string& e4h_coll_name, const std::string& lcio_coll_name,
                                           lcio::LCEventImpl* lcio_event) {
   DataHandle<edm4hep::TrackerHitCollection> trackerhits_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
@@ -168,8 +168,8 @@ void EDM4hep2LcioTool::convertTrackerHits(vec_pair<lcio::TrackerHitImpl*, edm4he
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
 // Add LCIO Collection Vector to LCIO event
 void EDM4hep2LcioTool::convertSimTrackerHits(
-    vec_pair<lcio::SimTrackerHitImpl*, edm4hep::ConstSimTrackerHit>& simtrackerhits_vec,
-    const vec_pair<lcio::MCParticleImpl*, edm4hep::ConstMCParticle>& mcparticles_vec, const std::string& e4h_coll_name,
+    vec_pair<lcio::SimTrackerHitImpl*, edm4hep::SimTrackerHit>& simtrackerhits_vec,
+    const vec_pair<lcio::MCParticleImpl*, edm4hep::MCParticle>& mcparticles_vec, const std::string& e4h_coll_name,
     const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event) {
   DataHandle<edm4hep::SimTrackerHitCollection> simtrackerhits_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
   const auto                                   simtrackerhits_coll = simtrackerhits_handle.get();
@@ -234,7 +234,7 @@ void EDM4hep2LcioTool::convertSimTrackerHits(
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
 // Add converted LCIO Collection Vector to LCIO event
 void EDM4hep2LcioTool::convertCalorimeterHits(
-    vec_pair<lcio::CalorimeterHitImpl*, edm4hep::ConstCalorimeterHit>& calo_hits_vec, const std::string& e4h_coll_name,
+    vec_pair<lcio::CalorimeterHitImpl*, edm4hep::CalorimeterHit>& calo_hits_vec, const std::string& e4h_coll_name,
     const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event) {
   DataHandle<edm4hep::CalorimeterHitCollection> calohit_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
   const auto                                    calohit_coll = calohit_handle.get();
@@ -282,7 +282,7 @@ void EDM4hep2LcioTool::convertCalorimeterHits(
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
 // Add converted LCIO Collection Vector to LCIO event
 void EDM4hep2LcioTool::convertRawCalorimeterHits(
-    vec_pair<lcio::RawCalorimeterHitImpl*, edm4hep::ConstRawCalorimeterHit>& raw_calo_hits_vec,
+    vec_pair<lcio::RawCalorimeterHitImpl*, edm4hep::RawCalorimeterHit>& raw_calo_hits_vec,
     const std::string& e4h_coll_name, const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event) {
   DataHandle<edm4hep::RawCalorimeterHitCollection> raw_calohit_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
   const auto                                       rawcalohit_coll = raw_calohit_handle.get();
@@ -316,8 +316,8 @@ void EDM4hep2LcioTool::convertRawCalorimeterHits(
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
 // Add converted LCIO Collection Vector to LCIO event
 void EDM4hep2LcioTool::convertSimCalorimeterHits(
-    vec_pair<lcio::SimCalorimeterHitImpl*, edm4hep::ConstSimCalorimeterHit>& sim_calo_hits_vec,
-    const vec_pair<lcio::MCParticleImpl*, edm4hep::ConstMCParticle>& mcparticles, const std::string& e4h_coll_name,
+    vec_pair<lcio::SimCalorimeterHitImpl*, edm4hep::SimCalorimeterHit>& sim_calo_hits_vec,
+    const vec_pair<lcio::MCParticleImpl*, edm4hep::MCParticle>& mcparticles, const std::string& e4h_coll_name,
     const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event) {
   DataHandle<edm4hep::SimCalorimeterHitCollection> sim_calohit_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
   const auto                                       simcalohit_coll = sim_calohit_handle.get();
@@ -343,7 +343,7 @@ void EDM4hep2LcioTool::convertSimCalorimeterHits(
                                      edm_sim_calohit.getPosition()[2]};
       lcio_simcalohit->setPosition(positions.data());
 
-      // Get ConstCaloHitContributions
+      // Get CaloHitContributions
       for (const auto& contrib : edm_sim_calohit.getContributions()) {
         if (contrib.isAvailable()) {
           auto contrib_mcp = contrib.getParticle();
@@ -384,7 +384,7 @@ void EDM4hep2LcioTool::convertSimCalorimeterHits(
 // Convert EDM4hep TPC Hits to LCIO
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
 // Add converted LCIO Collection Vector to LCIO event
-void EDM4hep2LcioTool::convertTPCHits(vec_pair<lcio::TPCHitImpl*, edm4hep::ConstTPCHit>& tpc_hits_vec,
+void EDM4hep2LcioTool::convertTPCHits(vec_pair<lcio::TPCHitImpl*, edm4hep::TPCHit>& tpc_hits_vec,
                                       const std::string& e4h_coll_name, const std::string& lcio_coll_name,
                                       lcio::LCEventImpl* lcio_event) {
   DataHandle<edm4hep::TPCHitCollection> tpchit_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
@@ -424,10 +424,10 @@ void EDM4hep2LcioTool::convertTPCHits(vec_pair<lcio::TPCHitImpl*, edm4hep::Const
 // Convert EDM4hep Clusters to LCIO
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
 // Add converted LCIO Collection Vector to LCIO event
-void EDM4hep2LcioTool::convertClusters(
-    vec_pair<lcio::ClusterImpl*, edm4hep::ConstCluster>&                     cluster_vec,
-    const vec_pair<lcio::CalorimeterHitImpl*, edm4hep::ConstCalorimeterHit>& calohits_vec,
-    const std::string& e4h_coll_name, const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event) {
+void EDM4hep2LcioTool::convertClusters(vec_pair<lcio::ClusterImpl*, edm4hep::Cluster>&                     cluster_vec,
+                                       const vec_pair<lcio::CalorimeterHitImpl*, edm4hep::CalorimeterHit>& calohits_vec,
+                                       const std::string& e4h_coll_name, const std::string& lcio_coll_name,
+                                       lcio::LCEventImpl* lcio_event) {
   DataHandle<edm4hep::ClusterCollection> cluster_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
   const auto                             cluster_coll = cluster_handle.get();
 
@@ -530,8 +530,8 @@ void EDM4hep2LcioTool::convertClusters(
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
 // Add converted LCIO Collection Vector to LCIO event
 void EDM4hep2LcioTool::convertVertices(
-    vec_pair<lcio::VertexImpl*, edm4hep::ConstVertex>&                                     vertex_vec,
-    const vec_pair<lcio::ReconstructedParticleImpl*, edm4hep::ConstReconstructedParticle>& recoparticles_vec,
+    vec_pair<lcio::VertexImpl*, edm4hep::Vertex>&                                     vertex_vec,
+    const vec_pair<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>& recoparticles_vec,
     const std::string& e4h_coll_name, const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event) {
   DataHandle<edm4hep::VertexCollection> vertex_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
   const auto                            vertex_coll = vertex_handle.get();
@@ -554,7 +554,7 @@ void EDM4hep2LcioTool::convertVertices(
       }
 
       // Link sinlge associated Particle if found in converted ones
-      edm4hep::ConstReconstructedParticle vertex_rp = edm_vertex.getAssociatedParticle();
+      edm4hep::ReconstructedParticle vertex_rp = edm_vertex.getAssociatedParticle();
       if (vertex_rp.isAvailable()) {
         bool conv_found = false;
         for (const auto& [lcio_rp, edm_rp] : recoparticles_vec) {
@@ -584,7 +584,7 @@ void EDM4hep2LcioTool::convertVertices(
 // Convert MC Particles to LCIO
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
 // Add converted LCIO Collection Vector to LCIO event
-void EDM4hep2LcioTool::convertMCParticles(vec_pair<lcio::MCParticleImpl*, edm4hep::ConstMCParticle>& mc_particles_vec,
+void EDM4hep2LcioTool::convertMCParticles(vec_pair<lcio::MCParticleImpl*, edm4hep::MCParticle>& mc_particles_vec,
                                           const std::string& e4h_coll_name, const std::string& lcio_coll_name,
                                           lcio::LCEventImpl* lcio_event) {
   // MCParticles handle
@@ -657,10 +657,10 @@ void EDM4hep2LcioTool::convertMCParticles(vec_pair<lcio::MCParticleImpl*, edm4he
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
 // Add converted LCIO Collection Vector to LCIO event
 void EDM4hep2LcioTool::convertReconstructedParticles(
-    vec_pair<lcio::ReconstructedParticleImpl*, edm4hep::ConstReconstructedParticle>& recoparticles_vec,
-    const vec_pair<lcio::TrackImpl*, edm4hep::ConstTrack>&                           tracks_vec,
-    const vec_pair<lcio::VertexImpl*, edm4hep::ConstVertex>&                         vertex_vec,
-    const vec_pair<lcio::ClusterImpl*, edm4hep::ConstCluster>& clusters_vec, const std::string& e4h_coll_name,
+    vec_pair<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>& recoparticles_vec,
+    const vec_pair<lcio::TrackImpl*, edm4hep::Track>&                           tracks_vec,
+    const vec_pair<lcio::VertexImpl*, edm4hep::Vertex>&                         vertex_vec,
+    const vec_pair<lcio::ClusterImpl*, edm4hep::Cluster>& clusters_vec, const std::string& e4h_coll_name,
     const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event) {
   // ReconstructedParticles handle
   DataHandle<edm4hep::ReconstructedParticleCollection> recos_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
@@ -700,7 +700,7 @@ void EDM4hep2LcioTool::convertReconstructedParticles(
       }
 
       // Link sinlge associated Particle
-      edm4hep::ConstParticleID edm_pid_used = edm_rp.getParticleIDUsed();
+      auto edm_pid_used = edm_rp.getParticleIDUsed();
       if (edm_pid_used.isAvailable()) {
         for (const auto& lcio_pid : lcio_recp->getParticleIDs()) {
           bool is_same = true;
@@ -719,7 +719,7 @@ void EDM4hep2LcioTool::convertReconstructedParticles(
       }
 
       // Link sinlge associated Vertex if found in converted ones
-      edm4hep::ConstVertex vertex = edm_rp.getStartVertex();
+      auto vertex = edm_rp.getStartVertex();
       if (vertex.isAvailable()) {
         bool conv_found = false;
         for (const auto& [lcio_vertex, edm_vertex] : vertex_vec) {

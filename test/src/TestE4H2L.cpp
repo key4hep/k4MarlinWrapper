@@ -33,17 +33,15 @@ void TestE4H2L::createCalorimeterHits(const int num_elements, int& int_cnt, floa
   auto* calohit_coll = new edm4hep::CalorimeterHitCollection();
 
   for (int i = 0; i < num_elements; ++i) {
-    auto* elem = new edm4hep::CalorimeterHit();
+    auto elem = calohit_coll->create();
 
-    elem->setCellID(int_cnt++);
-    elem->setEnergy(float_cnt++);
-    elem->setEnergyError(float_cnt++);
-    elem->setTime(float_cnt++);
+    elem.setCellID(int_cnt++);
+    elem.setEnergy(float_cnt++);
+    elem.setEnergyError(float_cnt++);
+    elem.setTime(float_cnt++);
     edm4hep::Vector3f test_vec{float_cnt++, float_cnt++, float_cnt++};
-    elem->setPosition(test_vec);
-    elem->setType(int_cnt++);
-
-    calohit_coll->push_back(*elem);
+    elem.setPosition(test_vec);
+    elem.setType(int_cnt++);
   }
 
   auto* calohit_handle =
@@ -55,13 +53,11 @@ void TestE4H2L::createRawCalorimeterHits(const int num_elements, int& int_cnt, f
   auto* rawcalohit_coll = new edm4hep::RawCalorimeterHitCollection();
 
   for (int i = 0; i < num_elements; ++i) {
-    auto* elem = new edm4hep::RawCalorimeterHit();
+    auto elem = rawcalohit_coll->create();
 
-    elem->setCellID(int_cnt++);
-    elem->setAmplitude(int_cnt++);
-    elem->setTimeStamp(int_cnt++);
-
-    rawcalohit_coll->push_back(*elem);
+    elem.setCellID(int_cnt++);
+    elem.setAmplitude(int_cnt++);
+    elem.setTimeStamp(int_cnt++);
   }
 
   auto* rawcalohit_handle =
@@ -79,15 +75,16 @@ void TestE4H2L::createSimCalorimeterHits(const int num_elements, const int num_c
   const auto                                mcparticles_coll = mcparticles_handle.get();
 
   for (int i = 0; i < num_elements; ++i) {
-    auto* elem = new edm4hep::SimCalorimeterHit();
+    // auto* elem = new edm4hep::SimCalorimeterHit();
+    auto elem = simcalohit_coll->create();
 
-    elem->setCellID(int_cnt++);
-    elem->setEnergy(float_cnt++);
+    elem.setCellID(int_cnt++);
+    elem.setEnergy(float_cnt++);
     edm4hep::Vector3f test_vec{float_cnt++, float_cnt++, float_cnt++};
-    elem->setPosition(test_vec);
+    elem.setPosition(test_vec);
 
     for (int j = 0; j < num_contributions; j++) {
-      auto* contrib = new edm4hep::CaloHitContribution();
+      auto* contrib = new edm4hep::MutableCaloHitContribution();
       contrib->setPDG(int_cnt++);
       contrib->setEnergy(float_cnt++);
       contrib->setTime(float_cnt++);
@@ -101,10 +98,8 @@ void TestE4H2L::createSimCalorimeterHits(const int num_elements, const int num_c
         }
       }
 
-      elem->addToContributions(*contrib);
+      elem.addToContributions(*contrib);
     }
-
-    simcalohit_coll->push_back(*elem);
   }
 
   auto* simcalohit_handle =
@@ -117,18 +112,16 @@ void TestE4H2L::createTPCHits(const int num_elements, const int num_rawwords, in
   auto* tpchit_coll = new edm4hep::TPCHitCollection();
 
   for (int i = 0; i < num_elements; ++i) {
-    auto* elem = new edm4hep::TPCHit();
+    auto elem = tpchit_coll->create();
 
-    elem->setCellID(int_cnt++);
-    elem->setQuality(int_cnt++);
-    elem->setTime(float_cnt++);
-    elem->setCharge(float_cnt++);
+    elem.setCellID(int_cnt++);
+    elem.setQuality(int_cnt++);
+    elem.setTime(float_cnt++);
+    elem.setCharge(float_cnt++);
 
     for (int j = 0; j < num_rawwords; ++j) {
-      elem->addToRawDataWords(int_cnt++);
+      elem.addToRawDataWords(int_cnt++);
     }
-
-    tpchit_coll->push_back(*elem);
   }
 
   auto* tpchit_handle = dynamic_cast<DataHandle<edm4hep::TPCHitCollection>*>(m_dataHandlesMap[m_e4h_tpchit_name]);
@@ -139,21 +132,19 @@ void TestE4H2L::createTrackerHits(const int num_elements, int& int_cnt, float& f
   auto trackerhit_coll = new edm4hep::TrackerHitCollection();
 
   for (int i = 0; i < num_elements; ++i) {
-    auto elem = new edm4hep::TrackerHit();
+    auto elem = trackerhit_coll->create();
 
-    elem->setCellID(int_cnt++);
-    elem->setType(int_cnt++);
-    elem->setQuality(int_cnt++);
-    elem->setTime(float_cnt++);
-    elem->setEDep(float_cnt++);
-    elem->setEDepError(float_cnt++);
-    elem->setEdx(float_cnt++);
+    elem.setCellID(int_cnt++);
+    elem.setType(int_cnt++);
+    elem.setQuality(int_cnt++);
+    elem.setTime(float_cnt++);
+    elem.setEDep(float_cnt++);
+    elem.setEDepError(float_cnt++);
+    elem.setEdx(float_cnt++);
     edm4hep::Vector3d test_vec{float_cnt++, float_cnt++, float_cnt++};
-    elem->setPosition(test_vec);
+    elem.setPosition(test_vec);
     std::array<float, 6> test_array{float_cnt++, float_cnt++, float_cnt++, float_cnt++, float_cnt++, float_cnt++};
-    elem->setCovMatrix(test_array);
-
-    trackerhit_coll->push_back(*elem);
+    elem.setCovMatrix(test_array);
   }
 
   auto* trackerhit_handle =
@@ -171,22 +162,20 @@ void TestE4H2L::createSimTrackerHits(const int                                 n
   auto simtrackerhit_coll = new edm4hep::SimTrackerHitCollection();
 
   for (int i = 0; i < num_elements; ++i) {
-    auto elem = new edm4hep::SimTrackerHit();
+    auto elem = simtrackerhit_coll->create();
 
-    elem->setCellID(int_cnt++);
-    elem->setEDep(float_cnt++);
-    elem->setTime(float_cnt++);
-    elem->setPathLength(float_cnt++);
-    elem->setQuality(int_cnt++);
+    elem.setCellID(int_cnt++);
+    elem.setEDep(float_cnt++);
+    elem.setTime(float_cnt++);
+    elem.setPathLength(float_cnt++);
+    elem.setQuality(int_cnt++);
     edm4hep::Vector3d test_vec{float_cnt++, float_cnt++, float_cnt++};
-    elem->setPosition(test_vec);
+    elem.setPosition(test_vec);
     edm4hep::Vector3f test_vec_mom{float_cnt++, float_cnt++, float_cnt++};
-    elem->setMomentum(test_vec_mom);
+    elem.setMomentum(test_vec_mom);
 
-    elem->setOverlay(true);
-    elem->setProducedBySecondary(false);
-
-    simtrackerhit_coll->push_back(*elem);
+    elem.setOverlay(true);
+    elem.setProducedBySecondary(false);
   }
 
   // Connect single mcparticles to SimTrackerHits
@@ -207,17 +196,17 @@ void TestE4H2L::createTracks(const int num_elements, const int subdetectorhitnum
   auto track_coll = new edm4hep::TrackCollection();
 
   for (int i = 0; i < num_elements; ++i) {
-    auto elem = new edm4hep::Track();
+    auto elem = track_coll->create();
 
-    elem->setType(2);  // TODO specific type
-    elem->setChi2(float_cnt++);
-    elem->setNdf(int_cnt++);
-    elem->setDEdx(float_cnt++);
-    elem->setDEdxError(float_cnt++);
-    elem->setRadiusOfInnermostHit(float_cnt++);
+    elem.setType(2);  // TODO specific type
+    elem.setChi2(float_cnt++);
+    elem.setNdf(int_cnt++);
+    elem.setDEdx(float_cnt++);
+    elem.setDEdxError(float_cnt++);
+    elem.setRadiusOfInnermostHit(float_cnt++);
 
     for (int j = 0; j < subdetectorhitnumbers; ++j) {
-      elem->addToSubDetectorHitNumbers(int_cnt++);
+      elem.addToSubDetectorHitNumbers(int_cnt++);
     }
 
     DataHandle<edm4hep::TrackerHitCollection> trackerhits_handle{m_e4h_trackerhit_name, Gaudi::DataHandle::Reader,
@@ -225,7 +214,7 @@ void TestE4H2L::createTracks(const int num_elements, const int subdetectorhitnum
     const auto                                trackerhits_coll = trackerhits_handle.get();
 
     for (auto& idx : link_trackerhits_idx) {
-      elem->addToTrackerHits((*trackerhits_coll)[idx]);
+      elem.addToTrackerHits((*trackerhits_coll)[idx]);
     }
 
     for (int j = 0; j < num_track_states; ++j) {
@@ -244,10 +233,8 @@ void TestE4H2L::createTracks(const int num_elements, const int subdetectorhitnum
                                           float_cnt++, float_cnt++, float_cnt++, float_cnt++, float_cnt++};
       trackstate.covMatrix             = test_array;
 
-      elem->addToTrackStates(trackstate);
+      elem.addToTrackStates(trackstate);
     }
-
-    track_coll->push_back(*elem);
   }
 
   // Connect tracks between them
@@ -266,37 +253,35 @@ void TestE4H2L::createMCParticles(const int num_elements, const std::vector<std:
   auto mcparticle_coll = new edm4hep::MCParticleCollection();
 
   for (int i = 0; i < num_elements; ++i) {
-    auto elem = new edm4hep::MCParticle();
+    auto elem = mcparticle_coll->create();
 
-    elem->setPDG(int_cnt++);
-    elem->setGeneratorStatus(int_cnt++);
+    elem.setPDG(int_cnt++);
+    elem.setGeneratorStatus(int_cnt++);
     // elem->setSimulatorStatus(int_cnt++);
     edm4hep::Vector3d vertex_vec{float_cnt++, float_cnt++, float_cnt++};
-    elem->setVertex(vertex_vec);
-    elem->setTime(float_cnt++);
+    elem.setVertex(vertex_vec);
+    elem.setTime(float_cnt++);
     edm4hep::Vector3d endpoint_vec{float_cnt++, float_cnt++, float_cnt++};
-    elem->setEndpoint(endpoint_vec);
+    elem.setEndpoint(endpoint_vec);
     edm4hep::Vector3f momentum_vec{float_cnt++, float_cnt++, float_cnt++};
-    elem->setMomentum(momentum_vec);
+    elem.setMomentum(momentum_vec);
     edm4hep::Vector3f momentumatendpoint_vec{float_cnt++, float_cnt++, float_cnt++};
-    elem->setMomentumAtEndpoint(momentumatendpoint_vec);
-    elem->setMass(float_cnt++);
-    elem->setCharge(float_cnt++);
+    elem.setMomentumAtEndpoint(momentumatendpoint_vec);
+    elem.setMass(float_cnt++);
+    elem.setCharge(float_cnt++);
     edm4hep::Vector3f spin_vec{float_cnt++, float_cnt++, float_cnt++};
-    elem->setSpin(spin_vec);
+    elem.setSpin(spin_vec);
     edm4hep::Vector2i colorflow_vec{int_cnt++, int_cnt++};
-    elem->setColorFlow(colorflow_vec);
+    elem.setColorFlow(colorflow_vec);
 
-    elem->setCreatedInSimulation(1);
-    elem->setBackscatter(0);
-    elem->setVertexIsNotEndpointOfParent(1);
-    elem->setDecayedInTracker(0);
-    elem->setDecayedInCalorimeter(1);
-    elem->setHasLeftDetector(0);
-    elem->setStopped(1);
-    elem->setOverlay(0);
-
-    mcparticle_coll->push_back(*elem);
+    elem.setCreatedInSimulation(1);
+    elem.setBackscatter(0);
+    elem.setVertexIsNotEndpointOfParent(1);
+    elem.setDecayedInTracker(0);
+    elem.setDecayedInCalorimeter(1);
+    elem.setHasLeftDetector(0);
+    elem.setStopped(1);
+    elem.setOverlay(0);
   }
 
   // Connect mcparticles between them with parent relationship
