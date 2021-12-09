@@ -138,18 +138,12 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
   if (m_params.size() == 1 && m_params[0] == "*") {
     const auto* collections = the_event->getCollectionNames();
 
-    const std::string ext = "_EXT";
-    int               index_str;
+    // Remove the asterisk
+    m_params.value().clear();
 
     for (auto& coll : *collections) {
-      auto found = coll.find(ext);
-      if (found != std::string::npos) {
-        warning() << "Skipping conversion of collection named " << coll << ": contains special pattern: " << ext
-                  << std::endl;
-      } else {
-        m_params.value().emplace_back(coll);
-        m_params.value().emplace_back(coll);
-      }
+      m_params.value().emplace_back(coll);
+      m_params.value().emplace_back(coll);
     }
   }
 
