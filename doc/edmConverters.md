@@ -126,6 +126,7 @@ Collections from events that are already read, or are produced by a Gaudi Algori
 
 1. Instantiate the `EDM4hep2LcioTool` Gaudi Tool.
 2. Indicate the collections to convert in `Parameters`.
+  + To convert all available collections write an asterisk, like follows: `edmConvTool.Parameters = ["*"]`
   + Arguments are read in groups of 2: name of the EDM4hep collection, name of the LCIO converted collection.
 3. Select the Gaudi Algorithm that will convert the indicated collections.
 4. Add the Tool to the Gaudi Algorithm.
@@ -155,6 +156,7 @@ Collections from events that are already read, or are produced by a gaudi Algori
 
 1. Instantiate the `Lcio2EDM4hepTool` Gaudi Tool.
 2. Indicate the collections to convert in `Parameters`.
+  + To convert all available collections write an asterisk, like follows: `lcioConvTool.Parameters = ["*"]`
   + Arguments are read in groups of 2: name of the LCIO collection, name of the EDM4hep converted collection.
 3. Select the Gaudi Algorithm that will convert the indicated collections.
 4. Add the Tool to the Gaudi Algorithm.
