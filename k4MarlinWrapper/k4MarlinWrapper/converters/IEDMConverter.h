@@ -19,11 +19,15 @@
 #include <edm4hep/MCRecoCaloParticleAssociationCollection.h>
 #include <edm4hep/MCRecoParticleAssociation.h>
 #include <edm4hep/MCRecoParticleAssociationCollection.h>
+#include <edm4hep/MCRecoTrackParticleAssociation.h>
+#include <edm4hep/MCRecoTrackParticleAssociationCollection.h>
 #include <edm4hep/MCRecoTrackerAssociation.h>
 #include <edm4hep/MCRecoTrackerAssociationCollection.h>
 #include <edm4hep/ParticleIDCollection.h>
 #include <edm4hep/RawCalorimeterHit.h>
 #include <edm4hep/RawCalorimeterHitCollection.h>
+#include <edm4hep/RecoParticleVertexAssociation.h>
+#include <edm4hep/RecoParticleVertexAssociationCollection.h>
 #include <edm4hep/ReconstructedParticle.h>
 #include <edm4hep/ReconstructedParticleCollection.h>
 #include <edm4hep/ReconstructedParticleData.h>
