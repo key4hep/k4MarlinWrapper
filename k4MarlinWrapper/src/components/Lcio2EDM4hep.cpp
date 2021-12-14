@@ -222,6 +222,12 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
         } else if (e4h_coll_type_str == "edm4hep::MCRecoCaloParticleAssociation") {
           convertRegister<edm4hep::MCRecoCaloParticleAssociationCollection>(m_params[i + 1], m_params[i],
                                                                             lcio_converter, lcio_coll);
+        } else if (e4h_coll_type_str == "edm4hep::MCRecoTrackParticleAssociation") {
+          convertRegister<edm4hep::MCRecoTrackParticleAssociationCollection>(m_params[i + 1], m_params[i],
+                                                                             lcio_converter, lcio_coll);
+        } else if (e4h_coll_type_str == "edm4hep::RecoParticleVertexAssociation") {
+          convertRegister<edm4hep::RecoParticleVertexAssociationCollection>(m_params[i + 1], m_params[i],
+                                                                            lcio_converter, lcio_coll);
         } else {
           error() << "Unsuported LCRelation for collection " << m_params[i] << std::endl;
         }
