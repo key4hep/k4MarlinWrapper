@@ -40,13 +40,13 @@ if (BASH_PROGRAM)
   add_test( edm_converters ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/edm_converters.sh )
 
   # Test indicating -1 to go over all events
-  add_test( all_events_bounds ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/test_eof_handling.sh --num-events=-1)
+  add_test( all_events_bounds ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/all_events_bounds.sh )
   set_tests_properties ( all_events_bounds
     PROPERTIES
       PASS_REGULAR_EXPRESSION "Application Manager Terminated successfully with a user requested ScheduledStop")
 
   # Test putting more events than available, stopping on last available event gracefully
-  add_test( over_total_events ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/test_eof_handling.sh --num-events=15 )
+  add_test( over_total_events ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/over_total_events.sh )
   set_tests_properties ( over_total_events
     PROPERTIES
       PASS_REGULAR_EXPRESSION "Application Manager Terminated successfully with a user requested ScheduledStop")
