@@ -497,6 +497,10 @@ void EDM4hep2LcioTool::convertClusters(vec_pair<lcio::ClusterImpl*, edm4hep::Clu
               lcio_cluster->addHit(nullptr, 0);
           }
         }
+      } else {
+        error() << "There must be the same number of hits and hit contributions to convert clusters and the associated "
+                   "Calorimeter Hits"
+                << endmsg;
       }
 
       // Add LCIO and EDM4hep pair collections to vec
