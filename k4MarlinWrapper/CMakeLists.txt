@@ -77,3 +77,10 @@ gaudi_add_module(Lcio2EDM4hep
 target_include_directories(Lcio2EDM4hep PUBLIC
   ${CMAKE_SOURCE_DIR}/k4MarlinWrapper
 )
+
+# Copy python parsing file to genConfDir in Gaudi
+add_custom_command(
+        TARGET MarlinWrapper POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+                ${CMAKE_SOURCE_DIR}/k4MarlinWrapper/python/k4MarlinWrapper/parseConstants.py
+                ${CMAKE_CURRENT_BINARY_DIR}/genConfDir/k4MarlinWrapper/parseConstants.py)
