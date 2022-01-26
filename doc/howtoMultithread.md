@@ -109,3 +109,15 @@ ApplicationMgr( TopAlg = [seq],
               )
 ```
 
+## Running example
+
+A multi-threaded CLIC Reconstruction can be run in multi-threaded mode, for LCIO input and output.
+After successful compilation, from the build location:
+
+```sh
+# Check available tests
+ctest -N
+
+# Run multi-threaded clicReconstruction test
+ctest -R clicRec_lcio_mt
+```
