@@ -18,7 +18,7 @@ jobs:
           -it --name k4MW_CI \
           -v ${{ github.workspace }}:/k4MW \
           -v /cvmfs:/cvmfs:shared \
-          -d clicdp/cc7-lcg /bin/bash
+          -d ghcr.io/aidasoft/centos7:latest /bin/bash
     - name: Setup container
       run: |
         docker exec k4MW_CI /bin/bash -c 'yum -y install make git wget\
