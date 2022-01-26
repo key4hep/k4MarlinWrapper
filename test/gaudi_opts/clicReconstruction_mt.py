@@ -369,30 +369,6 @@ OuterEndcapPlanarDigiProcessor.Parameters = {
                                              "TrackerHitCollectionName": ["OTrackerEndcapHits"]
                                              }
 
-Output_DST = MarlinProcessorWrapper("Output_DST")
-Output_DST.OutputLevel = WARNING 
-Output_DST.ProcessorType = "LCIOOutputProcessor" 
-Output_DST.Parameters = {
-                         "DropCollectionNames": [],
-                         "DropCollectionTypes": ["MCParticle", "LCRelation", "SimCalorimeterHit", "CalorimeterHit", "SimTrackerHit", "TrackerHit", "TrackerHitPlane", "Track", "ReconstructedParticle", "LCFloatVec", "Clusters"],
-                         "FullSubsetCollections": ["EfficientMCParticles", "InefficientMCParticles", "MCPhysicsParticles"],
-                         "KeepCollectionNames": ["MCParticlesSkimmed", "MCPhysicsParticles", "RecoMCTruthLink", "SiTracks", "SiTracks_Refitted", "PandoraClusters", "PandoraPFOs", "SelectedPandoraPFOs", "LooseSelectedPandoraPFOs", "TightSelectedPandoraPFOs", "LE_SelectedPandoraPFOs", "LE_LooseSelectedPandoraPFOs", "LE_TightSelectedPandoraPFOs", "LumiCalClusters", "LumiCalRecoParticles", "BeamCalClusters", "BeamCalRecoParticles", "MergedRecoParticles", "MergedClusters", "RefinedVertexJets", "RefinedVertexJets_rel", "RefinedVertexJets_vtx", "RefinedVertexJets_vtx_RP", "BuildUpVertices", "BuildUpVertices_res", "BuildUpVertices_RP", "BuildUpVertices_res_RP", "BuildUpVertices_V0", "BuildUpVertices_V0_res", "BuildUpVertices_V0_RP", "BuildUpVertices_V0_res_RP", "PrimaryVertices", "PrimaryVertices_res", "PrimaryVertices_RP", "PrimaryVertices_res_RP", "RefinedVertices", "RefinedVertices_RP"],
-                         "LCIOOutputFile": ["Output_DST.slcio"],
-                         "LCIOWriteMode": ["WRITE_NEW"]
-                         }
-
-Output_REC = MarlinProcessorWrapper("Output_REC")
-Output_REC.OutputLevel = WARNING 
-Output_REC.ProcessorType = "LCIOOutputProcessor" 
-Output_REC.Parameters = {
-                         "DropCollectionNames": [],
-                         "DropCollectionTypes": [],
-                         "FullSubsetCollections": ["EfficientMCParticles", "InefficientMCParticles"],
-                         "KeepCollectionNames": [],
-                         "LCIOOutputFile": ["Output_REC.slcio"],
-                         "LCIOWriteMode": ["WRITE_NEW"]
-                         }
-
 MyAIDAProcessor = MarlinProcessorWrapper("MyAIDAProcessor")
 MyAIDAProcessor.OutputLevel = WARNING 
 MyAIDAProcessor.ProcessorType = "AIDAProcessor" 
@@ -1350,18 +1326,59 @@ MyDDSimpleMuonDigi.Parameters = {
 
 
 
+Output_DST = MarlinProcessorWrapper("Output_DST")
+Output_DST.OutputLevel = WARNING
+Output_DST.ProcessorType = "LCIOOutputProcessor"
+Output_DST.Parameters = {
+                         "DropCollectionNames": [],
+                         "DropCollectionTypes": ["MCParticle", "LCRelation", "SimCalorimeterHit", "CalorimeterHit", "SimTrackerHit", "TrackerHit", "TrackerHitPlane", "Track", "ReconstructedParticle", "LCFloatVec", "Clusters"],
+                         "FullSubsetCollections": ["EfficientMCParticles", "InefficientMCParticles", "MCPhysicsParticles"],
+                         "KeepCollectionNames": ["MCParticlesSkimmed", "MCPhysicsParticles", "RecoMCTruthLink", "SiTracks", "SiTracks_Refitted", "PandoraClusters", "PandoraPFOs", "SelectedPandoraPFOs", "LooseSelectedPandoraPFOs", "TightSelectedPandoraPFOs", "LE_SelectedPandoraPFOs", "LE_LooseSelectedPandoraPFOs", "LE_TightSelectedPandoraPFOs", "LumiCalClusters", "LumiCalRecoParticles", "BeamCalClusters", "BeamCalRecoParticles", "MergedRecoParticles", "MergedClusters", "RefinedVertexJets", "RefinedVertexJets_rel", "RefinedVertexJets_vtx", "RefinedVertexJets_vtx_RP", "BuildUpVertices", "BuildUpVertices_res", "BuildUpVertices_RP", "BuildUpVertices_res_RP", "BuildUpVertices_V0", "BuildUpVertices_V0_res", "BuildUpVertices_V0_RP", "BuildUpVertices_V0_res_RP", "PrimaryVertices", "PrimaryVertices_res", "PrimaryVertices_RP", "PrimaryVertices_res_RP", "RefinedVertices", "RefinedVertices_RP"],
+                         "LCIOOutputFile": ["Output_DST.slcio"],
+                         "LCIOWriteMode": ["WRITE_NEW"]
+                         }
+
+Output_REC = MarlinProcessorWrapper("Output_REC")
+Output_REC.OutputLevel = WARNING
+Output_REC.ProcessorType = "LCIOOutputProcessor"
+Output_REC.Parameters = {
+                         "DropCollectionNames": [],
+                         "DropCollectionTypes": [],
+                         "FullSubsetCollections": ["EfficientMCParticles", "InefficientMCParticles"],
+                         "KeepCollectionNames": [],
+                         "LCIOOutputFile": ["Output_REC.slcio"],
+                         "LCIOWriteMode": ["WRITE_NEW"]
+                         }
+
+
+
+
 from Configurables import LcioEventOutput
 
-MyLcioEventOutput = LcioEventOutput("MyLcioEventOutput")
-MyLcioEventOutput.WriteMode = "WRITE_NEW"
-MyLcioEventOutput.OutputFileName = "MT_Output_REC.slcio"
+MyLcioEventOutput_DST = LcioEventOutput("MyLcioEventOutput_DST")
+MyLcioEventOutput_DST.DropCollectionNames = []
+MyLcioEventOutput_DST.DropCollectionTypes = ["MCParticle", "LCRelation", "SimCalorimeterHit", "CalorimeterHit", "SimTrackerHit", "TrackerHit", "TrackerHitPlane", "Track", "ReconstructedParticle", "LCFloatVec", "Clusters"]
+MyLcioEventOutput_DST.FullSubsetCollections = ["EfficientMCParticles", "InefficientMCParticles", "MCPhysicsParticles"]
+MyLcioEventOutput_DST.KeepCollectionNames = ["MCParticlesSkimmed", "MCPhysicsParticles", "RecoMCTruthLink", "SiTracks", "SiTracks_Refitted", "PandoraClusters", "PandoraPFOs", "SelectedPandoraPFOs", "LooseSelectedPandoraPFOs", "TightSelectedPandoraPFOs", "LE_SelectedPandoraPFOs", "LE_LooseSelectedPandoraPFOs", "LE_TightSelectedPandoraPFOs", "LumiCalClusters", "LumiCalRecoParticles", "BeamCalClusters", "BeamCalRecoParticles", "MergedRecoParticles", "MergedClusters", "RefinedVertexJets", "RefinedVertexJets_rel", "RefinedVertexJets_vtx", "RefinedVertexJets_vtx_RP", "BuildUpVertices", "BuildUpVertices_res", "BuildUpVertices_RP", "BuildUpVertices_res_RP", "BuildUpVertices_V0", "BuildUpVertices_V0_res", "BuildUpVertices_V0_RP", "BuildUpVertices_V0_res_RP", "PrimaryVertices", "PrimaryVertices_res", "PrimaryVertices_RP", "PrimaryVertices_res_RP", "RefinedVertices", "RefinedVertices_RP"]
+MyLcioEventOutput_DST.OutputFileName = "MT_Output_DST.slcio"
+MyLcioEventOutput_DST.WriteMode = "WRITE_NEW"
+
+
+
+MyLcioEventOutput_REC = LcioEventOutput("MyLcioEventOutput_REC")
+MyLcioEventOutput_REC.DropCollectionNames = []
+MyLcioEventOutput_REC.DropCollectionTypes = []
+MyLcioEventOutput_REC.FullSubsetCollections = ["EfficientMCParticles", "InefficientMCParticles"]
+MyLcioEventOutput_REC.KeepCollectionNames = []
+MyLcioEventOutput_REC.OutputFileName = "MT_Output_REC.slcio"
+MyLcioEventOutput_REC.WriteMode = "WRITE_NEW"
 
 
 
 
-
-
-
+###########################################################
+# Add all algorithms
+###########################################################
 algList.append(read)
 algList.append(MyAIDAProcessor)
 algList.append(EventNumber)
@@ -1410,9 +1427,11 @@ algList.append(RenameCollection)  # Config.OverlayFalse
 algList.append(VertexFinder)
 algList.append(JetClusteringAndRefiner)
 # algList.append(VertexFinderUnconstrained)  # Config.VertexUnconstrainedON
+
 # algList.append(Output_REC)
 # algList.append(Output_DST)
-algList.append(MyLcioEventOutput)
+algList.append(MyLcioEventOutput_REC)
+algList.append(MyLcioEventOutput_DST)
 
 
 
@@ -1430,7 +1449,9 @@ seq = GaudiSequencer(
     OutputLevel=VERBOSE)
 
 
-
+###########################################################
+# Application Manager configuration
+###########################################################
 from Configurables import ApplicationMgr
 ApplicationMgr( TopAlg = [seq],
                 EvtSel = 'NONE',
