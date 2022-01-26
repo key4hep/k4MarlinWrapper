@@ -31,6 +31,7 @@
 #include <GaudiAlg/GaudiAlgorithm.h>
 
 #include <EVENT/LCIO.h>
+#include <IMPL/LCCollectionVec.h>
 #include <IMPL/LCEventImpl.h>
 #include <MT/LCWriter.h>
 #include <lcio.h>
@@ -48,8 +49,16 @@ public:
 private:
   MT::LCWriter* m_writer = nullptr;
 
-  Gaudi::Property<std::string> m_write_mode{this, "WriteMode", ""};
-  Gaudi::Property<std::string> m_filename{this, "OutputFileName", ""};
+  Gaudi::Property<std::string>              m_write_mode{this, "WriteMode", {}};
+  Gaudi::Property<std::string>              m_filename{this, "OutputFileName", {}};
+  Gaudi::Property<std::vector<std::string>> m_drop_coll_names{this, "DropCollectionNames", {}};
+  Gaudi::Property<std::vector<std::string>> m_keep_coll_names{this, "KeepCollectionNames", {}};
+  Gaudi::Property<std::vector<std::string>> m_drop_coll_types{this, "DropCollectionTypes", {}};
+  Gaudi::Property<std::vector<std::string>> m_full_subset_colls{this, "FullSubsetCollections", {}};
+
+  void dropCollections(lcio::LCEventImpl* event, std::vector<lcio::LCCollectionVec*>& subsets);
+
+  void revertSubsets(const std::vector<lcio::LCCollectionVec*>& subsets);
 };
 
 #endif
