@@ -25,6 +25,9 @@ DECLARE_COMPONENT(LcioEventOutput)
 
 LcioEventOutput::LcioEventOutput(const std::string& name, ISvcLocator* pSL) : GaudiAlgorithm(name, pSL) {}
 
+////////////////////////////////////////////
+// Init MT writer and write mode
+////////////////////////////////////////////
 StatusCode LcioEventOutput::initialize() {
   StatusCode sc = GaudiAlgorithm::initialize();
   if (sc.isFailure())
@@ -48,6 +51,10 @@ StatusCode LcioEventOutput::initialize() {
   return StatusCode::SUCCESS;
 }
 
+
+////////////////////////////////////////////
+// Go over all collections and drop based on input parameters
+////////////////////////////////////////////
 void LcioEventOutput::dropCollections(lcio::LCEventImpl* event, std::vector<lcio::LCCollectionVec*>& subsets) {
   const std::vector<std::string>* evt_coll_names = event->getCollectionNames();
 
@@ -111,6 +118,9 @@ void LcioEventOutput::dropCollections(lcio::LCEventImpl* event, std::vector<lcio
   }
 }
 
+////////////////////////////////////////////
+// Revert subsets marked while dropping collections
+////////////////////////////////////////////
 void LcioEventOutput::revertSubsets(const std::vector<lcio::LCCollectionVec*>& subsets) {
   // revert subset flag - if any
   for (auto& subset : subsets) {
@@ -118,6 +128,10 @@ void LcioEventOutput::revertSubsets(const std::vector<lcio::LCCollectionVec*>& s
   }
 }
 
+
+////////////////////////////////////////////
+// Get LCIO event from event service, write it to output file
+////////////////////////////////////////////
 StatusCode LcioEventOutput::execute() {
   // Get event
   DataObject*        pObject   = nullptr;
@@ -133,6 +147,9 @@ StatusCode LcioEventOutput::execute() {
   return StatusCode::SUCCESS;
 }
 
+////////////////////////////////////////////
+// Clean-up resources
+////////////////////////////////////////////
 StatusCode LcioEventOutput::finalize() {
   // Cleanup
   m_writer->close();
