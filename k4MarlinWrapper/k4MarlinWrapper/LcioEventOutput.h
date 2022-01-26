@@ -22,9 +22,9 @@
 #ifndef K4MARLINWRAPPER_LCIOEVENTOUTPUT_H
 #define K4MARLINWRAPPER_LCIOEVENTOUTPUT_H
 
-// ***
-// LCEventOutput: Write out LCIO events
-// ***
+////////////////////////////////////////////
+// LCEventOutput: Write out LCIO events using MT writer from LCIO
+////////////////////////////////////////////
 
 #include <iostream>
 
