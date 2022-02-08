@@ -19,11 +19,6 @@ jobs:
           -v ${{ github.workspace }}:/k4MW \
           -v /cvmfs:/cvmfs:shared \
           -d ghcr.io/aidasoft/centos7:latest /bin/bash
-    - name: Setup container
-      run: |
-        docker exec k4MW_CI /bin/bash -c 'yum -y install make git wget\
-        '
-
     - name: Compile
       run: |
         docker exec k4MW_CI /bin/bash -c 'source ${{ matrix.SETUP }};
