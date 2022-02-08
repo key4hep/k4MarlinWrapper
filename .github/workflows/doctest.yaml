@@ -16,11 +16,6 @@ jobs:
     - name: Start container
       run: |
         docker run -it --name CI_container -v ${GITHUB_WORKSPACE}:/Package -v /cvmfs:/cvmfs:shared -d ghcr.io/aidasoft/centos7:latest /bin/bash
-    - name: Setup container
-      run: |
-        docker exec CI_container /bin/bash -c ' ln -s /usr/lib64/liblzma.so.5.2.2 /usr/lib64/liblzma.so;\
-        '
-
     - name: Compile
       run: |
         docker exec CI_container /bin/bash -c ' cd Package;/
@@ -29,7 +24,6 @@ jobs:
         cmake .. ;\
         make -j 2;\
         '
-
     - name: CheckPage  
       run: |
         docker exec CI_container /bin/bash -c 'cd ./Package;
