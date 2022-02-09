@@ -76,9 +76,10 @@ cd CLICPerformance/clicConfig
 convertMarlinSteeringToGaudi.py clicReconstruction.xml clicReconstruction.py
 ```
 
-
 Reconstruction can be performed with EDM4hep or LCIO input, depending on the output format of the events produced
 during [Simulation](#simulation).
+
+#### Reconstruction with EDM4hep input
 
 - When using **EDM4hep** format for the input events to be used in reconstruction, refer to the [**EDM converters**](https://github.com/key4hep/k4MarlinWrapper/blob/master/doc/edmConverters.md)
 included with k4MarlinWrapper. Note that:
@@ -88,12 +89,12 @@ included with k4MarlinWrapper. Note that:
     * Some *MarlinProcessorWrappers* may modify collections instead of producing new ones: the original EDM4hep collection wont be updated in this case and would need conversion from LCIO to EDM4hep.
 
 - To run *clicReconstruction* with EDM4hep format, use the steering file found in the `test` folder of k4MarlinWrapper:
-`test/gaudi_opts/clicReconstruction_e4h_input.py`
+`test/gaudi_opts/clicRec_e4h_input.py`
   + Change line `evtsvc.input = '$TEST_DIR/inputFiles/ttbar1_edm4hep.root'` to point to the location of your input file.
   + At the bottom of the file, in the `ApplicationMgr` parameters, change `EvtMax   = 3,` to the number of events to run.
 
 
-Reconstruction with EDM4hep input, using k4MarlinWrapper can be run with:
+This can be run with:
 
 ```bash
 cd CLICPerformance/clicConfig
@@ -103,7 +104,7 @@ cp ../../../test/gaudi_opts/clicRec_e4h_input.py .
 k4run clicRec_e4h_input.py --EventDataSvc.input ttbar_edm4hep.root
 ```
 
----
+#### Reconstruction with LCIO input
 
 - When using **LCIO** format for the input events to be used in reconstruction:
   + Modify the ``clicReconstruction.py`` file to point to the ``ttbar.slcio`` input file, and change the
