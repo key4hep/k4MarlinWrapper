@@ -28,7 +28,7 @@ Use the CVMFS HSF Key4hep view to compile and install k4MarlinWrapper.
 
 ```bash
 source /cvmfs/sw.hsf.org/key4hep/setup.sh
-# Alternatively use the nightlies to use the latests packages
+# Alternatively use the nightly build to get the latest development branches of key4hep packages
 # source /cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh
 
 git clone https://github.com/key4hep/k4MarlinWrapper.git
