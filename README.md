@@ -7,6 +7,12 @@ It provides the necessary converters and interfaces between the file types and f
 - Steering file input conversion from Marlin (XML) to Gaudi (Python)
 - Input and output file support for LCIO and EDM4hep
 
+## Build status
+
+![linux](https://github.com/github/docs/actions/workflows/test.yml/badge.svg)
+![doctest-linux](https://github.com/github/docs/actions/workflows/doctest.yml/badge.svg)
+![clang-format-check](https://github.com/github/docs/actions/workflows/clang-format-check.yml/badge.svg)
+
 ## Using Event Data Model (EDM) converters
 
 Please refer to the [EDM Converters](./doc/edmConverters.md) documentation
