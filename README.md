@@ -1,14 +1,24 @@
 # k4MarlinWrapper
 
-Welcome to k4 Marlin Wrapper
+k4MarlinWrapper runs [Marlin](https://github.com/iLCSoft/Marlin) procesors as [Gaudi](https://gitlab.cern.ch/gaudi/Gaudi) algorithms.
+It provides the necessary converters and interfaces between the file types and formats used between both frameworks:
+- Python interface to configure Marlin processors
+- In-memory Event Data Model (EDM) converters between [LCIO](https://github.com/iLCSoft/LCIO) and [EDM4hep](https://github.com/key4hep/EDM4hep)
+- Steering file input conversion from Marlin (XML) to Gaudi (Python)
+- Input and output file support for LCIO and EDM4hep
+
+## Using Event Data Model (EDM) converters
+
+Please refer to the [EDM Converters](./doc/edmConverters.md) documentation
+
 
 ## Configuring, compiling and installing
 
-Use the CVMFS HSF key4hep view to compile k4MarlinWrapper.
+Use the CVMFS HSF Key4hep view to compile and install k4MarlinWrapper.
 
 ```bash
 source /cvmfs/sw.hsf.org/key4hep/setup.sh
-# Alternatively use nightlies
+# Alternatively use the nightlies to use the latests packages
 # source /cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh
 
 git clone https://github.com/key4hep/k4MarlinWrapper.git
@@ -23,21 +33,25 @@ make -j 4
 make install
 ```
 
+
 ## Running
 
-To run k4MarlinWrapper, some input is needed:
-- As an example, copy the `muons.slcio` from the [DD4hep](https://github.com/AIDASoft/DD4hep) file located in the `DDTest/inputFiles/` directory to `test/inputFiles/` directory in k4MarlinWrapper
+k4MarlinWrapper processors run with LCIO and EDM4hep input.
+- As an example for LCIO, copy the `muons.slcio` from the [DD4hep](https://github.com/AIDASoft/DD4hep) file located in the `DDTest/inputFiles/` directory to `test/inputFiles/` directory in k4MarlinWrapper
 
-To copy file and run:
+To copy the file and run:
 ```bash
 mkdir ../test/inputFiles
 cp /path/to/muons.slcio ../test/inputFiles/muons.slcio
 k4run ../k4MarlinWrapper/examples/runit.py
 ```
 
+
 ## Testing
 
-Several tests are provided
+Several tests are provided. These serve as examples on how to use different features of k4MarlinWrapper.
+
+Refer to the `test/gaudi_opts` directory to find steering files covering different use cases.
 
 ```bash
 # Display available tests
@@ -47,7 +61,3 @@ ctest
 # Run specific test with verbose output
 ctest --verbose -R test_clicReconstruction
 ```
-
-## Using Event Data Model (EDM) converters
-
-Please refer to [this doc](./doc/edmConverters.md)
