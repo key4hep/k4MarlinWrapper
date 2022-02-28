@@ -9,11 +9,12 @@ It provides the necessary converters and interfaces between the file types and f
 
 ## Build status
 
-![linux](https://github.com/github/docs/actions/workflows/test.yml/badge.svg)
 
-![doctest-linux](https://github.com/github/docs/actions/workflows/doctest.yaml/badge.svg)
+[![linux](https://github.com/github/docs/actions/workflows/test.yml/badge.svg)](https://github.com/key4hep/k4MarlinWrapper/actions/workflows/test.yml)
 
-![clang-format-check](https://github.com/github/docs/actions/workflows/clang-format-check.yml/badge.svg)
+[![doctest-linux](https://github.com/github/docs/actions/workflows/doctest.yaml/badge.svg)](https://github.com/key4hep/k4MarlinWrapper/actions/workflows/doctest.yaml)
+
+[![clang-format-check](https://github.com/github/docs/actions/workflows/clang-format-check.yml/badge.svg)](https://github.com/key4hep/k4MarlinWrapper/actions/workflows/clang-format-check.yml)
 
 
 ## Using Event Data Model (EDM) converters
