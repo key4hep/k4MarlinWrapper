@@ -47,7 +47,18 @@ k4run ../k4MarlinWrapper/examples/runit.py
 ```
 
 
-## Testing
+## Format
+
+To keep source code style consistent a `.clang-format` configuration is included.
+A CI test will check for compliance with this format on Pull Requests.
+To apply Clang format to all source and header files, please use your editor's or IDE's built-in integration, or directly from the command line. For example:
+
+```bash
+find . -regex '.*\.\(cpp\|h\)' -exec clang-format -style=file -i {} \;
+```
+
+
+## Testing and examples
 
 Several tests are provided. These serve as examples on how to use different features of k4MarlinWrapper.
 
