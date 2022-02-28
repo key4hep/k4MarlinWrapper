@@ -11,7 +11,7 @@ It provides the necessary converters and interfaces between the file types and f
 
 ![linux](https://github.com/github/docs/actions/workflows/test.yml/badge.svg)
 
-![doctest-linux](https://github.com/github/docs/actions/workflows/doctest.yml/badge.svg)
+![doctest-linux](https://github.com/github/docs/actions/workflows/doctest.yaml/badge.svg)
 
 ![clang-format-check](https://github.com/github/docs/actions/workflows/clang-format-check.yml/badge.svg)
 
