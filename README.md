@@ -3,6 +3,10 @@
 
 # k4MarlinWrapper
 
+<p align="center">
+  <img src="doc/k4marlinwrapper_logo.svg"/>
+</p>
+
 k4MarlinWrapper runs [Marlin](https://github.com/iLCSoft/Marlin) procesors as [Gaudi](https://gitlab.cern.ch/gaudi/Gaudi) algorithms.
 It provides the necessary converters and interfaces between the file types and formats used between both frameworks:
 - Python interface to configure Marlin processors
