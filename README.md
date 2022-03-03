@@ -1,3 +1,6 @@
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4719244.svg)](https://doi.org/10.5281/zenodo.4719244)
+
 # k4MarlinWrapper
 
 k4MarlinWrapper runs [Marlin](https://github.com/iLCSoft/Marlin) procesors as [Gaudi](https://gitlab.cern.ch/gaudi/Gaudi) algorithms.
