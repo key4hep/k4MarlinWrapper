@@ -51,7 +51,6 @@ StatusCode LcioEventOutput::initialize() {
   return StatusCode::SUCCESS;
 }
 
-
 ////////////////////////////////////////////
 // Go over all collections and drop based on input parameters
 ////////////////////////////////////////////
@@ -127,7 +126,6 @@ void LcioEventOutput::revertSubsets(const std::vector<lcio::LCCollectionVec*>& s
     (*subset).setSubset(true);
   }
 }
-
 
 ////////////////////////////////////////////
 // Get LCIO event from event service, write it to output file
