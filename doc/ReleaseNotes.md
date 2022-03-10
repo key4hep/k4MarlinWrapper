@@ -1,3 +1,65 @@
+# v00-04-01
+
+* 2022-03-08 Andre Sailer ([PR#67](https://github.com/key4hep/k4MarlinWrapper/pull/67))
+  - GaudiOpts: add example for FCCee_o1_v04 reconstruction based on https://github.com/iLCSoft/CLICPerformance/blob/master/fcceeConfig/fccReconstruction.xml including conversions from EDM4hep to LCIO at the start and to EDM4hep at the end
+  - GaudiOpts: CLIC Reco: add some missing calo hit Contributions collections, BeamCal Collection
+
+* 2022-03-03 Valentin Volkl ([PR#70](https://github.com/key4hep/k4MarlinWrapper/pull/70))
+  - [doc] add zenodo badge to README
+
+* 2022-03-03 Placido Fernandez Declara ([PR#69](https://github.com/key4hep/k4MarlinWrapper/pull/69))
+  - add a simple logo for the project
+
+* 2022-03-02 Valentin Volkl ([PR#62](https://github.com/key4hep/k4MarlinWrapper/pull/62))
+  - convert RecoParticleVertexAssociation and MCRecoTrackParticleAssociation
+
+* 2022-03-01 Placido Fernandez Declara ([PR#63](https://github.com/key4hep/k4MarlinWrapper/pull/63))
+  - Add error message if hits and hit contributions in clusters are not the same size
+  - Copy `parseConstants.py` file to Gaudi-generated genConfDir to make it available Gaudi-wide
+
+* 2022-02-28 Placido Fernandez Declara ([PR#68](https://github.com/key4hep/k4MarlinWrapper/pull/68))
+  - Update documentation
+  - Add clang-format instructions
+  - Add badges for tests status
+
+* 2022-02-09 Andre Sailer ([PR#66](https://github.com/key4hep/k4MarlinWrapper/pull/66))
+  - Docs: titles for reco subsections with different input formats
+  - Docs: fix filename of clicRec_e4h_input.py
+
+* 2022-02-09 Andre Sailer ([PR#65](https://github.com/key4hep/k4MarlinWrapper/pull/65))
+  - CI: adapt to new container images and remove unnecessary container setup
+
+* 2022-01-26 Andre Sailer ([PR#64](https://github.com/key4hep/k4MarlinWrapper/pull/64))
+  - CI: use github hosted docker image
+
+* 2022-01-25 Thomas Madlener ([PR#59](https://github.com/key4hep/k4MarlinWrapper/pull/59))
+  - Adapting to the new immutable defaults introduced in AIDASoft/podio#205 and key4hep/EDM4hep#132.
+
+* 2021-12-15 Placido Fernandez Declara ([PR#61](https://github.com/key4hep/k4MarlinWrapper/pull/61))
+  - LCIO -> EDM4hep, and EDM4hep -> LCIO converters now have the option to convert all available collections
+  - Updated docs 
+  
+  Needs:
+  - https://github.com/key4hep/k4LCIOReader/pull/15
+  - https://github.com/key4hep/EDM4hep/pull/133
+
+* 2021-12-06 Placido Fernandez Declara ([PR#58](https://github.com/key4hep/k4MarlinWrapper/pull/58))
+  - Capture Exceptions coming from Marlin and handle them.
+
+* 2021-11-24 Placido Fernandez Declara ([PR#55](https://github.com/key4hep/k4MarlinWrapper/pull/55))
+  - Test clicReconstruction sequence with EDM4hep input
+  - Use converters for both EDM4hep <--> LCIO conversion in all relevant algorithms
+  - Output reconstruction in EDM4hep format
+
+* 2021-11-22 Placido Fernandez Declara ([PR#54](https://github.com/key4hep/k4MarlinWrapper/pull/54))
+  - remove calls to `getReadCollections()` to comply with updated k4fwcore https://github.com/key4hep/k4FWCore/pull/70
+
+* 2021-11-18 Valentin Volkl ([PR#51](https://github.com/key4hep/k4MarlinWrapper/pull/51))
+  - [cmake] fix wrong include for targets
+
+* 2021-11-12 Placido Fernandez Declara ([PR#50](https://github.com/key4hep/k4MarlinWrapper/pull/50))
+  - Convert LCIO cellID string to metadata when using LCIO2EDM4hep conversion
+
 # v00-04
 
 * 2021-10-19 Valentin Volkl ([PR#49](https://github.com/key4hep/k4MarlinWrapper/pull/49))
