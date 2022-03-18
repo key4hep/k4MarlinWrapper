@@ -157,23 +157,37 @@ StatusCode MarlinProcessorWrapper::initialize() {
     marlin::Global::parameters = new marlin::StringParameters();
     marlin::Global::parameters->add("AllowToModifyEvent", {"true"});
 
-    // From GaudiExamples/EvtColAlg
-    Assert(randSvc() != 0, "Random Service not available");
-    std::vector<long> rngSeeds;
-    if (randSvc()->engine()->seeds(rngSeeds).isFailure()) {
-      error() << "Cannot get seeds from Random Service" << endmsg;
-      return StatusCode::FAILURE;
-    }
-    debug() << "Got the following seeds from the random service: ";
-    for (const auto s : rngSeeds) {
-      debug() << s << " ";
-    }
-    debug() << endmsg;
+    // Random Service setup
+    // if (m_seeds.size() > 0) {
+    auto sc_set_seeds = randSvc()->engine()->setSeeds({});
+    if (!sc_set_seeds.isSuccess()) return Error("Could not set seeds for Random Generator Service");
 
-    if (!rngSeeds.empty()) {
-      info() << "Setting global Marlin random seed to " << rngSeeds[0] << endmsg;
-      marlin::Global::parameters->add("RandomSeed", {std::to_string(rngSeeds[0])});
-    }
+    std::vector<long> gotSeeds{};
+    randSvc()->engine()->seeds(gotSeeds);
+
+    auto sc_flatGen_init = m_flatGenerator.initialize(randSvc(), Rndm::Flat(0, 999999));
+    if (!sc_flatGen_init.isSuccess()) return Error("Cannot initialize Random Service based flat generator");
+
+
+
+    std::string marlin_seed = std::to_string((long) m_flatGenerator());
+    info() << "Setting global Marlin random seed to " << marlin_seed << endmsg;    
+    marlin::Global::parameters->add("RandomSeed", {marlin_seed});
+
+    // std::cout << m_flatGenerator() << std::endl;
+
+    // // From GaudiExamples/EvtColAlg
+    // Assert(randSvc() != 0, "Random Service not available");
+    // std::vector<long> rngSeeds;
+    // if (randSvc()->engine()->seeds(rngSeeds).isFailure()) {
+    //   error() << "Cannot get seeds from Random Service" << endmsg;
+    //   return StatusCode::FAILURE;
+    // }
+    // debug() << "Got the following seeds from the random service: ";
+    // for (const auto s : rngSeeds) {
+    //   debug() << s << " ";
+    // }
+    // debug() << endmsg;
 
     if (loadProcessorLibraries().isFailure()) {
       return StatusCode::FAILURE;
