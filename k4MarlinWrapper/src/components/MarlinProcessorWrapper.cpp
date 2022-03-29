@@ -201,7 +201,7 @@ StatusCode MarlinProcessorWrapper::execute() {
   if (scStatus.isSuccess()) {
     bool hasLCEvent = static_cast<LCEventWrapperStatus*>(pStatus)->hasLCEvent;
     if (not hasLCEvent) {
-      warning() << "An LCIO Event reading returned nullptr, so MarlinProcessorWrapper won't execute" << endmsg;
+      warning() << "LCIO Event reading returned nullptr, so MarlinProcessorWrapper won't execute" << endmsg;
       return StatusCode::SUCCESS;
     }
   }
