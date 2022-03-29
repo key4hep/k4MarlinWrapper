@@ -20,7 +20,6 @@
  *   or submit itself to any jurisdiction.
  *
  */
-#include "GaudiKernel/IRndmEngine.h"
 
 #include "k4MarlinWrapper/MarlinProcessorWrapper.h"
 
