@@ -30,7 +30,6 @@ procA.Parameters = {"FileName": ["histograms"],
                     "Compress": ["1"],
                     "Verbosity": ["DEBUG"],
                     }
-procA.RandomSeeds = [88]
 algList.append(procA)
 
 

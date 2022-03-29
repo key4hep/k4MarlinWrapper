@@ -158,36 +158,18 @@ StatusCode MarlinProcessorWrapper::initialize() {
     marlin::Global::parameters->add("AllowToModifyEvent", {"true"});
 
     // Random Service setup
-    // if (m_seeds.size() > 0) {
-    auto sc_set_seeds = randSvc()->engine()->setSeeds({});
-    if (!sc_set_seeds.isSuccess()) return Error("Could not set seeds for Random Generator Service");
-
     std::vector<long> gotSeeds{};
-    randSvc()->engine()->seeds(gotSeeds);
+    StatusCode        set_seeds_sc = randSvc()->engine()->seeds(gotSeeds);
+    if (!set_seeds_sc.isSuccess())
+      warning() << "Random Service seeds could not be set" << endmsg;
 
     auto sc_flatGen_init = m_flatGenerator.initialize(randSvc(), Rndm::Flat(0, 999999));
-    if (!sc_flatGen_init.isSuccess()) return Error("Cannot initialize Random Service based flat generator");
+    if (!sc_flatGen_init.isSuccess())
+      return Error("Cannot initialize Random Service based flat generator");
 
-
-
-    std::string marlin_seed = std::to_string((long) m_flatGenerator());
-    info() << "Setting global Marlin random seed to " << marlin_seed << endmsg;    
+    std::string marlin_seed = std::to_string((long)m_flatGenerator());
+    info() << "Setting global Marlin random seed to " << marlin_seed << endmsg;
     marlin::Global::parameters->add("RandomSeed", {marlin_seed});
-
-    // std::cout << m_flatGenerator() << std::endl;
-
-    // // From GaudiExamples/EvtColAlg
-    // Assert(randSvc() != 0, "Random Service not available");
-    // std::vector<long> rngSeeds;
-    // if (randSvc()->engine()->seeds(rngSeeds).isFailure()) {
-    //   error() << "Cannot get seeds from Random Service" << endmsg;
-    //   return StatusCode::FAILURE;
-    // }
-    // debug() << "Got the following seeds from the random service: ";
-    // for (const auto s : rngSeeds) {
-    //   debug() << s << " ";
-    // }
-    // debug() << endmsg;
 
     if (loadProcessorLibraries().isFailure()) {
       return StatusCode::FAILURE;
@@ -219,30 +201,29 @@ StatusCode MarlinProcessorWrapper::execute() {
   if (scStatus.isSuccess()) {
     bool hasLCEvent = static_cast<LCEventWrapperStatus*>(pStatus)->hasLCEvent;
     if (not hasLCEvent) {
-      warning() << "An LCEvent reading returned nullptr, so MarlinProcessorWrapper won't execute" << endmsg;
+      warning() << "An LCIO Event reading returned nullptr, so MarlinProcessorWrapper won't execute" << endmsg;
       return StatusCode::SUCCESS;
     }
   }
 
-  // Get Event
-  info() << "Getting the event for " << m_processor->name() << endmsg;
-  DataObject* pObject = nullptr;
-  StatusCode  sc      = eventSvc()->retrieveObject("/Event/LCEvent", pObject);
-
+  // Get LCIO Event
+  debug() << "Retrieving LCIO Event for wrapped processor " << m_processor->name() << endmsg;
+  DataObject*        pObject   = nullptr;
+  StatusCode         sc        = eventSvc()->retrieveObject("/Event/LCEvent", pObject);
   lcio::LCEventImpl* the_event = nullptr;
 
   if (sc.isFailure()) {
-    the_event = new lcio::LCEventImpl();
     // Register empty event
-    debug() << "Registering conversion EDM4hep to LCIO event in TES" << endmsg;
+    the_event = new lcio::LCEventImpl();
+    debug() << "Registering empty Event for EDM4hep to LCIO conversion event in TES" << endmsg;
     auto       pO     = std::make_unique<LCEventWrapper>(the_event, true);
     StatusCode reg_sc = evtSvc()->registerObject("/Event/LCEvent", pO.release());
     if (reg_sc.isFailure()) {
-      error() << "Failed to store the EDM4hep to LCIO event" << endmsg;
+      error() << "Failed to register empty LCIO Event" << endmsg;
       return reg_sc;
     }
   } else {
-    debug() << "LCEvent retrieved successfully" << endmsg;
+    debug() << "LCIO Event retrieved successfully" << endmsg;
     the_event = dynamic_cast<IMPL::LCEventImpl*>(static_cast<LCEventWrapper*>(pObject)->getEvent());
   }
 
@@ -250,7 +231,7 @@ StatusCode MarlinProcessorWrapper::execute() {
   if (!m_edm_conversionTool.empty()) {
     StatusCode edm_sc = m_edm_conversionTool->convertCollections(the_event);
     if (edm_sc.isFailure()) {
-      error() << "Failed converting EDM4hep to LCIO collection " << endmsg;
+      error() << "Failed to convert EDM4hep to LCIO collections" << endmsg;
     }
   }
 
@@ -316,7 +297,7 @@ StatusCode MarlinProcessorWrapper::execute() {
   if (!m_lcio_conversionTool.empty()) {
     StatusCode lcio_sc = m_lcio_conversionTool->convertCollections(the_event);
     if (lcio_sc.isFailure()) {
-      error() << "Failed converting LCIO to EDM4hep collection " << endmsg;
+      error() << "Failed to convert LCIO to EDM4hep collections" << endmsg;
     }
   }
 
