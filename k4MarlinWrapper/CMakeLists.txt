@@ -42,6 +42,7 @@ gaudi_add_module(MarlinWrapper
     src/components/MarlinProcessorWrapper.cpp
   LINK
     Gaudi::GaudiAlgLib
+    k4FWCore::k4FWCore
     ${Marlin_LIBRARIES}
 )
 
