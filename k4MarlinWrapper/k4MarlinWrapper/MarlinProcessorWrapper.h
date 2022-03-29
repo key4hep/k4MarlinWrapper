@@ -30,8 +30,8 @@
 #include <GaudiAlg/GaudiAlgorithm.h>
 #include <GaudiKernel/IEventProcessor.h>
 #include <GaudiKernel/MsgStream.h>
-#include <GaudiKernel/ToolHandle.h>
 #include <GaudiKernel/RndmGenerators.h>
+#include <GaudiKernel/ToolHandle.h>
 #include "GaudiKernel/IRndmEngine.h"
 
 // LCIO
@@ -80,7 +80,7 @@ private:
 
   /// Parse the parameters from the Property
   std::shared_ptr<marlin::StringParameters> parseParameters(
-  const Gaudi::Property<std::map<std::string, std::vector<std::string>>>& parameters, std::string& verbosity) const;
+      const Gaudi::Property<std::map<std::string, std::vector<std::string>>>& parameters, std::string& verbosity) const;
 
   /// ProcessorType: The Type of the MarlinProcessor to use
   Gaudi::Property<std::string>                                     m_processorType{this, "ProcessorType", {}};
