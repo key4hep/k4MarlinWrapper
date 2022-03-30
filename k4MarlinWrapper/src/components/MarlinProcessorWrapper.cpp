@@ -157,16 +157,16 @@ StatusCode MarlinProcessorWrapper::initialize() {
     marlin::Global::parameters->add("AllowToModifyEvent", {"true"});
 
     // Random Service setup
-    std::vector<long> gotSeeds{};
-    StatusCode        set_seeds_sc = randSvc()->engine()->seeds(gotSeeds);
-    if (!set_seeds_sc.isSuccess())
+    std::vector<long> got_seeds{};
+    StatusCode        got_seeds_sc = randSvc()->engine()->seeds(got_seeds);
+    if (!got_seeds_sc.isSuccess())
       warning() << "Random Service seeds could not be set" << endmsg;
 
     auto sc_flatGen_init = m_flatGenerator.initialize(randSvc(), Rndm::Flat(0, 999999));
     if (!sc_flatGen_init.isSuccess())
       return Error("Cannot initialize Random Service based flat generator");
 
-    std::string marlin_seed = std::to_string((long)m_flatGenerator());
+    std::string marlin_seed = std::to_string(got_seeds[0]);
     info() << "Setting global Marlin random seed to " << marlin_seed << endmsg;
     marlin::Global::parameters->add("RandomSeed", {marlin_seed});
 
