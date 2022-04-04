@@ -29,9 +29,9 @@
 // Gaudi
 #include <GaudiAlg/GaudiAlgorithm.h>
 #include <GaudiKernel/IEventProcessor.h>
+#include <GaudiKernel/IRndmEngine.h>
 #include <GaudiKernel/MsgStream.h>
 #include <GaudiKernel/ToolHandle.h>
-#include <GaudiKernel/IRndmEngine.h>
 
 // LCIO
 #include <EVENT/LCEvent.h>
