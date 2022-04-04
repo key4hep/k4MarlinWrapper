@@ -31,6 +31,7 @@
 #include <GaudiKernel/IEventProcessor.h>
 #include <GaudiKernel/MsgStream.h>
 #include <GaudiKernel/ToolHandle.h>
+#include <GaudiKernel/IRndmEngine.h>
 
 // LCIO
 #include <EVENT/LCEvent.h>
