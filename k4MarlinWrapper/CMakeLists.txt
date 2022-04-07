@@ -59,9 +59,10 @@ gaudi_add_module(EDM4hep2Lcio
   SOURCES
     src/components/EDM4hep2Lcio.cpp
   LINK
+    k4EDM4hep2LcioConv::k4EDM4hep2LcioConv
+    k4FWCore::k4FWCore
     Gaudi::GaudiAlgLib
     ${LCIO_LIBRARIES}
-    k4FWCore::k4FWCore
     EDM4HEP::edm4hep
 )
 
