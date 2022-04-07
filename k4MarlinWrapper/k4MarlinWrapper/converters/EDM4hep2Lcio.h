@@ -13,26 +13,14 @@
 // FWCore
 #include <k4FWCore/DataHandle.h>
 
+//k4EDM4hep2LcioConv
+#include "k4EDM4hep2LcioConv/k4EDM4hep2LcioConv.h"
+
 // k4MarlinWrapper
 #include "k4MarlinWrapper/LCEventWrapper.h"
 #include "k4MarlinWrapper/converters/IEDMConverter.h"
 #include "k4MarlinWrapper/util/k4MarlinWrapperUtil.h"
 
-template <typename T1, typename T2> using vec_pair = std::vector<std::pair<T1, T2>>;
-
-struct CollectionsPairVectors {
-  vec_pair<lcio::TrackImpl*, edm4hep::Track>                                 tracks;
-  vec_pair<lcio::TrackerHitImpl*, edm4hep::TrackerHit>                       trackerhits;
-  vec_pair<lcio::SimTrackerHitImpl*, edm4hep::SimTrackerHit>                 simtrackerhits;
-  vec_pair<lcio::CalorimeterHitImpl*, edm4hep::CalorimeterHit>               calohits;
-  vec_pair<lcio::RawCalorimeterHitImpl*, edm4hep::RawCalorimeterHit>         rawcalohits;
-  vec_pair<lcio::SimCalorimeterHitImpl*, edm4hep::SimCalorimeterHit>         simcalohits;
-  vec_pair<lcio::TPCHitImpl*, edm4hep::TPCHit>                               tpchits;
-  vec_pair<lcio::ClusterImpl*, edm4hep::Cluster>                             clusters;
-  vec_pair<lcio::VertexImpl*, edm4hep::Vertex>                               vertices;
-  vec_pair<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle> recoparticles;
-  vec_pair<lcio::MCParticleImpl*, edm4hep::MCParticle>                       mcparticles;
-};
 
 class EDM4hep2LcioTool : public GaudiTool, virtual public IEDMConverter {
 public:
@@ -100,12 +88,8 @@ private:
                           const std::string& e4h_coll_name, const std::string& lcio_coll_name,
                           lcio::LCEventImpl* lcio_event);
 
-  void FillMissingCollections(CollectionsPairVectors& collection_pairs);
-
   void convertAdd(const std::string& e4h_coll_name, const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event,
                   CollectionsPairVectors& collection_pairs);
-
-  bool collectionExist(const std::string& collection_name, lcio::LCEventImpl* lcio_event);
 };
 
 #endif

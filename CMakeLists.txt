@@ -60,6 +60,7 @@ find_package(LCIO REQUIRED)
 find_package(Marlin REQUIRED)
 find_package(EDM4HEP REQUIRED)
 find_package(k4FWCore REQUIRED)
+find_package(k4EDM4hep2LcioConv REQUIRED)
 find_package(k4LCIOReader REQUIRED)
 
 include(CTest)
