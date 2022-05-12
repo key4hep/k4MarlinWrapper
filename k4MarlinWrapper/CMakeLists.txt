@@ -34,6 +34,7 @@ gaudi_add_module(k4MarlinWrapperPlugins
 
 target_include_directories(k4MarlinWrapperPlugins PUBLIC
   ${CMAKE_SOURCE_DIR}/k4MarlinWrapper
+  ${LCIO_INCLUDE_DIRS}
 )
 
 # MarlinWrapper
@@ -44,10 +45,13 @@ gaudi_add_module(MarlinWrapper
     Gaudi::GaudiAlgLib
     k4FWCore::k4FWCore
     ${Marlin_LIBRARIES}
+    EDM4HEP::edm4hep
 )
 
 target_include_directories(MarlinWrapper PUBLIC
   ${CMAKE_SOURCE_DIR}/k4MarlinWrapper
+  ${Marlin_INCLUDE_DIRS}
+  ${LCIO_INCLUDE_DIRS}
 )
 
 # EDM4hep2lcio
@@ -63,6 +67,7 @@ gaudi_add_module(EDM4hep2Lcio
 
 target_include_directories(EDM4hep2Lcio PUBLIC
   ${CMAKE_SOURCE_DIR}/k4MarlinWrapper
+  ${LCIO_INCLUDE_DIRS}
 )
 
 # LCIO2EDM4hep
@@ -78,6 +83,7 @@ gaudi_add_module(Lcio2EDM4hep
 
 target_include_directories(Lcio2EDM4hep PUBLIC
   ${CMAKE_SOURCE_DIR}/k4MarlinWrapper
+  ${LCIO_INCLUDE_DIRS}
 )
 
 # Copy python parsing file to genConfDir in Gaudi
