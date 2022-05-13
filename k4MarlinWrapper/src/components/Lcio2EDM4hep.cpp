@@ -40,12 +40,13 @@ StatusCode Lcio2EDM4hepTool::finalize() {
 // **********************************
 template <typename T>
 void Lcio2EDM4hepTool::convertRegister(const std::string& edm_name, const std::string& lcio_name,
-                                       k4LCIOConverter* lcio_converter, const lcio::LCCollection* const lcio_coll,
+                                       std::unique_ptr<k4LCIOConverter>& lcio_converter, const lcio::LCCollection* const lcio_coll,
                                        const bool cnv_metadata) {
   debug() << "Converting collection: " << lcio_name << " from LCIO to EDM4hep " << edm_name << endmsg;
 
   // Convert and get EDM4hep collection
-  auto e4h_generic_coll = lcio_converter->getCollection(lcio_name);
+  auto* e4h_generic_coll = lcio_converter->getCollection(lcio_name);
+
   if (e4h_generic_coll == nullptr) {
     error() << "LCIO Collection " << lcio_name << " failed to convert to EDM4hep in k4LCIOConverter." << endmsg;
     return;
@@ -122,16 +123,19 @@ bool Lcio2EDM4hepTool::collectionExist(const std::string& collection_name) {
   return false;
 }
 
+
+
 // **********************************
-// Convert all collections indicated in Tool parameters
-// Some collections implicitly convert associated collections, as for
+// - Convert all collections indicated in Tool parameters
+// - Some collections implicitly convert associated collections, as for
 // key4hep/k4LCIOReader
-// Convert associated collections from LCRelation for existing EDM4hep relations
+// - Convert associated collections from LCRelation for existing EDM4hep relations
+// - Converted collections are put into TES
 // **********************************
 StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
   // Set the event to the converter
-  podio::CollectionIDTable* id_table       = m_podioDataSvc->getCollectionIDs();
-  k4LCIOConverter*          lcio_converter = new k4LCIOConverter(id_table);
+  podio::CollectionIDTable* id_table = m_podioDataSvc->getCollectionIDs();
+  std::unique_ptr<k4LCIOConverter> lcio_converter = std::make_unique<k4LCIOConverter>(id_table);
   lcio_converter->set(the_event);
 
   // Add all collections to params to convert all of them
@@ -162,7 +166,7 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
         lcio_coll          = the_event->getCollection(m_params[i]);
         lcio_coll_type_str = lcio_coll->getTypeName();
       } catch (const lcio::DataNotAvailableException& ex) {
-        warning() << "LCIO Collection " << m_params[i] << " not found, skipping its conversion to EDM4hep" << endmsg;
+        warning() << "LCIO Collection " << m_params[i] << " not found in the event, skipping conversion to EDM4hep" << endmsg;
         continue;
       }
 
@@ -208,7 +212,12 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
         convertRegister<edm4hep::ParticleIDCollection>("ParticleID_EXT", "ParticleID_EXT", lcio_converter, nullptr);
       } else if (lcio_coll_type_str == "LCRelation") {
         // Get specific relation type from converted
-        auto e4h_coll_type_str = lcio_converter->getCollection(m_params[i])->getValueTypeName();
+        auto* conv_collection = lcio_converter->getCollection(m_params[i]);
+        if (conv_collection == nullptr) {
+          error() << "Unable to convert collection " << m_params[i] << std::endl;
+          continue;
+        }
+        auto e4h_coll_type_str = conv_collection->getValueTypeName();
 
         if (e4h_coll_type_str == "edm4hep::MCRecoCaloAssociation") {
           convertRegister<edm4hep::MCRecoCaloAssociationCollection>(m_params[i + 1], m_params[i], lcio_converter,
@@ -239,8 +248,6 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
       debug() << "EDM4hep Collection " << m_params[i + 1] << " already in place, skipping conversion." << endmsg;
     }
   }
-
-  delete (lcio_converter);
 
   return StatusCode::SUCCESS;
 }
