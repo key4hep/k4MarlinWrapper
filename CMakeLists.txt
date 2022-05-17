@@ -21,7 +21,14 @@
 
 cmake_minimum_required(VERSION 3.14)
 cmake_policy(SET CMP0074 NEW) # use package_ROOT env var to find packages
-project(k4MarlinWrapper)
+project(k4MarlinWrapper LANGUAGES CXX)
+
+# RPATH settings 
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE CACHE BOOL "RPATH USE LINK PATH")
+option(USE_RUNPATH_INSTEAD_OF_RPATH "Use runpath instead of rpath (allow specifying liked libraries via LD_LIBRARY_PATH)" OFF)
+if(USE_RUNPATH_INSTEAD_OF_RPATH) 
+  set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--enable-new-dtags")
+endif()
 
 # options
 option(USE_EXTERNAL_CATCH2 "If off, build the catch2 unittest framework locally" ON)
