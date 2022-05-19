@@ -40,8 +40,8 @@ StatusCode Lcio2EDM4hepTool::finalize() {
 // **********************************
 template <typename T>
 void Lcio2EDM4hepTool::convertRegister(const std::string& edm_name, const std::string& lcio_name,
-                                       std::unique_ptr<k4LCIOConverter>& lcio_converter, const lcio::LCCollection* const lcio_coll,
-                                       const bool cnv_metadata) {
+                                       std::unique_ptr<k4LCIOConverter>& lcio_converter,
+                                       const lcio::LCCollection* const lcio_coll, const bool cnv_metadata) {
   debug() << "Converting collection: " << lcio_name << " from LCIO to EDM4hep " << edm_name << endmsg;
 
   // Convert and get EDM4hep collection
@@ -123,8 +123,6 @@ bool Lcio2EDM4hepTool::collectionExist(const std::string& collection_name) {
   return false;
 }
 
-
-
 // **********************************
 // - Convert all collections indicated in Tool parameters
 // - Some collections implicitly convert associated collections, as for
@@ -134,7 +132,7 @@ bool Lcio2EDM4hepTool::collectionExist(const std::string& collection_name) {
 // **********************************
 StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
   // Set the event to the converter
-  podio::CollectionIDTable* id_table = m_podioDataSvc->getCollectionIDs();
+  podio::CollectionIDTable*        id_table       = m_podioDataSvc->getCollectionIDs();
   std::unique_ptr<k4LCIOConverter> lcio_converter = std::make_unique<k4LCIOConverter>(id_table);
   lcio_converter->set(the_event);
 
@@ -166,7 +164,8 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
         lcio_coll          = the_event->getCollection(m_params[i]);
         lcio_coll_type_str = lcio_coll->getTypeName();
       } catch (const lcio::DataNotAvailableException& ex) {
-        warning() << "LCIO Collection " << m_params[i] << " not found in the event, skipping conversion to EDM4hep" << endmsg;
+        warning() << "LCIO Collection " << m_params[i] << " not found in the event, skipping conversion to EDM4hep"
+                  << endmsg;
         continue;
       }
 
