@@ -35,8 +35,9 @@ private:
   bool collectionExist(const std::string& collection_name);
 
   template <typename T>
-  void convertRegister(const std::string& edm_name, const std::string& lcio_name, std::unique_ptr<k4LCIOConverter>& lcio_conver,
-                       const lcio::LCCollection* const lcio_coll, const bool cnv_metadata = false);
+  void convertRegister(const std::string& edm_name, const std::string& lcio_name,
+                       std::unique_ptr<k4LCIOConverter>& lcio_conver, const lcio::LCCollection* const lcio_coll,
+                       const bool cnv_metadata = false);
 };
 
 #endif
