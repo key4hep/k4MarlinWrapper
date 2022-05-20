@@ -42,6 +42,13 @@ A Service to generate unique identifiers can be used with the following inputs:
 - Event number and Run number
 - Event number, Run number and Algorithm name
 
+To set a seed for the UniqueIDGenSvc, add the following to an options file:
+
+```python
+from Configurables import UniqueIDGenSvc
+UniqueIDGenSvc().Seed = 987654321
+```
+
 Declare the service in the header file:
 
 ```cpp
