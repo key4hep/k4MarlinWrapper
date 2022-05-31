@@ -140,7 +140,6 @@ void TestE4H2L::createTrackerHits(const int num_elements, int& int_cnt, float& f
     elem.setTime(float_cnt++);
     elem.setEDep(float_cnt++);
     elem.setEDepError(float_cnt++);
-    elem.setEdx(float_cnt++);
     edm4hep::Vector3d test_vec{float_cnt++, float_cnt++, float_cnt++};
     elem.setPosition(test_vec);
     std::array<float, 6> test_array{float_cnt++, float_cnt++, float_cnt++, float_cnt++, float_cnt++, float_cnt++};
