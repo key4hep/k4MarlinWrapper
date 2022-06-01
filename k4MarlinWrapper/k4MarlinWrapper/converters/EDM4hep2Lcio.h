@@ -21,7 +21,6 @@
 #include "k4MarlinWrapper/converters/IEDMConverter.h"
 #include "k4MarlinWrapper/util/k4MarlinWrapperUtil.h"
 
-
 class EDM4hep2LcioTool : public GaudiTool, virtual public IEDMConverter {
 public:
   EDM4hep2LcioTool(const std::string& type, const std::string& name, const IInterface* parent);
