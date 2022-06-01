@@ -31,7 +31,7 @@ void EDM4hep2LcioTool::convertTracks(vec_pair<lcio::TrackImpl*, edm4hep::Track>&
                                      const std::string& e4h_coll_name, const std::string& lcio_coll_name,
                                      lcio::LCEventImpl* lcio_event) {
   DataHandle<edm4hep::TrackCollection> tracks_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
-  const auto* tracks_coll = tracks_handle.get();
+  const auto*                          tracks_coll = tracks_handle.get();
 
   auto* conv_tracks = convTracks(tracks_coll, tracks_vec, trackerhits_vec);
 
@@ -186,7 +186,7 @@ void EDM4hep2LcioTool::convertMCParticles(vec_pair<lcio::MCParticleImpl*, edm4he
   DataHandle<edm4hep::MCParticleCollection> mcparticle_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
   const auto                                mcparticle_coll = mcparticle_handle.get();
 
-  auto* conv_mcparticles = convMCParticles(mcparticle_coll,mc_particles_vec);
+  auto* conv_mcparticles = convMCParticles(mcparticle_coll, mc_particles_vec);
 
   // Add all reconstructed particles to event
   lcio_event->addCollection(conv_mcparticles, lcio_coll_name);
@@ -266,7 +266,6 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
               << "MCParticle." << endmsg;
   }
 }
-
 
 // Parse property parameters and convert the indicated collections.
 // Use the collection names in the parameters to read and write them
