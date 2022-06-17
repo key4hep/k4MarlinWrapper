@@ -227,9 +227,11 @@ void TestE4H2L::createTracks(const int num_elements, const int subdetectorhitnum
       trackstate.tanLambda = float_cnt++;
       edm4hep::Vector3f test_vec{float_cnt++, float_cnt++, float_cnt++};
       trackstate.referencePoint        = test_vec;
-      std::array<float, 15> test_array = {float_cnt++, float_cnt++, float_cnt++, float_cnt++, float_cnt++,
+      std::array<float, 21> test_array = {float_cnt++, float_cnt++, float_cnt++, float_cnt++, float_cnt++,
                                           float_cnt++, float_cnt++, float_cnt++, float_cnt++, float_cnt++,
-                                          float_cnt++, float_cnt++, float_cnt++, float_cnt++, float_cnt++};
+                                          float_cnt++, float_cnt++, float_cnt++, float_cnt++, float_cnt++,
+                                          float_cnt++, float_cnt++, float_cnt++, float_cnt++, float_cnt++,
+                                          float_cnt++};
       trackstate.covMatrix             = test_array;
 
       elem.addToTrackStates(trackstate);
