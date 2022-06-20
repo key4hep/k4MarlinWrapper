@@ -227,11 +227,10 @@ void TestE4H2L::createTracks(const int num_elements, const int subdetectorhitnum
       trackstate.tanLambda = float_cnt++;
       edm4hep::Vector3f test_vec{float_cnt++, float_cnt++, float_cnt++};
       trackstate.referencePoint        = test_vec;
-      std::array<float, 21> test_array = {float_cnt++, float_cnt++, float_cnt++, float_cnt++, float_cnt++,
-                                          float_cnt++, float_cnt++, float_cnt++, float_cnt++, float_cnt++,
-                                          float_cnt++, float_cnt++, float_cnt++, float_cnt++, float_cnt++,
-                                          float_cnt++, float_cnt++, float_cnt++, float_cnt++, float_cnt++,
-                                          float_cnt++};
+      std::array<float, 21> test_array = {float_cnt++, float_cnt++, float_cnt++, float_cnt++, float_cnt++, float_cnt++,
+                                          float_cnt++, float_cnt++, float_cnt++, float_cnt++, float_cnt++, float_cnt++,
+                                          float_cnt++, float_cnt++, float_cnt++, float_cnt++, float_cnt++, float_cnt++,
+                                          float_cnt++, float_cnt++, float_cnt++};
       trackstate.covMatrix             = test_array;
 
       elem.addToTrackStates(trackstate);
@@ -687,7 +686,8 @@ bool TestE4H2L::checkEDMTrackLCIOTrack(lcio::LCEventImpl* the_event, const std::
                 track_same && (edm_trackestate_orig.referencePoint[k] == lcio_trackestate->getReferencePoint()[k]);
           }
           // Check cov matrix
-          auto smallest_cov_size = std::min(edm_trackestate_orig.covMatrix.size(), lcio_trackestate->getCovMatrix().size());
+          auto smallest_cov_size =
+              std::min(edm_trackestate_orig.covMatrix.size(), lcio_trackestate->getCovMatrix().size());
           for (int k = 0; k < smallest_cov_size; ++k) {
             track_same = track_same && (edm_trackestate_orig.covMatrix[k] == lcio_trackestate->getCovMatrix()[k]);
           }
