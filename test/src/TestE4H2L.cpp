@@ -686,12 +686,10 @@ bool TestE4H2L::checkEDMTrackLCIOTrack(lcio::LCEventImpl* the_event, const std::
             track_same =
                 track_same && (edm_trackestate_orig.referencePoint[k] == lcio_trackestate->getReferencePoint()[k]);
           }
-          // Check same size cov matrix
-          track_same = track_same && (edm_trackestate_orig.covMatrix.size() == lcio_trackestate->getCovMatrix().size());
-          if (edm_trackestate_orig.covMatrix.size() == lcio_trackestate->getCovMatrix().size()) {
-            for (int k = 0; k < edm_trackestate_orig.covMatrix.size(); ++k) {
-              track_same = track_same && (edm_trackestate_orig.covMatrix[k] == lcio_trackestate->getCovMatrix()[k]);
-            }
+          // Check cov matrix
+          auto smallest_cov_size = std::min(edm_trackestate_orig.covMatrix.size(), lcio_trackestate->getCovMatrix().size());
+          for (int k = 0; k < smallest_cov_size; ++k) {
+            track_same = track_same && (edm_trackestate_orig.covMatrix[k] == lcio_trackestate->getCovMatrix()[k]);
           }
         }
       }
@@ -1035,7 +1033,9 @@ bool TestE4H2L::checkEDMTrackEDMTrack(const std::vector<std::pair<uint, uint>>& 
           track_same = track_same && (edm_trackestate_orig.Z0 == edm_trackestate.Z0);
           track_same = track_same && (edm_trackestate_orig.tanLambda == edm_trackestate.tanLambda);
           track_same = track_same && (edm_trackestate_orig.referencePoint == edm_trackestate.referencePoint);
-          track_same = track_same && (edm_trackestate_orig.covMatrix == edm_trackestate.covMatrix);
+          for (int k = 0; k < 15; ++k) {
+            track_same = track_same && (edm_trackestate_orig.covMatrix[k] == edm_trackestate.covMatrix[k]);
+          }
         }
       }
     }
