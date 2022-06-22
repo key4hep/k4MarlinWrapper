@@ -92,8 +92,8 @@ ctest --verbose -R test_clicReconstruction
 
 ## Using Event Data Model (EDM) converters
 
-Please refer to [this doc](./doc/edmConverters.md) on how to convert between EDMs in k4MarlinWrapper
+Please refer to [this doc](./doc/starterkit/k4MarlinWrapperCLIC/edmConverters.md) on how to convert between EDMs in k4MarlinWrapper
 
 ## Running in parallel: multi-thread support
 
-Please refer to [this doc](./doc/howtoMultithread.md) on how to run with multi-thread support, and which options are supported.
+Please refer to [this doc](./doc/starterkit/k4MarlinWrapperCLIC/howtoMultithread.md) on how to run with multi-thread support, and which options are supported.
