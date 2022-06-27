@@ -1,3 +1,39 @@
+# v00-04-02
+
+* 2022-06-27 Thomas Madlener ([PR#85](https://github.com/key4hep/k4MarlinWrapper/pull/85))
+  - Add a gaudi options file that can be used to run the event display using the CLIC detector via the Marlin wrapper.
+
+* 2022-06-22 Placido Fernandez Declara ([PR#84](https://github.com/key4hep/k4MarlinWrapper/pull/84))
+  - Move doc md files to starterkit
+
+* 2022-06-21 Valentin Volkl ([PR#81](https://github.com/key4hep/k4MarlinWrapper/pull/81))
+  - Update covMatrix with changes from edm4hep v0.5
+
+* 2022-06-15 Placido Fernandez Declara ([PR#77](https://github.com/key4hep/k4MarlinWrapper/pull/77))
+  - Use k4EDM4hep2LcioConv as separate lib
+  - Remove conversion from MarlinWrapper
+
+* 2022-05-30 Valentin Volkl ([PR#79](https://github.com/key4hep/k4MarlinWrapper/pull/79))
+  * examples: use geometry file based on LCGEO from the current stack
+
+* 2022-05-20 Placido Fernandez Declara ([PR#75](https://github.com/key4hep/k4MarlinWrapper/pull/75))
+  - Use unique_ptr instead of new for converter
+  - Improve comments and error messages
+  - Handle errors coming from k4LCIOReader conversion
+
+* 2022-05-17 Placido Fernandez Declara ([PR#73](https://github.com/key4hep/k4MarlinWrapper/pull/73))
+  - Fix include dirs dependencies in cmake
+
+* 2022-04-05 Thomas Madlener ([PR#52](https://github.com/key4hep/k4MarlinWrapper/pull/52))
+  - Make it possible to set the random seed that is used for the `ProcessorEventSeeder` of the Marlin processors from the options file by retrieving it from Gaudis Random Service. Fixes #38 
+  - Use `argparse` for handling arguments in converter script
+  - Cleanup testing of `--num-events` handling and EOF.
+
+* 2022-03-14 Placido Fernandez Declara ([PR#71](https://github.com/key4hep/k4MarlinWrapper/pull/71))
+  - Add support for multi-threading with LCIO input only
+  - Add example Gaudi steering file on how to run in parallel
+  - Add documentation for multi-threading
+
 # v00-04-01
 
 * 2022-03-08 Andre Sailer ([PR#67](https://github.com/key4hep/k4MarlinWrapper/pull/67))
