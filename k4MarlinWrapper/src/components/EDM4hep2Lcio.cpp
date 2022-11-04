@@ -1,4 +1,5 @@
 #include "k4MarlinWrapper/converters/EDM4hep2Lcio.h"
+#include <unordered_map>
 
 DECLARE_COMPONENT(EDM4hep2LcioTool);
 
@@ -270,34 +271,30 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
 // Parse property parameters and convert the indicated collections.
 // Use the collection names in the parameters to read and write them
 StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
-  CollectionsPairVectors collection_pairs{};
+  const auto collections = m_podioDataSvc->getCollections();
 
-  // Convert collections from parameters
-  if (m_edm2lcio_params.size() > 1 && m_edm2lcio_params.size() % 2 == 0) {
-    for (int i = 0; i < m_edm2lcio_params.size(); i = i + 2) {
-      if (!collectionExist(m_edm2lcio_params[i + 1], lcio_event)) {
-        convertAdd(m_edm2lcio_params[i], m_edm2lcio_params[i + 1], lcio_event, collection_pairs);
-      } else {
-        debug() << " Collection " << m_edm2lcio_params[i + 1] << " already in place, skipping conversion. " << endmsg;
-      }
+  // Start of with the pre-defined collection name mappings
+  auto collsToConvert{m_collNames.value()};
+  if (m_convertAll) {
+    info() << "Converting all collections from EDM4hep to LCIO" << endmsg;
+    // And simply add the rest, taking exploiting the fact that emplace will not
+    // replace existing entries with the same key
+    for (const auto& [name, _] : collections) {
+      collsToConvert.emplace(name, name);
     }
-
-    FillMissingCollections(collection_pairs);
   }
 
-  // Convert all collections if the only parameter is "*"
-  else if (m_edm2lcio_params.size() == 1 && m_edm2lcio_params[0] == "*") {
-    info() << "Converting all collections from EDM4hep to LCIO" << endmsg;
-
-    const auto& collections = m_podioDataSvc->getCollections();
-    for (auto& [name, collection] : collections) {
-      convertAdd(name, name, lcio_event, collection_pairs);
+  CollectionsPairVectors collection_pairs{};
+  for (const auto& [edm4hepName, lcioName] : collsToConvert) {
+    if (!collectionExist(lcioName, lcio_event)) {
+      convertAdd(edm4hepName, lcioName, lcio_event, collection_pairs);
+    } else {
+      debug() << " Collection " << lcioName << " already in place, skipping conversion. " << endmsg;
     }
-  } else {
-    error() << " Error processing conversion parameters. 2 arguments (EDM4hep "
-               "name, LCIO name) per collection, or 1 argument \"*\" to convert all collections expected. "
-            << endmsg;
-    return StatusCode::FAILURE;
+
+    if (!m_convertAll) {
+      FillMissingCollections(collection_pairs);
+    }
   }
 
   return StatusCode::SUCCESS;

@@ -1,14 +1,10 @@
 #ifndef K4MARLINWRAPPER_EDM4HEP2LCIO_H
 #define K4MARLINWRAPPER_EDM4HEP2LCIO_H
 
-// std
-#include <algorithm>
-#include <bitset>
-#include <string>
-#include <vector>
-
-// GAUDI
-#include <GaudiAlg/GaudiTool.h>
+// k4MarlinWrapper
+#include "k4MarlinWrapper/LCEventWrapper.h"
+#include "k4MarlinWrapper/converters/IEDMConverter.h"
+#include "k4MarlinWrapper/util/k4MarlinWrapperUtil.h"
 
 // FWCore
 #include <k4FWCore/DataHandle.h>
@@ -16,10 +12,15 @@
 //k4EDM4hep2LcioConv
 #include "k4EDM4hep2LcioConv/k4EDM4hep2LcioConv.h"
 
-// k4MarlinWrapper
-#include "k4MarlinWrapper/LCEventWrapper.h"
-#include "k4MarlinWrapper/converters/IEDMConverter.h"
-#include "k4MarlinWrapper/util/k4MarlinWrapperUtil.h"
+// GAUDI
+#include <GaudiAlg/GaudiTool.h>
+
+// std
+#include <algorithm>
+#include <bitset>
+#include <map>
+#include <string>
+#include <vector>
 
 class EDM4hep2LcioTool : public GaudiTool, virtual public IEDMConverter {
 public:
@@ -31,7 +32,8 @@ public:
   StatusCode convertCollections(lcio::LCEventImpl* lcio_event);
 
 private:
-  Gaudi::Property<std::vector<std::string>> m_edm2lcio_params{this, "Parameters", {}};
+  Gaudi::Property<std::map<std::string, std::string>> m_collNames{this, "collNameMapping", {}};
+  Gaudi::Property<bool>                               m_convertAll{this, "convertAll", true};
 
   PodioDataSvc*                   m_podioDataSvc;
   ServiceHandle<IDataProviderSvc> m_eventDataSvc;
