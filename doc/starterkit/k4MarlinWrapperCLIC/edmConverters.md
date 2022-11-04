@@ -117,17 +117,18 @@ Note and review the following when using the converters:
 - If using the `PodioInput` to read events: collection names must be indicated both in the `PodioInput` and the `EDM4hep2LcioTool`.
 - Collections not indicated to be converted **will not** be converted even if its a dependency from an indicated collection to be converted.
 - If a converted collection is used later by a Gaudi Algorithm, and this Gaudi Algorithm indicates the use of that collection in the `Parameters`, the converted collection name must match the name indicated in the Gaudi Algorithm `Parameters`.
-  + For example: A collection may be converted with the following parameters: `ReconstructedParticles", "ReconstructedParticleLCIO"`
+  + For example: A collection may be converted with the following parameters: `"ReconstructedParticles": "ReconstructedParticleLCIO"`
   + A Gaudi Algorithm may indicate in their `Parameters`: `"PFOCollection": ["ReconstructedParticleLCIO"]`
 
 ###  EDM4hep to LCIO converter
 
 Collections from events that are already read, or are produced by a Gaudi Algorithm can be converted from EDM4hep to LCIO format:
 
-1. Instantiate the `EDM4hep2LcioTool` Gaudi Tool.
-2. Indicate the collections to convert in `Parameters`.
-  + To convert all available collections write an asterisk, like follows: `edmConvTool.Parameters = ["*"]`
-  + Arguments are read in groups of 2: name of the EDM4hep collection, name of the LCIO converted collection.
+1. Instantiate the `EDM4hep2LcioTool` Gaudi Tool, e.g. as `edmConvTool = EDM4hep2LcioTool("EDM4hep2lcio")`
+2. Indicate the collections to convert using the options of the tool.
+  + To sipmly convert all available collections use `edmConvTool.convertAll = True` (this is also the default!)
+  + If you want to convert all available collections but want to rename some of them, e.g. because an algorithm expects a different name, use the `collNameMapping` option. This maps the input name to the output name; `edmConvTool.collNameMapping = {'MCParticles': 'MCParticle'}` will convert the input `'MCParticles'` into the `'MCParticle'` collection.
+  + To convert only a subset of all available collections, set the `convertAll` option to `False` and indicate the collections to convert via the `collNameMapping` option.
 3. Select the Gaudi Algorithm that will convert the indicated collections.
 4. Add the Tool to the Gaudi Algorithm.
 
@@ -137,10 +138,11 @@ from Configurables import ToolSvc, EDM4hep2LcioTool
 # 1
 edmConvTool = EDM4hep2LcioTool("EDM4hep2lcio")
 # 2
-edmConvTool.Parameters = [
-    "EFlowTrack", "EFlowTrack_LCIO",
-    "ReconstructedParticles", "ReconstructedParticle_LCIO"
-]
+edmConvToll.convertAll = False
+edmConvTool.collNameMapping = {
+    "EFlowTrack": "EFlowTrack_LCIO",
+    "ReconstructedParticles": "ReconstructedParticle_LCIO"
+}
 edmConvTool.OutputLevel = DEBUG
 
 # 3
@@ -154,10 +156,11 @@ InitDD4hep.EDM4hep2LcioTool=edmConvTool
 
 Collections from events that are already read, or are produced by a gaudi Algorithm can be converted from LCIO to EDM4hep format:
 
-1. Instantiate the `Lcio2EDM4hepTool` Gaudi Tool.
-2. Indicate the collections to convert in `Parameters`.
-  + To convert all available collections write an asterisk, like follows: `lcioConvTool.Parameters = ["*"]`
-  + Arguments are read in groups of 2: name of the LCIO collection, name of the EDM4hep converted collection.
+1. Instantiate the `Lcio2EDM4hepTool` Gaudi Tool, e.g. as `lcioConvTool = Lcio2EDM4hepTool("LCIO2EDM4hep")`.
+2. Indicate the collections to convert in the options of the tool.
+  + To sipmly convert all available collections use `lcioConvTool.convertAll = True` (this is also the default!)
+  + If you want to convert all available collections but want to rename some of them, e.g. because an algorithm expects a different name, use the `collNameMapping` option. This maps the input name to the output name; `lcioConvTool.collNameMapping = {'MCParticles': 'MCParticle'}` will convert the input `'MCParticles'` into the `'MCParticle'` collection.
+  + To convert only a subset of all available collections, set the `convertAll` option to `False` and indicate the collections to convert via the `collNameMapping` option.
 3. Select the Gaudi Algorithm that will convert the indicated collections.
 4. Add the Tool to the Gaudi Algorithm.
 
@@ -167,12 +170,13 @@ from Configurables import ToolSvc, Lcio2EDM4hepTool
 # 1
 lcioConvTool = Lcio2EDM4hepTool("LCIO2EDM4hep")
 # 2
-lcioConvTool.Parameters = [
-    "EFlowTrackConv", "EFlowTrackEDM4hep",
-    "ReconstructedParticle", "ReconstructedParticlesEDM4hep",
-    "BuildUpVertices", "BuildUpVerticesEDM4hep",
-    "PrimaryVertices", "PrimaryVerticesEDM4hep"
-]
+lcioConvTool.convertAll = False
+lcioConvTool.collNameMapping = {
+    "EFlowTrackConv": "EFlowTrackEDM4hep",
+    "ReconstructedParticle": "ReconstructedParticlesEDM4hep",
+    "BuildUpVertices": "BuildUpVerticesEDM4hep",
+    "PrimaryVertices": "PrimaryVerticesEDM4hep"
+}
 lcioConvTool.OutputLevel = DEBUG
 
 # 3
@@ -181,5 +185,3 @@ JetClusteringAndRefiner = MarlinProcessorWrapper("JetClusteringAndRefiner")
 # 4
 JetClusteringAndRefiner.Lcio2EDM4hepTool=lcioConvTool
 ```
-
-

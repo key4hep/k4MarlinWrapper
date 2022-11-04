@@ -134,7 +134,7 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
   if (m_convertAll) {
     const auto* collections = the_event->getCollectionNames();
     for (const auto& collName : *collections) {
-      // And simply add the rest, taking exploiting the fact that emplace will not
+      // And simply add the rest, exploiting the fact that emplace will not
       // replace existing entries with the same key
       collsToConvert.emplace(collName, collName);
     }
