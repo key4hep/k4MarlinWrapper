@@ -126,7 +126,7 @@ Collections from events that are already read, or are produced by a Gaudi Algori
 
 1. Instantiate the `EDM4hep2LcioTool` Gaudi Tool, e.g. as `edmConvTool = EDM4hep2LcioTool("EDM4hep2lcio")`
 2. Indicate the collections to convert using the options of the tool.
-  + To sipmly convert all available collections use `edmConvTool.convertAll = True` (this is also the default!)
+  + To simply convert all available collections use `edmConvTool.convertAll = True` (this is also the default!)
   + If you want to convert all available collections but want to rename some of them, e.g. because an algorithm expects a different name, use the `collNameMapping` option. This maps the input name to the output name; `edmConvTool.collNameMapping = {'MCParticles': 'MCParticle'}` will convert the input `'MCParticles'` into the `'MCParticle'` collection.
   + To convert only a subset of all available collections, set the `convertAll` option to `False` and indicate the collections to convert via the `collNameMapping` option.
 3. Select the Gaudi Algorithm that will convert the indicated collections.
@@ -158,7 +158,7 @@ Collections from events that are already read, or are produced by a gaudi Algori
 
 1. Instantiate the `Lcio2EDM4hepTool` Gaudi Tool, e.g. as `lcioConvTool = Lcio2EDM4hepTool("LCIO2EDM4hep")`.
 2. Indicate the collections to convert in the options of the tool.
-  + To sipmly convert all available collections use `lcioConvTool.convertAll = True` (this is also the default!)
+  + To simply convert all available collections use `lcioConvTool.convertAll = True` (this is also the default!)
   + If you want to convert all available collections but want to rename some of them, e.g. because an algorithm expects a different name, use the `collNameMapping` option. This maps the input name to the output name; `lcioConvTool.collNameMapping = {'MCParticles': 'MCParticle'}` will convert the input `'MCParticles'` into the `'MCParticle'` collection.
   + To convert only a subset of all available collections, set the `convertAll` option to `False` and indicate the collections to convert via the `collNameMapping` option.
 3. Select the Gaudi Algorithm that will convert the indicated collections.

@@ -118,4 +118,4 @@ The `event_display.py` options file that is used above and that is present in th
 - Exchange the LCIO input reading by the podio input reading (see above)
 - Attach the `EDM4hep2LcioTool` to the wrapped `CEDViewer` processor
 
-This should allow to arrive at a similar steering file even for slightly different configurations. One potential pitfal is the slightly different naming of the `ddsim` outputs between LCIO and EDM4hep (see [this issue](https://github.com/AIDASoft/DD4hep/issues/921)). This can be addressed by configuring the EDM4hep to LCIO converter (`edmConvTool` in the code above) to map the names accordingly.
+This should allow one to arrive at a similar steering file even for slightly different configurations. One potential pitfall is the slightly different naming of the `ddsim` outputs between LCIO and EDM4hep (see [this issue](https://github.com/AIDASoft/DD4hep/issues/921)). This can be addressed by configuring the EDM4hep to LCIO converter (`edmConvTool` in the code above) to map the names accordingly.

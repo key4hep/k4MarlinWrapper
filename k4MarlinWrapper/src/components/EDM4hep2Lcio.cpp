@@ -273,11 +273,11 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
 StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
   const auto collections = m_podioDataSvc->getCollections();
 
-  // Start of with the pre-defined collection name mappings
+  // Start off with the pre-defined collection name mappings
   auto collsToConvert{m_collNames.value()};
   if (m_convertAll) {
     info() << "Converting all collections from EDM4hep to LCIO" << endmsg;
-    // And simply add the rest, taking exploiting the fact that emplace will not
+    // And simply add the rest, exploiting the fact that emplace will not
     // replace existing entries with the same key
     for (const auto& [name, _] : collections) {
       collsToConvert.emplace(name, name);

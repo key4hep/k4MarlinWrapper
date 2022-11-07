@@ -129,7 +129,7 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
   std::unique_ptr<k4LCIOConverter> lcio_converter = std::make_unique<k4LCIOConverter>(id_table);
   lcio_converter->set(the_event);
 
-  // Start of with the pre-defined collection name mappings
+  // Start off with the pre-defined collection name mappings
   auto collsToConvert{m_collNames.value()};
   if (m_convertAll) {
     const auto* collections = the_event->getCollectionNames();
