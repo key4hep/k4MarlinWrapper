@@ -10,27 +10,29 @@ evtsvc = k4DataSvc('EventDataSvc')
 
 # EDM4hep2lcio Tool
 edmConvTool = EDM4hep2LcioTool("EDM4hep2lcio")
-edmConvTool.Parameters = [
-    "E4H_CaloHitCollection", "LCIO_CaloHitCollection",
-    "E4H_RawCaloHitCollection", "LCIO_RawCaloHitCollection",
-    "E4H_TPCHitCollection", "LCIO_TPCHitCollection",
-    "E4H_TrackCollection", "LCIO_TrackCollection",
-    "E4H_SimTrackerHitCollection", "LCIO_SimTrackerHitCollection",
-    "E4H_TrackerHitCollection", "LCIO_TrackerHitCollection",
-    "E4H_MCParticleCollection", "LCIO_MCParticleCollection",
-    "E4H_SimCaloHitCollection", "LCIO_SimCaloHitCollection"
-]
+edmConvTool.convertAll = False
+edmConvTool.collNameMapping = {
+    "E4H_CaloHitCollection": "LCIO_CaloHitCollection",
+    "E4H_RawCaloHitCollection": "LCIO_RawCaloHitCollection",
+    "E4H_TPCHitCollection": "LCIO_TPCHitCollection",
+    "E4H_TrackCollection": "LCIO_TrackCollection",
+    "E4H_SimTrackerHitCollection": "LCIO_SimTrackerHitCollection",
+    "E4H_TrackerHitCollection": "LCIO_TrackerHitCollection",
+    "E4H_MCParticleCollection": "LCIO_MCParticleCollection",
+    "E4H_SimCaloHitCollection": "LCIO_SimCaloHitCollection"
+}
 
 # LCIO2EDM4hep Tool
 lcioConvTool = Lcio2EDM4hepTool("Lcio2EDM4hep")
-lcioConvTool.Parameters = [
-    "LCIO_CaloHitCollection", "E4H_CaloHitCollection_conv",
-    # "LCIO_TrackerHitCollection", "E4H_TrackerHitCollection_conv",
-    "LCIO_SimTrackerHitCollection", "E4H_SimTrackerHitCollection_conv",
-    "LCIO_TrackCollection", "E4H_TrackCollection_conv",
-    "LCIO_MCParticleCollection", "E4H_MCParticleCollection_conv",
-    "LCIO_SimCaloHitCollection", "E4H_SimCaloHitCollection_conv"
-]
+lcioConvTool.convertAll = False
+lcioConvTool.collNameMapping = {
+    "LCIO_CaloHitCollection": "E4H_CaloHitCollection_conv",
+    # "LCIO_TrackerHitCollection": "E4H_TrackerHitCollection_conv",
+    "LCIO_SimTrackerHitCollection": "E4H_SimTrackerHitCollection_conv",
+    "LCIO_TrackCollection": "E4H_TrackCollection_conv",
+    "LCIO_MCParticleCollection": "E4H_MCParticleCollection_conv",
+    "LCIO_SimCaloHitCollection": "E4H_SimCaloHitCollection_conv"
+}
 
 TestConversion = TestE4H2L("TestConversion")
 TestConversion.EDM4hep2LcioTool=edmConvTool
