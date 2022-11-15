@@ -156,7 +156,7 @@ MyCEDViewer.Parameters = {
                               "MarlinTrkTracks", "0", "6", "7",
                               "PandoraClusters", "0", "3", "8",
                               "PandoraPFOs", "0", "3", "9",
-                              "MCParticles", "0", "3", "0",
+                              "MCParticle", "0", "3", "0",
                               "VertexBarrelHits", "0", "5", "11",
                               "VertexEndcapHits", "0", "5", "11",
                               "InnerTrackerBarrelHits", "0", "5", "11",
@@ -193,7 +193,8 @@ MyCEDViewer.Parameters = {
 
 # EDM4hep to LCIO converter
 edmConvTool = EDM4hep2LcioTool("EDM4hep2lcio")
-edmConvTool.Parameters = ["*"]
+edmConvTool.convertAll = True
+edmConvTool.collNameMapping = {'MCParticles': 'MCParticle'}
 edmConvTool.OutputLevel = DEBUG
 MyCEDViewer.EDM4hep2LcioTool = edmConvTool
 

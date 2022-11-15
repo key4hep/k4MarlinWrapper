@@ -15,6 +15,9 @@
 // Converter Interface
 #include "k4MarlinWrapper/converters/IEDMConverter.h"
 
+#include <map>
+#include <string>
+
 class Lcio2EDM4hepTool : public GaudiTool, virtual public IEDMConverter {
 public:
   Lcio2EDM4hepTool(const std::string& type, const std::string& name, const IInterface* parent);
@@ -25,7 +28,8 @@ public:
   StatusCode convertCollections(lcio::LCEventImpl* lcio_event);
 
 private:
-  Gaudi::Property<std::vector<std::string>> m_params{this, "Parameters", {}};
+  Gaudi::Property<std::map<std::string, std::string>> m_collNames{this, "collNameMapping", {}};
+  Gaudi::Property<bool>                               m_convertAll{this, "convertAll", true};
 
   std::map<std::string, DataObjectHandleBase*> m_dataHandlesMap;
 

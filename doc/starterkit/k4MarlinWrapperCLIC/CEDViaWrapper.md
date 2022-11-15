@@ -83,7 +83,8 @@ MyCEDViewer.Parameters = {
                           
 # EDM4hep to LCIO converter
 edmConvTool = EDM4hep2LcioTool("EDM4hep2lcio")
-edmConvTool.Parameters = ["*"]
+edmConvTool.convertAll = True
+edmConvTool.collNameMapping = {'MCParticles': 'MCParticle'}
 edmConvTool.OutputLevel = DEBUG
 MyCEDViewer.EDM4hep2LcioTool = edmConvTool
 
@@ -117,16 +118,4 @@ The `event_display.py` options file that is used above and that is present in th
 - Exchange the LCIO input reading by the podio input reading (see above)
 - Attach the `EDM4hep2LcioTool` to the wrapped `CEDViewer` processor
 
-This should allow to arrive at a similar steering file even for slightly different configurations. One potential pitfal is the slightly different naming of the `ddsim` outputs between LCIO and EDM4hep (see [this issue](https://github.com/AIDASoft/DD4hep/issues/921)). For the `event_display.py` in the `examples` drawing the `MCParticle`s in the event display required to change the name of the collection that is used in the `DrawInLayers` configuration parameter of the `CEDViewer`:
-
-```diff
-@@ -156,7 +156,7 @@ MyCEDViewer.Parameters = {
-                               "MarlinTrkTracks", "0", "6", "7",
-                               "PandoraClusters", "0", "3", "8",
-                               "PandoraPFOs", "0", "3", "9",
--                              "MCParticle", "0", "3", "0",
-+                              "MCParticles", "0", "3", "0",
-                               "VertexBarrelHits", "0", "5", "11",
-                               "VertexEndcapHits", "0", "5", "11",
-                               "InnerTrackerBarrelHits", "0", "5", "11",
-```
+This should allow one to arrive at a similar steering file even for slightly different configurations. One potential pitfall is the slightly different naming of the `ddsim` outputs between LCIO and EDM4hep (see [this issue](https://github.com/AIDASoft/DD4hep/issues/921)). This can be addressed by configuring the EDM4hep to LCIO converter (`edmConvTool` in the code above) to map the names accordingly.
