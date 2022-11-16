@@ -249,7 +249,10 @@ StatusCode MarlinProcessorWrapper::execute() {
     } else {
       m_processor->processEvent(the_event);
     }
+
+    m_processor->setFirstEvent(false, marlin::ExternalProcessorMgrAccessor{this});
   }
+
   // Handle exceptions that may come from Marlin
   catch (marlin::SkipEventException& e) {
     // Store flag to prevent the rest of the event from processing
