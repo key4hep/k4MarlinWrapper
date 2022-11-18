@@ -12,6 +12,7 @@
 - Writing EDM4hep events with `PodioOutput()`
 - Writing EDM4hep events with `MarlinProcessorWrapper` of type `LCIOOutputProcessor`
 - Running non-thread algorithms/processors in parallel
+- Running wrapped Marlin processors that make use of the `isFirstEvent` method in their `processEvent` method to do some setup only in the first event. There is no way to make this thread safe. If you want your processor to be usable on in a multi threaded environment, you have to move this setup to `init`.
 
 ## Running Gaudi with multithreading support
 
