@@ -22,6 +22,7 @@
  */
 
 #include "k4MarlinWrapper/MarlinProcessorWrapper.h"
+#include "IMPL/LCEventImpl.h"
 
 DECLARE_COMPONENT(MarlinProcessorWrapper)
 
@@ -209,9 +210,9 @@ StatusCode MarlinProcessorWrapper::execute() {
 
   if (sc.isFailure()) {
     // Register empty event
-    the_event = new lcio::LCEventImpl();
     debug() << "Registering empty Event for EDM4hep to LCIO conversion event in TES" << endmsg;
-    auto       pO     = std::make_unique<LCEventWrapper>(the_event, true);
+    auto pO           = std::make_unique<LCEventWrapper>(std::make_unique<lcio::LCEventImpl>());
+    the_event         = static_cast<IMPL::LCEventImpl*>(pO->getEvent());
     StatusCode reg_sc = evtSvc()->registerObject("/Event/LCEvent", pO.release());
     if (reg_sc.isFailure()) {
       error() << "Failed to register empty LCIO Event" << endmsg;
