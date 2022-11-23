@@ -62,7 +62,7 @@ StatusCode LcioEvent::execute() {
     // wrappers
     info() << "Reading from file: " << m_fileNames[0] << endmsg;
 
-    auto             myEvWr = new LCEventWrapper(theEvent.release());
+    auto             myEvWr = new LCEventWrapper(std::move(theEvent));
     const StatusCode sc     = eventSvc()->registerObject("/Event/LCEvent", myEvWr);
     if (sc.isFailure()) {
       error() << "Failed to store the LCEvent" << endmsg;

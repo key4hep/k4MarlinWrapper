@@ -28,23 +28,18 @@
 
 #include <GaudiKernel/DataObject.h>
 
+#include <memory>
+
 class LCEventWrapper : public DataObject {
 public:
-  // Set delete_event to true when manually creating the LCEvent
-  LCEventWrapper(EVENT::LCEvent* theEvent, bool delete_event = false)
-      : m_event(theEvent), m_delete_event(delete_event) {}
+  LCEventWrapper(std::unique_ptr<EVENT::LCEvent>&& theEvent) : m_event(std::move(theEvent)) {}
 
-  ~LCEventWrapper() {
-    if (m_delete_event) {
-      delete m_event;
-    }
-  };
+  ~LCEventWrapper() = default;
 
-  EVENT::LCEvent* getEvent() const { return m_event; }
+  EVENT::LCEvent* getEvent() const { return m_event.get(); }
 
 private:
-  EVENT::LCEvent* m_event        = nullptr;
-  bool            m_delete_event = false;
+  std::unique_ptr<EVENT::LCEvent> m_event{nullptr};
 };
 
 // Event Status Data Object to indicate if there was underlying LCEvent
