@@ -76,8 +76,8 @@ MyCEDViewer.Parameters = {
                               "FTD_PIXELCollection", "0", "5", "1",
                               "FTD_STRIPCollection", "0", "5", "1",
                               "FTDCollection", "0", "5", "1",
-                              "TPCCollection", "0", "3", "1", "
-                              SETCollection", "0", "3", "1",
+                              "TPCCollection", "0", "3", "1",
+                              "SETCollection", "0", "3", "1",
                               "ETDCollection", "0", "3", "1",
                               "VertexBarrelCollection", "0", "5", "1",
                               "VertexEndcapCollection", "0", "5", "1",
