@@ -291,11 +291,9 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
     } else {
       debug() << " Collection " << lcioName << " already in place, skipping conversion. " << endmsg;
     }
-
-    if (!m_convertAll) {
-      FillMissingCollections(collection_pairs);
-    }
   }
+
+  FillMissingCollections(collection_pairs);
 
   return StatusCode::SUCCESS;
 }
