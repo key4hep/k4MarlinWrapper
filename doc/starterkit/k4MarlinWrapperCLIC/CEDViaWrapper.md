@@ -20,7 +20,7 @@ All the following steps assume that the environment is setup like above and that
 
 To create an input file for the event display we run a simple detector simulation using `ddsim` and a particle gun that shoots photons. The input file that we create here for illustration purposes has only 10 events, which also means that the creation should only take a few minutes. The steps to create this file are the following 
 
-```
+```bash
 ddsim --steeringFile CLICPerformance/clicConfig/clic_steer.py \
       --compactFile $LCGEO/CLIC/compact/CLIC_o3_v14/CLIC_o3_v14.xml \
       --enableGun \
