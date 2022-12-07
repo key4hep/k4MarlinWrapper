@@ -21,8 +21,8 @@ jobs:
         docker exec CI_container /bin/bash -c ' cd Package;/
         source ${{ matrix.SETUP }};\
         mkdir build; cd build;\
-        cmake .. ;\
-        make -j 2;\
+        cmake .. -GNinja;\
+        ninja;\
         '
     - name: CheckPage  
       run: |
