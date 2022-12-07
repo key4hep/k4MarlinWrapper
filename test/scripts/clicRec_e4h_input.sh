@@ -39,8 +39,8 @@ if ! diff <(anajob Output_DST.slcio) $TEST_DIR/inputFiles/anajob_Output_DST.expe
   exit 1
 fi
 
-echo "Comparing contents of EDM4hep output file"
-if ! diff <(podio-dump -e 0:2 my_output.root) $TEST_DIR/inputFiles/podio-dump_my_output.expected; then
-  echo "File contents of EDM4hep file are not as expected"
-  exit 1
-fi
+# echo "Comparing contents of EDM4hep output file"
+# if ! diff <(podio-dump -e 0:2 my_output.root) $TEST_DIR/inputFiles/podio-dump_my_output.expected; then
+#   echo "File contents of EDM4hep file are not as expected"
+#   exit 1
+# fi
