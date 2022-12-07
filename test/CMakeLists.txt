@@ -58,12 +58,7 @@ if (BASH_PROGRAM)
       PASS_REGULAR_EXPRESSION "Input and output have same number of events")
 
   # Test clicReconstruction with EDM4hep input and output
-  # Disabled for current version in k4lcioreader
-  get_target_property(k4lcioreader_PATH  k4LCIOReader::k4LCIOReader LOCATION)
-  if(${k4lcioreader_PATH} MATCHES  "sw[-]nightlies")
-    add_test( clicRec_edm4hep_input ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/clicRec_e4h_input.sh )
-    LIST(APPEND OPTIONAL_TESTS clicRec_edm4hep_input)
-  endif()
+  add_test( clicRec_edm4hep_input ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/clicRec_e4h_input.sh )
 
   # Run clicReconstruction sequence with LCIO input and output, no converters, with inter-event parallelism
   add_test( clicRec_lcio_mt ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/clicRec_lcio_mt.sh )
@@ -78,7 +73,7 @@ if (BASH_PROGRAM)
       over_total_events
       same_num_io
       clicRec_lcio_mt
-      ${OPTIONAL_TESTS}
+      clicRec_edm4hep_input
     PROPERTIES
       ENVIRONMENT "TEST_DIR=${CMAKE_CURRENT_SOURCE_DIR};LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:${CMAKE_INSTALL_PREFIX}/lib64:$ENV{LD_LIBRARY_PATH};PYTHONPATH=${CMAKE_INSTALL_PREFIX}/python:$ENV{PYTHONPATH}"
       )
