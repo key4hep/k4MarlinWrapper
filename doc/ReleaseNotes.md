@@ -1,3 +1,39 @@
+# v00-05
+
+* 2022-12-19 Thomas Madlener ([PR#101](https://github.com/key4hep/k4MarlinWrapper/pull/101))
+  - Add `diff` based tests that compare the output files of the clic reconstruction test, with expected outputs via `anajob` and `podio-dump`. This should catch very obvious regressions like #98, already in CI.
+  - Remove the restriction of running the clic reconstruction test only in nightly stacks.
+
+* 2022-12-19 Thomas Madlener ([PR#100](https://github.com/key4hep/k4MarlinWrapper/pull/100))
+  - Examples and other shared resources should go to `<prefix>/share/k4MarlinWrapper` in order for `key4hep-stack` environment variables to be properly populated. This fixes a problem where `$K4MARLINWRAPPER` points to an empty directory.
+  - Make sure to run the `doctest` workflows using the newly built version of `k4MarlinWrapper`
+  - Add `CEDViaWrapper` to the things that are run in the `doctest` workflow.
+  - Update github actions versions in CI.
+
+* 2022-12-19 Thomas Madlener ([PR#92](https://github.com/key4hep/k4MarlinWrapper/pull/92))
+  - Fix an issue where `isFirstEvent` always returns `false` in wrapped processors by calling `setFirstEvent` after processing the first event.
+
+* 2022-11-30 Andre Sailer ([PR#99](https://github.com/key4hep/k4MarlinWrapper/pull/99))
+  - EDM4hep2LCIO: Fix so that FillMissingCollections is always called after other collections were converted. Needed also to correctly assign SimCalorimeterHitContributions. Depends on key4hep/k4EDM4hep2LcioConv#7, fixes #98
+
+* 2022-11-24 Erica Brondolin ([PR#97](https://github.com/key4hep/k4MarlinWrapper/pull/97))
+  - Just a small fix to the `event_display.py` file
+
+* 2022-11-24 Thomas Madlener ([PR#95](https://github.com/key4hep/k4MarlinWrapper/pull/95))
+  - Fix memory leak in `LcioEvent`, where the event read from file was leaked every event.
+
+* 2022-11-15 Thomas Madlener ([PR#91](https://github.com/key4hep/k4MarlinWrapper/pull/91))
+  -  EDM4hep2LcioTool, Lcio2EDM4hepTool: Breaking Change! Replaced configuration via a list of string (pairs) with a `convertAll` flag and a `collNameMapping` (map of string to string). This makes it possible to more easily convert all collections, but still override the naming of the target collection without having to type out all possible collections.
+
+* 2022-07-08 Violetavican ([PR#89](https://github.com/key4hep/k4MarlinWrapper/pull/89))
+  - Reordered information just to clarify the steps that must be followed for LCIO input reconstruction
+
+* 2022-06-30 Thomas Madlener ([PR#87](https://github.com/key4hep/k4MarlinWrapper/pull/87))
+  - Add documentation and a bit of explanation of how to run a wrapped CEDViewer for an event display using EDM4hep inputs.
+
+* 2022-06-30 Thomas Madlener ([PR#86](https://github.com/key4hep/k4MarlinWrapper/pull/86))
+  - Install the `examples/` directory into `<install-prefix>/share/` to make them more easily available after installation. In Key4hep releases they will be accessible via `$K4MARLINWRAPPER/examples/`.
+
 # v00-04-02
 
 * 2022-06-27 Thomas Madlener ([PR#85](https://github.com/key4hep/k4MarlinWrapper/pull/85))
