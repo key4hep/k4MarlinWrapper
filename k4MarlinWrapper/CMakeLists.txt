@@ -35,6 +35,7 @@ gaudi_add_module(k4MarlinWrapperPlugins
 target_include_directories(k4MarlinWrapperPlugins PUBLIC
   ${CMAKE_SOURCE_DIR}/k4MarlinWrapper
   ${LCIO_INCLUDE_DIRS}
+  ${Marlin_INCLUDE_DIRS}
 )
 
 # MarlinWrapper
@@ -63,12 +64,14 @@ gaudi_add_module(EDM4hep2Lcio
     k4FWCore::k4FWCore
     Gaudi::GaudiAlgLib
     ${LCIO_LIBRARIES}
+    ${Marlin_LIBRARIES}
     EDM4HEP::edm4hep
 )
 
 target_include_directories(EDM4hep2Lcio PUBLIC
   ${CMAKE_SOURCE_DIR}/k4MarlinWrapper
   ${LCIO_INCLUDE_DIRS}
+  ${Marlin_INCLUDE_DIRS}
 )
 
 # LCIO2EDM4hep
