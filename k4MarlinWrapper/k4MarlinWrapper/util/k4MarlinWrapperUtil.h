@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 
+#include "marlin/StringParameters.h"
+
 namespace k4MW::util {
 
   // Split a string by a regex
@@ -20,6 +22,13 @@ namespace k4MW::util {
     std::regex re{"\\s+"};
     return split(subject, re);
   }
+
+  /// singleton helper for global parameters
+  marlin::StringParameters* globalParameters(){
+    static marlin::StringParameters p ;
+    return &p ;
+  }
+
 }  // namespace k4MW::util
 
 #endif
