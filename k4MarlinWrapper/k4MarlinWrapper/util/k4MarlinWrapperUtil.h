@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 
+#include "marlin/Global.h"
 #include "marlin/StringParameters.h"
 
 namespace k4MW::util {
@@ -23,11 +24,11 @@ namespace k4MW::util {
     return split(subject, re);
   }
 
-  /// singleton helper for global parameters
-  marlin::StringParameters* globalParameters(){
-    static marlin::StringParameters p ;
-    return &p ;
-  }
+  /// singleton helper to intialise global Marlin parameters exactly once
+  const static marlin::StringParameters* marlin_global_parameters = ( [](){
+      marlin::Global::parameters = new marlin::StringParameters ;
+      return marlin::Global::parameters;
+    }) ();
 
 }  // namespace k4MW::util
 
