@@ -20,7 +20,6 @@
  */
 
 #include "k4MarlinWrapper/LcioEventAlgo.h"
-#include "marlin/Global.h"
 #include "k4MarlinWrapper/util/k4MarlinWrapperUtil.h"
 
 DECLARE_COMPONENT(LcioEvent)
@@ -32,7 +31,6 @@ StatusCode LcioEvent::initialize() {
   if (sc.isFailure())
     return sc;
 
-  marlin::Global::parameters = k4MW::util::globalParameters() ;
   marlin::Global::parameters->add("LCIOInputFiles", m_fileNames ) ;
 
   m_reader = new MT::LCReader(0);

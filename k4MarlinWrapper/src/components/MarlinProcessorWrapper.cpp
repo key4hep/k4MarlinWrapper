@@ -154,7 +154,6 @@ StatusCode MarlinProcessorWrapper::initialize() {
   if (once) {
     once = false;
     streamlog::out.init(std::cout, "k4MarlinWrapper");
-    marlin::Global::parameters = k4MW::util::globalParameters();
     marlin::Global::parameters->add("AllowToModifyEvent", {"true"});
 
     // Get seed set for random engine
