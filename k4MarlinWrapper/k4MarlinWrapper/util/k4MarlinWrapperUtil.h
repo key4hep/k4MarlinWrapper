@@ -25,10 +25,10 @@ namespace k4MW::util {
   }
 
   /// singleton helper to intialise global Marlin parameters exactly once
-  const static marlin::StringParameters* marlin_global_parameters = ( [](){
-      marlin::Global::parameters = new marlin::StringParameters ;
-      return marlin::Global::parameters;
-    }) ();
+  const static marlin::StringParameters* marlin_global_parameters = ([]() {
+    marlin::Global::parameters = new marlin::StringParameters;
+    return marlin::Global::parameters;
+  })();
 
 }  // namespace k4MW::util
 
