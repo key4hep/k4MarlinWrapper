@@ -31,7 +31,7 @@ StatusCode LcioEvent::initialize() {
   if (sc.isFailure())
     return sc;
 
-  marlin::Global::parameters->add("LCIOInputFiles", m_fileNames ) ;
+  marlin::Global::parameters->add("LCIOInputFiles", m_fileNames);
 
   m_reader = new MT::LCReader(0);
   m_reader->open(m_fileNames);
