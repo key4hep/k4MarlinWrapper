@@ -51,7 +51,6 @@
 // k4MarlinWrapper
 #include "k4MarlinWrapper/LCEventWrapper.h"
 #include "k4MarlinWrapper/converters/IEDMConverter.h"
-#include "k4MarlinWrapper/util/k4MarlinWrapperUtil.h"
 
 namespace marlin {
   class Processor;
