@@ -59,23 +59,24 @@ MyAIDAProcessor.Parameters = {
                               }
 # EDM4hep to LCIO converter
 edmConvTool = EDM4hep2LcioTool("EDM4hep2lcio")
-edmConvTool.Parameters = [
-    'MCParticles',                     'MCParticles',
-    'VertexBarrelCollection',          'VertexBarrelCollection',
-    'VertexEndcapCollection',          'VertexEndcapCollection',
-    'InnerTrackerBarrelCollection',    'InnerTrackerBarrelCollection',
-    'OuterTrackerBarrelCollection',    'OuterTrackerBarrelCollection',
-    'InnerTrackerEndcapCollection',    'InnerTrackerEndcapCollection',
-    'OuterTrackerEndcapCollection',    'OuterTrackerEndcapCollection',
-    'ECalEndcapCollection',            'ECalEndcapCollection',
-    'ECalBarrelCollection',            'ECalBarrelCollection',
-    'HCalBarrelCollection',            'HCalBarrelCollection',
-    'HCalEndcapCollection',            'HCalEndcapCollection',
-    'HCalRingCollection',              'HCalRingCollection',
-    'YokeBarrelCollection',            'YokeBarrelCollection',
-    'YokeEndcapCollection',            'YokeEndcapCollection',
-    'LumiCalCollection',               'LumiCalCollection',
-]
+edmConvTool.convertAll = False
+edmConvTool.collNameMapping = {
+    'MCParticles':                     'MCParticles',
+    'VertexBarrelCollection':          'VertexBarrelCollection',
+    'VertexEndcapCollection':          'VertexEndcapCollection',
+    'InnerTrackerBarrelCollection':    'InnerTrackerBarrelCollection',
+    'OuterTrackerBarrelCollection':    'OuterTrackerBarrelCollection',
+    'InnerTrackerEndcapCollection':    'InnerTrackerEndcapCollection',
+    'OuterTrackerEndcapCollection':    'OuterTrackerEndcapCollection',
+    'ECalEndcapCollection':            'ECalEndcapCollection',
+    'ECalBarrelCollection':            'ECalBarrelCollection',
+    'HCalBarrelCollection':            'HCalBarrelCollection',
+    'HCalEndcapCollection':            'HCalEndcapCollection',
+    'HCalRingCollection':              'HCalRingCollection',
+    'YokeBarrelCollection':            'YokeBarrelCollection',
+    'YokeEndcapCollection':            'YokeEndcapCollection',
+    'LumiCalCollection':               'LumiCalCollection',
+}
 edmConvTool.OutputLevel = DEBUG
 MyAIDAProcessor.EDM4hep2LcioTool=edmConvTool
 
@@ -458,7 +459,7 @@ Output_REC.Parameters = {
 
 # LCIO to EDM4hep converter
 lcioConvTool = Lcio2EDM4hepTool("lcio2EDM4hep")
-lcioConvTool.Parameters = ["*"]
+lcioConvTool.convertAll = True
 lcioConvTool.OutputLevel = DEBUG
 Output_REC.Lcio2EDM4hepTool=lcioConvTool
 
