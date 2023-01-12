@@ -30,6 +30,11 @@ if (BASH_PROGRAM)
   # Test simple_processors2
   add_test( simple_processors2 ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/simple_processors2.sh )
 
+  # CLICPerformance setup is added as a simple test that will always succeed, on
+  # which other tests that need it can depend, in order to make concurrent
+  # running of those more easily possible
+  add_test( CLICPerformance_setup ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/setup_clic_performance.sh )
+
   # Test clicReconstruction
   add_test( clicRec ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/clicRec.sh )
 
@@ -78,5 +83,10 @@ if (BASH_PROGRAM)
       ENVIRONMENT "TEST_DIR=${CMAKE_CURRENT_SOURCE_DIR};LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:${CMAKE_INSTALL_PREFIX}/lib64:$ENV{LD_LIBRARY_PATH};PYTHONPATH=${CMAKE_INSTALL_PREFIX}/python:$ENV{PYTHONPATH}"
       )
 
+    set_tests_properties(
+      clicRec clicRec_lcio_mt clicRec_edm4hep_input
+      PROPERTIES
+      DEPENDS CLICPerformance_setup
+      )
 
 endif(BASH_PROGRAM)
