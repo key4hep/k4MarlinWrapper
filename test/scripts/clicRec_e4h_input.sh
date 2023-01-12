@@ -3,9 +3,7 @@
 set -eu
 
 # Clone CLICPerformance for input files
-if [ ! -d CLICPerformance ]; then
-  git clone https://github.com/iLCSoft/CLICPerformance
-fi
+bash $TEST_DIR/scripts/setup_clic_performance.sh
 
 cd CLICPerformance/clicConfig
 
