@@ -133,10 +133,10 @@ void EDM4hep2LcioTool::convertSimCalorimeterHits(
 // Convert EDM4hep TPC Hits to LCIO
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
 // Add converted LCIO Collection Vector to LCIO event
-void EDM4hep2LcioTool::convertTPCHits(vec_pair<lcio::TPCHitImpl*, edm4hep::TPCHit>& tpc_hits_vec,
+void EDM4hep2LcioTool::convertTPCHits(vec_pair<lcio::TPCHitImpl*, edm4hep::RawTimeSeries>& tpc_hits_vec,
                                       const std::string& e4h_coll_name, const std::string& lcio_coll_name,
                                       lcio::LCEventImpl* lcio_event) {
-  DataHandle<edm4hep::TPCHitCollection> tpchit_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
+  DataHandle<edm4hep::RawTimeSeriesCollection> tpchit_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
   const auto                            tpchit_coll = tpchit_handle.get();
 
   auto* conv_tpchits = convTPCHits(tpchit_coll, tpc_hits_vec);
@@ -246,7 +246,7 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
   } else if (fulltype == "edm4hep::SimCalorimeterHit") {
     convertSimCalorimeterHits(collection_pairs.simcalohits, collection_pairs.mcparticles, e4h_coll_name, lcio_coll_name,
                               lcio_event);
-  } else if (fulltype == "edm4hep::TPCHit") {
+  } else if (fulltype == "edm4hep::RawTimeSeries") {
     convertTPCHits(collection_pairs.tpchits, e4h_coll_name, lcio_coll_name, lcio_event);
   } else if (fulltype == "edm4hep::Cluster") {
     convertClusters(collection_pairs.clusters, collection_pairs.calohits, e4h_coll_name, lcio_coll_name, lcio_event);

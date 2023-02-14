@@ -65,7 +65,7 @@ private:
                                  const std::string& e4h_coll_name, const std::string& lcio_coll_name,
                                  lcio::LCEventImpl* lcio_event);
 
-  void convertTPCHits(vec_pair<lcio::TPCHitImpl*, edm4hep::TPCHit>& tpc_hits_vec, const std::string& e4h_coll_name,
+  void convertTPCHits(vec_pair<lcio::TPCHitImpl*, edm4hep::RawTimeSeries>& tpc_hits_vec, const std::string& e4h_coll_name,
                       const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event);
 
   void convertClusters(vec_pair<lcio::ClusterImpl*, edm4hep::Cluster>&                     cluster_vec,
