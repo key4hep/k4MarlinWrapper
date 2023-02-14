@@ -15,7 +15,7 @@ StatusCode TestE4H2L::initialize() {
   m_dataHandlesMap[m_e4h_simcalohit_name] =
       new DataHandle<edm4hep::SimCalorimeterHitCollection>(m_e4h_simcalohit_name, Gaudi::DataHandle::Writer, this);
   m_dataHandlesMap[m_e4h_tpchit_name] =
-      new DataHandle<edm4hep::TPCHitCollection>(m_e4h_tpchit_name, Gaudi::DataHandle::Writer, this);
+      new DataHandle<edm4hep::RawTimeSeriesCollection>(m_e4h_tpchit_name, Gaudi::DataHandle::Writer, this);
   m_dataHandlesMap[m_e4h_trackerhit_name] =
       new DataHandle<edm4hep::TrackerHitCollection>(m_e4h_trackerhit_name, Gaudi::DataHandle::Writer, this);
   m_dataHandlesMap[m_e4h_simtrackerhit_name] =
@@ -109,7 +109,7 @@ void TestE4H2L::createSimCalorimeterHits(const int num_elements, const int num_c
 
 void TestE4H2L::createTPCHits(const int num_elements, const int num_rawwords, int& int_cnt, float& float_cnt) {
   // edm4hep::CalorimeterHits
-  auto* tpchit_coll = new edm4hep::TPCHitCollection();
+  auto* tpchit_coll = new edm4hep::RawTimeSeriesCollection();
 
   for (int i = 0; i < num_elements; ++i) {
     auto elem = tpchit_coll->create();
@@ -124,7 +124,7 @@ void TestE4H2L::createTPCHits(const int num_elements, const int num_rawwords, in
     }
   }
 
-  auto* tpchit_handle = dynamic_cast<DataHandle<edm4hep::TPCHitCollection>*>(m_dataHandlesMap[m_e4h_tpchit_name]);
+  auto* tpchit_handle = dynamic_cast<DataHandle<edm4hep::RawTimeSeriesCollection>*>(m_dataHandlesMap[m_e4h_tpchit_name]);
   tpchit_handle->put(tpchit_coll);
 }
 
@@ -404,7 +404,7 @@ bool TestE4H2L::checkEDMSimCaloHitLCIOSimCaloHit(
 }
 
 bool TestE4H2L::checkEDMTPCHitLCIOTPCHit(lcio::LCEventImpl* the_event) {
-  DataHandle<edm4hep::TPCHitCollection> tpchit_handle_orig{m_e4h_tpchit_name, Gaudi::DataHandle::Reader, this};
+  DataHandle<edm4hep::RawTimeSeriesCollection> tpchit_handle_orig{m_e4h_tpchit_name, Gaudi::DataHandle::Reader, this};
   const auto                            tpchit_coll_orig = tpchit_handle_orig.get();
 
   auto lcio_tpchit_coll = the_event->getCollection(m_lcio_tpchit_name);
@@ -423,7 +423,7 @@ bool TestE4H2L::checkEDMTPCHitLCIOTPCHit(lcio::LCEventImpl* the_event) {
         tpchit_same = tpchit_same && (edm_tpchit_orig.getCharge() == lcio_tpchit->getCharge());
         tpchit_same = tpchit_same && (edm_tpchit_orig.getQuality() == lcio_tpchit->getQuality());
 
-        tpchit_same = tpchit_same && (edm_tpchit_orig.rawDataWords_size() == lcio_tpchit->getNRawDataWords());
+        tpchit_same = tpchit_same && (edm_tpchit_orig.adcCounts_size() == lcio_tpchit->getNRawDataWords());
         if (tpchit_same) {
           for (int j = 0; j < lcio_tpchit->getNRawDataWords(); ++j) {
             tpchit_same = tpchit_same && (edm_tpchit_orig.getRawDataWords(j) == lcio_tpchit->getRawDataWord(j));

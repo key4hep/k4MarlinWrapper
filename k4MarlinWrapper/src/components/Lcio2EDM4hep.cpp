@@ -190,7 +190,7 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
       } else if (lcio_coll_type_str == "RawCalorimeterHit") {
         convertRegister<edm4hep::RawCalorimeterHitCollection>(edm4hepName, lcioName, lcio_converter, lcio_coll);
       } else if (lcio_coll_type_str == "TPCHit") {
-        convertRegister<edm4hep::TPCHitCollection>(edm4hepName, lcioName, lcio_converter, lcio_coll);
+        convertRegister<edm4hep::RawTimeSeriesCollection>(edm4hepName, lcioName, lcio_converter, lcio_coll);
       } else if (lcio_coll_type_str == "Cluster") {
         convertRegister<edm4hep::ClusterCollection>(edm4hepName, lcioName, lcio_converter, lcio_coll);
         // Get associated collection. Name hardcoded in k4LCIOConverter
