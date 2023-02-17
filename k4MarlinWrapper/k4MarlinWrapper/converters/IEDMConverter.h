@@ -35,8 +35,8 @@
 #include <edm4hep/SimCalorimeterHitCollection.h>
 #include <edm4hep/SimTrackerHit.h>
 #include <edm4hep/SimTrackerHitCollection.h>
-#include <edm4hep/TPCHit.h>
-#include <edm4hep/TPCHitCollection.h>
+#include <edm4hep/RawTimeSeries.h>
+#include <edm4hep/RawTimeSeriesCollection.h>
 #include <edm4hep/Track.h>
 #include <edm4hep/TrackCollection.h>
 #include <edm4hep/TrackerHit.h>
