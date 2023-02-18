@@ -120,7 +120,7 @@ void TestE4H2L::createTPCHits(const int num_elements, const int num_rawwords, in
     elem.setCharge(float_cnt++);
 
     for (int j = 0; j < num_rawwords; ++j) {
-      elem.addToRawDataWords(int_cnt++);
+      elem.addToAdcCounts(int_cnt++);
     }
   }
 
@@ -426,7 +426,7 @@ bool TestE4H2L::checkEDMTPCHitLCIOTPCHit(lcio::LCEventImpl* the_event) {
         tpchit_same = tpchit_same && (edm_tpchit_orig.adcCounts_size() == lcio_tpchit->getNRawDataWords());
         if (tpchit_same) {
           for (int j = 0; j < lcio_tpchit->getNRawDataWords(); ++j) {
-            tpchit_same = tpchit_same && (edm_tpchit_orig.getRawDataWords(j) == lcio_tpchit->getRawDataWord(j));
+            tpchit_same = tpchit_same && (edm_tpchit_orig.getAdcCounts(j) == lcio_tpchit->getRawDataWord(j));
           }
         }
       }
