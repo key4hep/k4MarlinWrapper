@@ -214,17 +214,16 @@ void EDM4hep2LcioTool::convertReconstructedParticles(
 
 // Transfer info from EDM4hep EventHeader to LCIO event
 void EDM4hep2LcioTool::convertEventHeader(const std::string& e4h_coll_name, lcio::LCEventImpl* lcio_event) {
-  // ReconstructedParticles handle
   DataHandle<edm4hep::EventHeaderCollection> header_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
   const auto                                 header_coll = header_handle.get();
 
-  const auto event_n      = header_coll->eventNumber();
-  const auto run_n        = header_coll->runNumber();
-  const auto timestamp    = header_coll->timeStamp();
-  const auto event_weight = header_coll->weight();
+  const auto& event_n      = header_coll->eventNumber();
+  const auto& run_n        = header_coll->runNumber();
+  const auto& timestamp    = header_coll->timeStamp();
+  const auto& event_weight = header_coll->weight();
 
   // the collection returns vectors but they should be of length 1
-  if (event_n.size() != 1 || run_n.size() != 1) {
+  if (event_n.size() != 1 || run_n.size() != 1 || timestamp.size() != 1 || event_weight.size() != 1) {
     // TODO: fail harder?
     error() << "Malformed EventHeader, multiple entries for event number, run number, timestamp or weight!" << endmsg;
     return;
@@ -319,7 +318,7 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
   }
 
   // TODO: warn here if EventHeader not there
-  info() << "Event: " << lcio_event->getEventNumber() << " Run: " << lcio_event->getRunNumber() << endmsg;
+  debug() << "Event: " << lcio_event->getEventNumber() << " Run: " << lcio_event->getRunNumber() << endmsg;
 
   FillMissingCollections(collection_pairs);
 
