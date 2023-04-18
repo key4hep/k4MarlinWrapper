@@ -137,7 +137,7 @@ void EDM4hep2LcioTool::convertTPCHits(vec_pair<lcio::TPCHitImpl*, edm4hep::RawTi
                                       const std::string& e4h_coll_name, const std::string& lcio_coll_name,
                                       lcio::LCEventImpl* lcio_event) {
   DataHandle<edm4hep::RawTimeSeriesCollection> tpchit_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
-  const auto                            tpchit_coll = tpchit_handle.get();
+  const auto                                   tpchit_coll = tpchit_handle.get();
 
   auto* conv_tpchits = convTPCHits(tpchit_coll, tpc_hits_vec);
 

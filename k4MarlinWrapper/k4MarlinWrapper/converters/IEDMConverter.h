@@ -26,6 +26,8 @@
 #include <edm4hep/ParticleIDCollection.h>
 #include <edm4hep/RawCalorimeterHit.h>
 #include <edm4hep/RawCalorimeterHitCollection.h>
+#include <edm4hep/RawTimeSeries.h>
+#include <edm4hep/RawTimeSeriesCollection.h>
 #include <edm4hep/RecoParticleVertexAssociation.h>
 #include <edm4hep/RecoParticleVertexAssociationCollection.h>
 #include <edm4hep/ReconstructedParticle.h>
@@ -35,8 +37,6 @@
 #include <edm4hep/SimCalorimeterHitCollection.h>
 #include <edm4hep/SimTrackerHit.h>
 #include <edm4hep/SimTrackerHitCollection.h>
-#include <edm4hep/RawTimeSeries.h>
-#include <edm4hep/RawTimeSeriesCollection.h>
 #include <edm4hep/Track.h>
 #include <edm4hep/TrackCollection.h>
 #include <edm4hep/TrackerHit.h>
