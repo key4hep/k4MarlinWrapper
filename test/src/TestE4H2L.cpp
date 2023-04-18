@@ -124,7 +124,8 @@ void TestE4H2L::createTPCHits(const int num_elements, const int num_rawwords, in
     }
   }
 
-  auto* tpchit_handle = dynamic_cast<DataHandle<edm4hep::RawTimeSeriesCollection>*>(m_dataHandlesMap[m_e4h_tpchit_name]);
+  auto* tpchit_handle =
+      dynamic_cast<DataHandle<edm4hep::RawTimeSeriesCollection>*>(m_dataHandlesMap[m_e4h_tpchit_name]);
   tpchit_handle->put(tpchit_coll);
 }
 
@@ -405,7 +406,7 @@ bool TestE4H2L::checkEDMSimCaloHitLCIOSimCaloHit(
 
 bool TestE4H2L::checkEDMTPCHitLCIOTPCHit(lcio::LCEventImpl* the_event) {
   DataHandle<edm4hep::RawTimeSeriesCollection> tpchit_handle_orig{m_e4h_tpchit_name, Gaudi::DataHandle::Reader, this};
-  const auto                            tpchit_coll_orig = tpchit_handle_orig.get();
+  const auto                                   tpchit_coll_orig = tpchit_handle_orig.get();
 
   auto lcio_tpchit_coll = the_event->getCollection(m_lcio_tpchit_name);
   auto lcio_coll_size   = lcio_tpchit_coll->getNumberOfElements();
