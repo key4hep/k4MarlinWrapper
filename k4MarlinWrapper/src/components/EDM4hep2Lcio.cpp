@@ -217,6 +217,10 @@ void EDM4hep2LcioTool::convertEventHeader(const std::string& e4h_coll_name, lcio
   DataHandle<edm4hep::EventHeaderCollection> header_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
   const auto                                 header_coll = header_handle.get();
 
+  if (header_coll->size() != 1) {
+    error() << "Header collection contains " << header_coll->size() << " headers, expected 1." << endmsg;
+    return;
+  }
   convEventHeader(header_coll, lcio_event);
 }
 
