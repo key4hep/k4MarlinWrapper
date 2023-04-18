@@ -217,22 +217,7 @@ void EDM4hep2LcioTool::convertEventHeader(const std::string& e4h_coll_name, lcio
   DataHandle<edm4hep::EventHeaderCollection> header_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
   const auto                                 header_coll = header_handle.get();
 
-  const auto& event_n      = header_coll->eventNumber();
-  const auto& run_n        = header_coll->runNumber();
-  const auto& timestamp    = header_coll->timeStamp();
-  const auto& event_weight = header_coll->weight();
-
-  // the collection returns vectors but they should be of length 1
-  if (event_n.size() != 1 || run_n.size() != 1 || timestamp.size() != 1 || event_weight.size() != 1) {
-    // TODO: fail harder?
-    error() << "Malformed EventHeader, multiple entries for event number, run number, timestamp or weight!" << endmsg;
-    return;
-  }
-
-  lcio_event->setEventNumber(event_n[0]);
-  lcio_event->setRunNumber(run_n[0]);
-  lcio_event->setTimeStamp(timestamp[0]);
-  lcio_event->setWeight(event_weight[0]);
+  convEventHeader(header_coll, lcio_event);
 }
 
 // Select the appropiate method to convert a collection given its type
