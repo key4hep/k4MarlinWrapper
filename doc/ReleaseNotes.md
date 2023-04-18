@@ -1,3 +1,25 @@
+# v00-06
+
+* 2023-03-02 jmcarcell ([PR#108](https://github.com/key4hep/k4MarlinWrapper/pull/108))
+  - Rename TPCHit -> RawTimeSeries
+
+* 2023-02-28 Thomas Madlener ([PR#107](https://github.com/key4hep/k4MarlinWrapper/pull/107))
+  - Fix link to edm converters documentation
+
+* 2023-01-16 Thomas Madlener ([PR#106](https://github.com/key4hep/k4MarlinWrapper/pull/106))
+  - Make it possible to run clic reco tests concurrently, by ensuring that cloning the CLICPerformance repository is not done concurrently by several test processes.
+  - Only get the last commit of CLICPerformance to speed up the cloning.
+
+* 2023-01-16 Frank Gaede ([PR#103](https://github.com/key4hep/k4MarlinWrapper/pull/103))
+  - LcioEventAlgo: put LCIO input files into global::parameters
+     - needed e.g. by PatchCollection processor
+     - done in LcioEventAlgo::init()
+     - this fix is needed to be able to convert LCIO files to EDM4hep when not all collections are present in all events (default in ILD reconstruction)
+  - ensure marlin::Global:parameters is created exactly once
+
+* 2023-01-15 Erica Brondolin ([PR#105](https://github.com/key4hep/k4MarlinWrapper/pull/105))
+  - The input file test/gaudi_opts/fccRec_e4h_input.py is now updated with changes introduced with https://github.com/key4hep/k4MarlinWrapper/pull/91
+
 # v00-05
 
 * 2022-12-19 Thomas Madlener ([PR#101](https://github.com/key4hep/k4MarlinWrapper/pull/101))
