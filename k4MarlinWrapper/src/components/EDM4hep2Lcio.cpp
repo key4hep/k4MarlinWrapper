@@ -306,7 +306,6 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
     }
   }
 
-  // TODO: warn here if EventHeader not there
   debug() << "Event: " << lcio_event->getEventNumber() << " Run: " << lcio_event->getRunNumber() << endmsg;
 
   FillMissingCollections(collection_pairs);
