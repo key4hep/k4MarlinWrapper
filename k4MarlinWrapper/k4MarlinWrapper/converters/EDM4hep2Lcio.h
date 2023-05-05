@@ -90,6 +90,8 @@ private:
                           const std::string& e4h_coll_name, const std::string& lcio_coll_name,
                           lcio::LCEventImpl* lcio_event);
 
+  void convertEventHeader(const std::string& e4h_coll_name, lcio::LCEventImpl* lcio_event);
+
   void convertAdd(const std::string& e4h_coll_name, const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event,
                   CollectionsPairVectors& collection_pairs);
 };

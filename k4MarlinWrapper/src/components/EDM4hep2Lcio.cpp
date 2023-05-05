@@ -212,6 +212,18 @@ void EDM4hep2LcioTool::convertReconstructedParticles(
   lcio_event->addCollection(conv_recops, lcio_coll_name);
 }
 
+// Transfer info from EDM4hep EventHeader to LCIO event
+void EDM4hep2LcioTool::convertEventHeader(const std::string& e4h_coll_name, lcio::LCEventImpl* lcio_event) {
+  DataHandle<edm4hep::EventHeaderCollection> header_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
+  const auto                                 header_coll = header_handle.get();
+
+  if (header_coll->size() != 1) {
+    error() << "Header collection contains " << header_coll->size() << " headers, expected 1." << endmsg;
+    return;
+  }
+  convEventHeader(header_coll, lcio_event);
+}
+
 // Select the appropiate method to convert a collection given its type
 void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::string& lcio_coll_name,
                                   lcio::LCEventImpl* lcio_event, CollectionsPairVectors& collection_pairs) {
@@ -258,6 +270,8 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
   } else if (fulltype == "edm4hep::ReconstructedParticle") {
     convertReconstructedParticles(collection_pairs.recoparticles, collection_pairs.tracks, collection_pairs.vertices,
                                   collection_pairs.clusters, e4h_coll_name, lcio_coll_name, lcio_event);
+  } else if (fulltype == "edm4hep::EventHeader") {
+    convertEventHeader(e4h_coll_name, lcio_event);
   } else {
     warning() << "Error trying to convert requested " << fulltype << " with name " << e4h_coll_name << endmsg;
     warning() << "List of supported types: "
@@ -272,7 +286,6 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
 // Use the collection names in the parameters to read and write them
 StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
   const auto collections = m_podioDataSvc->getCollections();
-
   // Start off with the pre-defined collection name mappings
   auto collsToConvert{m_collNames.value()};
   if (m_convertAll) {
@@ -292,6 +305,8 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
       debug() << " Collection " << lcioName << " already in place, skipping conversion. " << endmsg;
     }
   }
+
+  debug() << "Event: " << lcio_event->getEventNumber() << " Run: " << lcio_event->getRunNumber() << endmsg;
 
   FillMissingCollections(collection_pairs);
 
