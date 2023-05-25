@@ -8,10 +8,6 @@
 #include <k4FWCore/DataHandle.h>
 #include <k4FWCore/PodioLegacyDataSvc.h>
 
-// k4LCIOReader
-#include <k4LCIOReader/k4LCIOConverter.h>
-#include <k4LCIOReader/k4LCIOReader.h>
-
 // Converter Interface
 #include "k4MarlinWrapper/converters/IEDMConverter.h"
 
@@ -39,6 +35,12 @@ public:
   virtual StatusCode initialize();
   virtual StatusCode finalize();
 
+  // **********************************
+  // - Convert all collections indicated in Tool parameters
+  // - Some collections implicitly convert associated collections
+  // - Convert associated collections from LCRelation for existing EDM4hep relations
+  // - Converted collections are put into TES
+  // **********************************
   StatusCode convertCollections(lcio::LCEventImpl* lcio_event) override;
 
 private:
@@ -48,28 +50,49 @@ private:
   ServiceHandle<IDataProviderSvc> m_eds;
   PodioLegacyDataSvc*             m_podioDataSvc;
 
+  // **********************************
+  // Check if a collection was already registered to skip it
+  // **********************************
   bool collectionExist(const std::string& collection_name);
 
+  /**
+   * Convert the collection data and return the mapping of LCIO to EDM4hep
+   * objects, the LCRelation collections (and their names) as well as the subset
+   * collections (with their names and types). These data are necessary for
+   * resolving relations and creating association collections.
+   *
+   * The converted collections are put into the TES (but the contained objects
+   * have no relations set yet).
+   */
   std::tuple<LCIO2EDM4hepConv::LcioEdmTypeMapping, std::vector<std::tuple<std::string, EVENT::LCCollection*>>,
              std::vector<std::tuple<std::string, EVENT::LCCollection*, std::string>>>
   convertCollectionData(const std::map<std::string, std::string>& collsToConvert, lcio::LCEventImpl* the_event);
 
+  /**
+   * Create the subset collections and put them into the TES.
+   */
   void createSubsetColls(const std::vector<std::tuple<std::string, EVENT::LCCollection*, std::string>>& subsetColls,
                          const LCIO2EDM4hepConv::LcioEdmTypeMapping& lcio2edm4hepMaps);
 
+  /**
+   * Create the association collections from the LCRelation collections and put
+   * them into the TES.
+   */
   void createAssociations(const std::vector<std::tuple<std::string, EVENT::LCCollection*>>& lcRelationColls,
                           const LCIO2EDM4hepConv::LcioEdmTypeMapping&                       lcio2edm4hepMaps);
 
-  template <typename T>
-  void convertRegister(const std::string& edm_name, const std::string& lcio_name,
-                       std::unique_ptr<k4LCIOConverter>& lcio_conver, const lcio::LCCollection* const lcio_coll,
-                       const bool cnv_metadata = false);
-
-  // Non nullptr lcio collection -> convert metadata
+  /**
+   * Register a collection into the TES. If the lcioColl is not a nullptr also
+   * convert the metadata from the input lcio collection.
+   */
   template <typename T>
   void registerCollection(std::tuple<const std::string&, std::unique_ptr<podio::CollectionBase>> namedColl,
                           EVENT::LCCollection*                                                   lcioColl = nullptr);
 
+  /**
+    * Register a collection into the TES. If the lcioColl is not a nullptr also
+    * convert the metadata from the input lcio collection.
+    */
   template <typename T>
   void registerCollection(const std::string& name, std::unique_ptr<T>&& coll, EVENT::LCCollection* lcioColl = nullptr) {
     registerCollection<T>(std::make_tuple(name, std::move(coll)), lcioColl);

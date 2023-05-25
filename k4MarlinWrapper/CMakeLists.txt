@@ -82,7 +82,7 @@ gaudi_add_module(Lcio2EDM4hep
     Gaudi::GaudiAlgLib
     EDM4HEP::edm4hep
     k4FWCore::k4FWCore
-    k4LCIOReader::k4LCIOReader
+    k4EDM4hep2LcioConv::k4EDM4hep2LcioConv
 )
 
 target_include_directories(Lcio2EDM4hep PUBLIC

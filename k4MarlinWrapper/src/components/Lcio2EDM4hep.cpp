@@ -1,6 +1,8 @@
 #include "k4MarlinWrapper/converters/Lcio2EDM4hep.h"
+
 #include <EVENT/LCCollection.h>
 #include <Exceptions.h>
+
 #include <edm4hep/ClusterCollection.h>
 #include <edm4hep/EventHeaderCollection.h>
 #include <edm4hep/MCParticleCollection.h>
@@ -13,7 +15,6 @@
 #include <edm4hep/TrackCollection.h>
 #include <edm4hep/TrackerHitPlaneCollection.h>
 #include <edm4hep/VertexCollection.h>
-#include <k4LCIOReader/k4LCIOConverter.h>
 
 #include "k4EDM4hep2LcioConv/k4Lcio2EDM4hepConv.h"
 
@@ -38,84 +39,6 @@ StatusCode Lcio2EDM4hepTool::initialize() {
 
 StatusCode Lcio2EDM4hepTool::finalize() { return GaudiTool::finalize(); }
 
-// **********************************
-// Convert EDM4hep collection using k4LCIOConverter
-// Register converted collection with Podio Data Service to Event Store
-// **********************************
-template <typename T>
-void Lcio2EDM4hepTool::convertRegister(const std::string& edm_name, const std::string& lcio_name,
-                                       std::unique_ptr<k4LCIOConverter>& lcio_converter,
-                                       const lcio::LCCollection* const lcio_coll, const bool cnv_metadata) {
-  debug() << "Converting collection: " << lcio_name << " from LCIO to EDM4hep " << edm_name << endmsg;
-
-  // Convert and get EDM4hep collection
-  auto* e4h_generic_coll = lcio_converter->getCollection(lcio_name);
-
-  if (e4h_generic_coll == nullptr) {
-    error() << "LCIO Collection " << lcio_name << " failed to convert to EDM4hep in k4LCIOConverter." << endmsg;
-    return;
-  }
-
-  // Cast to specific type based on typename
-  T* mycoll = dynamic_cast<T*>(e4h_generic_coll);
-  if (mycoll == nullptr) {
-    error() << "LCIO Collection " << lcio_name
-            << " did not get correct type to be registered. Type was: " << typeid(T).name() << endmsg;
-    return;
-  }
-
-  // Manually register object instead of using DataHandle
-  DataWrapper<T>* wrapper = new DataWrapper<T>();
-  wrapper->setData(mycoll);
-
-  // Check if collection was already registered
-  auto collections   = m_podioDataSvc->getCollections();
-  bool is_registered = false;
-  for (auto& coll : collections) {
-    if (coll.first == edm_name) {
-      is_registered = true;
-      return;
-    }
-  }
-
-  if (is_registered == false) {
-    StatusCode sc = m_podioDataSvc->registerObject("/Event", "/" + std::string(edm_name), wrapper);
-    if (sc == StatusCode::FAILURE) {
-      error() << "Error registering collection " << edm_name << endmsg;
-      return;
-    }
-  } else {
-    debug() << "Collection " << edm_name << " was already registered" << endmsg;
-  }
-
-  // Convert Metadata
-  if (cnv_metadata) {
-    // int params_size = lcio_coll->getParameters().size();
-
-    DataHandle<T> ahandle{edm_name, Gaudi::DataHandle::Reader, this};
-    const auto    acoll   = ahandle.get();
-    auto          acollid = acoll->getID();
-
-    std::vector<std::string> string_keys = {};
-    lcio_coll->getParameters().getStringKeys(string_keys);
-
-    auto& e4h_coll_md = m_podioDataSvc->getProvider().getCollectionMetaData(acollid);
-
-    for (auto& elem : string_keys) {
-      if (elem == "CellIDEncoding") {
-        std::string lcio_coll_cellid_str = lcio_coll->getParameters().getStringVal(lcio::LCIO::CellIDEncoding);
-        e4h_coll_md.setValue("CellIDEncodingString", lcio_coll_cellid_str);
-      } else {
-        std::string lcio_coll_value = lcio_coll->getParameters().getStringVal(elem);
-        e4h_coll_md.setValue(elem, lcio_coll_value);
-      }
-    }
-  }
-}
-
-// **********************************
-// Check if a collection was already registered to skip it
-// **********************************
 bool Lcio2EDM4hepTool::collectionExist(const std::string& collection_name) {
   auto collections = m_podioDataSvc->getCollections();
   for (const auto& [name, coll] : collections) {
@@ -159,90 +82,7 @@ void Lcio2EDM4hepTool::registerCollection(
   }
 }
 
-std::tuple<LCIO2EDM4hepConv::LcioEdmTypeMapping, std::vector<std::tuple<std::string, EVENT::LCCollection*>>,
-           std::vector<std::tuple<std::string, EVENT::LCCollection*, std::string>>>
-Lcio2EDM4hepTool::convertCollectionData(const std::map<std::string, std::string>& collsToConvert,
-                                        lcio::LCEventImpl*                        the_event) {
-  auto lcio2edm4hepMaps = LCIO2EDM4hepConv::LcioEdmTypeMapping{};
-
-  std::vector<std::tuple<std::string, EVENT::LCCollection*>>              lcRelationColls{};
-  std::vector<std::tuple<std::string, EVENT::LCCollection*, std::string>> subsetColls{};
-
-  for (const auto& [lcioName, edm4hepName] : collsToConvert) {
-    try {
-      auto*       lcio_coll          = the_event->getCollection(lcioName);
-      const auto& lcio_coll_type_str = lcio_coll->getTypeName();
-
-      // We deal with subset collections and LCRelations once we have all data
-      // converted
-      if (lcio_coll->isSubset()) {
-        subsetColls.emplace_back(std::make_tuple(edm4hepName, lcio_coll, lcio_coll_type_str));
-        continue;
-      }
-      if (lcio_coll_type_str == "LCRelation") {
-        lcRelationColls.emplace_back(std::make_tuple(edm4hepName, lcio_coll));
-      }
-
-      if (lcio_coll_type_str == "ReconstructedParticle") {
-        auto e4hColls = LCIO2EDM4hepConv::convertReconstructedParticle(
-            edm4hepName, lcio_coll, lcio2edm4hepMaps.recoParticles, lcio2edm4hepMaps.particleIDs);
-        registerCollection<edm4hep::ReconstructedParticleCollection>(std::move(e4hColls[0]));
-        registerCollection<edm4hep::ParticleIDCollection>(std::move(e4hColls[1]));
-      } else if (lcio_coll_type_str == "MCParticle") {
-        registerCollection(edm4hepName,
-                           LCIO2EDM4hepConv::convertMCParticle(edm4hepName, lcio_coll, lcio2edm4hepMaps.mcParticles));
-      } else if (lcio_coll_type_str == "Vertex") {
-        registerCollection(edm4hepName,
-                           LCIO2EDM4hepConv::convertVertex(edm4hepName, lcio_coll, lcio2edm4hepMaps.vertices));
-      } else if (lcio_coll_type_str == "Track") {
-        registerCollection(edm4hepName,
-                           LCIO2EDM4hepConv::convertTrack(edm4hepName, lcio_coll, lcio2edm4hepMaps.tracks));
-      } else if (lcio_coll_type_str == "TrackerHit") {
-        registerCollection(edm4hepName,
-                           LCIO2EDM4hepConv::convertTrackerHit(edm4hepName, lcio_coll, lcio2edm4hepMaps.trackerHits));
-      } else if (lcio_coll_type_str == "TrackerHitPlane") {
-        registerCollection(edm4hepName, LCIO2EDM4hepConv::convertTrackerHitPlane(edm4hepName, lcio_coll,
-                                                                                 lcio2edm4hepMaps.trackerHitPlanes));
-      } else if (lcio_coll_type_str == "SimTrackerHit") {
-        registerCollection(edm4hepName, LCIO2EDM4hepConv::convertSimTrackerHit(edm4hepName, lcio_coll,
-                                                                               lcio2edm4hepMaps.simTrackerHits));
-      } else if (lcio_coll_type_str == "SimCalorimeterHit") {
-        registerCollection(edm4hepName, LCIO2EDM4hepConv::convertSimCalorimeterHit(edm4hepName, lcio_coll,
-                                                                                   lcio2edm4hepMaps.simCaloHits));
-      } else if (lcio_coll_type_str == "RawCalorimeterHit") {
-        registerCollection(edm4hepName, LCIO2EDM4hepConv::convertRawCalorimeterHit(edm4hepName, lcio_coll,
-                                                                                   lcio2edm4hepMaps.rawCaloHits));
-      } else if (lcio_coll_type_str == "TPCHit") {
-        registerCollection(edm4hepName,
-                           LCIO2EDM4hepConv::convertTPCHit(edm4hepName, lcio_coll, lcio2edm4hepMaps.tpcHits));
-      } else if (lcio_coll_type_str == "Cluster") {
-        registerCollection(edm4hepName,
-                           LCIO2EDM4hepConv::convertCluster(edm4hepName, lcio_coll, lcio2edm4hepMaps.clusters));
-        // TODO: Particle IDs related to Clusters. Needs converter support!
-      } else {
-        error() << lcio_coll_type_str << ": conversion type not supported." << endmsg;
-      }
-    } catch (const lcio::DataNotAvailableException& ex) {
-      warning() << "LCIO Collection " << lcioName << " not found in the event, skipping conversion to EDM4hep"
-                << endmsg;
-      continue;
-    }
-  }
-
-  return std::make_tuple(std::move(lcio2edm4hepMaps), std::move(lcRelationColls), std::move(subsetColls));
-}
-
-// **********************************
-// - Convert all collections indicated in Tool parameters
-// - Some collections implicitly convert associated collections, as for
-// key4hep/k4LCIOReader
-// - Convert associated collections from LCRelation for existing EDM4hep relations
-// - Converted collections are put into TES
-// **********************************
 StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
-  // const auto* collNames       = the_event->getCollectionNames();
-  // auto        lcioEDM4hepMaps = LCIO2EDM4hepConv::LcioEdmTypeMapping{};
-
   // Convert Event Header outside the collections loop
   if (!collectionExist("EventHeader")) {
     registerCollection<edm4hep::EventHeaderCollection>("EventHeader", LCIO2EDM4hepConv::createEventHeader(the_event));
@@ -268,46 +108,107 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
   return StatusCode::SUCCESS;
 }
 
+std::tuple<LCIO2EDM4hepConv::LcioEdmTypeMapping, std::vector<std::tuple<std::string, EVENT::LCCollection*>>,
+           std::vector<std::tuple<std::string, EVENT::LCCollection*, std::string>>>
+Lcio2EDM4hepTool::convertCollectionData(const std::map<std::string, std::string>& collsToConvert,
+                                        lcio::LCEventImpl*                        the_event) {
+  using namespace LCIO2EDM4hepConv;
+
+  auto lcio2edm4hepMaps = LcioEdmTypeMapping{};
+
+  std::vector<std::tuple<std::string, EVENT::LCCollection*>>              lcRelationColls{};
+  std::vector<std::tuple<std::string, EVENT::LCCollection*, std::string>> subsetColls{};
+
+  for (const auto& [lcioName, edm4hepName] : collsToConvert) {
+    try {
+      auto*       lcio_coll          = the_event->getCollection(lcioName);
+      const auto& lcio_coll_type_str = lcio_coll->getTypeName();
+
+      // We deal with subset collections and LCRelations once we have all data
+      // converted
+      if (lcio_coll->isSubset()) {
+        subsetColls.emplace_back(std::make_tuple(edm4hepName, lcio_coll, lcio_coll_type_str));
+        continue;
+      }
+      if (lcio_coll_type_str == "LCRelation") {
+        lcRelationColls.emplace_back(std::make_tuple(edm4hepName, lcio_coll));
+      }
+
+      if (lcio_coll_type_str == "ReconstructedParticle") {
+        auto e4hColls = convertReconstructedParticle(edm4hepName, lcio_coll, lcio2edm4hepMaps.recoParticles,
+                                                     lcio2edm4hepMaps.particleIDs);
+        registerCollection<edm4hep::ReconstructedParticleCollection>(std::move(e4hColls[0]));
+        registerCollection<edm4hep::ParticleIDCollection>(std::move(e4hColls[1]));
+      } else if (lcio_coll_type_str == "MCParticle") {
+        registerCollection(edm4hepName, convertMCParticle(edm4hepName, lcio_coll, lcio2edm4hepMaps.mcParticles));
+      } else if (lcio_coll_type_str == "Vertex") {
+        registerCollection(edm4hepName, convertVertex(edm4hepName, lcio_coll, lcio2edm4hepMaps.vertices));
+      } else if (lcio_coll_type_str == "Track") {
+        registerCollection(edm4hepName, convertTrack(edm4hepName, lcio_coll, lcio2edm4hepMaps.tracks));
+      } else if (lcio_coll_type_str == "TrackerHit") {
+        registerCollection(edm4hepName, convertTrackerHit(edm4hepName, lcio_coll, lcio2edm4hepMaps.trackerHits));
+      } else if (lcio_coll_type_str == "TrackerHitPlane") {
+        registerCollection(edm4hepName,
+                           convertTrackerHitPlane(edm4hepName, lcio_coll, lcio2edm4hepMaps.trackerHitPlanes));
+      } else if (lcio_coll_type_str == "SimTrackerHit") {
+        registerCollection(edm4hepName, convertSimTrackerHit(edm4hepName, lcio_coll, lcio2edm4hepMaps.simTrackerHits));
+      } else if (lcio_coll_type_str == "SimCalorimeterHit") {
+        registerCollection(edm4hepName, convertSimCalorimeterHit(edm4hepName, lcio_coll, lcio2edm4hepMaps.simCaloHits));
+      } else if (lcio_coll_type_str == "RawCalorimeterHit") {
+        registerCollection(edm4hepName, convertRawCalorimeterHit(edm4hepName, lcio_coll, lcio2edm4hepMaps.rawCaloHits));
+      } else if (lcio_coll_type_str == "TPCHit") {
+        registerCollection(edm4hepName, convertTPCHit(edm4hepName, lcio_coll, lcio2edm4hepMaps.tpcHits));
+      } else if (lcio_coll_type_str == "Cluster") {
+        registerCollection(edm4hepName, convertCluster(edm4hepName, lcio_coll, lcio2edm4hepMaps.clusters));
+        // TODO: Particle IDs related to Clusters. Needs converter support!
+      } else {
+        error() << lcio_coll_type_str << ": conversion type not supported." << endmsg;
+      }
+    } catch (const lcio::DataNotAvailableException& ex) {
+      warning() << "LCIO Collection " << lcioName << " not found in the event, skipping conversion to EDM4hep"
+                << endmsg;
+      continue;
+    }
+  }
+
+  return std::make_tuple(std::move(lcio2edm4hepMaps), std::move(lcRelationColls), std::move(subsetColls));
+}
+
 void Lcio2EDM4hepTool::createSubsetColls(
     const std::vector<std::tuple<std::string, EVENT::LCCollection*, std::string>>& subsetColls,
     const LCIO2EDM4hepConv::LcioEdmTypeMapping&                                    lcio2edm4hepMaps) {
+  using namespace LCIO2EDM4hepConv;
+
   for (const auto& [name, coll, type] : subsetColls) {
     if (type == "MCParticle") {
-      registerCollection(
-          name, LCIO2EDM4hepConv::handleSubsetColl<edm4hep::MCParticleCollection>(coll, lcio2edm4hepMaps.mcParticles));
+      registerCollection(name, handleSubsetColl<edm4hep::MCParticleCollection>(coll, lcio2edm4hepMaps.mcParticles));
     } else if (type == "ReconstructedParticle") {
-      registerCollection(name, LCIO2EDM4hepConv::handleSubsetColl<edm4hep::ReconstructedParticleCollection>(
-                                   coll, lcio2edm4hepMaps.recoParticles));
+      registerCollection(
+          name, handleSubsetColl<edm4hep::ReconstructedParticleCollection>(coll, lcio2edm4hepMaps.recoParticles));
     } else if (type == "Vertex") {
-      registerCollection(
-          name, LCIO2EDM4hepConv::handleSubsetColl<edm4hep::VertexCollection>(coll, lcio2edm4hepMaps.vertices));
+      registerCollection(name, handleSubsetColl<edm4hep::VertexCollection>(coll, lcio2edm4hepMaps.vertices));
     } else if (type == "Track") {
-      registerCollection(name,
-                         LCIO2EDM4hepConv::handleSubsetColl<edm4hep::TrackCollection>(coll, lcio2edm4hepMaps.tracks));
+      registerCollection(name, handleSubsetColl<edm4hep::TrackCollection>(coll, lcio2edm4hepMaps.tracks));
     } else if (type == "Cluster") {
-      registerCollection(
-          name, LCIO2EDM4hepConv::handleSubsetColl<edm4hep::ClusterCollection>(coll, lcio2edm4hepMaps.clusters));
+      registerCollection(name, handleSubsetColl<edm4hep::ClusterCollection>(coll, lcio2edm4hepMaps.clusters));
     } else if (type == "SimCalorimeterHit") {
-      registerCollection(name, LCIO2EDM4hepConv::handleSubsetColl<edm4hep::SimCalorimeterHitCollection>(
-                                   coll, lcio2edm4hepMaps.simCaloHits));
+      registerCollection(name,
+                         handleSubsetColl<edm4hep::SimCalorimeterHitCollection>(coll, lcio2edm4hepMaps.simCaloHits));
     } else if (type == "RawCalorimeterHit") {
-      registerCollection(name, LCIO2EDM4hepConv::handleSubsetColl<edm4hep::RawCalorimeterHitCollection>(
-                                   coll, lcio2edm4hepMaps.rawCaloHits));
+      registerCollection(name,
+                         handleSubsetColl<edm4hep::RawCalorimeterHitCollection>(coll, lcio2edm4hepMaps.rawCaloHits));
     } else if (type == "CalorimeterHit") {
-      registerCollection(
-          name, LCIO2EDM4hepConv::handleSubsetColl<edm4hep::CalorimeterHitCollection>(coll, lcio2edm4hepMaps.caloHits));
+      registerCollection(name, handleSubsetColl<edm4hep::CalorimeterHitCollection>(coll, lcio2edm4hepMaps.caloHits));
     } else if (type == "SimTrackerHit") {
-      registerCollection(name, LCIO2EDM4hepConv::handleSubsetColl<edm4hep::SimTrackerHitCollection>(
-                                   coll, lcio2edm4hepMaps.simTrackerHits));
+      registerCollection(name,
+                         handleSubsetColl<edm4hep::SimTrackerHitCollection>(coll, lcio2edm4hepMaps.simTrackerHits));
     } else if (type == "TPCHit") {
-      registerCollection(
-          name, LCIO2EDM4hepConv::handleSubsetColl<edm4hep::RawTimeSeriesCollection>(coll, lcio2edm4hepMaps.tpcHits));
+      registerCollection(name, handleSubsetColl<edm4hep::RawTimeSeriesCollection>(coll, lcio2edm4hepMaps.tpcHits));
     } else if (type == "TrackerHit") {
-      registerCollection(
-          name, LCIO2EDM4hepConv::handleSubsetColl<edm4hep::TrackerHitCollection>(coll, lcio2edm4hepMaps.trackerHits));
+      registerCollection(name, handleSubsetColl<edm4hep::TrackerHitCollection>(coll, lcio2edm4hepMaps.trackerHits));
     } else if (type == "TrackerHitPlane") {
-      registerCollection(name, LCIO2EDM4hepConv::handleSubsetColl<edm4hep::TrackerHitPlaneCollection>(
-                                   coll, lcio2edm4hepMaps.trackerHitPlanes));
+      registerCollection(name,
+                         handleSubsetColl<edm4hep::TrackerHitPlaneCollection>(coll, lcio2edm4hepMaps.trackerHitPlanes));
     } else {
       error() << type << ": conversion type not supported." << endmsg;
     }
@@ -317,6 +218,8 @@ void Lcio2EDM4hepTool::createSubsetColls(
 void Lcio2EDM4hepTool::createAssociations(
     const std::vector<std::tuple<std::string, EVENT::LCCollection*>>& lcRelationColls,
     const LCIO2EDM4hepConv::LcioEdmTypeMapping&                       lcio2edm4hepMaps) {
+  using namespace LCIO2EDM4hepConv;
+
   for (const auto& [name, lcioColl] : lcRelationColls) {
     const auto& params   = lcioColl->getParameters();
     const auto& fromType = params.getStringVal("FromType");

@@ -8,7 +8,6 @@ gaudi_add_module(TestE4H2L
     ${LCIO_LIBRARIES}
     k4FWCore::k4FWCore
     EDM4HEP::edm4hep
-    k4LCIOReader::k4LCIOReader
 )
 
 target_include_directories(TestE4H2L PUBLIC
