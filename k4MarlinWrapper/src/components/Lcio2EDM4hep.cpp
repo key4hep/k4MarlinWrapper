@@ -18,6 +18,9 @@
 
 #include "k4EDM4hep2LcioConv/k4Lcio2EDM4hepConv.h"
 
+#include <k4FWCore/DataHandle.h>
+#include <k4FWCore/MetaDataHandle.h>
+
 DECLARE_COMPONENT(Lcio2EDM4hepTool);
 
 Lcio2EDM4hepTool::Lcio2EDM4hepTool(const std::string& type, const std::string& name, const IInterface* parent)
@@ -30,7 +33,7 @@ Lcio2EDM4hepTool::Lcio2EDM4hepTool(const std::string& type, const std::string& n
 Lcio2EDM4hepTool::~Lcio2EDM4hepTool() { ; }
 
 StatusCode Lcio2EDM4hepTool::initialize() {
-  m_podioDataSvc = dynamic_cast<PodioLegacyDataSvc*>(m_eds.get());
+  m_podioDataSvc = dynamic_cast<PodioDataSvc*>(m_eds.get());
   if (nullptr == m_podioDataSvc)
     return StatusCode::FAILURE;
 
@@ -39,9 +42,12 @@ StatusCode Lcio2EDM4hepTool::initialize() {
 
 StatusCode Lcio2EDM4hepTool::finalize() { return GaudiTool::finalize(); }
 
+// **********************************
+// Check if a collection was already registered to skip it
+// **********************************
 bool Lcio2EDM4hepTool::collectionExist(const std::string& collection_name) {
-  auto collections = m_podioDataSvc->getCollections();
-  for (const auto& [name, coll] : collections) {
+  auto collections = m_podioDataSvc->getEventFrame().getAvailableCollections();
+  for (const auto& name : collections) {
     if (collection_name == name) {
       debug() << "Collection named " << name << " already registered, skipping conversion." << endmsg;
       return true;
@@ -68,24 +74,18 @@ void Lcio2EDM4hepTool::registerCollection(
     error() << "Could not register collection " << name << endmsg;
   }
 
-  auto handle = DataHandle<podio::CollectionBase>{name, Gaudi::DataHandle::Reader, this};
-
   // Convert metadata
   if (lcioColl != nullptr) {
-    const auto acollid = handle.get()->getID();
-
     std::vector<std::string> string_keys = {};
     lcioColl->getParameters().getStringKeys(string_keys);
 
-    auto& e4h_coll_md = m_podioDataSvc->getProvider().getCollectionMetaData(acollid);
-
     for (auto& elem : string_keys) {
       if (elem == "CellIDEncoding") {
-        std::string lcio_coll_cellid_str = lcioColl->getParameters().getStringVal(lcio::LCIO::CellIDEncoding);
-        e4h_coll_md.setValue("CellIDEncodingString", lcio_coll_cellid_str);
+        const auto& lcio_coll_cellid_str = lcioColl->getParameters().getStringVal(lcio::LCIO::CellIDEncoding);
+        auto&       mdFrame              = m_podioDataSvc->getMetaDataFrame();
+        mdFrame.putParameter(podio::collMetadataParamName(name, "CellIDEncoding"), lcio_coll_cellid_str);
       } else {
-        std::string lcio_coll_value = lcioColl->getParameters().getStringVal(elem);
-        e4h_coll_md.setValue(elem, lcio_coll_value);
+        // TODO: figure out where this actually needs to go
       }
     }
   }
