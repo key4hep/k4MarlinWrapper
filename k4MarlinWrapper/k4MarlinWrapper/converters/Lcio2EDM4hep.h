@@ -25,13 +25,11 @@ public:
   virtual StatusCode initialize();
   virtual StatusCode finalize();
 
-  StatusCode convertCollections(lcio::LCEventImpl* lcio_event);
+  StatusCode convertCollections(lcio::LCEventImpl* lcio_event) override;
 
 private:
   Gaudi::Property<std::map<std::string, std::string>> m_collNames{this, "collNameMapping", {}};
   Gaudi::Property<bool>                               m_convertAll{this, "convertAll", true};
-
-  std::map<std::string, DataObjectHandleBase*> m_dataHandlesMap;
 
   ServiceHandle<IDataProviderSvc> m_eds;
   PodioLegacyDataSvc*             m_podioDataSvc;

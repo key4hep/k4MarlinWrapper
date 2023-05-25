@@ -19,13 +19,7 @@ StatusCode Lcio2EDM4hepTool::initialize() {
   return GaudiTool::initialize();
 }
 
-StatusCode Lcio2EDM4hepTool::finalize() {
-  for (const auto& [key, val] : m_dataHandlesMap) {
-    delete val;
-  }
-
-  return GaudiTool::finalize();
-}
+StatusCode Lcio2EDM4hepTool::finalize() { return GaudiTool::finalize(); }
 
 // **********************************
 // Convert EDM4hep collection using k4LCIOConverter
