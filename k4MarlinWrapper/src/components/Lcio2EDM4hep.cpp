@@ -146,14 +146,17 @@ Lcio2EDM4hepTool::convertCollectionData(const std::map<std::string, std::string>
       } else if (lcio_coll_type_str == "Track") {
         registerCollection(edm4hepName, convertTrack(edm4hepName, lcio_coll, lcio2edm4hepMaps.tracks));
       } else if (lcio_coll_type_str == "TrackerHit") {
-        registerCollection(edm4hepName, convertTrackerHit(edm4hepName, lcio_coll, lcio2edm4hepMaps.trackerHits));
+        registerCollection(edm4hepName, convertTrackerHit(edm4hepName, lcio_coll, lcio2edm4hepMaps.trackerHits),
+                           lcio_coll);
       } else if (lcio_coll_type_str == "TrackerHitPlane") {
-        registerCollection(edm4hepName,
-                           convertTrackerHitPlane(edm4hepName, lcio_coll, lcio2edm4hepMaps.trackerHitPlanes));
+        registerCollection(
+            edm4hepName, convertTrackerHitPlane(edm4hepName, lcio_coll, lcio2edm4hepMaps.trackerHitPlanes), lcio_coll);
       } else if (lcio_coll_type_str == "SimTrackerHit") {
-        registerCollection(edm4hepName, convertSimTrackerHit(edm4hepName, lcio_coll, lcio2edm4hepMaps.simTrackerHits));
+        registerCollection(edm4hepName, convertSimTrackerHit(edm4hepName, lcio_coll, lcio2edm4hepMaps.simTrackerHits),
+                           lcio_coll);
       } else if (lcio_coll_type_str == "SimCalorimeterHit") {
-        registerCollection(edm4hepName, convertSimCalorimeterHit(edm4hepName, lcio_coll, lcio2edm4hepMaps.simCaloHits));
+        registerCollection(edm4hepName, convertSimCalorimeterHit(edm4hepName, lcio_coll, lcio2edm4hepMaps.simCaloHits),
+                           lcio_coll);
       } else if (lcio_coll_type_str == "RawCalorimeterHit") {
         registerCollection(edm4hepName, convertRawCalorimeterHit(edm4hepName, lcio_coll, lcio2edm4hepMaps.rawCaloHits));
       } else if (lcio_coll_type_str == "TPCHit") {
