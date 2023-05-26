@@ -135,34 +135,35 @@ Lcio2EDM4hepTool::convertCollectionData(const std::map<std::string, std::string>
       }
 
       if (lcio_coll_type_str == "ReconstructedParticle") {
-        auto e4hColls = convertReconstructedParticle(edm4hepName, lcio_coll, lcio2edm4hepMaps.recoParticles,
-                                                     lcio2edm4hepMaps.particleIDs);
+        auto e4hColls = convertReconstructedParticles(edm4hepName, lcio_coll, lcio2edm4hepMaps.recoParticles,
+                                                      lcio2edm4hepMaps.particleIDs);
         registerCollection<edm4hep::ReconstructedParticleCollection>(std::move(e4hColls[0]));
         registerCollection<edm4hep::ParticleIDCollection>(std::move(e4hColls[1]));
       } else if (lcio_coll_type_str == "MCParticle") {
-        registerCollection(edm4hepName, convertMCParticle(edm4hepName, lcio_coll, lcio2edm4hepMaps.mcParticles));
+        registerCollection(edm4hepName, convertMCParticles(edm4hepName, lcio_coll, lcio2edm4hepMaps.mcParticles));
       } else if (lcio_coll_type_str == "Vertex") {
-        registerCollection(edm4hepName, convertVertex(edm4hepName, lcio_coll, lcio2edm4hepMaps.vertices));
+        registerCollection(edm4hepName, convertVertices(edm4hepName, lcio_coll, lcio2edm4hepMaps.vertices));
       } else if (lcio_coll_type_str == "Track") {
-        registerCollection(edm4hepName, convertTrack(edm4hepName, lcio_coll, lcio2edm4hepMaps.tracks));
+        registerCollection(edm4hepName, convertTracks(edm4hepName, lcio_coll, lcio2edm4hepMaps.tracks));
       } else if (lcio_coll_type_str == "TrackerHit") {
-        registerCollection(edm4hepName, convertTrackerHit(edm4hepName, lcio_coll, lcio2edm4hepMaps.trackerHits),
+        registerCollection(edm4hepName, convertTrackerHits(edm4hepName, lcio_coll, lcio2edm4hepMaps.trackerHits),
                            lcio_coll);
       } else if (lcio_coll_type_str == "TrackerHitPlane") {
         registerCollection(
-            edm4hepName, convertTrackerHitPlane(edm4hepName, lcio_coll, lcio2edm4hepMaps.trackerHitPlanes), lcio_coll);
+            edm4hepName, convertTrackerHitPlanes(edm4hepName, lcio_coll, lcio2edm4hepMaps.trackerHitPlanes), lcio_coll);
       } else if (lcio_coll_type_str == "SimTrackerHit") {
-        registerCollection(edm4hepName, convertSimTrackerHit(edm4hepName, lcio_coll, lcio2edm4hepMaps.simTrackerHits),
+        registerCollection(edm4hepName, convertSimTrackerHits(edm4hepName, lcio_coll, lcio2edm4hepMaps.simTrackerHits),
                            lcio_coll);
       } else if (lcio_coll_type_str == "SimCalorimeterHit") {
-        registerCollection(edm4hepName, convertSimCalorimeterHit(edm4hepName, lcio_coll, lcio2edm4hepMaps.simCaloHits),
+        registerCollection(edm4hepName, convertSimCalorimeterHits(edm4hepName, lcio_coll, lcio2edm4hepMaps.simCaloHits),
                            lcio_coll);
       } else if (lcio_coll_type_str == "RawCalorimeterHit") {
-        registerCollection(edm4hepName, convertRawCalorimeterHit(edm4hepName, lcio_coll, lcio2edm4hepMaps.rawCaloHits));
+        registerCollection(edm4hepName,
+                           convertRawCalorimeterHits(edm4hepName, lcio_coll, lcio2edm4hepMaps.rawCaloHits));
       } else if (lcio_coll_type_str == "TPCHit") {
-        registerCollection(edm4hepName, convertTPCHit(edm4hepName, lcio_coll, lcio2edm4hepMaps.tpcHits));
+        registerCollection(edm4hepName, convertTPCHits(edm4hepName, lcio_coll, lcio2edm4hepMaps.tpcHits));
       } else if (lcio_coll_type_str == "Cluster") {
-        registerCollection(edm4hepName, convertCluster(edm4hepName, lcio_coll, lcio2edm4hepMaps.clusters));
+        registerCollection(edm4hepName, convertClusters(edm4hepName, lcio_coll, lcio2edm4hepMaps.clusters));
         // TODO: Particle IDs related to Clusters. Needs converter support!
       } else {
         error() << lcio_coll_type_str << ": conversion type not supported." << endmsg;
