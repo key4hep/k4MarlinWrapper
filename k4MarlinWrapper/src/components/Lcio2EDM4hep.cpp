@@ -57,8 +57,18 @@ void Lcio2EDM4hepTool::registerCollection(
     error() << "Could not convert collection " << name << endmsg;
     return;
   }
-  DataHandle<podio::CollectionBase> handle{name, Gaudi::DataHandle::Writer, this};
-  handle.put(e4hColl.release());
+
+  auto wrapper = new DataWrapper<podio::CollectionBase>();
+  wrapper->setData(e4hColl.release());
+
+  // No need to check for pre-existing collections, since we only ever end up
+  // here if that is not the case
+  auto sc = m_podioDataSvc->registerObject("/Event", "/" + std::string(name), wrapper);
+  if (sc == StatusCode::FAILURE) {
+    error() << "Could not register collection " << name << endmsg;
+  }
+
+  auto handle = DataHandle<podio::CollectionBase>{name, Gaudi::DataHandle::Reader, this};
 
   // Convert metadata
   if (lcioColl != nullptr) {
@@ -105,7 +115,10 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
 
   for (const auto& [lcioName, edm4hepName] : collsToConvert) {
     try {
-      auto*       lcio_coll          = the_event->getCollection(lcioName);
+      auto* lcio_coll = the_event->getCollection(lcioName);
+      if (collectionExist(edm4hepName)) {
+        continue;  // No need to convert again
+      }
       const auto& lcio_coll_type_str = lcio_coll->getTypeName();
 
       // We deal with subset collections and LCRelations once we have all data
