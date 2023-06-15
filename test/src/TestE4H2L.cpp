@@ -1022,19 +1022,19 @@ bool TestE4H2L::checkEDMTrackEDMTrack(const std::vector<std::pair<uint, uint>>& 
 
 #if EDM4HEP_BUILD_VERSION > EDM4HEP_VERSION(0, 9, 0)
       // TODO Resizing in EDM4hep to LCIO conversion causes to "have" 50 hits
-      if (edm_track.subDetectorHitNumbers_size() == 50) {
-        for (int j = 0; j < edm_track_orig.subDetectorHitNumbers_size(); ++j) {
+      if (edm_track.subdetectorHitNumbers_size() == 50) {
+        for (int j = 0; j < edm_track_orig.subdetectorHitNumbers_size(); ++j) {
           track_same =
               track_same && (edm_track_orig.getSubdetectorHitNumbers(j) == edm_track.getSubdetectorHitNumbers(j));
         }
-        for (int j = edm_track_orig.subDetectorHitNumbers_size(); j < 50; ++j) {
+        for (int j = edm_track_orig.subdetectorHitNumbers_size(); j < 50; ++j) {
           track_same = track_same && (0 == edm_track.getSubdetectorHitNumbers(j));
         }
       } else {
         track_same =
-            track_same && (edm_track_orig.subDetectorHitNumbers_size() == edm_track.subDetectorHitNumbers_size());
-        if ((edm_track_orig.subDetectorHitNumbers_size() == edm_track.subDetectorHitNumbers_size())) {
-          for (int j = 0; j < edm_track_orig.subDetectorHitNumbers_size(); ++j) {
+            track_same && (edm_track_orig.subdetectorHitNumbers_size() == edm_track.subdetectorHitNumbers_size());
+        if ((edm_track_orig.subdetectorHitNumbers_size() == edm_track.subdetectorHitNumbers_size())) {
+          for (int j = 0; j < edm_track_orig.subdetectorHitNumbers_size(); ++j) {
             track_same =
                 track_same && (edm_track_orig.getSubdetectorHitNumbers(j) == edm_track.getSubdetectorHitNumbers(j));
           }
