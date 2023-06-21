@@ -662,15 +662,32 @@ bool TestE4H2L::checkEDMTrackLCIOTrack(lcio::LCEventImpl* the_event, const std::
         }
       }
 
+#if EDM4HEP_BUILD_VERSION > EDM4HEP_VERSION(0, 9, 0)
+      // TODO Resizing in EDM4hep to LCIO conversion causes to "have" 50 hits
+      if (lcio_track->getSubdetectorHitNumbers().size() == 50) {
+        for (int j = 0; j < edm_track_orig.subdetectorHitNumbers_size(); ++j) {
+          track_same =
+              track_same && (edm_track_orig.getSubdetectorHitNumbers(j) == lcio_track->getSubdetectorHitNumbers()[j]);
+        }
+        for (int j = edm_track_orig.subdetectorHitNumbers_size(); j < 50; ++j) {
+          track_same = track_same && (0 == lcio_track->getSubdetectorHitNumbers()[j]);
+        }
+      } else {
+        track_same = track_same &&
+                     (edm_track_orig.subdetectorHitNumbers_size() == lcio_track->getSubdetectorHitNumbers().size());
+        if (track_same) {
+          for (int j = 0; j < edm_track_orig.subdetectorHitNumbers_size(); ++j) {
+            track_same =
+                track_same && (edm_track_orig.getSubdetectorHitNumbers(j) == lcio_track->getSubdetectorHitNumbers()[j]);
+          }
+        }
+      }
+#else
       // TODO Resizing in EDM4hep to LCIO conversion causes to "have" 50 hits
       if (lcio_track->getSubdetectorHitNumbers().size() == 50) {
         for (int j = 0; j < edm_track_orig.subDetectorHitNumbers_size(); ++j) {
           track_same =
-#if EDM4HEP_BUILD_VERSION > EDM4HEP_VERSION(0, 9, 0)
-              track_same && (edm_track_orig.getSubdetectorHitNumbers(j) == lcio_track->getSubdetectorHitNumbers()[j]);
-#else
               track_same && (edm_track_orig.getSubDetectorHitNumbers(j) == lcio_track->getSubdetectorHitNumbers()[j]);
-#endif
         }
         for (int j = edm_track_orig.subDetectorHitNumbers_size(); j < 50; ++j) {
           track_same = track_same && (0 == lcio_track->getSubdetectorHitNumbers()[j]);
@@ -681,14 +698,11 @@ bool TestE4H2L::checkEDMTrackLCIOTrack(lcio::LCEventImpl* the_event, const std::
         if (track_same) {
           for (int j = 0; j < edm_track_orig.subDetectorHitNumbers_size(); ++j) {
             track_same =
-#if EDM4HEP_BUILD_VERSION > EDM4HEP_VERSION(0, 9, 0)
-                track_same && (edm_track_orig.getSubdetectorHitNumbers(j) == lcio_track->getSubdetectorHitNumbers()[j]);
-#else
                 track_same && (edm_track_orig.getSubDetectorHitNumbers(j) == lcio_track->getSubdetectorHitNumbers()[j]);
-#endif
           }
         }
       }
+#endif
 
       track_same = track_same && (edm_track_orig.trackStates_size() == lcio_track->getTrackStates().size());
       if ((edm_track_orig.trackStates_size() == lcio_track->getTrackStates().size())) {
