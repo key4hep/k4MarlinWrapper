@@ -6,7 +6,7 @@
 
 // k4FWCore
 #include <k4FWCore/DataHandle.h>
-#include <k4FWCore/PodioDataSvc.h>
+#include <k4FWCore/PodioLegacyDataSvc.h>
 
 // k4LCIOReader
 #include <k4LCIOReader/k4LCIOConverter.h>
@@ -34,7 +34,7 @@ private:
   std::map<std::string, DataObjectHandleBase*> m_dataHandlesMap;
 
   ServiceHandle<IDataProviderSvc> m_eds;
-  PodioDataSvc*                   m_podioDataSvc;
+  PodioLegacyDataSvc*                   m_podioDataSvc;
 
   bool collectionExist(const std::string& collection_name);
 
