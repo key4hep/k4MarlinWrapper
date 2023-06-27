@@ -12,7 +12,7 @@ Lcio2EDM4hepTool::Lcio2EDM4hepTool(const std::string& type, const std::string& n
 Lcio2EDM4hepTool::~Lcio2EDM4hepTool() { ; }
 
 StatusCode Lcio2EDM4hepTool::initialize() {
-  m_podioDataSvc = dynamic_cast<PodioDataSvc*>(m_eds.get());
+  m_podioDataSvc = dynamic_cast<PodioLegacyDataSvc*>(m_eds.get());
   if (nullptr == m_podioDataSvc)
     return StatusCode::FAILURE;
 
