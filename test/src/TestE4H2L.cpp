@@ -1,4 +1,12 @@
 #include "TestE4H2L.h"
+#if __has_include("edm4hep/EDM4hepVersion.h")
+#include "edm4hep/EDM4hepVersion.h"
+#else
+// Copy the necessary parts from  the header above to make whatever we need to work here
+#define EDM4HEP_VERSION(major, minor, patch) ((UINT64_C(major) << 32) | (UINT64_C(minor) << 16) | (UINT64_C(patch)))
+// v00-09 is the last version without the capitalization change of the track vector members
+#define EDM4HEP_BUILD_VERSION EDM4HEP_VERSION(0, 9, 0)
+#endif
 
 DECLARE_COMPONENT(TestE4H2L)
 
@@ -206,7 +214,11 @@ void TestE4H2L::createTracks(const int num_elements, const int subdetectorhitnum
     elem.setRadiusOfInnermostHit(float_cnt++);
 
     for (int j = 0; j < subdetectorhitnumbers; ++j) {
+#if EDM4HEP_BUILD_VERSION > EDM4HEP_VERSION(0, 9, 0)
+      elem.addToSubdetectorHitNumbers(int_cnt++);
+#else
       elem.addToSubDetectorHitNumbers(int_cnt++);
+#endif
     }
 
     DataHandle<edm4hep::TrackerHitCollection> trackerhits_handle{m_e4h_trackerhit_name, Gaudi::DataHandle::Reader,
@@ -650,6 +662,27 @@ bool TestE4H2L::checkEDMTrackLCIOTrack(lcio::LCEventImpl* the_event, const std::
         }
       }
 
+#if EDM4HEP_BUILD_VERSION > EDM4HEP_VERSION(0, 9, 0)
+      // TODO Resizing in EDM4hep to LCIO conversion causes to "have" 50 hits
+      if (lcio_track->getSubdetectorHitNumbers().size() == 50) {
+        for (int j = 0; j < edm_track_orig.subdetectorHitNumbers_size(); ++j) {
+          track_same =
+              track_same && (edm_track_orig.getSubdetectorHitNumbers(j) == lcio_track->getSubdetectorHitNumbers()[j]);
+        }
+        for (int j = edm_track_orig.subdetectorHitNumbers_size(); j < 50; ++j) {
+          track_same = track_same && (0 == lcio_track->getSubdetectorHitNumbers()[j]);
+        }
+      } else {
+        track_same = track_same &&
+                     (edm_track_orig.subdetectorHitNumbers_size() == lcio_track->getSubdetectorHitNumbers().size());
+        if (track_same) {
+          for (int j = 0; j < edm_track_orig.subdetectorHitNumbers_size(); ++j) {
+            track_same =
+                track_same && (edm_track_orig.getSubdetectorHitNumbers(j) == lcio_track->getSubdetectorHitNumbers()[j]);
+          }
+        }
+      }
+#else
       // TODO Resizing in EDM4hep to LCIO conversion causes to "have" 50 hits
       if (lcio_track->getSubdetectorHitNumbers().size() == 50) {
         for (int j = 0; j < edm_track_orig.subDetectorHitNumbers_size(); ++j) {
@@ -669,6 +702,7 @@ bool TestE4H2L::checkEDMTrackLCIOTrack(lcio::LCEventImpl* the_event, const std::
           }
         }
       }
+#endif
 
       track_same = track_same && (edm_track_orig.trackStates_size() == lcio_track->getTrackStates().size());
       if ((edm_track_orig.trackStates_size() == lcio_track->getTrackStates().size())) {
@@ -1000,6 +1034,27 @@ bool TestE4H2L::checkEDMTrackEDMTrack(const std::vector<std::pair<uint, uint>>& 
         }
       }
 
+#if EDM4HEP_BUILD_VERSION > EDM4HEP_VERSION(0, 9, 0)
+      // TODO Resizing in EDM4hep to LCIO conversion causes to "have" 50 hits
+      if (edm_track.subdetectorHitNumbers_size() == 50) {
+        for (int j = 0; j < edm_track_orig.subdetectorHitNumbers_size(); ++j) {
+          track_same =
+              track_same && (edm_track_orig.getSubdetectorHitNumbers(j) == edm_track.getSubdetectorHitNumbers(j));
+        }
+        for (int j = edm_track_orig.subdetectorHitNumbers_size(); j < 50; ++j) {
+          track_same = track_same && (0 == edm_track.getSubdetectorHitNumbers(j));
+        }
+      } else {
+        track_same =
+            track_same && (edm_track_orig.subdetectorHitNumbers_size() == edm_track.subdetectorHitNumbers_size());
+        if ((edm_track_orig.subdetectorHitNumbers_size() == edm_track.subdetectorHitNumbers_size())) {
+          for (int j = 0; j < edm_track_orig.subdetectorHitNumbers_size(); ++j) {
+            track_same =
+                track_same && (edm_track_orig.getSubdetectorHitNumbers(j) == edm_track.getSubdetectorHitNumbers(j));
+          }
+        }
+      }
+#else
       // TODO Resizing in EDM4hep to LCIO conversion causes to "have" 50 hits
       if (edm_track.subDetectorHitNumbers_size() == 50) {
         for (int j = 0; j < edm_track_orig.subDetectorHitNumbers_size(); ++j) {
@@ -1019,6 +1074,7 @@ bool TestE4H2L::checkEDMTrackEDMTrack(const std::vector<std::pair<uint, uint>>& 
           }
         }
       }
+#endif
 
       track_same = track_same && (edm_track_orig.trackStates_size() == edm_track.trackStates_size());
       if ((edm_track_orig.trackStates_size() == edm_track.trackStates_size())) {
