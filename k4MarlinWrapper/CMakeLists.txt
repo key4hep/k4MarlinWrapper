@@ -33,7 +33,7 @@ gaudi_add_module(k4MarlinWrapperPlugins
 )
 
 target_include_directories(k4MarlinWrapperPlugins PUBLIC
-  ${CMAKE_SOURCE_DIR}/k4MarlinWrapper
+  ${PROJECT_SOURCE_DIR}/k4MarlinWrapper
   ${LCIO_INCLUDE_DIRS}
   ${Marlin_INCLUDE_DIRS}
 )
@@ -50,7 +50,7 @@ gaudi_add_module(MarlinWrapper
 )
 
 target_include_directories(MarlinWrapper PUBLIC
-  ${CMAKE_SOURCE_DIR}/k4MarlinWrapper
+  ${PROJECT_SOURCE_DIR}/k4MarlinWrapper
   ${Marlin_INCLUDE_DIRS}
   ${LCIO_INCLUDE_DIRS}
 )
@@ -69,7 +69,7 @@ gaudi_add_module(EDM4hep2Lcio
 )
 
 target_include_directories(EDM4hep2Lcio PUBLIC
-  ${CMAKE_SOURCE_DIR}/k4MarlinWrapper
+  ${PROJECT_SOURCE_DIR}/k4MarlinWrapper
   ${LCIO_INCLUDE_DIRS}
   ${Marlin_INCLUDE_DIRS}
 )
@@ -86,7 +86,7 @@ gaudi_add_module(Lcio2EDM4hep
 )
 
 target_include_directories(Lcio2EDM4hep PUBLIC
-  ${CMAKE_SOURCE_DIR}/k4MarlinWrapper
+  ${PROJECT_SOURCE_DIR}/k4MarlinWrapper
   ${LCIO_INCLUDE_DIRS}
 )
 
@@ -94,7 +94,7 @@ target_include_directories(Lcio2EDM4hep PUBLIC
 add_custom_command(
         TARGET MarlinWrapper POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
-                ${CMAKE_SOURCE_DIR}/k4MarlinWrapper/python/k4MarlinWrapper/parseConstants.py
+                ${PROJECT_SOURCE_DIR}/k4MarlinWrapper/python/k4MarlinWrapper/parseConstants.py
                 ${CMAKE_CURRENT_BINARY_DIR}/genConfDir/k4MarlinWrapper/parseConstants.py)
 
 # Install the example options files to share to make them easily accessible
