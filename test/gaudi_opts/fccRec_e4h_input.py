@@ -86,7 +86,7 @@ InitDD4hep = MarlinProcessorWrapper("InitDD4hep")
 InitDD4hep.OutputLevel = WARNING
 InitDD4hep.ProcessorType = "InitializeDD4hep"
 InitDD4hep.Parameters = {
-                         "DD4hepXMLFile": [os.environ["LCGEO"]+"/FCCee/compact/FCCee_o1_v04/FCCee_o1_v04.xml"],
+                         "DD4hepXMLFile": [os.environ["LCGEO"]+"/FCCee/CLD/compact/FCCee_o1_v04/FCCee_o1_v04.xml"],
                          "EncodingStringParameter": ["GlobalTrackerReadoutID"]
                          }
 
