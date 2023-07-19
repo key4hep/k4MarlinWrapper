@@ -1,6 +1,6 @@
 anajob:  will open and read from files: 
 
-     Output_REC.slcio     [ number of runs: 0, number of events: 1 ] 
+     Output_REC.slcio     [ number of runs: 0, number of events: 3 ] 
 
 
  will reopen and read from files: 
@@ -96,7 +96,7 @@ YokeEndcapCollection          SimCalorimeterHit                6
 
 
 ///////////////////////////////////
-EVENT: 0
+EVENT: 1
 RUN: 0
 DETECTOR: unknown
 COLLECTIONS: (see below)
@@ -106,8 +106,8 @@ COLLECTIONS: (see below)
 COLLECTION NAME               COLLECTION TYPE          NUMBER OF ELEMENTS  
 ===========================================================================
 BeamCalCollection             SimCalorimeterHit                6
-BuildUpVertices               Vertex                           3
-BuildUpVertices_RP            ReconstructedParticle            3
+BuildUpVertices               Vertex                           2
+BuildUpVertices_RP            ReconstructedParticle            2
 BuildUpVertices_V0            Vertex                           0
 BuildUpVertices_V0_RP         ReconstructedParticle            0
 CalohitMCTruthLink            LCRelation                    9010
@@ -159,19 +159,19 @@ PrimaryVertices               Vertex                           1
 PrimaryVertices_RP            ReconstructedParticle            1
 RecoMCTruthLink               LCRelation                      93
 RefinedVertexJets             ReconstructedParticle            2
-RefinedVertexJets_rel         LCRelation                       2
-RefinedVertexJets_vtx         Vertex                           2
-RefinedVertexJets_vtx_RP      ReconstructedParticle            2
-RefinedVertices               Vertex                           2
-RefinedVertices_RP            ReconstructedParticle            2
+RefinedVertexJets_rel         LCRelation                       1
+RefinedVertexJets_vtx         Vertex                           1
+RefinedVertexJets_vtx_RP      ReconstructedParticle            1
+RefinedVertices               Vertex                           1
+RefinedVertices_RP            ReconstructedParticle            1
 RelationCaloHit               LCRelation                    8909
 RelationMuonHit               LCRelation                       0
-SelectedPandoraPFOs           ReconstructedParticle           83
+SelectedPandoraPFOs           ReconstructedParticle           82
 SiTracks                      Track                           43
 SiTracksCT                    Track                           43
 SiTracksMCTruthLink           LCRelation                      43
 SiTracks_Refitted             Track                           43
-TightSelectedPandoraPFOs      ReconstructedParticle           70
+TightSelectedPandoraPFOs      ReconstructedParticle           69
 VXDEndcapTrackerHitRelations  LCRelation                      19
 VXDEndcapTrackerHits          TrackerHitPlane                 19
 VXDTrackerHitRelations        LCRelation                     268
@@ -186,7 +186,7 @@ YokeEndcapCollection          SimCalorimeterHit                0
 
 
 ///////////////////////////////////
-EVENT: 0
+EVENT: 2
 RUN: 0
 DETECTOR: unknown
 COLLECTIONS: (see below)
