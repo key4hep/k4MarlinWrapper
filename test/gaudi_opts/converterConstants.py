@@ -9,7 +9,7 @@ evtsvc = EventDataSvc()
 CONSTANTS = {
              'DetectorModel': "CLIC_o2_v04",
              'MyCompact': "compact",
-             'DD4hepXMLFile_subPath': "/cvmfs/sw.hsf.org/spackages/linux-centos7-x86_64/gcc-8.3.0/lcgeo-0.16.6-vbidketl5esynx6pmkrdnqrnfyf3m2vf/share/lcgeo/compact/CLIC/%(MyCompact)s/%(DetectorModel)s/%(DetectorModel)s.xml",
+             'DD4hepXMLFile_subPath': "$K4GEO/CLIC/%(MyCompact)s/%(DetectorModel)s/%(DetectorModel)s.xml",
              'MyResTest': "0.003",
              'MyResTest2': "003",
              'MyResTest3': "0.",
