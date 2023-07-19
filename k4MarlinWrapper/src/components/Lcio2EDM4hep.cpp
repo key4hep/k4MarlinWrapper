@@ -159,5 +159,11 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
     registerCollection(std::move(assocColl));
   }
 
+  if (!lcio2edm4hepMaps.simCaloHits.empty()) {
+    registerCollection(
+        name() + "_CaloHitContributions",
+        LCIO2EDM4hepConv::createCaloHitContributions(lcio2edm4hepMaps.simCaloHits, lcio2edm4hepMaps.mcParticles));
+  }
+
   return StatusCode::SUCCESS;
 }
