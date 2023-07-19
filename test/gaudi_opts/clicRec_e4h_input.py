@@ -23,12 +23,12 @@ from Configurables import ToolSvc, Lcio2EDM4hepTool, EDM4hep2LcioTool
 # algList.append(read)
 
 
-from Configurables import k4LegacyDataSvc, PodioLegacyInput
-evtsvc = k4LegacyDataSvc('EventDataSvc')
 evtsvc.input = '$TEST_DIR/inputFiles/ttbar1_edm4hep.root'
+from Configurables import k4DataSvc, PodioInput
+evtsvc = k4DataSvc('EventDataSvc')
 
 
-inp = PodioLegacyInput('InputReader')
+inp = PodioInput('InputReader')
 inp.collections = [
   'EventHeader',
   'MCParticles',
@@ -1765,8 +1765,8 @@ VertexFinderUnconstrained.Parameters = {
 
 
 # Write output to EDM4hep
-from Configurables import PodioLegacyOutput
-out = PodioLegacyOutput("PodioOutput", filename = "my_output.root")
+from Configurables import PodioOutput
+out = PodioOutput("PodioOutput", filename = "my_output.root")
 out.outputCommands = ["keep *"]
 
 
