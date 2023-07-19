@@ -9,7 +9,7 @@ if [ ! -f $TEST_DIR/inputFiles/muons.slcio ]; then
   wget https://github.com/AIDASoft/DD4hep/raw/master/DDTest/inputFiles/muons.slcio -P $TEST_DIR/inputFiles/
 fi
 
-../run k4run $TEST_DIR/gaudi_opts/same_num_io.py --num-events=-1
+k4run $TEST_DIR/gaudi_opts/same_num_io.py --num-events=-1
 
 input_num_events=$(lcio_event_counter $TEST_DIR/inputFiles/muons.slcio)
 output_num_events=$(lcio_event_counter Output_DST.slcio)
