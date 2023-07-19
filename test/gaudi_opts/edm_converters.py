@@ -27,7 +27,7 @@ lcioConvTool = Lcio2EDM4hepTool("Lcio2EDM4hep")
 lcioConvTool.convertAll = False
 lcioConvTool.collNameMapping = {
     "LCIO_CaloHitCollection": "E4H_CaloHitCollection_conv",
-    # "LCIO_TrackerHitCollection": "E4H_TrackerHitCollection_conv",
+    "LCIO_TrackerHitCollection": "E4H_TrackerHitCollection_conv",
     "LCIO_SimTrackerHitCollection": "E4H_SimTrackerHitCollection_conv",
     "LCIO_TrackCollection": "E4H_TrackCollection_conv",
     "LCIO_MCParticleCollection": "E4H_MCParticleCollection_conv",
