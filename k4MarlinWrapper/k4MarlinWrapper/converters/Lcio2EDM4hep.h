@@ -34,7 +34,7 @@ private:
   std::map<std::string, DataObjectHandleBase*> m_dataHandlesMap;
 
   ServiceHandle<IDataProviderSvc> m_eds;
-  PodioLegacyDataSvc*                   m_podioDataSvc;
+  PodioLegacyDataSvc*             m_podioDataSvc;
 
   bool collectionExist(const std::string& collection_name);
 

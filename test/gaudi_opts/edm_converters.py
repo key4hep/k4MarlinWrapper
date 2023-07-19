@@ -1,12 +1,12 @@
 from Gaudi.Configuration import *
 
-from Configurables import k4DataSvc, TestE4H2L, EDM4hep2LcioTool, Lcio2EDM4hepTool
+from Configurables import k4LegacyDataSvc, TestE4H2L, EDM4hep2LcioTool, Lcio2EDM4hepTool
 
 algList = []
 
 END_TAG = "END_TAG"
 
-evtsvc = k4DataSvc('EventDataSvc')
+evtsvc = k4LegacyDataSvc("EventDataSvc")
 
 # EDM4hep2lcio Tool
 edmConvTool = EDM4hep2LcioTool("EDM4hep2lcio")

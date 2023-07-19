@@ -35,7 +35,7 @@ private:
   Gaudi::Property<std::map<std::string, std::string>> m_collNames{this, "collNameMapping", {}};
   Gaudi::Property<bool>                               m_convertAll{this, "convertAll", true};
 
-  PodioLegacyDataSvc*                   m_podioDataSvc;
+  PodioLegacyDataSvc*             m_podioDataSvc;
   ServiceHandle<IDataProviderSvc> m_eventDataSvc;
 
   void convertTracks(vec_pair<lcio::TrackImpl*, edm4hep::Track>&           tracks_vec,
