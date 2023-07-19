@@ -1,6 +1,6 @@
 anajob:  will open and read from files: 
 
-     Output_DST.slcio     [ number of runs: 0, number of events: 1 ] 
+     Output_DST.slcio     [ number of runs: 0, number of events: 3 ] 
 
 
  will reopen and read from files: 
@@ -50,7 +50,7 @@ TightSelectedPandoraPFOs      ReconstructedParticle           67
 
 
 ///////////////////////////////////
-EVENT: 0
+EVENT: 1
 RUN: 0
 DETECTOR: unknown
 COLLECTIONS: (see below)
@@ -59,8 +59,8 @@ COLLECTIONS: (see below)
 ---------------------------------------------------------------------------
 COLLECTION NAME               COLLECTION TYPE          NUMBER OF ELEMENTS  
 ===========================================================================
-BuildUpVertices               Vertex                           3
-BuildUpVertices_RP            ReconstructedParticle            3
+BuildUpVertices               Vertex                           2
+BuildUpVertices_RP            ReconstructedParticle            2
 BuildUpVertices_V0            Vertex                           0
 BuildUpVertices_V0_RP         ReconstructedParticle            0
 LE_LooseSelectedPandoraPFOs   ReconstructedParticle           92
@@ -80,21 +80,21 @@ PrimaryVertices               Vertex                           1
 PrimaryVertices_RP            ReconstructedParticle            1
 RecoMCTruthLink               LCRelation                      93
 RefinedVertexJets             ReconstructedParticle            2
-RefinedVertexJets_rel         LCRelation                       2
-RefinedVertexJets_vtx         Vertex                           2
-RefinedVertexJets_vtx_RP      ReconstructedParticle            2
-RefinedVertices               Vertex                           2
-RefinedVertices_RP            ReconstructedParticle            2
-SelectedPandoraPFOs           ReconstructedParticle           83
+RefinedVertexJets_rel         LCRelation                       1
+RefinedVertexJets_vtx         Vertex                           1
+RefinedVertexJets_vtx_RP      ReconstructedParticle            1
+RefinedVertices               Vertex                           1
+RefinedVertices_RP            ReconstructedParticle            1
+SelectedPandoraPFOs           ReconstructedParticle           82
 SiTracks                      Track                           43
 SiTracks_Refitted             Track                           43
-TightSelectedPandoraPFOs      ReconstructedParticle           70
+TightSelectedPandoraPFOs      ReconstructedParticle           69
 ---------------------------------------------------------------------------
 
 
 
 ///////////////////////////////////
-EVENT: 0
+EVENT: 2
 RUN: 0
 DETECTOR: unknown
 COLLECTIONS: (see below)
