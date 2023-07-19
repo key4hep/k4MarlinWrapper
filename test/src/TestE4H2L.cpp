@@ -1000,6 +1000,11 @@ bool TestE4H2L::checkEDMTrackEDMTrack(const std::vector<std::pair<uint, uint>>& 
 
   bool track_same = (*track_coll_orig).size() == (*track_coll).size();
 
+  if (!track_same) {
+    error() << "Track collections do not have the same size (expected " << track_coll_orig->size() << ", actual "
+            << track_coll->size() << ")" << endmsg;
+  }
+
   if (track_same) {
     for (int i = 0; i < (*track_coll).size(); ++i) {
       auto edm_track_orig = (*track_coll_orig)[i];
@@ -1015,6 +1020,12 @@ bool TestE4H2L::checkEDMTrackEDMTrack(const std::vector<std::pair<uint, uint>>& 
       track_same = track_same && (edm_track_orig.getRadiusOfInnermostHit() == edm_track.getRadiusOfInnermostHit());
 
       track_same = track_same && (edm_track_orig.trackerHits_size() == edm_track.trackerHits_size());
+
+      if (!track_same) {
+        error() << "Track " << i << " differs: (expected: " << edm_track_orig << ", actual: " << edm_track << ")"
+                << endmsg;
+      }
+
       if ((edm_track_orig.trackerHits_size() == edm_track.trackerHits_size())) {
         for (int j = 0; j < edm_track_orig.trackerHits_size(); ++j) {
           auto edm_trackerhit_orig = edm_track_orig.getTrackerHits(j);
@@ -1029,6 +1040,11 @@ bool TestE4H2L::checkEDMTrackEDMTrack(const std::vector<std::pair<uint, uint>>& 
           track_same = track_same && (edm_trackerhit_orig.getEDepError() == edm_trackerhit.getEDepError());
           track_same = track_same && (edm_trackerhit_orig.getPosition() == edm_trackerhit.getPosition());
           track_same = track_same && (edm_trackerhit_orig.getCovMatrix() == edm_trackerhit.getCovMatrix());
+
+          if (!track_same) {
+            error() << "TrackerHit " << j << " of track " << i << " differs: (expected: " << edm_trackerhit_orig
+                    << ", actual: " << edm_trackerhit << ")" << endmsg;
+          }
 
           // TODO Raw hits
         }
@@ -1076,6 +1092,10 @@ bool TestE4H2L::checkEDMTrackEDMTrack(const std::vector<std::pair<uint, uint>>& 
       }
 #endif
 
+      if (!track_same) {
+        error() << "subdetectorHitNumbers of track " << i << " differ" << endmsg;
+      }
+
       track_same = track_same && (edm_track_orig.trackStates_size() == edm_track.trackStates_size());
       if ((edm_track_orig.trackStates_size() == edm_track.trackStates_size())) {
         for (int j = 0; j < edm_track_orig.trackStates_size(); ++j) {
@@ -1092,6 +1112,11 @@ bool TestE4H2L::checkEDMTrackEDMTrack(const std::vector<std::pair<uint, uint>>& 
           track_same = track_same && (edm_trackestate_orig.referencePoint == edm_trackestate.referencePoint);
           for (int k = 0; k < 15; ++k) {
             track_same = track_same && (edm_trackestate_orig.covMatrix[k] == edm_trackestate.covMatrix[k]);
+          }
+
+          if (!track_same) {
+            error() << "trackState " << j << " of track " << i << " differs (expected: " << edm_trackestate_orig
+                    << ", actual: " << edm_trackestate << ")" << endmsg;
           }
         }
       }
