@@ -25,14 +25,14 @@ if [ "$input_num_events" != "$output_num_events" ]; then
 fi
 
 # Second check: contents (at least superficially)
-echo "Comparing contents of Output_REC.slcio"
-if ! diff <(anajob Output_REC.slcio) $TEST_DIR/inputFiles/anajob_Output_REC.expected; then
+echo "Comparing contents of Output_REC_e4h_input.slcio"
+if ! diff <(anajob Output_REC_e4h_input.slcio) $TEST_DIR/inputFiles/anajob_Output_REC.expected; then
   echo "File contents of REC slcio file are not as expected"
   exit 1
 fi
 
-echo "Comparing contents of Output_DST.slcio"
-if ! diff <(anajob Output_DST.slcio) $TEST_DIR/inputFiles/anajob_Output_DST.expected; then
+echo "Comparing contents of Output_DST_e4h_input.slcio"
+if ! diff <(anajob Output_DST_e4h_input.slcio) $TEST_DIR/inputFiles/anajob_Output_DST.expected; then
   echo "File contents of DST slcio file are not as expected"
   exit 1
 fi
