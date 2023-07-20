@@ -19,32 +19,32 @@ BuildUpVertices               Vertex                           4
 BuildUpVertices_RP            ReconstructedParticle            4
 BuildUpVertices_V0            Vertex                           0
 BuildUpVertices_V0_RP         ReconstructedParticle            0
-LE_LooseSelectedPandoraPFOs   ReconstructedParticle           88
-LE_SelectedPandoraPFOs        ReconstructedParticle           85
-LE_TightSelectedPandoraPFOs   ReconstructedParticle           82
-LooseSelectedPandoraPFOs      ReconstructedParticle           85
+LE_LooseSelectedPandoraPFOs   ReconstructedParticle           87
+LE_SelectedPandoraPFOs        ReconstructedParticle           82
+LE_TightSelectedPandoraPFOs   ReconstructedParticle           80
+LooseSelectedPandoraPFOs      ReconstructedParticle           80
 LumiCalClusters               Cluster                          0
 LumiCalRecoParticles          ReconstructedParticle            0
-MCParticlesSkimmed            MCParticle                     252
-MCPhysicsParticles            MCParticle                     406
-MergedClusters                Cluster                         86
-MergedRecoParticles           ReconstructedParticle           89
-PandoraClusters               Cluster                         86
-PandoraPFOs                   ReconstructedParticle           89
-PandoraStartVertices          Vertex                          89
+MCParticlesSkimmed            MCParticle                     258
+MCPhysicsParticles            MCParticle                     427
+MergedClusters                Cluster                         82
+MergedRecoParticles           ReconstructedParticle           87
+PandoraClusters               Cluster                         82
+PandoraPFOs                   ReconstructedParticle           87
+PandoraStartVertices          Vertex                          87
 PrimaryVertices               Vertex                           1
 PrimaryVertices_RP            ReconstructedParticle            1
-RecoMCTruthLink               LCRelation                      89
+RecoMCTruthLink               LCRelation                      87
 RefinedVertexJets             ReconstructedParticle            2
 RefinedVertexJets_rel         LCRelation                       0
 RefinedVertexJets_vtx         Vertex                           0
 RefinedVertexJets_vtx_RP      ReconstructedParticle            0
 RefinedVertices               Vertex                           0
 RefinedVertices_RP            ReconstructedParticle            0
-SelectedPandoraPFOs           ReconstructedParticle           82
+SelectedPandoraPFOs           ReconstructedParticle           78
 SiTracks                      Track                           38
 SiTracks_Refitted             Track                           38
-TightSelectedPandoraPFOs      ReconstructedParticle           67
+TightSelectedPandoraPFOs      ReconstructedParticle           63
 ---------------------------------------------------------------------------
 
 
@@ -59,36 +59,36 @@ COLLECTIONS: (see below)
 ---------------------------------------------------------------------------
 COLLECTION NAME               COLLECTION TYPE          NUMBER OF ELEMENTS  
 ===========================================================================
-BuildUpVertices               Vertex                           2
-BuildUpVertices_RP            ReconstructedParticle            2
+BuildUpVertices               Vertex                           4
+BuildUpVertices_RP            ReconstructedParticle            4
 BuildUpVertices_V0            Vertex                           0
 BuildUpVertices_V0_RP         ReconstructedParticle            0
-LE_LooseSelectedPandoraPFOs   ReconstructedParticle           92
-LE_SelectedPandoraPFOs        ReconstructedParticle           88
-LE_TightSelectedPandoraPFOs   ReconstructedParticle           86
-LooseSelectedPandoraPFOs      ReconstructedParticle           87
+LE_LooseSelectedPandoraPFOs   ReconstructedParticle           85
+LE_SelectedPandoraPFOs        ReconstructedParticle           80
+LE_TightSelectedPandoraPFOs   ReconstructedParticle           75
+LooseSelectedPandoraPFOs      ReconstructedParticle           84
 LumiCalClusters               Cluster                          0
 LumiCalRecoParticles          ReconstructedParticle            0
-MCParticlesSkimmed            MCParticle                     304
-MCPhysicsParticles            MCParticle                     494
-MergedClusters                Cluster                         85
-MergedRecoParticles           ReconstructedParticle           93
-PandoraClusters               Cluster                         85
-PandoraPFOs                   ReconstructedParticle           93
-PandoraStartVertices          Vertex                          93
+MCParticlesSkimmed            MCParticle                     299
+MCPhysicsParticles            MCParticle                     527
+MergedClusters                Cluster                         78
+MergedRecoParticles           ReconstructedParticle           88
+PandoraClusters               Cluster                         78
+PandoraPFOs                   ReconstructedParticle           88
+PandoraStartVertices          Vertex                          88
 PrimaryVertices               Vertex                           1
 PrimaryVertices_RP            ReconstructedParticle            1
-RecoMCTruthLink               LCRelation                      93
+RecoMCTruthLink               LCRelation                      88
 RefinedVertexJets             ReconstructedParticle            2
-RefinedVertexJets_rel         LCRelation                       1
-RefinedVertexJets_vtx         Vertex                           1
-RefinedVertexJets_vtx_RP      ReconstructedParticle            1
-RefinedVertices               Vertex                           1
-RefinedVertices_RP            ReconstructedParticle            1
-SelectedPandoraPFOs           ReconstructedParticle           82
-SiTracks                      Track                           43
-SiTracks_Refitted             Track                           43
-TightSelectedPandoraPFOs      ReconstructedParticle           69
+RefinedVertexJets_rel         LCRelation                       3
+RefinedVertexJets_vtx         Vertex                           3
+RefinedVertexJets_vtx_RP      ReconstructedParticle            3
+RefinedVertices               Vertex                           3
+RefinedVertices_RP            ReconstructedParticle            3
+SelectedPandoraPFOs           ReconstructedParticle           76
+SiTracks                      Track                           45
+SiTracks_Refitted             Track                           45
+TightSelectedPandoraPFOs      ReconstructedParticle           65
 ---------------------------------------------------------------------------
 
 
@@ -105,34 +105,34 @@ COLLECTION NAME               COLLECTION TYPE          NUMBER OF ELEMENTS
 ===========================================================================
 BuildUpVertices               Vertex                           2
 BuildUpVertices_RP            ReconstructedParticle            2
-BuildUpVertices_V0            Vertex                           0
-BuildUpVertices_V0_RP         ReconstructedParticle            0
-LE_LooseSelectedPandoraPFOs   ReconstructedParticle           73
-LE_SelectedPandoraPFOs        ReconstructedParticle           66
-LE_TightSelectedPandoraPFOs   ReconstructedParticle           64
-LooseSelectedPandoraPFOs      ReconstructedParticle           70
+BuildUpVertices_V0            Vertex                           1
+BuildUpVertices_V0_RP         ReconstructedParticle            1
+LE_LooseSelectedPandoraPFOs   ReconstructedParticle           79
+LE_SelectedPandoraPFOs        ReconstructedParticle           73
+LE_TightSelectedPandoraPFOs   ReconstructedParticle           70
+LooseSelectedPandoraPFOs      ReconstructedParticle           75
 LumiCalClusters               Cluster                          0
 LumiCalRecoParticles          ReconstructedParticle            0
-MCParticlesSkimmed            MCParticle                     258
-MCPhysicsParticles            MCParticle                     426
-MergedClusters                Cluster                         65
-MergedRecoParticles           ReconstructedParticle           74
-PandoraClusters               Cluster                         65
-PandoraPFOs                   ReconstructedParticle           74
-PandoraStartVertices          Vertex                          74
+MCParticlesSkimmed            MCParticle                     267
+MCPhysicsParticles            MCParticle                     403
+MergedClusters                Cluster                         75
+MergedRecoParticles           ReconstructedParticle           84
+PandoraClusters               Cluster                         75
+PandoraPFOs                   ReconstructedParticle           84
+PandoraStartVertices          Vertex                          84
 PrimaryVertices               Vertex                           1
 PrimaryVertices_RP            ReconstructedParticle            1
-RecoMCTruthLink               LCRelation                      74
+RecoMCTruthLink               LCRelation                      84
 RefinedVertexJets             ReconstructedParticle            2
 RefinedVertexJets_rel         LCRelation                       0
 RefinedVertexJets_vtx         Vertex                           0
 RefinedVertexJets_vtx_RP      ReconstructedParticle            0
 RefinedVertices               Vertex                           0
 RefinedVertices_RP            ReconstructedParticle            0
-SelectedPandoraPFOs           ReconstructedParticle           64
-SiTracks                      Track                           35
-SiTracks_Refitted             Track                           35
-TightSelectedPandoraPFOs      ReconstructedParticle           57
+SelectedPandoraPFOs           ReconstructedParticle           68
+SiTracks                      Track                           36
+SiTracks_Refitted             Track                           36
+TightSelectedPandoraPFOs      ReconstructedParticle           61
 ---------------------------------------------------------------------------
 
 
