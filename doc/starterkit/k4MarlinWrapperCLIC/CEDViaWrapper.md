@@ -106,14 +106,12 @@ With all these pieces put together (as in `examples/event_display.py`) it is now
 ```bash
 glced &
 
-k4run $K4MARLINWRAPPER/examples/event_display.py --EventDataSvc.input=gamma_10GeV_edm4hep.root
-result=$?
-[ $result = "0" ] || [ $result = "4" ] && true
+k4run $K4MARLINWRAPPER/examples/event_display.py --EventDataSvc.input=gamma_10GeV_edm4hep.root || true
 ```
 
-Note that you can ommit the handling of the exit value of `k4run` in most cases.
-We just keep it here to show how to work around a [framework
-issue](https://github.com/key4hep/k4FWCore/issues/125).
+Note that we silence the exit code of `k4run` to work around a [framework
+issue](https://github.com/key4hep/k4FWCore/issues/125). This is usually not
+necessary if you run things interactively.
 
 ## Creating a Gaudi options file
 
