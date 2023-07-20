@@ -1,10 +1,10 @@
 anajob:  will open and read from files: 
 
-     Output_REC.slcio     [ number of runs: 0, number of events: 3 ] 
+     Output_REC_e4h_input.slcio     [ number of runs: 0, number of events: 3 ] 
 
 
  will reopen and read from files: 
-     Output_REC.slcio
+     Output_REC_e4h_input.slcio
 ///////////////////////////////////
 EVENT: 0
 RUN: 0
@@ -277,4 +277,4 @@ YokeEndcapCollection          SimCalorimeterHit                6
 
 
   3 events read from files: 
-     Output_REC.slcio
+     Output_REC_e4h_input.slcio

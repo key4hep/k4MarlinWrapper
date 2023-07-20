@@ -923,7 +923,7 @@ Output_REC.Parameters = {
                          "DropCollectionTypes": [],
                          "FullSubsetCollections": ["EfficientMCParticles", "InefficientMCParticles"],
                          "KeepCollectionNames": [],
-                         "LCIOOutputFile": ["Output_REC.slcio"],
+                         "LCIOOutputFile": ["Output_REC_e4h_input.slcio"],
                          "LCIOWriteMode": ["WRITE_NEW"]
                          }
 
@@ -935,7 +935,7 @@ Output_DST.Parameters = {
                          "DropCollectionTypes": ["MCParticle", "LCRelation", "SimCalorimeterHit", "CalorimeterHit", "SimTrackerHit", "TrackerHit", "TrackerHitPlane", "Track", "ReconstructedParticle", "LCFloatVec", "Clusters"],
                          "FullSubsetCollections": ["EfficientMCParticles", "InefficientMCParticles", "MCPhysicsParticles"],
                          "KeepCollectionNames": ["MCParticlesSkimmed", "MCPhysicsParticles", "RecoMCTruthLink", "SiTracks", "SiTracks_Refitted", "PandoraClusters", "PandoraPFOs", "SelectedPandoraPFOs", "LooseSelectedPandoraPFOs", "TightSelectedPandoraPFOs", "LE_SelectedPandoraPFOs", "LE_LooseSelectedPandoraPFOs", "LE_TightSelectedPandoraPFOs", "LumiCalClusters", "LumiCalRecoParticles", "BeamCalClusters", "BeamCalRecoParticles", "MergedRecoParticles", "MergedClusters", "RefinedVertexJets", "RefinedVertexJets_rel", "RefinedVertexJets_vtx", "RefinedVertexJets_vtx_RP", "BuildUpVertices", "BuildUpVertices_res", "BuildUpVertices_RP", "BuildUpVertices_res_RP", "BuildUpVertices_V0", "BuildUpVertices_V0_res", "BuildUpVertices_V0_RP", "BuildUpVertices_V0_res_RP", "PrimaryVertices", "PrimaryVertices_res", "PrimaryVertices_RP", "PrimaryVertices_res_RP", "RefinedVertices", "RefinedVertices_RP"],
-                         "LCIOOutputFile": ["Output_DST.slcio"],
+                         "LCIOOutputFile": ["Output_DST_e4h_input.slcio"],
                          "LCIOWriteMode": ["WRITE_NEW"]
                          }
 
