@@ -7,15 +7,19 @@ bash $TEST_DIR/scripts/setup_clic_performance.sh
 
 cd CLICPerformance/clicConfig
 
+INPUTFILE=ttbar_edm4hep_frame.root
+
 # Download root file if not present
-if [ ! -f $TEST_DIR/inputFiles/ttbar1_edm4hep.root ]; then
+if [ ! -f $TEST_DIR/inputFiles/$INPUTFILE ]; then
   echo "Input file not found. Getting it from key4hep..."
-  wget https://key4hep.web.cern.ch/testFiles/ddsimOutput/ttbar1_edm4hep.root -P $TEST_DIR/inputFiles/
+  wget https://key4hep.web.cern.ch/testFiles/ddsimOutput/$INPUTFILE -P $TEST_DIR/inputFiles/
 fi
 
-k4run $TEST_DIR/gaudi_opts/clicRec_e4h_input.py
+# Frame based I/O exits with a user requested stop here, that makes Gaudi exit
+# with an exit code of 4. See https://github.com/key4hep/k4FWCore/issues/125
+k4run $TEST_DIR/gaudi_opts/clicRec_e4h_input.py || true
 
-input_num_events=$(python $TEST_DIR/python/root_num_events.py $TEST_DIR/inputFiles/ttbar1_edm4hep.root)
+input_num_events=$(python $TEST_DIR/python/root_num_events.py $TEST_DIR/inputFiles/$INPUTFILE)
 output_num_events=$(python $TEST_DIR/python/root_num_events.py my_output.root)
 
 # First check do we have the same number of events in input and output

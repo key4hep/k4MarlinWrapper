@@ -1,4 +1,8 @@
 #include "k4MarlinWrapper/converters/EDM4hep2Lcio.h"
+
+#include "k4FWCore/DataHandle.h"
+#include "k4FWCore/MetaDataHandle.h"
+
 #include <unordered_map>
 
 DECLARE_COMPONENT(EDM4hep2LcioTool);
@@ -12,7 +16,7 @@ EDM4hep2LcioTool::~EDM4hep2LcioTool() { ; }
 
 StatusCode EDM4hep2LcioTool::initialize() {
   StatusCode sc  = m_eventDataSvc.retrieve();
-  m_podioDataSvc = dynamic_cast<PodioLegacyDataSvc*>(m_eventDataSvc.get());
+  m_podioDataSvc = dynamic_cast<PodioDataSvc*>(m_eventDataSvc.get());
 
   if (sc == StatusCode::FAILURE) {
     error() << "Error retrieving Event Data Service" << endmsg;
@@ -49,10 +53,9 @@ void EDM4hep2LcioTool::convertTrackerHits(vec_pair<lcio::TrackerHitImpl*, edm4he
   DataHandle<edm4hep::TrackerHitCollection> trackerhits_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
   const auto                                trackerhits_coll = trackerhits_handle.get();
 
-  const auto collID    = trackerhits_coll->getID();
-  const auto cellIDstr = trackerhits_handle.getCollMetadataCellID(collID);
+  MetaDataHandle<std::string> cellIDStrHandle{trackerhits_handle, "CellIDEncoding", Gaudi::DataHandle::Reader};
 
-  auto* conv_trackerhits = convTrackerHits(trackerhits_coll, cellIDstr, trackerhits_vec);
+  auto* conv_trackerhits = convTrackerHits(trackerhits_coll, cellIDStrHandle.get(), trackerhits_vec);
 
   // Add all trackerhits to event
   lcio_event->addCollection(conv_trackerhits, lcio_coll_name);
@@ -68,8 +71,8 @@ void EDM4hep2LcioTool::convertSimTrackerHits(
   DataHandle<edm4hep::SimTrackerHitCollection> simtrackerhits_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
   const auto                                   simtrackerhits_coll = simtrackerhits_handle.get();
 
-  const auto collID    = simtrackerhits_coll->getID();
-  const auto cellIDstr = simtrackerhits_handle.getCollMetadataCellID(collID);
+  MetaDataHandle<std::string> cellIDHandle{simtrackerhits_handle, "CellIDEncoding", Gaudi::DataHandle::Reader};
+  const auto                  cellIDstr = cellIDHandle.get();
 
   auto* conv_simtrackerhits = convSimTrackerHits(simtrackerhits_coll, cellIDstr, simtrackerhits_vec, mcparticles_vec);
 
@@ -86,8 +89,8 @@ void EDM4hep2LcioTool::convertCalorimeterHits(
   DataHandle<edm4hep::CalorimeterHitCollection> calohit_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
   const auto                                    calohit_coll = calohit_handle.get();
 
-  const auto collID    = calohit_coll->getID();
-  const auto cellIDstr = calohit_handle.getCollMetadataCellID(collID);
+  MetaDataHandle<std::string> cellIDHandle{calohit_handle, "CellIDEncoding", Gaudi::DataHandle::Reader};
+  const auto                  cellIDstr = cellIDHandle.get();
 
   auto* conv_calohits = convCalorimeterHits(calohit_coll, cellIDstr, calo_hits_vec);
 
@@ -120,8 +123,8 @@ void EDM4hep2LcioTool::convertSimCalorimeterHits(
   DataHandle<edm4hep::SimCalorimeterHitCollection> sim_calohit_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
   const auto                                       simcalohit_coll = sim_calohit_handle.get();
 
-  auto       collID    = simcalohit_coll->getID();
-  const auto cellIDstr = sim_calohit_handle.getCollMetadataCellID(collID);
+  MetaDataHandle<std::string> cellIDHandle{sim_calohit_handle, "CellIDEncoding", Gaudi::DataHandle::Reader};
+  const auto                  cellIDstr = cellIDHandle.get();
 
   // TODO mcparticles_vdc
   auto* conv_simcalohits = convSimCalorimeterHits(simcalohit_coll, cellIDstr, sim_calo_hits_vec, mcparticles);
@@ -227,22 +230,12 @@ void EDM4hep2LcioTool::convertEventHeader(const std::string& e4h_coll_name, lcio
 // Select the appropiate method to convert a collection given its type
 void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::string& lcio_coll_name,
                                   lcio::LCEventImpl* lcio_event, CollectionsPairVectors& collection_pairs) {
-  // Get the associated type to the collection name
-  auto evt_store = m_podioDataSvc->getCollections();
-
-  std::string fulltype = "";
-
-  for (auto& [name, coll] : evt_store) {
-    if (name == e4h_coll_name) {
-      fulltype = coll->getValueTypeName();
-      break;
-    }
+  const auto& evtFrame = m_podioDataSvc->getEventFrame();
+  const auto  collPtr  = evtFrame.get(e4h_coll_name);
+  if (!collPtr) {
+    error() << "No collection with name: " << e4h_coll_name << " available for conversion" << endmsg;
   }
-
-  if (fulltype == "") {
-    error() << "Could not get type from collection name: " << e4h_coll_name << endmsg;
-    return;
-  }
+  const auto fulltype = collPtr->getValueTypeName();
 
   if (fulltype == "edm4hep::Track") {
     convertTracks(collection_pairs.tracks, collection_pairs.trackerhits, e4h_coll_name, lcio_coll_name, lcio_event);
@@ -272,6 +265,9 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
                                   collection_pairs.clusters, e4h_coll_name, lcio_coll_name, lcio_event);
   } else if (fulltype == "edm4hep::EventHeader") {
     convertEventHeader(e4h_coll_name, lcio_event);
+  } else if (fulltype == "edm4hep::CaloHitContribution") {
+    debug() << "CaloHitContribution collection cannot be converted standalone. "
+            << "SimCalorimeterHit collection to be converted in order to be able to attach to them" << endmsg;
   } else {
     warning() << "Error trying to convert requested " << fulltype << " with name " << e4h_coll_name << endmsg;
     warning() << "List of supported types: "
@@ -285,14 +281,14 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
 // Parse property parameters and convert the indicated collections.
 // Use the collection names in the parameters to read and write them
 StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
-  const auto collections = m_podioDataSvc->getCollections();
+  const auto collections = m_podioDataSvc->getEventFrame().getAvailableCollections();
   // Start off with the pre-defined collection name mappings
   auto collsToConvert{m_collNames.value()};
   if (m_convertAll) {
     info() << "Converting all collections from EDM4hep to LCIO" << endmsg;
     // And simply add the rest, exploiting the fact that emplace will not
     // replace existing entries with the same key
-    for (const auto& [name, _] : collections) {
+    for (const auto& name : collections) {
       collsToConvert.emplace(name, name);
     }
   }

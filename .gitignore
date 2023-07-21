@@ -48,3 +48,10 @@ Testing
 test/gaudi_opts/testConverterConstants.py
 test/inputFiles/muons.slcio
 test/inputFiles/testSimulation.slcio
+
+# Tooling
+/.clangd/
+
+# Spack artifacts
+spack-*/
+spack-*.txt

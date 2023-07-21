@@ -7,7 +7,7 @@
 #include "k4MarlinWrapper/util/k4MarlinWrapperUtil.h"
 
 // FWCore
-#include <k4FWCore/DataHandle.h>
+#include <k4FWCore/PodioDataSvc.h>
 
 //k4EDM4hep2LcioConv
 #include "k4EDM4hep2LcioConv/k4EDM4hep2LcioConv.h"
@@ -35,7 +35,7 @@ private:
   Gaudi::Property<std::map<std::string, std::string>> m_collNames{this, "collNameMapping", {}};
   Gaudi::Property<bool>                               m_convertAll{this, "convertAll", true};
 
-  PodioLegacyDataSvc*             m_podioDataSvc;
+  PodioDataSvc*                   m_podioDataSvc;
   ServiceHandle<IDataProviderSvc> m_eventDataSvc;
 
   void convertTracks(vec_pair<lcio::TrackImpl*, edm4hep::Track>&           tracks_vec,

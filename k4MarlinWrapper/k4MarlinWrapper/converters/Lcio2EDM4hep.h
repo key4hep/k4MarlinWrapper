@@ -5,8 +5,7 @@
 #include <GaudiAlg/GaudiTool.h>
 
 // k4FWCore
-#include <k4FWCore/DataHandle.h>
-#include <k4FWCore/PodioLegacyDataSvc.h>
+#include <k4FWCore/PodioDataSvc.h>
 
 // Converter Interface
 #include "k4MarlinWrapper/converters/IEDMConverter.h"
@@ -48,7 +47,7 @@ private:
   Gaudi::Property<bool>                               m_convertAll{this, "convertAll", true};
 
   ServiceHandle<IDataProviderSvc> m_eds;
-  PodioLegacyDataSvc*             m_podioDataSvc;
+  PodioDataSvc*                   m_podioDataSvc;
 
   // **********************************
   // Check if a collection was already registered to skip it

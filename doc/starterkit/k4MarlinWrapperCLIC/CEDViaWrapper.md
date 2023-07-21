@@ -102,12 +102,16 @@ ApplicationMgr( TopAlg = algList,
               )
 ```
 
-With all these pieces put together (as in `examples/event_display.py`) it is no possible to run the event display. In order to run the event display we first have to start the `glced` server program to which the wrapped `CEDViewer` processor will then connect. Starting the server and running the wrapped processor can be done via
+With all these pieces put together (as in `examples/event_display.py`) it is now possible to run the event display. In order to run the event display we first have to start the `glced` server program to which the wrapped `CEDViewer` processor will then connect. Starting the server and running the wrapped processor can be done via
 ```bash
 glced &
 
-k4run $K4MARLINWRAPPER/examples/event_display.py --EventDataSvc.input=gamma_10GeV_edm4hep.root
+k4run $K4MARLINWRAPPER/examples/event_display.py --EventDataSvc.input=gamma_10GeV_edm4hep.root || true
 ```
+
+Note that we silence the exit code of `k4run` to work around a [framework
+issue](https://github.com/key4hep/k4FWCore/issues/125). This is usually not
+necessary if you run things interactively.
 
 ## Creating a Gaudi options file
 
