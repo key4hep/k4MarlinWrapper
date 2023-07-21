@@ -137,9 +137,9 @@ included with k4MarlinWrapper. Note that:
     * Output collections of *MarlinProcessorWrappers* will be in LCIO format unless these are explicitly converted
     * Some *MarlinProcessorWrappers* may modify collections instead of producing new ones: the original EDM4hep collection wont be updated in this case and would need conversion from LCIO to EDM4hep.
 
-- To run *clicReconstruction* with EDM4hep format, use the steering file found in the `test` folder of k4MarlinWrapper:
-`test/gaudi_opts/clicRec_e4h_input.py`
-  + Change line `evtsvc.input = '$TEST_DIR/inputFiles/ttbar1_edm4hep.root'` to point to the location of your input file.
+- To run *clicReconstruction* with EDM4hep format, use the steering file found in the `examples` folder of k4MarlinWrapper:
+`k4MarlinWrapper/examples/clicRec_e4h_input.py` (this also get's installed to `$K4MARLINWRAPPER/examples` in Key4hep releases)
+  + Change line `evtsvc.input = '$TEST_DIR/inputFiles/ttbar_edm4hep_frame.root'` to point to the location of your input file.
   + At the bottom of the file, in the `ApplicationMgr` parameters, change `EvtMax   = 3,` to the number of events to run.
 
 This can be run in the following way. Note that we show the usage here in a way
@@ -150,7 +150,7 @@ that also works in scripts with `-e` enabled. This is necessary because of a
 ```bash
 cd CLICPerformance/clicConfig
 
-cp ../../../test/gaudi_opts/clicRec_e4h_input.py .
+cp $K4MARLINWRAPPER/examples/clicRec_e4h_input.py .
 
 k4run clicRec_e4h_input.py --EventDataSvc.input ttbar_edm4hep.root
 result=$?
