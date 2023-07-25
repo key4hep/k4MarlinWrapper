@@ -1,0 +1,40 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.4.0
+    hooks:
+      - id: mixed-line-ending
+      - id: trailing-whitespace
+        exclude: (doc/ReleaseNotes.md|test/inputFiles/.*\.expected)
+  - repo: local
+    hooks:
+      # - id: clang-tidy
+      #   name: clang-tidy
+      #   entry: clang-tidy -warnings-as-errors='*' -p compile_commands.json
+      #   types: [c++]
+      #   exclude: (tests/(datamodel|src)/.*(h|cc)|podioVersion.in.h)
+      #   language: system
+      - id: clang-format
+        name: clang-format
+        entry: .github/scripts/clang-format-hook
+        types: [c++]
+        language: system
+      # - id: pylint
+      #   name: pylint
+      #   entry: 'pylint --rcfile=.github/scripts/pylint.rc --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}"'
+      #   types: [python]
+      #   language: system
+      # - id: flake8
+      #   name: flake8
+      #   entry: flake8
+      #   types: [python]
+      #   language: system
+  - repo: https://github.com/johann-petrak/licenseheaders.git
+    rev: 'v0.8.8'
+    hooks:
+      - id: licenseheaders
+        args: ["-t", ".github/templates/apache-2.tmpl", "-y2019-2023",
+        "-o", "Key4hep-Project",
+        "-n", "Key4hep",
+        "-u", "https://key4hep.github.io/key4hep-doc/",
+        "-x", ".github/*", ".pre-commit-config.yaml", "README.md", "doc/ReleaseNotes.md", ".clang-format",
+        "-f",]
