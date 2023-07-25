@@ -1,3 +1,21 @@
+<!--
+Copyright (c) 2019-2023 Key4hep-Project.
+
+This file is part of Key4hep.
+See https://key4hep.github.io/key4hep-doc/ for further info.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
 # Running an Event Display with EDM4hep input
 
 It is possible to run the [C Event Display (CED)](https://github.com/iLCSoft/CED) via a wrapped [CEDViewer](https://github.com/iLCSoft/CEDViewer) Marlin Processor. This makes it possible to run the Event Dispaly with EDM4hep input files using an on the fly conversion to LCIO for CED. This introduction shows the basic concepts and also provides a options file that should work for most use cases. This example will be using the CLIC detector but should also work for other DD4hep detector models. The example is fully self contained, if you already have everything set up you can jump directly to [running the event display](#running-the-event-display).
