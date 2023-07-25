@@ -28,7 +28,7 @@ The two levels of parallelims can be combined: events can run in parallel, and a
 
 The following components are used to achieve parallelism:
 
-```python 
+```python
 from Configurables import (HiveWhiteBoard, HiveSlimEventLoopMgr, AvalancheSchedulerSvc)
 ```
 

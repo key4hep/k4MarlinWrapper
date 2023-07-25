@@ -22,7 +22,7 @@ k4run clicReconstruction_mt.py
 input_num_events=$(lcio_event_counter $TEST_DIR/inputFiles/testSimulation.slcio)
 output_num_events=$(lcio_event_counter Output_REC_mt_lcio.slcio)
 
-echo $input_num_events 
+echo $input_num_events
 echo $output_num_events
 
 if [ "$input_num_events" == "$output_num_events" ]; then

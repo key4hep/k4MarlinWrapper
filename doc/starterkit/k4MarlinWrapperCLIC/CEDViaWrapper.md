@@ -18,7 +18,7 @@ All the following steps assume that the environment is setup like above and that
 
 ## Creating an input file
 
-To create an input file for the event display we run a simple detector simulation using `ddsim` and a particle gun that shoots photons. The input file that we create here for illustration purposes has only 10 events, which also means that the creation should only take a few minutes. The steps to create this file are the following 
+To create an input file for the event display we run a simple detector simulation using `ddsim` and a particle gun that shoots photons. The input file that we create here for illustration purposes has only 10 events, which also means that the creation should only take a few minutes. The steps to create this file are the following
 
 ```bash
 ddsim --steeringFile CLICPerformance/clicConfig/clic_steer.py \
@@ -65,7 +65,7 @@ MyInitializeDD4hep.ProcessorType = "InitializeDD4hep"
 MyInitializeDD4hep.Parameters = {
                                  "DD4hepXMLFile": ["CLICPerformance/Visualisation/CLIC_o3_v06_CED/CLIC_o3_v06_CED.xml"]
                                  }
-                                 
+
 algList.append(MyInitializeDD4hep)
 ```
 Note that in this case we already have passed in the geometry that we want to use for the event display.
@@ -80,7 +80,7 @@ MyCEDViewer.ProcessorType = "DDCEDViewer"
 MyCEDViewer.Parameters = {
                           # ... lots of CEDViewer configuration ...
                           }
-                          
+
 # EDM4hep to LCIO converter
 edmConvTool = EDM4hep2LcioTool("EDM4hep2lcio")
 edmConvTool.convertAll = True

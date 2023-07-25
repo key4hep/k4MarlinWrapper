@@ -12,8 +12,8 @@ read.Files = ["$TEST_DIR/inputFiles/muons.slcio"]
 algList.append(read)
 
 Output_DST = MarlinProcessorWrapper("Output_DST")
-Output_DST.OutputLevel = WARNING 
-Output_DST.ProcessorType = "LCIOOutputProcessor" 
+Output_DST.OutputLevel = WARNING
+Output_DST.ProcessorType = "LCIOOutputProcessor"
 Output_DST.Parameters = {
                          "DropCollectionNames": [],
                          "DropCollectionTypes": ["MCParticle", "LCRelation", "SimCalorimeterHit", "CalorimeterHit", "SimTrackerHit", "TrackerHit", "TrackerHitPlane", "Track", "ReconstructedParticle", "LCFloatVec", "Clusters"],

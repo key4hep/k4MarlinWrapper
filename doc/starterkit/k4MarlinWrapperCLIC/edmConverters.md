@@ -23,7 +23,7 @@ from Configurables import k4DataSvc, PodioInput
 # 1
 evtsvc = k4DataSvc('EventDataSvc')
 # 2
-evtsvc.input = 'path/to/file.root' 
+evtsvc.input = 'path/to/file.root'
 
 # 3
 inp = PodioInput('InputReader')
@@ -82,7 +82,7 @@ algList.append(out)
 
 ===
 
-Write **LCIO** events: 
+Write **LCIO** events:
 
 1. Instantiate a `MarlinProcessorWrapper` with a relevant name.
 2. Indicate the `ProcessorType` to be `LCIOOutputProcessor`.
@@ -104,8 +104,8 @@ Output_DST.Parameters = {
                          ...
                          }
 
-# 4                         
-algList.append(Output_DST)                         
+# 4
+algList.append(Output_DST)
 ```
 
 
