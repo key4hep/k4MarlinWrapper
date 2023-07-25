@@ -102,6 +102,8 @@ void Lcio2EDM4hepTool::registerCollection(
         const auto& lcio_coll_cellid_str = lcioColl->getParameters().getStringVal(lcio::LCIO::CellIDEncoding);
         auto&       mdFrame              = m_podioDataSvc->getMetaDataFrame();
         mdFrame.putParameter(podio::collMetadataParamName(name, "CellIDEncoding"), lcio_coll_cellid_str);
+        debug() << "Storing CellIDEncoding " << podio::collMetadataParamName(name, "CellIDEncoding")
+                << " value: " << lcio_coll_cellid_str << endmsg;
       } else {
         // TODO: figure out where this actually needs to go
       }
@@ -154,7 +156,7 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
 
       for (auto&& e4hColl : LCIO2EDM4hepConv::convertCollection(edm4hepName, lcio_coll, lcio2edm4hepMaps)) {
         if (std::get<1>(e4hColl)) {
-          registerCollection(std::move(e4hColl));
+          registerCollection(std::move(e4hColl), lcio_coll);
         } else {
           error() << "Could not convert collection " << lcioName << " (type: " << lcio_coll_type_str << ")" << endmsg;
         }
@@ -170,17 +172,18 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
   LCIO2EDM4hepConv::resolveRelations(lcio2edm4hepMaps);
 
   for (const auto& [name, coll, type] : subsetColls) {
-    registerCollection(name, LCIO2EDM4hepConv::fillSubset(coll, lcio2edm4hepMaps, type));
+    registerCollection(name, LCIO2EDM4hepConv::fillSubset(coll, lcio2edm4hepMaps, type), coll);
   }
 
   for (auto&& assocColl : LCIO2EDM4hepConv::createAssociations(lcio2edm4hepMaps, lcRelationColls)) {
-    registerCollection(std::move(assocColl));
+    registerCollection(std::move(assocColl));  // TODO: Potentially handle metadata here?
   }
 
   if (!lcio2edm4hepMaps.simCaloHits.empty()) {
-    registerCollection(
-        name() + "_CaloHitContributions",
-        LCIO2EDM4hepConv::createCaloHitContributions(lcio2edm4hepMaps.simCaloHits, lcio2edm4hepMaps.mcParticles));
+    registerCollection(name() + "_CaloHitContributions",
+                       LCIO2EDM4hepConv::createCaloHitContributions(
+                           lcio2edm4hepMaps.simCaloHits,
+                           lcio2edm4hepMaps.mcParticles));  // TODO: Can we do something about meta data here?
   }
 
   return StatusCode::SUCCESS;
