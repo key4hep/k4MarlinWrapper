@@ -25,7 +25,7 @@ jobs:
         cmake .. -GNinja -DCMAKE_INSTALL_PREFIX=../install;\
         ninja install;\
         '
-    - name: CheckPage  
+    - name: CheckPage
       run: |
         docker exec CI_container /bin/bash -c 'cd ./Package;
         source ${{ matrix.SETUP }};

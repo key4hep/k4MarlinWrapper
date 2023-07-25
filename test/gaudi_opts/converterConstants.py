@@ -24,8 +24,8 @@ read.Files = ["$TEST_DIR/inputFiles/muons.slcio"]
 algList.append(read)
 
 AidaProcessor = MarlinProcessorWrapper("AidaProcessor")
-AidaProcessor.OutputLevel = DEBUG 
-AidaProcessor.ProcessorType = "AIDAProcessor" 
+AidaProcessor.OutputLevel = DEBUG
+AidaProcessor.ProcessorType = "AIDAProcessor"
 AidaProcessor.Parameters = {
                             "Compress": ["1"],
                             "FileName": ["histograms"],
@@ -33,22 +33,22 @@ AidaProcessor.Parameters = {
                             }
 
 EventNumber = MarlinProcessorWrapper("EventNumber")
-EventNumber.OutputLevel = DEBUG 
-EventNumber.ProcessorType = "Statusmonitor" 
+EventNumber.OutputLevel = DEBUG
+EventNumber.ProcessorType = "Statusmonitor"
 EventNumber.Parameters = {
                           "HowOften": ["1"]
                           }
 
 InitDD4hep = MarlinProcessorWrapper("InitDD4hep")
-InitDD4hep.OutputLevel = DEBUG 
-InitDD4hep.ProcessorType = "InitializeDD4hep" 
+InitDD4hep.OutputLevel = DEBUG
+InitDD4hep.ProcessorType = "InitializeDD4hep"
 InitDD4hep.Parameters = {
                          "DD4hepXMLFile": ["%(DD4hepXMLFile_subPath)s" % CONSTANTS]
                          }
 
 VXDBarrelDigitiser = MarlinProcessorWrapper("VXDBarrelDigitiser")
-VXDBarrelDigitiser.OutputLevel = DEBUG 
-VXDBarrelDigitiser.ProcessorType = "DDPlanarDigiProcessor" 
+VXDBarrelDigitiser.OutputLevel = DEBUG
+VXDBarrelDigitiser.ProcessorType = "DDPlanarDigiProcessor"
 VXDBarrelDigitiser.Parameters = {
                                  "IsStrip": ["false"],
                                  "ResolutionU": ["%(MyResTest)s" % CONSTANTS, "0.%(MyResTest2)s" % CONSTANTS, "0.003", "%(MyResTest3)s%(MyResTest2)s" % CONSTANTS, "%(MyResTest)s" % CONSTANTS, "%(MyResTest)s" % CONSTANTS],
