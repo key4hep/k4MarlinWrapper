@@ -207,8 +207,8 @@ def verbosityTranslator(marlinLogLevel):
 def convertParameters(params, proc, globParams, constants):
   """ convert json of parameters to gaudi """
   lines = []
-  lines.append("%s.OutputLevel = %s " % (proc.replace(".", "_"), verbosityTranslator(globParams.get("Verbosity"))))
-  lines.append("%s.ProcessorType = \"%s\" " % (proc.replace(".", "_"), params.get("type")))
+  lines.append("%s.OutputLevel = %s" % (proc.replace(".", "_"), verbosityTranslator(globParams.get("Verbosity"))))
+  lines.append("%s.ProcessorType = \"%s\"" % (proc.replace(".", "_"), params.get("type")))
   lines.append("%s.Parameters = {" % proc.replace(".", "_"))
   for para in sorted(params):
     if para not in ["type", "Verbosity"]:
