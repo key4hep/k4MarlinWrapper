@@ -204,7 +204,7 @@ def verbosityTranslator(marlinLogLevel):
       return trans
 
 
-def convertParamters(params, proc, globParams, constants):
+def convertParameters(params, proc, globParams, constants):
   """ convert json of parameters to gaudi """
   lines = []
   lines.append("%s.OutputLevel = %s " % (proc.replace(".", "_"), verbosityTranslator(globParams.get("Verbosity"))))
@@ -227,7 +227,7 @@ def convertProcessors(lines, tree, globParams, constants):
   processors = getProcessors(tree)
   for proc in processors:
     lines.append("%s = MarlinProcessorWrapper(\"%s\")" % (proc.replace(".", "_"), proc))
-    lines += convertParamters(processors[proc], proc, globParams, constants)
+    lines += convertParameters(processors[proc], proc, globParams, constants)
   return lines
 
 
