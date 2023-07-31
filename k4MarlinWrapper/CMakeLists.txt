@@ -27,7 +27,7 @@ gaudi_add_module(k4MarlinWrapperPlugins
     src/components/LcioEventOutput.cpp
   LINK
     Gaudi::GaudiAlgLib
-    ${Marlin_LIBRARIES}
+    Marlin
 )
 
 target_include_directories(k4MarlinWrapperPlugins PUBLIC
@@ -43,7 +43,7 @@ gaudi_add_module(MarlinWrapper
   LINK
     Gaudi::GaudiAlgLib
     k4FWCore::k4FWCore
-    ${Marlin_LIBRARIES}
+    Marlin
     EDM4HEP::edm4hep
 )
 
@@ -61,8 +61,8 @@ gaudi_add_module(EDM4hep2Lcio
     k4EDM4hep2LcioConv::k4EDM4hep2LcioConv
     k4FWCore::k4FWCore
     Gaudi::GaudiAlgLib
-    ${LCIO_LIBRARIES}
-    ${Marlin_LIBRARIES}
+    lcio
+    Marlin
     EDM4HEP::edm4hep
 )
 

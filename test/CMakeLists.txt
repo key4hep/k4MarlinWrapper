@@ -24,7 +24,7 @@ gaudi_add_module(TestE4H2L
   LINK
     Gaudi::GaudiAlgLib
     Gaudi::GaudiKernel
-    ${LCIO_LIBRARIES}
+    lcio
     k4FWCore::k4FWCore
     EDM4HEP::edm4hep
 )
