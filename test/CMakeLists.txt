@@ -86,6 +86,9 @@ if (BASH_PROGRAM)
   # Run clicReconstruction sequence with LCIO input and output, no converters, with inter-event parallelism
   add_test( clicRec_lcio_mt ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/clicRec_lcio_mt.sh )
 
+  # Test the GeoSvc and TrackingCellIDEncodingSvc
+  add_test( clic_geo_test ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/clicGeoTest.sh )
+
   set_tests_properties (
       simple_processors
       simple_processors2
@@ -97,6 +100,7 @@ if (BASH_PROGRAM)
       same_num_io
       clicRec_lcio_mt
       clicRec_edm4hep_input
+      clic_geo_test
     PROPERTIES
       ENVIRONMENT "TEST_DIR=${CMAKE_CURRENT_SOURCE_DIR};LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:${CMAKE_INSTALL_PREFIX}/lib64:$ENV{LD_LIBRARY_PATH};PYTHONPATH=${CMAKE_INSTALL_PREFIX}/python:$ENV{PYTHONPATH};EXAMPLE_DIR=${PROJECT_SOURCE_DIR}/k4MarlinWrapper/examples"
       )

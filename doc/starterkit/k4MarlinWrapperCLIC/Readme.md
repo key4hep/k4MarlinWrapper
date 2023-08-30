@@ -158,3 +158,23 @@ result=$?
 [ $result = "0" ] || [ $result = "4" ] && true
 ```
 
+### DD4hep Geometry Information
+
+The ``MarlinDD4hep::InitializeDD4hep`` processor can be replaced by the ``k4SimGeant4::GeoSvc`` and the
+``TrackingCellIDEncodingSvc`` the latter of which is part of the k4MarlinWrapper repository.
+
+For example:
+
+```python
+svcList = []
+geoservice = GeoSvc("GeoSvc")
+geoservice.detectors = [os.environ["K4GEO"]+"/CLIC/compact/CLIC_o3_v15/CLIC_o3_v15.xml"]
+geoservice.OutputLevel = INFO
+geoservice.EnableGeant4Geo = False
+svcList.append(geoservice)
+
+cellIDSvc = TrackingCellIDEncodingSvc("CellIDSvc")
+cellIDSvc.EncodingStringParameterName = "GlobalTrackerReadoutID"
+cellIDSvc.OutputLevel = INFO
+svcList.append(cellIDSvc)
+```
