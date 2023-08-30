@@ -40,9 +40,11 @@ target_include_directories(k4MarlinWrapperPlugins PUBLIC
 gaudi_add_module(MarlinWrapper
   SOURCES
     src/components/MarlinProcessorWrapper.cpp
+    src/components/TrackingCellIDEncodingSvc.cpp
   LINK
     Gaudi::GaudiAlgLib
     k4FWCore::k4FWCore
+    k4FWCore::k4Interface
     ${Marlin_LIBRARIES}
     EDM4HEP::edm4hep
 )
