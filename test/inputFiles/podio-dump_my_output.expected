@@ -1,259 +1,296 @@
-input file: my_output.root
+input file: ../build/k4MarlinWrapper/test/CLICPerformance/clicConfig/my_output.root
 
-Frame categories in this file (this is a legacy file!):
+datamodel model definitions stored in this file: edm4hep
+
+Frame categories in this file:
 Name                 Entries   
 -------------------------------
+metadata             1         
 events               3         
+configuration_metadata 1         
 
 #################################### events 0 ####################################
 Collections:
-Name                           Type                                     Size      
-----------------------------------------------------------------------------------
-VertexJets                     edm4hep::ReconstructedParticle           2         
-PrimaryVertices                edm4hep::Vertex                          1         
-BuildUpVertices_V0             edm4hep::Vertex                          0         
-PFOsFromJets                   edm4hep::ReconstructedParticle           89        
-LE_TightSelectedPandoraPFOs    edm4hep::ReconstructedParticle           82        
-LE_LooseSelectedPandoraPFOs    edm4hep::ReconstructedParticle           88        
-BuildUpVertices                edm4hep::Vertex                          4         
-LE_SelectedPandoraPFOs         edm4hep::ReconstructedParticle           85        
-TightSelectedPandoraPFOs       edm4hep::ReconstructedParticle           67        
-SiTracksMCTruthLink            edm4hep::MCRecoTrackParticleAssociation  39        
-PandoraClusters                edm4hep::Cluster                         86        
-YokeEndcapCollectionContributions edm4hep::CaloHitContribution             33        
-MCPhysicsParticles             edm4hep::MCParticle                      406       
-RefinedVertexJets              edm4hep::ReconstructedParticle           2         
-DebugHits                      edm4hep::TrackerHitPlane                 0         
-HCalEndcapCollectionContributions edm4hep::CaloHitContribution             8848      
-OTrackerHits                   edm4hep::TrackerHitPlane                 71        
-HCalEndcapCollection           edm4hep::SimCalorimeterHit               4229      
-HCalBarrelCollectionContributions edm4hep::CaloHitContribution             6821      
-ECalBarrelCollectionContributions edm4hep::CaloHitContribution             49272     
-MCParticles                    edm4hep::MCParticle                      406       
-ECalBarrelCollection           edm4hep::SimCalorimeterHit               7238      
-InnerTrackerEndcapCollection   edm4hep::SimTrackerHit                   113       
-ECALBarrel                     edm4hep::CalorimeterHit                  5740      
-InnerTrackerBarrelCollection   edm4hep::SimTrackerHit                   134       
-OuterTrackerBarrelCollection   edm4hep::SimTrackerHit                   97        
-OTrackerEndcapHits             edm4hep::TrackerHitPlane                 84        
-SelectedPandoraPFOs            edm4hep::ReconstructedParticle           82        
-LumiCalClusters                edm4hep::Cluster                         0         
-LumiCalRecoParticles           edm4hep::ReconstructedParticle           0         
-VXDTrackerHits                 edm4hep::TrackerHitPlane                 238       
-MCParticlesSkimmed             edm4hep::MCParticle                      252       
-HCalRingCollection             edm4hep::SimCalorimeterHit               110       
-BeamCalCollectionContributions edm4hep::CaloHitContribution             0         
-YokeBarrelCollection           edm4hep::SimCalorimeterHit               0         
-ITrackerHits                   edm4hep::TrackerHitPlane                 89        
-OuterTrackerEndcapCollection   edm4hep::SimTrackerHit                   110       
-LumiCalCollectionContributions edm4hep::CaloHitContribution             31        
-RefinedVertices                edm4hep::Vertex                          0         
-HCALBarrel                     edm4hep::CalorimeterHit                  264       
-BeamCalCollection              edm4hep::SimCalorimeterHit               0         
-HCalBarrelCollection           edm4hep::SimCalorimeterHit               3298      
-LumiCalCollection              edm4hep::SimCalorimeterHit               12        
-ECalEndcapCollection           edm4hep::SimCalorimeterHit               2739      
-RecoMCTruthLink                edm4hep::MCRecoParticleAssociation       89        
-VertexBarrelCollection         edm4hep::SimTrackerHit                   244       
-ECalPlugCollection             edm4hep::SimCalorimeterHit               61        
-ECalPlugCollectionContributions edm4hep::CaloHitContribution             218       
-YokeBarrelCollectionContributions edm4hep::CaloHitContribution             0         
-SiTracks_Refitted              edm4hep::Track                           38        
-HCalRingCollectionContributions edm4hep::CaloHitContribution             160       
-VertexEndcapCollection         edm4hep::SimTrackerHit                   56        
-VXDEndcapTrackerHits           edm4hep::TrackerHitPlane                 55        
-HCALOther                      edm4hep::CalorimeterHit                  11        
-SiTracksCT                     edm4hep::Track                           39        
-PandoraStartVertices           edm4hep::Vertex                          89        
-SiTracks                       edm4hep::Track                           38        
-ECALEndcap                     edm4hep::CalorimeterHit                  2133      
-ITrackerEndcapHits             edm4hep::TrackerHitPlane                 107       
-ECALOther                      edm4hep::CalorimeterHit                  57        
-HCALEndcap                     edm4hep::CalorimeterHit                  488       
-ECalEndcapCollectionContributions edm4hep::CaloHitContribution             14120     
-RelationCaloHit                edm4hep::MCRecoCaloAssociation           8693      
-MUON                           edm4hep::CalorimeterHit                  6         
-ParticleID_EXT                 edm4hep::ParticleID                      0         
-YokeEndcapCollection           edm4hep::SimCalorimeterHit               6         
-RelationMuonHit                edm4hep::MCRecoCaloAssociation           6         
-PandoraPFOs                    edm4hep::ReconstructedParticle           89        
-Vertex_EXT                     edm4hep::Vertex                          0         
-EventHeader                    edm4hep::EventHeader                     1         
-LumiCal_Hits                   edm4hep::CalorimeterHit                  2         
-MergedRecoParticles            edm4hep::ReconstructedParticle           89        
-MergedClusters                 edm4hep::Cluster                         86        
-CalohitMCTruthLink             edm4hep::MCRecoCaloParticleAssociation   8730      
+Name                               ValueType                                    Size  ID
+---------------------------------  -----------------------------------------  ------  --------
+BeamCalCollection                  edm4hep::SimCalorimeterHit                      0  c298a348
+BeamCalCollectionContributions     edm4hep::CaloHitContribution                    0  a1b6cac8
+BuildUpVertices                    edm4hep::Vertex                                 3  fd03f5d0
+BuildUpVertices_V0                 edm4hep::Vertex                                 0  9bc85810
+CalohitMCTruthLink                 edm4hep::MCRecoCaloParticleAssociation       8708  1132953d
+ClusterMCTruthLink                 edm4hep::MCRecoClusterParticleAssociation     185  e2727d90
+DebugHits                          edm4hep::TrackerHitPlane                        0  c498ee0d
+ECALBarrel                         edm4hep::CalorimeterHit                      5423  4b6bf95c
+ECalBarrelCollection               edm4hep::SimCalorimeterHit                   7067  407eb17b
+ECalBarrelCollectionContributions  edm4hep::CaloHitContribution                46904  047dde9c
+ECALEndcap                         edm4hep::CalorimeterHit                      2659  868b64f8
+ECalEndcapCollection               edm4hep::SimCalorimeterHit                   3508  0c09a156
+ECalEndcapCollectionContributions  edm4hep::CaloHitContribution                17792  934221f8
+ECALOther                          edm4hep::CalorimeterHit                        13  01cbea96
+ECalPlugCollection                 edm4hep::SimCalorimeterHit                     30  d36e0cf8
+ECalPlugCollectionContributions    edm4hep::CaloHitContribution                   53  25f0d096
+EventHeader                        edm4hep::EventHeader                            1  d793ab91
+HCALBarrel                         edm4hep::CalorimeterHit                       259  076db0c4
+HCalBarrelCollection               edm4hep::SimCalorimeterHit                   3718  6daf3b41
+HCalBarrelCollectionContributions  edm4hep::CaloHitContribution                 7268  4450a8f2
+HCALEndcap                         edm4hep::CalorimeterHit                       299  4ca8cf89
+HCalEndcapCollection               edm4hep::SimCalorimeterHit                   3273  50d90aed
+HCalEndcapCollectionContributions  edm4hep::CaloHitContribution                 6836  82a31463
+HCALOther                          edm4hep::CalorimeterHit                         2  3ba1679d
+HCalRingCollection                 edm4hep::SimCalorimeterHit                    206  ad7abfca
+HCalRingCollectionContributions    edm4hep::CaloHitContribution                  361  3b573866
+InnerTrackerBarrelCollection       edm4hep::SimTrackerHit                        160  f57448f3
+InnerTrackerBarrelHitsRelations    edm4hep::MCRecoTrackerHitPlaneAssociation     131  029be193
+InnerTrackerEndcapCollection       edm4hep::SimTrackerHit                        135  6d724693
+InnerTrackerEndcapHitsRelations    edm4hep::MCRecoTrackerHitPlaneAssociation     119  743732ae
+ITrackerEndcapHits                 edm4hep::TrackerHitPlane                      119  55c7e3f3
+ITrackerHits                       edm4hep::TrackerHitPlane                      131  3263f08b
+LE_LooseSelectedPandoraPFOs        edm4hep::ReconstructedParticle                  0  1a98d83b
+LE_SelectedPandoraPFOs             edm4hep::ReconstructedParticle                  0  a49e7fd9
+LE_TightSelectedPandoraPFOs        edm4hep::ReconstructedParticle                  0  0357ac32
+LumiCal_Hits                       edm4hep::CalorimeterHit                         4  0379c80d
+LumiCalClusters                    edm4hep::Cluster                                0  53ea535b
+LumiCalClusters_particleIDs        edm4hep::ParticleID                             0  4cca20cb
+LumiCalCollection                  edm4hep::SimCalorimeterHit                     15  45759015
+LumiCalCollectionContributions     edm4hep::CaloHitContribution                   56  dab2a7ce
+LumiCalRecoParticles               edm4hep::ReconstructedParticle                  0  4dd99362
+LumiCalRecoParticles_particleIDs   edm4hep::ParticleID                             0  395e0b46
+MCParticles                        edm4hep::MCParticle                           521  a1cba250
+MCParticlesSkimmed                 edm4hep::MCParticle                             0  16b252ac
+MCPhysicsParticles                 edm4hep::MCParticle                             0  8fe81b12
+MergedClusters                     edm4hep::Cluster                                0  e813f486
+MergedRecoParticles                edm4hep::ReconstructedParticle                  0  f989a279
+MUON                               edm4hep::CalorimeterHit                         6  0f355ef3
+OTrackerEndcapHits                 edm4hep::TrackerHitPlane                      107  e118ca47
+OTrackerHits                       edm4hep::TrackerHitPlane                       95  3a241fef
+OuterTrackerBarrelCollection       edm4hep::SimTrackerHit                        217  083cc03d
+OuterTrackerBarrelHitsRelations    edm4hep::MCRecoTrackerHitPlaneAssociation      95  c42bbbee
+OuterTrackerEndcapCollection       edm4hep::SimTrackerHit                        192  1450dff0
+OuterTrackerEndcapHitsRelations    edm4hep::MCRecoTrackerHitPlaneAssociation     107  d1211017
+PandoraClusters                    edm4hep::Cluster                               99  1ada7608
+PandoraClusters_particleIDs        edm4hep::ParticleID                             0  d74d176a
+PandoraPFOs                        edm4hep::ReconstructedParticle                104  fa28d9be
+PandoraPFOs_particleIDs            edm4hep::ParticleID                             0  2085e24d
+PandoraStartVertices               edm4hep::Vertex                               104  baf37a08
+PFOsFromJets                       edm4hep::ReconstructedParticle                  0  1979049e
+PrimaryVertices                    edm4hep::Vertex                                 1  50874189
+RecoMCTruthLink                    edm4hep::MCRecoParticleAssociation            104  6b81837a
+RefinedVertexJets                  edm4hep::ReconstructedParticle                  2  6a2b2496
+RefinedVertexJets_particleIDs      edm4hep::ParticleID                             2  6e50f897
+RefinedVertices                    edm4hep::Vertex                                 0  392f5baf
+RelationCaloHit                    edm4hep::MCRecoCaloAssociation               8655  603a5016
+RelationMuonHit                    edm4hep::MCRecoCaloAssociation                  6  df24625a
+SelectedPandoraPFOs                edm4hep::ReconstructedParticle                  0  5d4278bb
+SiTracks                           edm4hep::Track                                 42  82d755bd
+SiTracks_Refitted                  edm4hep::Track                                 42  f4957afa
+SiTracksCT                         edm4hep::Track                                 43  d094e81e
+SiTracksMCTruthLink                edm4hep::MCRecoTrackParticleAssociation        45  9a2f9ac5
+TightSelectedPandoraPFOs           edm4hep::ReconstructedParticle                  0  5fa7cf93
+VertexBarrelCollection             edm4hep::SimTrackerHit                        223  85e68310
+VertexEndcapCollection             edm4hep::SimTrackerHit                         45  5add7f42
+VertexJets                         edm4hep::ReconstructedParticle                  2  ca369aad
+VertexJets_particleIDs             edm4hep::ParticleID                             2  9764e204
+VXDEndcapTrackerHitRelations       edm4hep::MCRecoTrackerHitPlaneAssociation      45  bb4cff22
+VXDEndcapTrackerHits               edm4hep::TrackerHitPlane                       45  e9876f4e
+VXDTrackerHitRelations             edm4hep::MCRecoTrackerHitPlaneAssociation     213  178c9330
+VXDTrackerHits                     edm4hep::TrackerHitPlane                      213  db43b881
+YokeBarrelCollection               edm4hep::SimCalorimeterHit                      0  97bfada6
+YokeBarrelCollectionContributions  edm4hep::CaloHitContribution                    0  5e0fdff3
+YokeEndcapCollection               edm4hep::SimCalorimeterHit                      6  60209550
+YokeEndcapCollectionContributions  edm4hep::CaloHitContribution                   10  68f65222
 
 Parameters:
-Name                           Type         Elements  
-------------------------------------------------------
+Name    Type    Elements
+------  ------  ----------
 
 
 #################################### events 1 ####################################
 Collections:
-Name                           Type                                     Size      
-----------------------------------------------------------------------------------
-VertexJets                     edm4hep::ReconstructedParticle           2         
-PrimaryVertices                edm4hep::Vertex                          1         
-BuildUpVertices_V0             edm4hep::Vertex                          0         
-PFOsFromJets                   edm4hep::ReconstructedParticle           93        
-LE_TightSelectedPandoraPFOs    edm4hep::ReconstructedParticle           86        
-LE_LooseSelectedPandoraPFOs    edm4hep::ReconstructedParticle           92        
-BuildUpVertices                edm4hep::Vertex                          3         
-LE_SelectedPandoraPFOs         edm4hep::ReconstructedParticle           88        
-TightSelectedPandoraPFOs       edm4hep::ReconstructedParticle           70        
-SiTracksMCTruthLink            edm4hep::MCRecoTrackParticleAssociation  43        
-PandoraClusters                edm4hep::Cluster                         85        
-YokeEndcapCollectionContributions edm4hep::CaloHitContribution             0         
-MCPhysicsParticles             edm4hep::MCParticle                      494       
-RefinedVertexJets              edm4hep::ReconstructedParticle           2         
-DebugHits                      edm4hep::TrackerHitPlane                 0         
-HCalEndcapCollectionContributions edm4hep::CaloHitContribution             2280      
-OTrackerHits                   edm4hep::TrackerHitPlane                 107       
-HCalEndcapCollection           edm4hep::SimCalorimeterHit               1205      
-HCalBarrelCollectionContributions edm4hep::CaloHitContribution             16629     
-ECalBarrelCollectionContributions edm4hep::CaloHitContribution             73249     
-MCParticles                    edm4hep::MCParticle                      494       
-ECalBarrelCollection           edm4hep::SimCalorimeterHit               9602      
-InnerTrackerEndcapCollection   edm4hep::SimTrackerHit                   101       
-ECALBarrel                     edm4hep::CalorimeterHit                  7713      
-InnerTrackerBarrelCollection   edm4hep::SimTrackerHit                   291       
-OuterTrackerBarrelCollection   edm4hep::SimTrackerHit                   133       
-OTrackerEndcapHits             edm4hep::TrackerHitPlane                 75        
-SelectedPandoraPFOs            edm4hep::ReconstructedParticle           83        
-LumiCalClusters                edm4hep::Cluster                         0         
-LumiCalRecoParticles           edm4hep::ReconstructedParticle           0         
-VXDTrackerHits                 edm4hep::TrackerHitPlane                 268       
-MCParticlesSkimmed             edm4hep::MCParticle                      304       
-HCalRingCollection             edm4hep::SimCalorimeterHit               347       
-BeamCalCollectionContributions edm4hep::CaloHitContribution             6         
-YokeBarrelCollection           edm4hep::SimCalorimeterHit               0         
-ITrackerHits                   edm4hep::TrackerHitPlane                 159       
-OuterTrackerEndcapCollection   edm4hep::SimTrackerHit                   96        
-LumiCalCollectionContributions edm4hep::CaloHitContribution             182       
-RefinedVertices                edm4hep::Vertex                          2         
-HCALBarrel                     edm4hep::CalorimeterHit                  620       
-BeamCalCollection              edm4hep::SimCalorimeterHit               6         
-HCalBarrelCollection           edm4hep::SimCalorimeterHit               7806      
-LumiCalCollection              edm4hep::SimCalorimeterHit               28        
-ECalEndcapCollection           edm4hep::SimCalorimeterHit               862       
-RecoMCTruthLink                edm4hep::MCRecoParticleAssociation       93        
-VertexBarrelCollection         edm4hep::SimTrackerHit                   280       
-ECalPlugCollection             edm4hep::SimCalorimeterHit               97        
-ECalPlugCollectionContributions edm4hep::CaloHitContribution             183       
-YokeBarrelCollectionContributions edm4hep::CaloHitContribution             0         
-SiTracks_Refitted              edm4hep::Track                           43        
-HCalRingCollectionContributions edm4hep::CaloHitContribution             661       
-VertexEndcapCollection         edm4hep::SimTrackerHit                   19        
-VXDEndcapTrackerHits           edm4hep::TrackerHitPlane                 19        
-HCALOther                      edm4hep::CalorimeterHit                  6         
-SiTracksCT                     edm4hep::Track                           43        
-PandoraStartVertices           edm4hep::Vertex                          93        
-SiTracks                       edm4hep::Track                           43        
-ECALEndcap                     edm4hep::CalorimeterHit                  432       
-ITrackerEndcapHits             edm4hep::TrackerHitPlane                 66        
-ECALOther                      edm4hep::CalorimeterHit                  77        
-HCALEndcap                     edm4hep::CalorimeterHit                  61        
-ECalEndcapCollectionContributions edm4hep::CaloHitContribution             2826      
-RelationCaloHit                edm4hep::MCRecoCaloAssociation           8909      
-MUON                           edm4hep::CalorimeterHit                  0         
-ParticleID_EXT                 edm4hep::ParticleID                      0         
-YokeEndcapCollection           edm4hep::SimCalorimeterHit               0         
-RelationMuonHit                edm4hep::MCRecoCaloAssociation           0         
-PandoraPFOs                    edm4hep::ReconstructedParticle           93        
-Vertex_EXT                     edm4hep::Vertex                          0         
-EventHeader                    edm4hep::EventHeader                     1         
-LumiCal_Hits                   edm4hep::CalorimeterHit                  22        
-MergedRecoParticles            edm4hep::ReconstructedParticle           93        
-MergedClusters                 edm4hep::Cluster                         85        
-CalohitMCTruthLink             edm4hep::MCRecoCaloParticleAssociation   9010      
+Name                               ValueType                                    Size  ID
+---------------------------------  -----------------------------------------  ------  --------
+BeamCalCollection                  edm4hep::SimCalorimeterHit                     11  c298a348
+BeamCalCollectionContributions     edm4hep::CaloHitContribution                   11  a1b6cac8
+BuildUpVertices                    edm4hep::Vertex                                 3  fd03f5d0
+BuildUpVertices_V0                 edm4hep::Vertex                                 0  9bc85810
+CalohitMCTruthLink                 edm4hep::MCRecoCaloParticleAssociation       8854  1132953d
+ClusterMCTruthLink                 edm4hep::MCRecoClusterParticleAssociation     151  e2727d90
+DebugHits                          edm4hep::TrackerHitPlane                        0  c498ee0d
+ECALBarrel                         edm4hep::CalorimeterHit                      7139  4b6bf95c
+ECalBarrelCollection               edm4hep::SimCalorimeterHit                   9396  407eb17b
+ECalBarrelCollectionContributions  edm4hep::CaloHitContribution                69484  047dde9c
+ECALEndcap                         edm4hep::CalorimeterHit                       692  868b64f8
+ECalEndcapCollection               edm4hep::SimCalorimeterHit                   1080  0c09a156
+ECalEndcapCollectionContributions  edm4hep::CaloHitContribution                 4423  934221f8
+ECALOther                          edm4hep::CalorimeterHit                        44  01cbea96
+ECalPlugCollection                 edm4hep::SimCalorimeterHit                     59  d36e0cf8
+ECalPlugCollectionContributions    edm4hep::CaloHitContribution                  206  25f0d096
+EventHeader                        edm4hep::EventHeader                            1  d793ab91
+HCALBarrel                         edm4hep::CalorimeterHit                       749  076db0c4
+HCalBarrelCollection               edm4hep::SimCalorimeterHit                   8301  6daf3b41
+HCalBarrelCollectionContributions  edm4hep::CaloHitContribution                18111  4450a8f2
+HCALEndcap                         edm4hep::CalorimeterHit                        79  4ca8cf89
+HCalEndcapCollection               edm4hep::SimCalorimeterHit                    906  50d90aed
+HCalEndcapCollectionContributions  edm4hep::CaloHitContribution                 1814  82a31463
+HCALOther                          edm4hep::CalorimeterHit                        12  3ba1679d
+HCalRingCollection                 edm4hep::SimCalorimeterHit                    270  ad7abfca
+HCalRingCollectionContributions    edm4hep::CaloHitContribution                  511  3b573866
+InnerTrackerBarrelCollection       edm4hep::SimTrackerHit                        247  f57448f3
+InnerTrackerBarrelHitsRelations    edm4hep::MCRecoTrackerHitPlaneAssociation     188  029be193
+InnerTrackerEndcapCollection       edm4hep::SimTrackerHit                        101  6d724693
+InnerTrackerEndcapHitsRelations    edm4hep::MCRecoTrackerHitPlaneAssociation      71  743732ae
+ITrackerEndcapHits                 edm4hep::TrackerHitPlane                       71  55c7e3f3
+ITrackerHits                       edm4hep::TrackerHitPlane                      188  3263f08b
+LE_LooseSelectedPandoraPFOs        edm4hep::ReconstructedParticle                  0  1a98d83b
+LE_SelectedPandoraPFOs             edm4hep::ReconstructedParticle                  0  a49e7fd9
+LE_TightSelectedPandoraPFOs        edm4hep::ReconstructedParticle                  0  0357ac32
+LumiCal_Hits                       edm4hep::CalorimeterHit                        25  0379c80d
+LumiCalClusters                    edm4hep::Cluster                                0  53ea535b
+LumiCalClusters_particleIDs        edm4hep::ParticleID                             0  4cca20cb
+LumiCalCollection                  edm4hep::SimCalorimeterHit                     30  45759015
+LumiCalCollectionContributions     edm4hep::CaloHitContribution                   66  dab2a7ce
+LumiCalRecoParticles               edm4hep::ReconstructedParticle                  0  4dd99362
+LumiCalRecoParticles_particleIDs   edm4hep::ParticleID                             0  395e0b46
+MCParticles                        edm4hep::MCParticle                           540  a1cba250
+MCParticlesSkimmed                 edm4hep::MCParticle                             0  16b252ac
+MCPhysicsParticles                 edm4hep::MCParticle                             0  8fe81b12
+MergedClusters                     edm4hep::Cluster                                0  e813f486
+MergedRecoParticles                edm4hep::ReconstructedParticle                  0  f989a279
+MUON                               edm4hep::CalorimeterHit                         0  0f355ef3
+OTrackerEndcapHits                 edm4hep::TrackerHitPlane                       58  e118ca47
+OTrackerHits                       edm4hep::TrackerHitPlane                      123  3a241fef
+OuterTrackerBarrelCollection       edm4hep::SimTrackerHit                        240  083cc03d
+OuterTrackerBarrelHitsRelations    edm4hep::MCRecoTrackerHitPlaneAssociation     123  c42bbbee
+OuterTrackerEndcapCollection       edm4hep::SimTrackerHit                        107  1450dff0
+OuterTrackerEndcapHitsRelations    edm4hep::MCRecoTrackerHitPlaneAssociation      58  d1211017
+PandoraClusters                    edm4hep::Cluster                               82  1ada7608
+PandoraClusters_particleIDs        edm4hep::ParticleID                             0  d74d176a
+PandoraPFOs                        edm4hep::ReconstructedParticle                 90  fa28d9be
+PandoraPFOs_particleIDs            edm4hep::ParticleID                             0  2085e24d
+PandoraStartVertices               edm4hep::Vertex                                90  baf37a08
+PFOsFromJets                       edm4hep::ReconstructedParticle                  0  1979049e
+PrimaryVertices                    edm4hep::Vertex                                 1  50874189
+RecoMCTruthLink                    edm4hep::MCRecoParticleAssociation             90  6b81837a
+RefinedVertexJets                  edm4hep::ReconstructedParticle                  2  6a2b2496
+RefinedVertexJets_particleIDs      edm4hep::ParticleID                             3  6e50f897
+RefinedVertices                    edm4hep::Vertex                                 3  392f5baf
+RelationCaloHit                    edm4hep::MCRecoCaloAssociation               8715  603a5016
+RelationMuonHit                    edm4hep::MCRecoCaloAssociation                  0  df24625a
+SelectedPandoraPFOs                edm4hep::ReconstructedParticle                  0  5d4278bb
+SiTracks                           edm4hep::Track                                 43  82d755bd
+SiTracks_Refitted                  edm4hep::Track                                 43  f4957afa
+SiTracksCT                         edm4hep::Track                                 43  d094e81e
+SiTracksMCTruthLink                edm4hep::MCRecoTrackParticleAssociation        43  9a2f9ac5
+TightSelectedPandoraPFOs           edm4hep::ReconstructedParticle                  0  5fa7cf93
+VertexBarrelCollection             edm4hep::SimTrackerHit                        358  85e68310
+VertexEndcapCollection             edm4hep::SimTrackerHit                         23  5add7f42
+VertexJets                         edm4hep::ReconstructedParticle                  2  ca369aad
+VertexJets_particleIDs             edm4hep::ParticleID                             2  9764e204
+VXDEndcapTrackerHitRelations       edm4hep::MCRecoTrackerHitPlaneAssociation      23  bb4cff22
+VXDEndcapTrackerHits               edm4hep::TrackerHitPlane                       23  e9876f4e
+VXDTrackerHitRelations             edm4hep::MCRecoTrackerHitPlaneAssociation     331  178c9330
+VXDTrackerHits                     edm4hep::TrackerHitPlane                      331  db43b881
+YokeBarrelCollection               edm4hep::SimCalorimeterHit                      0  97bfada6
+YokeBarrelCollectionContributions  edm4hep::CaloHitContribution                    0  5e0fdff3
+YokeEndcapCollection               edm4hep::SimCalorimeterHit                      0  60209550
+YokeEndcapCollectionContributions  edm4hep::CaloHitContribution                    0  68f65222
 
 Parameters:
-Name                           Type         Elements  
-------------------------------------------------------
+Name    Type    Elements
+------  ------  ----------
 
 
 #################################### events 2 ####################################
 Collections:
-Name                           Type                                     Size      
-----------------------------------------------------------------------------------
-VertexJets                     edm4hep::ReconstructedParticle           2         
-PrimaryVertices                edm4hep::Vertex                          1         
-BuildUpVertices_V0             edm4hep::Vertex                          0         
-PFOsFromJets                   edm4hep::ReconstructedParticle           74        
-LE_TightSelectedPandoraPFOs    edm4hep::ReconstructedParticle           64        
-LE_LooseSelectedPandoraPFOs    edm4hep::ReconstructedParticle           73        
-BuildUpVertices                edm4hep::Vertex                          2         
-LE_SelectedPandoraPFOs         edm4hep::ReconstructedParticle           66        
-TightSelectedPandoraPFOs       edm4hep::ReconstructedParticle           57        
-SiTracksMCTruthLink            edm4hep::MCRecoTrackParticleAssociation  36        
-PandoraClusters                edm4hep::Cluster                         65        
-YokeEndcapCollectionContributions edm4hep::CaloHitContribution             8         
-MCPhysicsParticles             edm4hep::MCParticle                      426       
-RefinedVertexJets              edm4hep::ReconstructedParticle           2         
-DebugHits                      edm4hep::TrackerHitPlane                 0         
-HCalEndcapCollectionContributions edm4hep::CaloHitContribution             407       
-OTrackerHits                   edm4hep::TrackerHitPlane                 107       
-HCalEndcapCollection           edm4hep::SimCalorimeterHit               212       
-HCalBarrelCollectionContributions edm4hep::CaloHitContribution             20810     
-ECalBarrelCollectionContributions edm4hep::CaloHitContribution             42235     
-MCParticles                    edm4hep::MCParticle                      426       
-ECalBarrelCollection           edm4hep::SimCalorimeterHit               7050      
-InnerTrackerEndcapCollection   edm4hep::SimTrackerHit                   78        
-ECALBarrel                     edm4hep::CalorimeterHit                  5337      
-InnerTrackerBarrelCollection   edm4hep::SimTrackerHit                   243       
-OuterTrackerBarrelCollection   edm4hep::SimTrackerHit                   212       
-OTrackerEndcapHits             edm4hep::TrackerHitPlane                 31        
-SelectedPandoraPFOs            edm4hep::ReconstructedParticle           64        
-LumiCalClusters                edm4hep::Cluster                         0         
-LumiCalRecoParticles           edm4hep::ReconstructedParticle           0         
-VXDTrackerHits                 edm4hep::TrackerHitPlane                 248       
-MCParticlesSkimmed             edm4hep::MCParticle                      258       
-HCalRingCollection             edm4hep::SimCalorimeterHit               71        
-BeamCalCollectionContributions edm4hep::CaloHitContribution             45        
-YokeBarrelCollection           edm4hep::SimCalorimeterHit               0         
-ITrackerHits                   edm4hep::TrackerHitPlane                 173       
-OuterTrackerEndcapCollection   edm4hep::SimTrackerHit                   74        
-LumiCalCollectionContributions edm4hep::CaloHitContribution             26        
-RefinedVertices                edm4hep::Vertex                          0         
-HCALBarrel                     edm4hep::CalorimeterHit                  769       
-BeamCalCollection              edm4hep::SimCalorimeterHit               8         
-HCalBarrelCollection           edm4hep::SimCalorimeterHit               8751      
-LumiCalCollection              edm4hep::SimCalorimeterHit               7         
-ECalEndcapCollection           edm4hep::SimCalorimeterHit               1812      
-RecoMCTruthLink                edm4hep::MCRecoParticleAssociation       74        
-VertexBarrelCollection         edm4hep::SimTrackerHit                   263       
-ECalPlugCollection             edm4hep::SimCalorimeterHit               16        
-ECalPlugCollectionContributions edm4hep::CaloHitContribution             18        
-YokeBarrelCollectionContributions edm4hep::CaloHitContribution             0         
-SiTracks_Refitted              edm4hep::Track                           35        
-HCalRingCollectionContributions edm4hep::CaloHitContribution             134       
-VertexEndcapCollection         edm4hep::SimTrackerHit                   14        
-VXDEndcapTrackerHits           edm4hep::TrackerHitPlane                 14        
-HCALOther                      edm4hep::CalorimeterHit                  7         
-SiTracksCT                     edm4hep::Track                           35        
-PandoraStartVertices           edm4hep::Vertex                          74        
-SiTracks                       edm4hep::Track                           35        
-ECALEndcap                     edm4hep::CalorimeterHit                  1416      
-ITrackerEndcapHits             edm4hep::TrackerHitPlane                 39        
-ECALOther                      edm4hep::CalorimeterHit                  0         
-HCALEndcap                     edm4hep::CalorimeterHit                  26        
-ECalEndcapCollectionContributions edm4hep::CaloHitContribution             22593     
-RelationCaloHit                edm4hep::MCRecoCaloAssociation           7555      
-MUON                           edm4hep::CalorimeterHit                  6         
-ParticleID_EXT                 edm4hep::ParticleID                      0         
-YokeEndcapCollection           edm4hep::SimCalorimeterHit               6         
-RelationMuonHit                edm4hep::MCRecoCaloAssociation           6         
-PandoraPFOs                    edm4hep::ReconstructedParticle           74        
-Vertex_EXT                     edm4hep::Vertex                          0         
-EventHeader                    edm4hep::EventHeader                     1         
-LumiCal_Hits                   edm4hep::CalorimeterHit                  0         
-MergedRecoParticles            edm4hep::ReconstructedParticle           74        
-MergedClusters                 edm4hep::Cluster                         65        
-CalohitMCTruthLink             edm4hep::MCRecoCaloParticleAssociation   7873      
+Name                               ValueType                                    Size  ID
+---------------------------------  -----------------------------------------  ------  --------
+BeamCalCollection                  edm4hep::SimCalorimeterHit                      0  c298a348
+BeamCalCollectionContributions     edm4hep::CaloHitContribution                    0  a1b6cac8
+BuildUpVertices                    edm4hep::Vertex                                 2  fd03f5d0
+BuildUpVertices_V0                 edm4hep::Vertex                                 0  9bc85810
+CalohitMCTruthLink                 edm4hep::MCRecoCaloParticleAssociation       7359  1132953d
+ClusterMCTruthLink                 edm4hep::MCRecoClusterParticleAssociation     114  e2727d90
+DebugHits                          edm4hep::TrackerHitPlane                        0  c498ee0d
+ECALBarrel                         edm4hep::CalorimeterHit                      5130  4b6bf95c
+ECalBarrelCollection               edm4hep::SimCalorimeterHit                   6841  407eb17b
+ECalBarrelCollectionContributions  edm4hep::CaloHitContribution                41249  047dde9c
+ECALEndcap                         edm4hep::CalorimeterHit                      1411  868b64f8
+ECalEndcapCollection               edm4hep::SimCalorimeterHit                   1764  0c09a156
+ECalEndcapCollectionContributions  edm4hep::CaloHitContribution                22823  934221f8
+ECALOther                          edm4hep::CalorimeterHit                        32  01cbea96
+ECalPlugCollection                 edm4hep::SimCalorimeterHit                     45  d36e0cf8
+ECalPlugCollectionContributions    edm4hep::CaloHitContribution                   90  25f0d096
+EventHeader                        edm4hep::EventHeader                            1  d793ab91
+HCALBarrel                         edm4hep::CalorimeterHit                       725  076db0c4
+HCalBarrelCollection               edm4hep::SimCalorimeterHit                   8000  6daf3b41
+HCalBarrelCollectionContributions  edm4hep::CaloHitContribution                18826  4450a8f2
+HCALEndcap                         edm4hep::CalorimeterHit                        30  4ca8cf89
+HCalEndcapCollection               edm4hep::SimCalorimeterHit                    260  50d90aed
+HCalEndcapCollectionContributions  edm4hep::CaloHitContribution                  502  82a31463
+HCALOther                          edm4hep::CalorimeterHit                        14  3ba1679d
+HCalRingCollection                 edm4hep::SimCalorimeterHit                     93  ad7abfca
+HCalRingCollectionContributions    edm4hep::CaloHitContribution                  209  3b573866
+InnerTrackerBarrelCollection       edm4hep::SimTrackerHit                        222  f57448f3
+InnerTrackerBarrelHitsRelations    edm4hep::MCRecoTrackerHitPlaneAssociation     145  029be193
+InnerTrackerEndcapCollection       edm4hep::SimTrackerHit                         78  6d724693
+InnerTrackerEndcapHitsRelations    edm4hep::MCRecoTrackerHitPlaneAssociation      35  743732ae
+ITrackerEndcapHits                 edm4hep::TrackerHitPlane                       35  55c7e3f3
+ITrackerHits                       edm4hep::TrackerHitPlane                      145  3263f08b
+LE_LooseSelectedPandoraPFOs        edm4hep::ReconstructedParticle                  0  1a98d83b
+LE_SelectedPandoraPFOs             edm4hep::ReconstructedParticle                  0  a49e7fd9
+LE_TightSelectedPandoraPFOs        edm4hep::ReconstructedParticle                  0  0357ac32
+LumiCal_Hits                       edm4hep::CalorimeterHit                         1  0379c80d
+LumiCalClusters                    edm4hep::Cluster                                0  53ea535b
+LumiCalClusters_particleIDs        edm4hep::ParticleID                             0  4cca20cb
+LumiCalCollection                  edm4hep::SimCalorimeterHit                     29  45759015
+LumiCalCollectionContributions     edm4hep::CaloHitContribution                   74  dab2a7ce
+LumiCalRecoParticles               edm4hep::ReconstructedParticle                  0  4dd99362
+LumiCalRecoParticles_particleIDs   edm4hep::ParticleID                             0  395e0b46
+MCParticles                        edm4hep::MCParticle                           492  a1cba250
+MCParticlesSkimmed                 edm4hep::MCParticle                             0  16b252ac
+MCPhysicsParticles                 edm4hep::MCParticle                             0  8fe81b12
+MergedClusters                     edm4hep::Cluster                                0  e813f486
+MergedRecoParticles                edm4hep::ReconstructedParticle                  0  f989a279
+MUON                               edm4hep::CalorimeterHit                         7  0f355ef3
+OTrackerEndcapHits                 edm4hep::TrackerHitPlane                       32  e118ca47
+OTrackerHits                       edm4hep::TrackerHitPlane                      154  3a241fef
+OuterTrackerBarrelCollection       edm4hep::SimTrackerHit                        223  083cc03d
+OuterTrackerBarrelHitsRelations    edm4hep::MCRecoTrackerHitPlaneAssociation     154  c42bbbee
+OuterTrackerEndcapCollection       edm4hep::SimTrackerHit                         74  1450dff0
+OuterTrackerEndcapHitsRelations    edm4hep::MCRecoTrackerHitPlaneAssociation      32  d1211017
+PandoraClusters                    edm4hep::Cluster                               61  1ada7608
+PandoraClusters_particleIDs        edm4hep::ParticleID                             0  d74d176a
+PandoraPFOs                        edm4hep::ReconstructedParticle                 72  fa28d9be
+PandoraPFOs_particleIDs            edm4hep::ParticleID                             0  2085e24d
+PandoraStartVertices               edm4hep::Vertex                                72  baf37a08
+PFOsFromJets                       edm4hep::ReconstructedParticle                  0  1979049e
+PrimaryVertices                    edm4hep::Vertex                                 1  50874189
+RecoMCTruthLink                    edm4hep::MCRecoParticleAssociation             72  6b81837a
+RefinedVertexJets                  edm4hep::ReconstructedParticle                  2  6a2b2496
+RefinedVertexJets_particleIDs      edm4hep::ParticleID                             2  6e50f897
+RefinedVertices                    edm4hep::Vertex                                 0  392f5baf
+RelationCaloHit                    edm4hep::MCRecoCaloAssociation               7342  603a5016
+RelationMuonHit                    edm4hep::MCRecoCaloAssociation                  7  df24625a
+SelectedPandoraPFOs                edm4hep::ReconstructedParticle                  0  5d4278bb
+SiTracks                           edm4hep::Track                                 36  82d755bd
+SiTracks_Refitted                  edm4hep::Track                                 36  f4957afa
+SiTracksCT                         edm4hep::Track                                 36  d094e81e
+SiTracksMCTruthLink                edm4hep::MCRecoTrackParticleAssociation        38  9a2f9ac5
+TightSelectedPandoraPFOs           edm4hep::ReconstructedParticle                  0  5fa7cf93
+VertexBarrelCollection             edm4hep::SimTrackerHit                        216  85e68310
+VertexEndcapCollection             edm4hep::SimTrackerHit                         14  5add7f42
+VertexJets                         edm4hep::ReconstructedParticle                  2  ca369aad
+VertexJets_particleIDs             edm4hep::ParticleID                             2  9764e204
+VXDEndcapTrackerHitRelations       edm4hep::MCRecoTrackerHitPlaneAssociation      13  bb4cff22
+VXDEndcapTrackerHits               edm4hep::TrackerHitPlane                       13  e9876f4e
+VXDTrackerHitRelations             edm4hep::MCRecoTrackerHitPlaneAssociation     204  178c9330
+VXDTrackerHits                     edm4hep::TrackerHitPlane                      204  db43b881
+YokeBarrelCollection               edm4hep::SimCalorimeterHit                      1  97bfada6
+YokeBarrelCollectionContributions  edm4hep::CaloHitContribution                    1  5e0fdff3
+YokeEndcapCollection               edm4hep::SimCalorimeterHit                      6  60209550
+YokeEndcapCollectionContributions  edm4hep::CaloHitContribution                    8  68f65222
 
 Parameters:
-Name                           Type         Elements  
-------------------------------------------------------
+Name    Type    Elements
+------  ------  ----------
 
 

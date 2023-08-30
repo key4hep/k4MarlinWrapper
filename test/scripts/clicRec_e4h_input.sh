@@ -26,7 +26,7 @@ bash $TEST_DIR/scripts/setup_clic_performance.sh
 
 cd CLICPerformance/clicConfig
 
-INPUTFILE=ttbar_edm4hep_frame.root
+export INPUTFILE=ttbar_podio230830_edm4hep_frame.root
 
 # Download root file if not present
 if [ ! -f $TEST_DIR/inputFiles/$INPUTFILE ]; then
