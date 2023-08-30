@@ -43,7 +43,7 @@ from Configurables import ToolSvc, Lcio2EDM4hepTool, EDM4hep2LcioTool
 
 from Configurables import k4DataSvc, PodioInput
 evtsvc = k4DataSvc('EventDataSvc')
-evtsvc.input = '$TEST_DIR/inputFiles/ttbar_edm4hep_frame.root'
+evtsvc.input = os.path.join('$TEST_DIR/inputFiles/', os.environ.get("INPUTFILE", "ttbar_edm4hep_frame.root"))
 
 
 inp = PodioInput('InputReader')
