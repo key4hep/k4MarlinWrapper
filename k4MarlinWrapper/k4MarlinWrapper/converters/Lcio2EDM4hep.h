@@ -49,8 +49,8 @@ class Lcio2EDM4hepTool : public GaudiTool, virtual public IEDMConverter {
 public:
   Lcio2EDM4hepTool(const std::string& type, const std::string& name, const IInterface* parent);
   virtual ~Lcio2EDM4hepTool();
-  virtual StatusCode initialize();
-  virtual StatusCode finalize();
+  StatusCode initialize() final;
+  StatusCode finalize() final;
 
   // **********************************
   // - Convert all collections indicated in Tool parameters
