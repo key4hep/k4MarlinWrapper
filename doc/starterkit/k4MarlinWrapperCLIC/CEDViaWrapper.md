@@ -40,7 +40,7 @@ To create an input file for the event display we run a simple detector simulatio
 
 ```bash
 ddsim --steeringFile CLICPerformance/clicConfig/clic_steer.py \
-      --compactFile $LCGEO/CLIC/compact/CLIC_o3_v14/CLIC_o3_v14.xml \
+      --compactFile $K4GEO/CLIC/compact/CLIC_o3_v14/CLIC_o3_v14.xml \
       --enableGun \
       --gun.distribution uniform \
       --gun.particle gamma \

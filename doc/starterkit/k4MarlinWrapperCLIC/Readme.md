@@ -48,7 +48,7 @@ output in such format:
 ```bash
 cd CLICPerformance/clicConfig
 
-ddsim --compactFile $LCGEO/CLIC/compact/CLIC_o3_v14/CLIC_o3_v14.xml \
+ddsim --compactFile $K4GEO/CLIC/compact/CLIC_o3_v14/CLIC_o3_v14.xml \
       --outputFile ttbar_edm4hep.root \
       --steeringFile clic_steer.py \
       --inputFiles ../Tests/yyxyev_000.stdhep \
@@ -61,7 +61,7 @@ in such format:
 ```bash
 cd CLICPerformance/clicConfig
 
-ddsim --compactFile $LCGEO/CLIC/compact/CLIC_o3_v14/CLIC_o3_v14.xml \
+ddsim --compactFile $K4GEO/CLIC/compact/CLIC_o3_v14/CLIC_o3_v14.xml \
       --outputFile ttbar.slcio \
       --steeringFile clic_steer.py \
       --inputFiles ../Tests/yyxyev_000.stdhep \
@@ -79,7 +79,7 @@ To run the reconstruction with ``Marlin``:
 cd CLICPerformance/clicConfig
 
 Marlin clicReconstruction.xml \
-       --InitDD4hep.DD4hepXMLFile=$LCGEO/CLIC/compact/CLIC_o3_v14/CLIC_o3_v14.xml \
+       --InitDD4hep.DD4hepXMLFile=$K4GEO/CLIC/compact/CLIC_o3_v14/CLIC_o3_v14.xml \
        --global.LCIOInputFiles=ttbar.slcio \
        --global.MaxRecordNumber=3
 ```

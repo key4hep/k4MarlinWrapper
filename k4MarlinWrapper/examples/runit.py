@@ -58,7 +58,7 @@ proc1.OutputLevel = DEBUG
 proc1.ProcessorType = "InitializeDD4hep"
 proc1.Parameters = {#"EncodingStringParameter", "GlobalTrackerReadoutID"},
                     #"DD4hepXMLFile", "/cvmfs/clicdp.cern.ch/iLCSoft/builds/nightly/x86_64-slc6-gcc62-opt/lcgeo/HEAD/CLIC/compact/CLIC_o3_v13/CLIC_o3_v13.xml"},
-                    "DD4hepXMLFile": [os.path.join(os.environ["LCGEO"], "CLIC/compact/CLIC_o2_v04/CLIC_o2_v04.xml")],
+                    "DD4hepXMLFile": [os.path.join(os.environ["K4GEO"], "CLIC/compact/CLIC_o2_v04/CLIC_o2_v04.xml")],
                     }
 algList.append(proc1)
 
