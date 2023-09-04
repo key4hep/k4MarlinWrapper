@@ -55,7 +55,7 @@ proc1 = MarlinProcessorWrapper("InitDD4hep")
 proc1.OutputLevel = DEBUG
 proc1.ProcessorType = "InitializeDD4hep"
 proc1.Parameters = {#"EncodingStringParameter": ["GlobalTrackerReadoutID"],
-                     "DD4hepXMLFile": [os.path.join(os.environ.get('LCGEO'), 'CLIC/compact/CLIC_o2_v04/CLIC_o2_v04.xml')]
+                     "DD4hepXMLFile": [os.path.join(os.environ.get('K4GEO'), 'CLIC/compact/CLIC_o2_v04/CLIC_o2_v04.xml')]
                     }
 algList.append(proc1)
 
