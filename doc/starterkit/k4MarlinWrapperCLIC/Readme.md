@@ -138,8 +138,8 @@ included with k4MarlinWrapper. Note that:
     * Some *MarlinProcessorWrappers* may modify collections instead of producing new ones: the original EDM4hep collection wont be updated in this case and would need conversion from LCIO to EDM4hep.
 
 - To run *clicReconstruction* with EDM4hep format, use the steering file found in the `examples` folder of k4MarlinWrapper:
-`k4MarlinWrapper/examples/clicRec_e4h_input.py` (this also get's installed to `$K4MARLINWRAPPER/examples` in Key4hep releases)
-  + Change line `evtsvc.input = '$TEST_DIR/inputFiles/ttbar_edm4hep_frame.root'` to point to the location of your input file.
+`k4MarlinWrapper/examples/clicRec_e4h_input.py` (this also gets installed to `$K4MARLINWRAPPER/examples` in Key4hep releases)
+  + Change the line where `evtsvc.input` is defined to point to the location of your input file.
   + At the bottom of the file, in the `ApplicationMgr` parameters, change `EvtMax   = 3,` to the number of events to run.
 
 This can be run in the following way. Note that we show the usage here in a way

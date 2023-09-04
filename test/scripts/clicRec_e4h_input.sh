@@ -34,9 +34,7 @@ if [ ! -f $TEST_DIR/inputFiles/$INPUTFILE ]; then
   wget https://key4hep.web.cern.ch/testFiles/ddsimOutput/$INPUTFILE -P $TEST_DIR/inputFiles/
 fi
 
-# Frame based I/O exits with a user requested stop here, that makes Gaudi exit
-# with an exit code of 4. See https://github.com/key4hep/k4FWCore/issues/125
-k4run $EXAMPLE_DIR/clicRec_e4h_input.py || true
+k4run $EXAMPLE_DIR/clicRec_e4h_input.py
 
 input_num_events=$(python $TEST_DIR/python/root_num_events.py $TEST_DIR/inputFiles/$INPUTFILE)
 output_num_events=$(python $TEST_DIR/python/root_num_events.py my_output.root)
