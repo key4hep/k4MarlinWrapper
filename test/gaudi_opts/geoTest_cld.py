@@ -30,6 +30,7 @@ svcList.append(geoservice)
 
 cellIDSvc = TrackingCellIDEncodingSvc("CellIDSvc")
 cellIDSvc.EncodingStringParameterName = "GlobalTrackerReadoutID"
+cellIDSvc.GeoSvcName = geoservice.name()
 cellIDSvc.OutputLevel = DEBUG
 svcList.append(cellIDSvc)
 
