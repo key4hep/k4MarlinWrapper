@@ -166,6 +166,7 @@ The ``MarlinDD4hep::InitializeDD4hep`` processor can be replaced by the ``k4SimG
 For example:
 
 ```python
+from Configurables import GeoSvc, TrackingCellIDEncodingSvc
 svcList = []
 geoservice = GeoSvc("GeoSvc")
 geoservice.detectors = [os.environ["K4GEO"]+"/CLIC/compact/CLIC_o3_v15/CLIC_o3_v15.xml"]
@@ -175,6 +176,7 @@ svcList.append(geoservice)
 
 cellIDSvc = TrackingCellIDEncodingSvc("CellIDSvc")
 cellIDSvc.EncodingStringParameterName = "GlobalTrackerReadoutID"
+cellIDSvc.GeoSvcName = geoservice.name()
 cellIDSvc.OutputLevel = INFO
 svcList.append(cellIDSvc)
 ```

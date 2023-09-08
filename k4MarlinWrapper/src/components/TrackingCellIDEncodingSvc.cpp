@@ -26,12 +26,16 @@
 DECLARE_COMPONENT(TrackingCellIDEncodingSvc);
 
 TrackingCellIDEncodingSvc::TrackingCellIDEncodingSvc(const std::string& name, ISvcLocator* svc)
-    : base_class(name, svc), m_geoSvc(svc->service("GeoSvc")) {}
+    : base_class(name, svc) {}
 
 TrackingCellIDEncodingSvc::~TrackingCellIDEncodingSvc() {}
 
 StatusCode TrackingCellIDEncodingSvc::initialize() {
   try {
+    info() << "Looking for GeoSvc with the name" << m_geoSvcName.value() << endmsg;
+
+    m_geoSvc = serviceLocator()->service(m_geoSvcName);
+
     info() << "Taking the encoding string as specified in dd4hep constant: " << m_encodingStringVariable.value()
            << endmsg;
 

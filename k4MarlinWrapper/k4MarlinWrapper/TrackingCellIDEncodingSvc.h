@@ -32,14 +32,16 @@ class TrackingCellIDEncodingSvc : public extends<Service, IService> {
 public:
   TrackingCellIDEncodingSvc(const std::string& name, ISvcLocator* svc);
 
-  virtual ~TrackingCellIDEncodingSvc();
-  virtual StatusCode initialize() final;
-  virtual StatusCode finalize() final;
+  ~TrackingCellIDEncodingSvc();
+  StatusCode initialize() final;
+  StatusCode finalize() final;
 
   /// Property to configure which DD4hep constant to use for the encodingString
   Gaudi::Property<std::string> m_encodingStringVariable{
       this, "EncodingStringParameterName", "GlobalTrackerReadoutID",
       "The name of the DD4hep constant that contains the Encoding string for tracking detectors"};
+
+  Gaudi::Property<std::string> m_geoSvcName{this, "GeoSvcName", "GeoSvc", "The name of the GeoSvc instance"};
 
 private:
   SmartIF<IGeoSvc> m_geoSvc;
