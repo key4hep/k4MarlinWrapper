@@ -40,6 +40,9 @@
 #include <string>
 #include <vector>
 
+using EDM4hep2LCIOConv::CollectionsPairVectors;
+using EDM4hep2LCIOConv::vec_pair;
+
 class EDM4hep2LcioTool : public GaudiTool, virtual public IEDMConverter {
 public:
   EDM4hep2LcioTool(const std::string& type, const std::string& name, const IInterface* parent);
