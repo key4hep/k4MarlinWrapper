@@ -628,6 +628,8 @@ bool TestE4H2L::checkEDMSimTrackerHitLCIOSimTrackerHit(lcio::LCEventImpl*       
 }
 
 bool TestE4H2L::checkEDMTrackerHitLCIOTrackerHit(lcio::LCEventImpl* the_event) {
+  info() << "Checking TrackerHit collections " << m_e4h_trackerhit_name << " vs " << m_lcio_trackerhit_name << endmsg;
+
   DataHandle<edm4hep::TrackerHitCollection> trackerhit_handle_orig{m_e4h_trackerhit_name, Gaudi::DataHandle::Reader,
                                                                    this};
   const auto                                trackerhit_coll_orig = trackerhit_handle_orig.get();
@@ -636,6 +638,10 @@ bool TestE4H2L::checkEDMTrackerHitLCIOTrackerHit(lcio::LCEventImpl* the_event) {
   auto lcio_coll_size       = lcio_trackerhit_coll->getNumberOfElements();
 
   bool trackerhit_same = (*trackerhit_coll_orig).size() == lcio_coll_size;
+
+  if (!trackerhit_same) {
+    error() << "collections differ in size " << trackerhit_coll_orig->size() << " vs " << lcio_coll_size << endmsg;
+  }
 
   if (trackerhit_same) {
     for (int i = 0; i < (*trackerhit_coll_orig).size(); ++i) {
@@ -670,7 +676,7 @@ bool TestE4H2L::checkEDMTrackerHitLCIOTrackerHit(lcio::LCEventImpl* the_event) {
   }
 
   if (!trackerhit_same) {
-    error() << "Track EDM4hep -> LCIO failed." << endmsg;
+    error() << "TrackerHit EDM4hep -> LCIO failed." << endmsg;
   }
 
   return trackerhit_same;
@@ -678,6 +684,7 @@ bool TestE4H2L::checkEDMTrackerHitLCIOTrackerHit(lcio::LCEventImpl* the_event) {
 
 bool TestE4H2L::checkEDMTrackLCIOTrack(lcio::LCEventImpl* the_event, const std::vector<uint>& link_trackerhits_idx,
                                        const std::vector<std::pair<uint, uint>>& track_link_tracks_idx) {
+  info() << "Checking Track collections " << m_e4h_track_name << " vs " << m_lcio_track_name << endmsg;
   DataHandle<edm4hep::TrackCollection> track_handle_orig{m_e4h_track_name, Gaudi::DataHandle::Reader, this};
   const auto                           track_coll_orig = track_handle_orig.get();
 
@@ -685,6 +692,10 @@ bool TestE4H2L::checkEDMTrackLCIOTrack(lcio::LCEventImpl* the_event, const std::
   auto lcio_coll_size  = lcio_track_coll->getNumberOfElements();
 
   bool track_same = (*track_coll_orig).size() == lcio_coll_size;
+
+  if (!track_same) {
+    error() << "collections differ in size: " << track_coll_orig->size() << " vs " << lcio_coll_size << endmsg;
+  }
 
   if (track_same) {
     for (int i = 0; i < (*track_coll_orig).size(); ++i) {
@@ -701,10 +712,20 @@ bool TestE4H2L::checkEDMTrackLCIOTrack(lcio::LCEventImpl* the_event, const std::
       track_same = track_same && (edm_track_orig.getDEdxError() == lcio_track->getdEdxError());
       track_same = track_same && (edm_track_orig.getRadiusOfInnermostHit() == lcio_track->getRadiusOfInnermostHit());
 
+      if (!track_same) {
+        error() << "data member conversion failed for track " << i << endmsg;
+      }
+
       std::vector<edm4hep::TrackerHit>   edm_trackerhits;
       std::vector<lcio::TrackerHitImpl*> lcio_trackerhits;
 
       track_same = track_same && (edm_track_orig.trackerHits_size() == lcio_track->getTrackerHits().size());
+
+      if (!track_same) {
+        error() << "track " << i << " has different number of tracker hits: " << edm_track_orig.trackerHits_size()
+                << " vs " << lcio_track->getTrackerHits().size() << endmsg;
+      }
+
       if (track_same) {
         // Check linked trackerhits connections
         if (lcio_track->getTrackerHits().size() >= link_trackerhits_idx.size()) {
@@ -718,6 +739,10 @@ bool TestE4H2L::checkEDMTrackLCIOTrack(lcio::LCEventImpl* the_event, const std::
                  dynamic_cast<lcio::TrackerHitImpl*>(lcio_trackerhit_coll->getElementAt(link_trackerhits_idx[j])));
           }
         }
+      }
+
+      if (!track_same) {
+        error() << "track " << i << " has different linked tracker hits" << endmsg;
       }
 
 #if EDM4HEP_BUILD_VERSION > EDM4HEP_VERSION(0, 9, 0)
@@ -762,7 +787,16 @@ bool TestE4H2L::checkEDMTrackLCIOTrack(lcio::LCEventImpl* the_event, const std::
       }
 #endif
 
+      if (!track_same) {
+        error() << "track " << i << " has different subdetector hit numbers" << endmsg;
+      }
+
       track_same = track_same && (edm_track_orig.trackStates_size() == lcio_track->getTrackStates().size());
+      if (!track_same) {
+        error() << "track " << i << " has different number of track states: " << edm_track_orig.getTrackStates().size()
+                << " vs " << lcio_track->getTrackStates().size() << endmsg;
+      }
+
       if ((edm_track_orig.trackStates_size() == lcio_track->getTrackStates().size())) {
         for (int j = 0; j < edm_track_orig.trackStates_size(); ++j) {
           auto edm_trackestate_orig = edm_track_orig.getTrackStates(j);
@@ -786,6 +820,9 @@ bool TestE4H2L::checkEDMTrackLCIOTrack(lcio::LCEventImpl* the_event, const std::
           }
         }
       }
+      if (!track_same) {
+        error() << "track " << i << " has differing track states (data)" << endmsg;
+      }
     }
 
     std::vector<uint> appeared(lcio_coll_size, 0);
@@ -793,6 +830,10 @@ bool TestE4H2L::checkEDMTrackLCIOTrack(lcio::LCEventImpl* the_event, const std::
       auto* lcio_track_orig = dynamic_cast<lcio::TrackImpl*>(lcio_track_coll->getElementAt(orig_idx));
       auto* lcio_track_link = dynamic_cast<lcio::TrackImpl*>(lcio_track_coll->getElementAt(link_idx));
       track_same            = track_same && (lcio_track_orig->getTracks()[appeared[orig_idx]] == lcio_track_link);
+      if (!track_same) {
+        error() << "Track link (" << appeared[orig_idx] << ") for original track " << orig_idx << ", to linked track "
+                << link_idx << " not as expected" << endmsg;
+      }
       appeared[orig_idx]++;
     }
   }
