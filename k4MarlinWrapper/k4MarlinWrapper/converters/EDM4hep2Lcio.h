@@ -34,12 +34,24 @@
 // std
 #include <map>
 #include <string>
+#include <tuple>
 #include <vector>
 
-#ifdef EDM4HEP2LCIOCONV_NAMESPACE
-using EDM4hep2LCIOConv::CollectionsPairVectors;
-using EDM4hep2LCIOConv::vec_pair;
-#endif
+template <typename K, typename V> using ObjMapT = k4EDM4hep2LcioConv::VecMapT<K, V>;
+
+struct CollectionPairMappings {
+  ObjMapT<lcio::TrackImpl*, edm4hep::Track>                                 tracks{};
+  ObjMapT<lcio::TrackerHitImpl*, edm4hep::TrackerHit>                       trackerhits{};
+  ObjMapT<lcio::SimTrackerHitImpl*, edm4hep::SimTrackerHit>                 simtrackerhits{};
+  ObjMapT<lcio::CalorimeterHitImpl*, edm4hep::CalorimeterHit>               calohits{};
+  ObjMapT<lcio::RawCalorimeterHitImpl*, edm4hep::RawCalorimeterHit>         rawcalohits{};
+  ObjMapT<lcio::SimCalorimeterHitImpl*, edm4hep::SimCalorimeterHit>         simcalohits{};
+  ObjMapT<lcio::TPCHitImpl*, edm4hep::RawTimeSeries>                        tpchits{};
+  ObjMapT<lcio::ClusterImpl*, edm4hep::Cluster>                             clusters{};
+  ObjMapT<lcio::VertexImpl*, edm4hep::Vertex>                               vertices{};
+  ObjMapT<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle> recoparticles{};
+  ObjMapT<lcio::MCParticleImpl*, edm4hep::MCParticle>                       mcparticles{};
+};
 
 class EDM4hep2LcioTool : public GaudiTool, virtual public IEDMConverter {
 public:
@@ -57,62 +69,62 @@ private:
   PodioDataSvc*                   m_podioDataSvc;
   ServiceHandle<IDataProviderSvc> m_eventDataSvc;
 
-  void convertTracks(vec_pair<lcio::TrackImpl*, edm4hep::Track>&           tracks_vec,
-                     vec_pair<lcio::TrackerHitImpl*, edm4hep::TrackerHit>& trackerhits_vec,
+  void convertTracks(ObjMapT<lcio::TrackImpl*, edm4hep::Track>&           tracks_vec,
+                     ObjMapT<lcio::TrackerHitImpl*, edm4hep::TrackerHit>& trackerhits_vec,
                      const std::string& e4h_coll_name, const std::string& lcio_coll_name,
                      lcio::LCEventImpl* lcio_event);
 
-  void convertTrackerHits(vec_pair<lcio::TrackerHitImpl*, edm4hep::TrackerHit>& trackerhits_vec,
+  void convertTrackerHits(ObjMapT<lcio::TrackerHitImpl*, edm4hep::TrackerHit>& trackerhits_vec,
                           const std::string& e4h_coll_name, const std::string& lcio_coll_name,
                           lcio::LCEventImpl* lcio_event);
 
-  void convertSimTrackerHits(vec_pair<lcio::SimTrackerHitImpl*, edm4hep::SimTrackerHit>& simtrackerhits_vec,
-                             const vec_pair<lcio::MCParticleImpl*, edm4hep::MCParticle>& mcparticles_vec,
+  void convertSimTrackerHits(ObjMapT<lcio::SimTrackerHitImpl*, edm4hep::SimTrackerHit>& simtrackerhits_vec,
+                             const ObjMapT<lcio::MCParticleImpl*, edm4hep::MCParticle>& mcparticles_vec,
                              const std::string& e4h_coll_name, const std::string& lcio_coll_name,
                              lcio::LCEventImpl* lcio_event);
 
-  void convertCalorimeterHits(vec_pair<lcio::CalorimeterHitImpl*, edm4hep::CalorimeterHit>& calo_hits_vec,
+  void convertCalorimeterHits(ObjMapT<lcio::CalorimeterHitImpl*, edm4hep::CalorimeterHit>& calo_hits_vec,
                               const std::string& e4h_coll_name, const std::string& lcio_coll_name,
                               lcio::LCEventImpl* lcio_event);
 
-  void convertRawCalorimeterHits(vec_pair<lcio::RawCalorimeterHitImpl*, edm4hep::RawCalorimeterHit>& raw_calo_hits_vec,
+  void convertRawCalorimeterHits(ObjMapT<lcio::RawCalorimeterHitImpl*, edm4hep::RawCalorimeterHit>& raw_calo_hits_vec,
                                  const std::string& e4h_coll_name, const std::string& lcio_coll_name,
                                  lcio::LCEventImpl* lcio_event);
 
-  void convertSimCalorimeterHits(vec_pair<lcio::SimCalorimeterHitImpl*, edm4hep::SimCalorimeterHit>& sim_calo_hits_vec,
-                                 const vec_pair<lcio::MCParticleImpl*, edm4hep::MCParticle>&         mcparticles,
+  void convertSimCalorimeterHits(ObjMapT<lcio::SimCalorimeterHitImpl*, edm4hep::SimCalorimeterHit>& sim_calo_hits_vec,
+                                 const ObjMapT<lcio::MCParticleImpl*, edm4hep::MCParticle>&         mcparticles,
                                  const std::string& e4h_coll_name, const std::string& lcio_coll_name,
                                  lcio::LCEventImpl* lcio_event);
 
-  void convertTPCHits(vec_pair<lcio::TPCHitImpl*, edm4hep::RawTimeSeries>& tpc_hits_vec,
+  void convertTPCHits(ObjMapT<lcio::TPCHitImpl*, edm4hep::RawTimeSeries>& tpc_hits_vec,
                       const std::string& e4h_coll_name, const std::string& lcio_coll_name,
                       lcio::LCEventImpl* lcio_event);
 
-  void convertClusters(vec_pair<lcio::ClusterImpl*, edm4hep::Cluster>&                     cluster_vec,
-                       const vec_pair<lcio::CalorimeterHitImpl*, edm4hep::CalorimeterHit>& calohits_vec,
+  void convertClusters(ObjMapT<lcio::ClusterImpl*, edm4hep::Cluster>&                     cluster_vec,
+                       const ObjMapT<lcio::CalorimeterHitImpl*, edm4hep::CalorimeterHit>& calohits_vec,
                        const std::string& e4h_coll_name, const std::string& lcio_coll_name,
                        lcio::LCEventImpl* lcio_event);
 
   void convertVertices(
-      vec_pair<lcio::VertexImpl*, edm4hep::Vertex>&                                     vertex_vec,
-      const vec_pair<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>& recoparticles_vec,
+      ObjMapT<lcio::VertexImpl*, edm4hep::Vertex>&                                     vertex_vec,
+      const ObjMapT<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>& recoparticles_vec,
       const std::string& e4h_name, const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event);
 
   void convertReconstructedParticles(
-      vec_pair<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>& recoparticles_vec,
-      const vec_pair<lcio::TrackImpl*, edm4hep::Track>&                           tracks_vec,
-      const vec_pair<lcio::VertexImpl*, edm4hep::Vertex>&                         vertex_vec,
-      const vec_pair<lcio::ClusterImpl*, edm4hep::Cluster>& clusters_vec, const std::string& e4h_coll_name,
+      ObjMapT<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>& recoparticles_vec,
+      const ObjMapT<lcio::TrackImpl*, edm4hep::Track>&                           tracks_vec,
+      const ObjMapT<lcio::VertexImpl*, edm4hep::Vertex>&                         vertex_vec,
+      const ObjMapT<lcio::ClusterImpl*, edm4hep::Cluster>& clusters_vec, const std::string& e4h_coll_name,
       const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event);
 
-  void convertMCParticles(vec_pair<lcio::MCParticleImpl*, edm4hep::MCParticle>& mc_particles_vec,
+  void convertMCParticles(ObjMapT<lcio::MCParticleImpl*, edm4hep::MCParticle>& mc_particles_vec,
                           const std::string& e4h_coll_name, const std::string& lcio_coll_name,
                           lcio::LCEventImpl* lcio_event);
 
   void convertEventHeader(const std::string& e4h_coll_name, lcio::LCEventImpl* lcio_event);
 
   void convertAdd(const std::string& e4h_coll_name, const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event,
-                  CollectionsPairVectors& collection_pairs);
+                  CollectionPairMappings& collection_pairs);
 };
 
 #endif
