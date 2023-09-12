@@ -40,8 +40,10 @@
 #include <string>
 #include <vector>
 
+#ifdef EDM4HEP2LCIOCONV_NAMESPACE
 using EDM4hep2LCIOConv::CollectionsPairVectors;
 using EDM4hep2LCIOConv::vec_pair;
+#endif
 
 class EDM4hep2LcioTool : public GaudiTool, virtual public IEDMConverter {
 public:

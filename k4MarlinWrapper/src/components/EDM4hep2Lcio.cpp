@@ -25,7 +25,9 @@
 
 DECLARE_COMPONENT(EDM4hep2LcioTool);
 
+#ifdef EDM4HEP2LCIOCONV_NAMESPACE
 using namespace EDM4hep2LCIOConv;
+#endif
 
 EDM4hep2LcioTool::EDM4hep2LcioTool(const std::string& type, const std::string& name, const IInterface* parent)
     : GaudiTool(type, name, parent), m_eventDataSvc("EventDataSvc", "EDM4hep2LcioTool") {
