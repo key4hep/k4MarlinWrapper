@@ -41,6 +41,7 @@ fi
 echo "Modifying clicReconstruction.py file..."
 # Replace SLCIO file path
 # sed -i 's|/run/simulation/with/ctest/to/create/a/file.slcio|testSimulation.slcio|g' clicReconstruction.py
+sed -i '1s/^/import os\n/' clicReconstruction.py
 sed -i 's|/run/simulation/with/ctest/to/create/a/file.slcio|$TEST_DIR/inputFiles/testSimulation.slcio|g' clicReconstruction.py
 # Uncomment selected optional processors
 sed -i 's;EvtMax   = 10,;EvtMax   = 3,;' clicReconstruction.py
