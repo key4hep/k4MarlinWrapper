@@ -108,6 +108,7 @@ during [Simulation](#simulation).
 ```bash
 cd CLICPerformance/clicConfig
 
+sed -i '1s/^/import os\n/' clicReconstruction.py
 sed -i 's;read.Files = \[".*"\];read.Files = \["ttbar.slcio"\];' clicReconstruction.py
 sed -i 's;EvtMax   = 10,;EvtMax   = 3,;' clicReconstruction.py
 sed -i 's;"MaxRecordNumber": ["10"],;"MaxRecordNumber": ["3"],;' clicReconstruction.py
