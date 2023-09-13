@@ -166,6 +166,7 @@ The ``MarlinDD4hep::InitializeDD4hep`` processor can be replaced by the ``k4SimG
 For example:
 
 ```python
+import os
 from Configurables import GeoSvc, TrackingCellIDEncodingSvc
 svcList = []
 geoservice = GeoSvc("GeoSvc")
