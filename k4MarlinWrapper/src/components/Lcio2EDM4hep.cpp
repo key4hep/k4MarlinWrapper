@@ -111,6 +111,26 @@ void Lcio2EDM4hepTool::registerCollection(
   }
 }
 
+namespace {
+  template <typename K, typename V> using ObjMapT = k4EDM4hep2LcioConv::VecMapT<K, V>;
+
+  struct ObjectMappings {
+    ObjMapT<lcio::Track*, edm4hep::MutableTrack>                                 tracks{};
+    ObjMapT<lcio::TrackerHit*, edm4hep::MutableTrackerHit>                       trackerHits{};
+    ObjMapT<lcio::SimTrackerHit*, edm4hep::MutableSimTrackerHit>                 simTrackerHits{};
+    ObjMapT<lcio::CalorimeterHit*, edm4hep::MutableCalorimeterHit>               caloHits{};
+    ObjMapT<lcio::RawCalorimeterHit*, edm4hep::MutableRawCalorimeterHit>         rawCaloHits{};
+    ObjMapT<lcio::SimCalorimeterHit*, edm4hep::MutableSimCalorimeterHit>         simCaloHits{};
+    ObjMapT<lcio::TPCHit*, edm4hep::MutableRawTimeSeries>                        tpcHits{};
+    ObjMapT<lcio::Cluster*, edm4hep::MutableCluster>                             clusters{};
+    ObjMapT<lcio::Vertex*, edm4hep::MutableVertex>                               vertices{};
+    ObjMapT<lcio::ReconstructedParticle*, edm4hep::MutableReconstructedParticle> recoParticles{};
+    ObjMapT<lcio::MCParticle*, edm4hep::MutableMCParticle>                       mcParticles{};
+    ObjMapT<lcio::TrackerHitPlane*, edm4hep::MutableTrackerHitPlane>             trackerHitPlanes{};
+    ObjMapT<lcio::ParticleID*, edm4hep::MutableParticleID>                       particleIDs{};
+  };
+}  // namespace
+
 StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
   // Convert Event Header outside the collections loop
   if (!collectionExist("EventHeader")) {
@@ -128,7 +148,7 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
     }
   }
 
-  auto lcio2edm4hepMaps = LCIO2EDM4hepConv::LcioEdmTypeMapping{};
+  auto lcio2edm4hepMaps = ::ObjectMappings{};
 
   std::vector<std::pair<std::string, EVENT::LCCollection*>>               lcRelationColls{};
   std::vector<std::tuple<std::string, EVENT::LCCollection*, std::string>> subsetColls{};

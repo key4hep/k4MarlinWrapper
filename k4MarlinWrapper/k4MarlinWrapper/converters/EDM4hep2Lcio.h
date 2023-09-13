@@ -39,19 +39,7 @@
 
 template <typename K, typename V> using ObjMapT = k4EDM4hep2LcioConv::VecMapT<K, V>;
 
-struct CollectionPairMappings {
-  ObjMapT<lcio::TrackImpl*, edm4hep::Track>                                 tracks{};
-  ObjMapT<lcio::TrackerHitImpl*, edm4hep::TrackerHit>                       trackerhits{};
-  ObjMapT<lcio::SimTrackerHitImpl*, edm4hep::SimTrackerHit>                 simtrackerhits{};
-  ObjMapT<lcio::CalorimeterHitImpl*, edm4hep::CalorimeterHit>               calohits{};
-  ObjMapT<lcio::RawCalorimeterHitImpl*, edm4hep::RawCalorimeterHit>         rawcalohits{};
-  ObjMapT<lcio::SimCalorimeterHitImpl*, edm4hep::SimCalorimeterHit>         simcalohits{};
-  ObjMapT<lcio::TPCHitImpl*, edm4hep::RawTimeSeries>                        tpchits{};
-  ObjMapT<lcio::ClusterImpl*, edm4hep::Cluster>                             clusters{};
-  ObjMapT<lcio::VertexImpl*, edm4hep::Vertex>                               vertices{};
-  ObjMapT<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle> recoparticles{};
-  ObjMapT<lcio::MCParticleImpl*, edm4hep::MCParticle>                       mcparticles{};
-};
+struct CollectionPairMappings;
 
 class EDM4hep2LcioTool : public GaudiTool, virtual public IEDMConverter {
 public:
