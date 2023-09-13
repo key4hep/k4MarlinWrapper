@@ -37,10 +37,6 @@ namespace podio {
   class CollectionBase;
 }
 
-namespace LCIO2EDM4hepConv {
-  struct LcioEdmTypeMapping;
-}
-
 namespace EVENT {
   class LCCollection;
 }

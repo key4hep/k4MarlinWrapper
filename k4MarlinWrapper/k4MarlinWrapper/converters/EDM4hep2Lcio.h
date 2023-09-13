@@ -20,9 +20,7 @@
 #define K4MARLINWRAPPER_EDM4HEP2LCIO_H
 
 // k4MarlinWrapper
-#include "k4MarlinWrapper/LCEventWrapper.h"
 #include "k4MarlinWrapper/converters/IEDMConverter.h"
-#include "k4MarlinWrapper/util/k4MarlinWrapperUtil.h"
 
 // FWCore
 #include <k4FWCore/PodioDataSvc.h>
