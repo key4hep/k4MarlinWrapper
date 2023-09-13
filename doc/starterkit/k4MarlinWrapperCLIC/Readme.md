@@ -143,19 +143,13 @@ included with k4MarlinWrapper. Note that:
   + Change the line where `evtsvc.input` is defined to point to the location of your input file.
   + At the bottom of the file, in the `ApplicationMgr` parameters, change `EvtMax   = 3,` to the number of events to run.
 
-This can be run in the following way. Note that we show the usage here in a way
-that also works in scripts with `-e` enabled. This is necessary because of a
-[framework issue](https://github.com/key4hep/k4FWCore/issues/125) that makes
-`k4run` exit with a non-zero exit code even though nothing went wrong.
-
+This can be run in the following way.
 ```bash
 cd CLICPerformance/clicConfig
 
 cp $K4MARLINWRAPPER/examples/clicRec_e4h_input.py .
 
 k4run clicRec_e4h_input.py --EventDataSvc.input ttbar_edm4hep.root
-result=$?
-[ $result = "0" ] || [ $result = "4" ] && true
 ```
 
 ### DD4hep Geometry Information
