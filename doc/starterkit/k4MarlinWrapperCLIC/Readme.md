@@ -167,7 +167,7 @@ For example:
 
 ```python
 import os
-from Configurables import GeoSvc, TrackingCellIDEncodingSvc
+from Configurables import GeoSvc, TrackingCellIDEncodingSvc, INFO
 svcList = []
 geoservice = GeoSvc("GeoSvc")
 geoservice.detectors = [os.environ["K4GEO"]+"/CLIC/compact/CLIC_o3_v15/CLIC_o3_v15.xml"]
