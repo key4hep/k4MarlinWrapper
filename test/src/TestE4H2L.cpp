@@ -17,6 +17,22 @@
  * limitations under the License.
  */
 #include "TestE4H2L.h"
+
+#include <IMPL/LCRelationImpl.h>
+#include <IMPL/MCParticleImpl.h>
+#include <IMPL/ParticleIDImpl.h>
+#include <IMPL/RawCalorimeterHitImpl.h>
+#include <IMPL/ReconstructedParticleImpl.h>
+#include <IMPL/SimCalorimeterHitImpl.h>
+#include <IMPL/SimTrackerHitImpl.h>
+#include <IMPL/TPCHitImpl.h>
+#include <IMPL/TrackImpl.h>
+#include <IMPL/TrackStateImpl.h>
+#include <IMPL/TrackerHitImpl.h>
+#include <IMPL/VertexImpl.h>
+#include <LCIOSTLTypes.h>
+#include <UTIL/CellIDEncoder.h>
+
 #if __has_include("edm4hep/EDM4hepVersion.h")
 #include "edm4hep/EDM4hepVersion.h"
 #else
@@ -25,6 +41,30 @@
 // v00-09 is the last version without the capitalization change of the track vector members
 #define EDM4HEP_BUILD_VERSION EDM4HEP_VERSION(0, 9, 0)
 #endif
+
+// EDM4hep
+#include <edm4hep/CaloHitContributionCollection.h>
+#include <edm4hep/CalorimeterHitCollection.h>
+#include <edm4hep/ClusterCollection.h>
+#include <edm4hep/EventHeaderCollection.h>
+#include <edm4hep/MCParticleCollection.h>
+#include <edm4hep/MCRecoCaloAssociationCollection.h>
+#include <edm4hep/MCRecoCaloParticleAssociationCollection.h>
+#include <edm4hep/MCRecoParticleAssociationCollection.h>
+#include <edm4hep/MCRecoTrackParticleAssociationCollection.h>
+#include <edm4hep/MCRecoTrackerAssociationCollection.h>
+#include <edm4hep/ParticleIDCollection.h>
+#include <edm4hep/RawCalorimeterHitCollection.h>
+#include <edm4hep/RawTimeSeriesCollection.h>
+#include <edm4hep/RecoParticleVertexAssociationCollection.h>
+#include <edm4hep/ReconstructedParticleCollection.h>
+#include <edm4hep/ReconstructedParticleData.h>
+#include <edm4hep/SimCalorimeterHitCollection.h>
+#include <edm4hep/SimTrackerHitCollection.h>
+#include <edm4hep/TrackCollection.h>
+#include <edm4hep/TrackerHitCollection.h>
+#include <edm4hep/TrackerHitPlaneCollection.h>
+#include <edm4hep/VertexCollection.h>
 
 DECLARE_COMPONENT(TestE4H2L)
 
