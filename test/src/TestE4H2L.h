@@ -19,8 +19,6 @@
 #ifndef TEST_E4H2L_H
 #define TEST_E4H2L_H
 
-#include <string>
-
 #include <GaudiAlg/GaudiAlgorithm.h>
 
 #include <k4FWCore/DataHandle.h>
@@ -29,6 +27,12 @@
 #include "k4MarlinWrapper/converters/IEDMConverter.h"
 
 #include <lcio.h>
+
+#include <map>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
 
 class TestE4H2L : public GaudiAlgorithm {
 public:
