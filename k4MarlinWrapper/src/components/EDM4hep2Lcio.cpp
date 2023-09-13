@@ -21,8 +21,6 @@
 #include "k4FWCore/DataHandle.h"
 #include "k4FWCore/MetaDataHandle.h"
 
-#include <unordered_map>
-
 DECLARE_COMPONENT(EDM4hep2LcioTool);
 
 #ifdef EDM4HEP2LCIOCONV_NAMESPACE

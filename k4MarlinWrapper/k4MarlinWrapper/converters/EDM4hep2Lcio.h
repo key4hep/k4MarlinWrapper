@@ -32,8 +32,6 @@
 #include <GaudiAlg/GaudiTool.h>
 
 // std
-#include <algorithm>
-#include <bitset>
 #include <map>
 #include <string>
 #include <vector>
