@@ -28,6 +28,8 @@
 // Converters interface
 #include "k4MarlinWrapper/converters/IEDMConverter.h"
 
+#include <lcio.h>
+
 class TestE4H2L : public GaudiAlgorithm {
 public:
   explicit TestE4H2L(const std::string& name, ISvcLocator* pSL);

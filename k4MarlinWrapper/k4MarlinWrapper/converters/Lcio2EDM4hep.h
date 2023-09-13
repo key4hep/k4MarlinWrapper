@@ -28,6 +28,8 @@
 // Converter Interface
 #include "k4MarlinWrapper/converters/IEDMConverter.h"
 
+#include <lcio.h>
+
 #include <map>
 #include <string>
 #include <tuple>
