@@ -17,6 +17,7 @@
  * limitations under the License.
  */
 #include "k4MarlinWrapper/converters/EDM4hep2Lcio.h"
+#include "ConverterObjectMap.h"
 
 #include "k4FWCore/DataHandle.h"
 #include "k4FWCore/MetaDataHandle.h"
@@ -326,7 +327,9 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
 
   debug() << "Event: " << lcio_event->getEventNumber() << " Run: " << lcio_event->getRunNumber() << endmsg;
 
-  FillMissingCollections(collection_pairs);
+  k4MarlinWrapper::GlobalConvertedObjectsMap::update(collection_pairs);
+
+  FillMissingCollections(collection_pairs, k4MarlinWrapper::GlobalConvertedObjectsMap::get());
 
   return StatusCode::SUCCESS;
 }
