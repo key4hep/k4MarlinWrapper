@@ -29,16 +29,16 @@ using namespace EDM4hep2LCIOConv;
 
 struct CollectionPairMappings {
   TrackMap         tracks{};
-  TrackerHitMap    trackerhits{};
-  SimTrackerHitMap simtrackerhits{};
-  CaloHitMap       calohits{};
-  RawCaloHitMap    rawcalohits{};
-  SimCaloHitMap    simcalohits{};
-  TPCHitMap        tpchits{};
+  TrackerHitMap    trackerHits{};
+  SimTrackerHitMap simTrackerHits{};
+  CaloHitMap       caloHits{};
+  RawCaloHitMap    rawCaloHits{};
+  SimCaloHitMap    simCaloHits{};
+  TPCHitMap        tpcHits{};
   ClusterMap       clusters{};
   VertexMap        vertices{};
-  RecoParticleMap  recoparticles{};
-  MCParticleMap    mcparticles{};
+  RecoParticleMap  recoParticles{};
+  MCParticleMap    mcParticles{};
 };
 
 EDM4hep2LcioTool::EDM4hep2LcioTool(const std::string& type, const std::string& name, const IInterface* parent)
@@ -260,30 +260,30 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
   const auto fulltype = collPtr->getValueTypeName();
 
   if (fulltype == "edm4hep::Track") {
-    convertTracks(collection_pairs.tracks, collection_pairs.trackerhits, e4h_coll_name, lcio_coll_name, lcio_event);
+    convertTracks(collection_pairs.tracks, collection_pairs.trackerHits, e4h_coll_name, lcio_coll_name, lcio_event);
   } else if (fulltype == "edm4hep::TrackerHit") {
-    convertTrackerHits(collection_pairs.trackerhits, e4h_coll_name, lcio_coll_name, lcio_event);
+    convertTrackerHits(collection_pairs.trackerHits, e4h_coll_name, lcio_coll_name, lcio_event);
   } else if (fulltype == "edm4hep::SimTrackerHit") {
-    convertSimTrackerHits(collection_pairs.simtrackerhits, collection_pairs.mcparticles, e4h_coll_name, lcio_coll_name,
+    convertSimTrackerHits(collection_pairs.simTrackerHits, collection_pairs.mcParticles, e4h_coll_name, lcio_coll_name,
                           lcio_event);
   } else if (fulltype == "edm4hep::CalorimeterHit") {
-    convertCalorimeterHits(collection_pairs.calohits, e4h_coll_name, lcio_coll_name, lcio_event);
+    convertCalorimeterHits(collection_pairs.caloHits, e4h_coll_name, lcio_coll_name, lcio_event);
   } else if (fulltype == "edm4hep::RawCalorimeterHit") {
-    convertRawCalorimeterHits(collection_pairs.rawcalohits, e4h_coll_name, lcio_coll_name, lcio_event);
+    convertRawCalorimeterHits(collection_pairs.rawCaloHits, e4h_coll_name, lcio_coll_name, lcio_event);
   } else if (fulltype == "edm4hep::SimCalorimeterHit") {
-    convertSimCalorimeterHits(collection_pairs.simcalohits, collection_pairs.mcparticles, e4h_coll_name, lcio_coll_name,
+    convertSimCalorimeterHits(collection_pairs.simCaloHits, collection_pairs.mcParticles, e4h_coll_name, lcio_coll_name,
                               lcio_event);
   } else if (fulltype == "edm4hep::RawTimeSeries") {
-    convertTPCHits(collection_pairs.tpchits, e4h_coll_name, lcio_coll_name, lcio_event);
+    convertTPCHits(collection_pairs.tpcHits, e4h_coll_name, lcio_coll_name, lcio_event);
   } else if (fulltype == "edm4hep::Cluster") {
-    convertClusters(collection_pairs.clusters, collection_pairs.calohits, e4h_coll_name, lcio_coll_name, lcio_event);
+    convertClusters(collection_pairs.clusters, collection_pairs.caloHits, e4h_coll_name, lcio_coll_name, lcio_event);
   } else if (fulltype == "edm4hep::Vertex") {
-    convertVertices(collection_pairs.vertices, collection_pairs.recoparticles, e4h_coll_name, lcio_coll_name,
+    convertVertices(collection_pairs.vertices, collection_pairs.recoParticles, e4h_coll_name, lcio_coll_name,
                     lcio_event);
   } else if (fulltype == "edm4hep::MCParticle") {
-    convertMCParticles(collection_pairs.mcparticles, e4h_coll_name, lcio_coll_name, lcio_event);
+    convertMCParticles(collection_pairs.mcParticles, e4h_coll_name, lcio_coll_name, lcio_event);
   } else if (fulltype == "edm4hep::ReconstructedParticle") {
-    convertReconstructedParticles(collection_pairs.recoparticles, collection_pairs.tracks, collection_pairs.vertices,
+    convertReconstructedParticles(collection_pairs.recoParticles, collection_pairs.tracks, collection_pairs.vertices,
                                   collection_pairs.clusters, e4h_coll_name, lcio_coll_name, lcio_event);
   } else if (fulltype == "edm4hep::EventHeader") {
     convertEventHeader(e4h_coll_name, lcio_event);
