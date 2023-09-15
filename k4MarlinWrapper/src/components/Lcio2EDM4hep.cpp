@@ -17,6 +17,7 @@
  * limitations under the License.
  */
 #include "k4MarlinWrapper/converters/Lcio2EDM4hep.h"
+#include "GlobalConvertedObjectsMap.h"
 
 #include <EVENT/LCCollection.h>
 #include <Exceptions.h>
@@ -188,8 +189,11 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
     }
   }
 
+  // Update the global conversion mapping
+  k4MarlinWrapper::GlobalConvertedObjectsMap::update(lcio2edm4hepMaps);
+
   // Now we can resolve relations, subset collections and LCRelations
-  LCIO2EDM4hepConv::resolveRelations(lcio2edm4hepMaps);
+  LCIO2EDM4hepConv::resolveRelations(lcio2edm4hepMaps, k4MarlinWrapper::GlobalConvertedObjectsMap::get());
 
   for (const auto& [name, coll, type] : subsetColls) {
     registerCollection(name, LCIO2EDM4hepConv::fillSubset(coll, lcio2edm4hepMaps, type), coll);
