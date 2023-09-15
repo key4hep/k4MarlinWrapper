@@ -512,6 +512,9 @@ bool TestE4H2L::checkEDMTPCHitLCIOTPCHit(lcio::LCEventImpl* the_event) {
 }
 
 bool TestE4H2L::checkEDMSimTrackerHitEDMSimTrackerHit(const std::vector<std::pair<uint, uint>>& link_mcparticles_idx) {
+  info() << "Checking SimTrackerHit roundtrip conversion " << m_e4h_simtrackerhit_name << " vs "
+         << m_e4h_simtrackerhit_name << m_conv_tag << endmsg;
+
   DataHandle<edm4hep::SimTrackerHitCollection> simtrackerhit_handle_orig{m_e4h_simtrackerhit_name,
                                                                          Gaudi::DataHandle::Reader, this};
   const auto                                   simtrackerhit_coll_orig = simtrackerhit_handle_orig.get();
@@ -521,6 +524,10 @@ bool TestE4H2L::checkEDMSimTrackerHitEDMSimTrackerHit(const std::vector<std::pai
   const auto                                   simtrackerhit_coll = simtrackerhit_handle.get();
 
   bool strh_same = (*simtrackerhit_coll_orig).size() == (*simtrackerhit_coll).size();
+  if (!strh_same) {
+    error() << "collections differ in size (expected " << simtrackerhit_coll_orig->size() << ", actual "
+            << simtrackerhit_coll->size() << ")" << endmsg;
+  }
 
   if (strh_same) {
     for (int i = 0; i < (*simtrackerhit_coll).size(); ++i) {
@@ -540,6 +547,10 @@ bool TestE4H2L::checkEDMSimTrackerHitEDMSimTrackerHit(const std::vector<std::pai
       strh_same = strh_same && (edm_strh_orig.getQuality() == edm_strh.getQuality());
       strh_same = strh_same && (edm_strh_orig.isOverlay() == edm_strh.isOverlay());
       strh_same = strh_same && (edm_strh_orig.isProducedBySecondary() == edm_strh.isProducedBySecondary());
+
+      if (!strh_same) {
+        error() << "data member conversion failed for SimTrackerHit " << i << endmsg;
+      }
     }
 
     if (strh_same) {
@@ -553,7 +564,17 @@ bool TestE4H2L::checkEDMSimTrackerHitEDMSimTrackerHit(const std::vector<std::pai
         auto edm_mcpart      = (*mcparticle_coll)[mcp_idx];
         auto edm_strh_mcpart = edm_strh.getMCParticle();
 
+        info() << "Checking link of SimTrackerHit " << strh_idx << " to MCParticle " << mcp_idx << endmsg;
+        info() << "actual indices: " << edm_strh_mcpart.getObjectID().index << " and " << edm_mcpart.getObjectID().index
+               << endmsg;
+        info() << "coll ids: " << edm_strh_mcpart.getObjectID().collectionID << " and "
+               << edm_mcpart.getObjectID().collectionID << endmsg;
+
         strh_same = strh_same && (edm_strh_mcpart == edm_mcpart);
+        if (!strh_same) {
+          error() << "SimTrackerHit " << strh_idx << " is not linked to the correct MCParticle (" << mcp_idx << ")"
+                  << endmsg;
+        }
       }
     }
   }
