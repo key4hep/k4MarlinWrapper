@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 #include "k4MarlinWrapper/converters/EDM4hep2Lcio.h"
-#include "ConverterObjectMap.h"
+#include "GlobalConvertedObjectsMap.h"
 
 #include "k4FWCore/DataHandle.h"
 #include "k4FWCore/MetaDataHandle.h"
