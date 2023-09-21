@@ -40,7 +40,15 @@
 #include <k4FWCore/DataHandle.h>
 #include <k4FWCore/MetaDataHandle.h>
 
+#include "GaudiKernel/AnyDataWrapper.h"
+
+#include <memory>
+
 DECLARE_COMPONENT(Lcio2EDM4hepTool);
+
+using namespace k4MarlinWrapper;
+
+using GlobalMapWrapper = AnyDataWrapper<GlobalConvertedObjectsMap>;
 
 Lcio2EDM4hepTool::Lcio2EDM4hepTool(const std::string& type, const std::string& name, const IInterface* parent)
     : GaudiTool(type, name, parent), m_eds("EventDataSvc", "Lcio2EDM4hepTool") {
@@ -189,11 +197,25 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
     }
   }
 
-  // Update the global conversion mapping
-  k4MarlinWrapper::GlobalConvertedObjectsMap::update(lcio2edm4hepMaps);
+  // We want one "global" map that is created the first time it is use in the
+  // event.
+  //
+  // Technically getOrCreate is a thing in GaudiTool but that doesn't seem to
+  // easily work with the AnyDataWrapper we want to use here. So doing the two
+  // step process here
+  if (!exist<GlobalMapWrapper>(GlobalConvertedObjectsMap::TESpath.data())) {
+    debug() << "Creating GlobalconvertedObjectsMap for this event since it is not already in the EventStore" << endmsg;
+    auto globalObjMapWrapper = std::make_unique<GlobalMapWrapper>(GlobalConvertedObjectsMap{});
+    put(std::move(globalObjMapWrapper), GlobalConvertedObjectsMap::TESpath.data());
+  }
+
+  auto  globalObjMapWrapper = get<GlobalMapWrapper>(GlobalConvertedObjectsMap::TESpath.data());
+  auto& globalObjMap        = globalObjMapWrapper->getData();
+
+  globalObjMap.update(lcio2edm4hepMaps);
 
   // Now we can resolve relations, subset collections and LCRelations
-  LCIO2EDM4hepConv::resolveRelations(lcio2edm4hepMaps, k4MarlinWrapper::GlobalConvertedObjectsMap::get());
+  LCIO2EDM4hepConv::resolveRelations(lcio2edm4hepMaps, globalObjMap);
 
   for (const auto& [name, coll, type] : subsetColls) {
     registerCollection(name, LCIO2EDM4hepConv::fillSubset(coll, lcio2edm4hepMaps, type), coll);

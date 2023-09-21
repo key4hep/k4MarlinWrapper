@@ -22,11 +22,19 @@
 #include "k4FWCore/DataHandle.h"
 #include "k4FWCore/MetaDataHandle.h"
 
+#include "GaudiKernel/AnyDataWrapper.h"
+
+#include <memory>
+
 DECLARE_COMPONENT(EDM4hep2LcioTool);
 
 #ifdef EDM4HEP2LCIOCONV_NAMESPACE
 using namespace EDM4hep2LCIOConv;
 #endif
+
+using namespace k4MarlinWrapper;
+
+using GlobalMapWrapper = AnyDataWrapper<GlobalConvertedObjectsMap>;
 
 struct CollectionPairMappings {
   TrackMap         tracks{};
@@ -327,9 +335,24 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
 
   debug() << "Event: " << lcio_event->getEventNumber() << " Run: " << lcio_event->getRunNumber() << endmsg;
 
-  k4MarlinWrapper::GlobalConvertedObjectsMap::update(collection_pairs);
+  // We want one "global" map that is created the first time it is use in the
+  // event.
+  //
+  // Technically getOrCreate is a thing in GaudiTool but that doesn't seem to
+  // easily work with the AnyDataWrapper we want to use here. So doing the two
+  // step process here
+  if (!exist<GlobalMapWrapper>(GlobalConvertedObjectsMap::TESpath.data())) {
+    debug() << "Creating GlobalconvertedObjectsMap for this event since it is not already in the EventStore" << endmsg;
+    auto globalObjMapWrapper = std::make_unique<GlobalMapWrapper>(GlobalConvertedObjectsMap{});
+    put(std::move(globalObjMapWrapper), GlobalConvertedObjectsMap::TESpath.data());
+  }
 
-  FillMissingCollections(collection_pairs, k4MarlinWrapper::GlobalConvertedObjectsMap::get());
+  auto  globalObjMapWrapper = get<GlobalMapWrapper>(GlobalConvertedObjectsMap::TESpath.data());
+  auto& globalObjMap        = globalObjMapWrapper->getData();
+
+  globalObjMap.update(collection_pairs);
+
+  FillMissingCollections(collection_pairs, globalObjMap);
 
   return StatusCode::SUCCESS;
 }

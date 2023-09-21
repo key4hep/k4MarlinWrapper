@@ -21,6 +21,8 @@
 
 #include "k4EDM4hep2LcioConv/MappingUtils.h"
 
+#include <string_view>
+
 namespace EVENT {
   class Track;
   class TrackerHit;
@@ -91,43 +93,31 @@ namespace k4MarlinWrapper {
     ObjectMapT<EVENT::TrackerHitPlane*, edm4hep::TrackerHitPlane>             trackerHitPlanes{};
     ObjectMapT<EVENT::ParticleID*, edm4hep::ParticleID>                       particleIDs{};
 
-    /**
-     * Get the singleton instance
-     */
-    static GlobalConvertedObjectsMap& get() {
-      static GlobalConvertedObjectsMap globalMap{};
-      return globalMap;
-    }
-
-    // TODO: clear
+    constexpr static auto TESpath = std::string_view{"/Event/EDMConvGlobalObjMap"};
 
     /**
      * Update the map with contents from one converter run
      */
-    template <typename ObjectMap> static void update(const ObjectMap& localMap) {
-      auto& globalMap = get();
-      updateMap(globalMap.tracks, localMap.tracks);
-      updateMap(globalMap.trackerHits, localMap.trackerHits);
-      updateMap(globalMap.simTrackerHits, localMap.simTrackerHits);
-      updateMap(globalMap.caloHits, localMap.caloHits);
-      updateMap(globalMap.rawCaloHits, localMap.rawCaloHits);
-      updateMap(globalMap.simCaloHits, localMap.simCaloHits);
-      updateMap(globalMap.tpcHits, localMap.tpcHits);
-      updateMap(globalMap.clusters, localMap.clusters);
-      updateMap(globalMap.vertices, localMap.vertices);
-      updateMap(globalMap.recoParticles, localMap.recoParticles);
-      updateMap(globalMap.mcParticles, localMap.mcParticles);
+    template <typename ObjectMap> void update(const ObjectMap& localMap) {
+      updateMap(tracks, localMap.tracks);
+      updateMap(trackerHits, localMap.trackerHits);
+      updateMap(simTrackerHits, localMap.simTrackerHits);
+      updateMap(caloHits, localMap.caloHits);
+      updateMap(rawCaloHits, localMap.rawCaloHits);
+      updateMap(simCaloHits, localMap.simCaloHits);
+      updateMap(tpcHits, localMap.tpcHits);
+      updateMap(clusters, localMap.clusters);
+      updateMap(vertices, localMap.vertices);
+      updateMap(recoParticles, localMap.recoParticles);
+      updateMap(mcParticles, localMap.mcParticles);
 
       if constexpr (det::is_detected_v<detail::has_trkhit_plane, ObjectMap>) {
-        updateMap(globalMap.trackerHitPlanes, localMap.trackerHitPlanes);
+        updateMap(trackerHitPlanes, localMap.trackerHitPlanes);
       }
       if constexpr (det::is_detected_v<detail::has_particle_id, ObjectMap>) {
-        updateMap(globalMap.particleIDs, localMap.particleIDs);
+        updateMap(particleIDs, localMap.particleIDs);
       }
     }
-
-  private:
-    GlobalConvertedObjectsMap() = default;
   };
 }  // namespace k4MarlinWrapper
 
