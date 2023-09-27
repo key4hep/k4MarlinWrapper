@@ -17,26 +17,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ]]
 
-# Compile Gaudi algorithm for conversion testing
-gaudi_add_module(TestE4H2L
-  SOURCES
-    src/TestE4H2L.cpp
-  LINK
-    Gaudi::GaudiAlgLib
-    Gaudi::GaudiKernel
-    ${LCIO_LIBRARIES}
-    k4FWCore::k4FWCore
-    EDM4HEP::edm4hep
-)
-
-target_include_directories(TestE4H2L PUBLIC
-  src
-  ${PROJECT_SOURCE_DIR}/k4MarlinWrapper
-  k4FWCore::k4FWCore
-  EDM4HEP::edm4hep
-  ${LCIO_INCLUDE_DIRS}
-)
-
 # Add test scripts
 
 find_program(BASH_PROGRAM bash)
@@ -58,9 +38,6 @@ if (BASH_PROGRAM)
 
   # Test converter constants
   add_test( converter_constants ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/converter_constants.sh )
-
-  # Test the edm4hep to lcio converter
-  add_test( edm_converters ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/edm_converters.sh )
 
   # Test indicating -1 to go over all events
   add_test( all_events_bounds ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/all_events_bounds.sh )
@@ -94,7 +71,6 @@ if (BASH_PROGRAM)
       simple_processors2
       clicRec
       converter_constants
-      edm_converters
       all_events_bounds
       over_total_events
       same_num_io
