@@ -218,10 +218,10 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
   LCIO2EDM4hepConv::resolveRelations(lcio2edm4hepMaps, globalObjMap);
 
   for (const auto& [name, coll, type] : subsetColls) {
-    registerCollection(name, LCIO2EDM4hepConv::fillSubset(coll, lcio2edm4hepMaps, type), coll);
+    registerCollection(name, LCIO2EDM4hepConv::fillSubset(coll, globalObjMap, type), coll);
   }
 
-  for (auto&& assocColl : LCIO2EDM4hepConv::createAssociations(lcio2edm4hepMaps, lcRelationColls)) {
+  for (auto&& assocColl : LCIO2EDM4hepConv::createAssociations(globalObjMap, lcRelationColls)) {
     registerCollection(std::move(assocColl));  // TODO: Potentially handle metadata here?
   }
 
