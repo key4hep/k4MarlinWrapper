@@ -155,7 +155,7 @@ k4run clicRec_e4h_input.py --EventDataSvc.input ttbar_edm4hep.root
 ### DD4hep Geometry Information
 
 The ``MarlinDD4hep::InitializeDD4hep`` processor can be replaced by the ``k4SimGeant4::GeoSvc`` and the
-``TrackingCellIDEncodingSvc`` the latter of which is part of the k4MarlinWrapper repository.
+``k4Reco::TrackingCellIDEncodingSvc`` the latter of which is part of the k4MarlinWrapper repository.
 
 For example:
 
