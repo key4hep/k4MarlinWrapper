@@ -17,6 +17,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ]]
 
+gaudi_add_module(GaudiTestAlgorithms
+  SOURCES
+    src/MCRecoLinkChecker.cc
+  LINK
+    Gaudi::GaudiAlgLib
+    Gaudi::GaudiKernel
+    k4FWCore::k4FWCore
+    EDM4HEP::edm4hep
+)
+
+
+# Compile the Marlin test processors into a shared library
+find_package(Marlin REQUIRED)
+
+add_library(MarlinTestProcessors SHARED src/PseudoRecoProcessor.cc src/TrivialMCTruthLinkerProcessor.cc)
+target_link_libraries(MarlinTestProcessors PUBLIC ${Marlin_LIBRARIES})
+target_include_directories(MarlinTestProcessors PUBLIC ${Marlin_INCLUDE_DIRS})
+
 # Add test scripts
 
 find_program(BASH_PROGRAM bash)
@@ -66,6 +84,10 @@ if (BASH_PROGRAM)
   # Test the GeoSvc and TrackingCellIDEncodingSvc
   add_test( clic_geo_test ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/clicGeoTest.sh )
 
+  # Test for checking whether the converters can resolve relations accross
+  # multiple processors
+  add_test( global_converter_maps ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/global_converter_maps.sh )
+
   set_tests_properties (
       simple_processors
       simple_processors2
@@ -77,8 +99,9 @@ if (BASH_PROGRAM)
       clicRec_lcio_mt
       clicRec_edm4hep_input
       clic_geo_test
+      global_converter_maps
     PROPERTIES
-      ENVIRONMENT "TEST_DIR=${CMAKE_CURRENT_SOURCE_DIR};LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:${CMAKE_INSTALL_PREFIX}/lib64:$ENV{LD_LIBRARY_PATH};PYTHONPATH=${CMAKE_INSTALL_PREFIX}/python:$ENV{PYTHONPATH};EXAMPLE_DIR=${PROJECT_SOURCE_DIR}/k4MarlinWrapper/examples"
+      ENVIRONMENT "TEST_DIR=${CMAKE_CURRENT_SOURCE_DIR};LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:${CMAKE_INSTALL_PREFIX}/lib64:$ENV{LD_LIBRARY_PATH};PYTHONPATH=${CMAKE_INSTALL_PREFIX}/python:$ENV{PYTHONPATH};EXAMPLE_DIR=${PROJECT_SOURCE_DIR}/k4MarlinWrapper/examples;MARLIN_DLL=$ENV{MARLIN_DLL}:${CMAKE_CURRENT_BINARY_DIR}/libMarlinTestProcessors.so"
       )
 
     set_tests_properties(
