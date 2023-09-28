@@ -268,6 +268,8 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
   }
   const auto fulltype = collPtr->getValueTypeName();
 
+  debug() << "Converting type " << fulltype << " from input " << e4h_coll_name << endmsg;
+
   if (fulltype == "edm4hep::Track") {
     convertTracks(collection_pairs.tracks, collection_pairs.trackerHits, e4h_coll_name, lcio_coll_name, lcio_event);
   } else if (fulltype == "edm4hep::TrackerHit") {
@@ -326,6 +328,7 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
 
   CollectionPairMappings collection_pairs{};
   for (const auto& [edm4hepName, lcioName] : collsToConvert) {
+    debug() << "Converting collection " << edm4hepName << " (storing it as " << lcioName << ")" << endmsg;
     if (!collectionExist(lcioName, lcio_event)) {
       convertAdd(edm4hepName, lcioName, lcio_event, collection_pairs);
     } else {
