@@ -171,7 +171,7 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
         continue;  // No need to convert again
       }
       const auto& lcio_coll_type_str = lcio_coll->getTypeName();
-      debug() << "LCIO type of the relation is " << lcio_coll_type_str << endmsg;
+      debug() << "LCIO type of the collection is " << lcio_coll_type_str << endmsg;
 
       // We deal with subset collections and LCRelations once we have all data
       // converted

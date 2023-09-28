@@ -1722,6 +1722,9 @@ VertexFinderLCIOConv.collNameMapping = {
   "BuildUpVertices_V0": "BuildUpVertices_V0",
   "BuildUpVertices": "BuildUpVertices",
   "PrimaryVertices": "PrimaryVertices",
+  "BuildUpVertices_RP": "BuildUpVertices_RP",
+  "BuildUpVertices_V0_RP": "BuildUpVertices_V0_RP",
+  "PrimaryVertices_RP": "PrimaryVertices_RP",
   }
 VertexFinderLCIOConv.OutputLevel = DEBUG
 # Add it to VertexFinder Algorithm
