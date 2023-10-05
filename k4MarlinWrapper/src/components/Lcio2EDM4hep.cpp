@@ -17,6 +17,7 @@
  * limitations under the License.
  */
 #include "k4MarlinWrapper/converters/Lcio2EDM4hep.h"
+#include "GlobalConvertedObjectsMap.h"
 
 #include <EVENT/LCCollection.h>
 #include <Exceptions.h>
@@ -39,7 +40,15 @@
 #include <k4FWCore/DataHandle.h>
 #include <k4FWCore/MetaDataHandle.h>
 
+#include "GaudiKernel/AnyDataWrapper.h"
+
+#include <memory>
+
 DECLARE_COMPONENT(Lcio2EDM4hepTool);
+
+using namespace k4MarlinWrapper;
+
+using GlobalMapWrapper = AnyDataWrapper<GlobalConvertedObjectsMap>;
 
 Lcio2EDM4hepTool::Lcio2EDM4hepTool(const std::string& type, const std::string& name, const IInterface* parent)
     : GaudiTool(type, name, parent), m_eds("EventDataSvc", "Lcio2EDM4hepTool") {
@@ -111,6 +120,26 @@ void Lcio2EDM4hepTool::registerCollection(
   }
 }
 
+namespace {
+  template <typename K, typename V> using ObjMapT = k4EDM4hep2LcioConv::VecMapT<K, V>;
+
+  struct ObjectMappings {
+    ObjMapT<lcio::Track*, edm4hep::MutableTrack>                                 tracks{};
+    ObjMapT<lcio::TrackerHit*, edm4hep::MutableTrackerHit>                       trackerHits{};
+    ObjMapT<lcio::SimTrackerHit*, edm4hep::MutableSimTrackerHit>                 simTrackerHits{};
+    ObjMapT<lcio::CalorimeterHit*, edm4hep::MutableCalorimeterHit>               caloHits{};
+    ObjMapT<lcio::RawCalorimeterHit*, edm4hep::MutableRawCalorimeterHit>         rawCaloHits{};
+    ObjMapT<lcio::SimCalorimeterHit*, edm4hep::MutableSimCalorimeterHit>         simCaloHits{};
+    ObjMapT<lcio::TPCHit*, edm4hep::MutableRawTimeSeries>                        tpcHits{};
+    ObjMapT<lcio::Cluster*, edm4hep::MutableCluster>                             clusters{};
+    ObjMapT<lcio::Vertex*, edm4hep::MutableVertex>                               vertices{};
+    ObjMapT<lcio::ReconstructedParticle*, edm4hep::MutableReconstructedParticle> recoParticles{};
+    ObjMapT<lcio::MCParticle*, edm4hep::MutableMCParticle>                       mcParticles{};
+    ObjMapT<lcio::TrackerHitPlane*, edm4hep::MutableTrackerHitPlane>             trackerHitPlanes{};
+    ObjMapT<lcio::ParticleID*, edm4hep::MutableParticleID>                       particleIDs{};
+  };
+}  // namespace
+
 StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
   // Convert Event Header outside the collections loop
   if (!collectionExist("EventHeader")) {
@@ -128,7 +157,7 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
     }
   }
 
-  auto lcio2edm4hepMaps = LCIO2EDM4hepConv::LcioEdmTypeMapping{};
+  auto lcio2edm4hepMaps = ::ObjectMappings{};
 
   std::vector<std::pair<std::string, EVENT::LCCollection*>>               lcRelationColls{};
   std::vector<std::tuple<std::string, EVENT::LCCollection*, std::string>> subsetColls{};
@@ -142,7 +171,7 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
         continue;  // No need to convert again
       }
       const auto& lcio_coll_type_str = lcio_coll->getTypeName();
-      debug() << "LCIO type of the relation is " << lcio_coll_type_str << endmsg;
+      debug() << "LCIO type of the collection is " << lcio_coll_type_str << endmsg;
 
       // We deal with subset collections and LCRelations once we have all data
       // converted
@@ -168,14 +197,31 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
     }
   }
 
-  // Now we can resolve relations, subset collections and LCRelations
-  LCIO2EDM4hepConv::resolveRelations(lcio2edm4hepMaps);
-
-  for (const auto& [name, coll, type] : subsetColls) {
-    registerCollection(name, LCIO2EDM4hepConv::fillSubset(coll, lcio2edm4hepMaps, type), coll);
+  // We want one "global" map that is created the first time it is use in the
+  // event.
+  //
+  // Technically getOrCreate is a thing in GaudiTool but that doesn't seem to
+  // easily work with the AnyDataWrapper we want to use here. So doing the two
+  // step process here
+  if (!exist<GlobalMapWrapper>(GlobalConvertedObjectsMap::TESpath.data())) {
+    debug() << "Creating GlobalconvertedObjectsMap for this event since it is not already in the EventStore" << endmsg;
+    auto globalObjMapWrapper = std::make_unique<GlobalMapWrapper>(GlobalConvertedObjectsMap{});
+    put(std::move(globalObjMapWrapper), GlobalConvertedObjectsMap::TESpath.data());
   }
 
-  for (auto&& assocColl : LCIO2EDM4hepConv::createAssociations(lcio2edm4hepMaps, lcRelationColls)) {
+  auto  globalObjMapWrapper = get<GlobalMapWrapper>(GlobalConvertedObjectsMap::TESpath.data());
+  auto& globalObjMap        = globalObjMapWrapper->getData();
+
+  globalObjMap.update(lcio2edm4hepMaps);
+
+  // Now we can resolve relations, subset collections and LCRelations
+  LCIO2EDM4hepConv::resolveRelations(lcio2edm4hepMaps, globalObjMap);
+
+  for (const auto& [name, coll, type] : subsetColls) {
+    registerCollection(name, LCIO2EDM4hepConv::fillSubset(coll, globalObjMap, type), coll);
+  }
+
+  for (auto&& assocColl : LCIO2EDM4hepConv::createAssociations(globalObjMap, lcRelationColls)) {
     registerCollection(std::move(assocColl));  // TODO: Potentially handle metadata here?
   }
 
