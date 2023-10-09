@@ -26,7 +26,7 @@ It provides the necessary converters and interfaces between the file types and f
 
 ## Using Event Data Model (EDM) converters
 
-Please refer to the [EDM Converters](./doc/edmConverters.md) documentation
+Please refer to the [EDM Converters](./doc/MarlinWrapperIntroduction.md) documentation
 
 
 ## Configuring, compiling and installing
@@ -92,7 +92,7 @@ ctest --verbose -R test_clicReconstruction
 
 ## Using Event Data Model (EDM) converters
 
-Please refer to [this doc](./doc/starterkit/k4MarlinWrapperCLIC/edmConverters.md) on how to convert between EDMs in k4MarlinWrapper
+Please refer to [this doc](./doc/MarlinWrapperIntroduction.md) on how to convert between EDMs in k4MarlinWrapper
 
 ## Running in parallel: multi-thread support
 

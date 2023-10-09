@@ -131,7 +131,7 @@ k4run clicReconstruction.py
 
 #### Reconstruction with EDM4hep input
 
-- When using **EDM4hep** format for the input events to be used in reconstruction, refer to the [**EDM converters**](https://github.com/key4hep/k4MarlinWrapper/blob/master/doc/starterkit/k4MarlinWrapperCLIC/edmConverters.md)
+- When using **EDM4hep** format for the input events to be used in reconstruction, refer to the [**EDM converters**](https://github.com/key4hep/k4MarlinWrapper/blob/master/doc/MarlinWrapperIntroduction.md)
 included with k4MarlinWrapper. Note that:
   + *MarlinProcessorWrappers* need input in LCIO format: EDM4hep collections need to be converted to LCIO
   + The output collections of *MarlinProcessorWrappers* may be used later by other algorithms:
