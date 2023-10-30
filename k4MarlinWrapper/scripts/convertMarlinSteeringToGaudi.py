@@ -268,14 +268,17 @@ def escapeIllegalChars(file_str):
   return file_str.replace("&&", "&amp;&amp;")
 
 
-def includeFiles(tree):
+def includeFiles(tree, infile):
   for p_item in tree.findall('.//include/..'):
     for if_item in p_item.findall('./include'):
       try:
-        with open(if_item.attrib['ref'], "r+") as iFile:
+        #TODO resolve path for part-files
+        nested_file = if_item.attrib['ref']
+        with open(nested_file, "r+") as iFile:
           # workaround: part files are not xml compliant
           fStr = r'<%s>%s</%s>' % (p_item.tag, escapeIllegalChars(iFile.read()), p_item.tag)
           iTree = ElementTree(fromstring(fStr))
+          includeFiles(iTree, nested_file)
           for e_item in iTree.findall('./*'):
             p_item.append(e_item)
       except Exception as ex:
@@ -293,7 +296,7 @@ def run(inputfile, outputfile):
     sys.exit(1)
 
   # TODO check compliance with https://www.w3.org/TR/xinclude/
-  includeFiles(tree)
+  includeFiles(tree, inputfile)
 
   with open(outputfile, 'w') as wf_file:
     wf_file.write("\n".join(generateGaudiSteering(tree)))
