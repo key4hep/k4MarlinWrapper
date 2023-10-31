@@ -22,6 +22,7 @@ from __future__ import absolute_import, unicode_literals, print_function
 from copy import deepcopy
 import re
 import sys
+import os.path
 
 from xml.etree.ElementTree import fromstring, ElementTree
 
@@ -269,11 +270,13 @@ def escapeIllegalChars(file_str):
 
 
 def includeFiles(tree, infile):
+  wdir = os.path.dirname(os.path.abspath(infile))
   for p_item in tree.findall('.//include/..'):
     for if_item in p_item.findall('./include'):
       try:
-        #TODO resolve path for part-files
         nested_file = if_item.attrib['ref']
+        if not os.path.isabs(nested_file):
+            nested_file = os.path.join(wdir, nested_file)
         with open(nested_file, "r+") as iFile:
           # workaround: part files are not xml compliant
           fStr = r'<%s>%s</%s>' % (p_item.tag, escapeIllegalChars(iFile.read()), p_item.tag)
