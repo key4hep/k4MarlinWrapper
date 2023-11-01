@@ -19,6 +19,8 @@
 #include "k4MarlinWrapper/converters/EDM4hep2Lcio.h"
 #include "GlobalConvertedObjectsMap.h"
 
+#include "edm4hep/Constants.h"
+
 #include "k4FWCore/DataHandle.h"
 #include "k4FWCore/MetaDataHandle.h"
 
@@ -94,7 +96,7 @@ void EDM4hep2LcioTool::convertTrackerHits(TrackerHitMap& trackerhits_vec, const 
   DataHandle<edm4hep::TrackerHitCollection> trackerhits_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
   const auto                                trackerhits_coll = trackerhits_handle.get();
 
-  MetaDataHandle<std::string> cellIDStrHandle{trackerhits_handle, "CellIDEncoding", Gaudi::DataHandle::Reader};
+  MetaDataHandle<std::string> cellIDStrHandle{trackerhits_handle, edm4hep::CellIDEncoding, Gaudi::DataHandle::Reader};
 
   auto* conv_trackerhits = convTrackerHits(trackerhits_coll, cellIDStrHandle.get(), trackerhits_vec);
 
@@ -111,7 +113,7 @@ void EDM4hep2LcioTool::convertSimTrackerHits(SimTrackerHitMap& simtrackerhits_ve
   DataHandle<edm4hep::SimTrackerHitCollection> simtrackerhits_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
   const auto                                   simtrackerhits_coll = simtrackerhits_handle.get();
 
-  MetaDataHandle<std::string> cellIDHandle{simtrackerhits_handle, "CellIDEncoding", Gaudi::DataHandle::Reader};
+  MetaDataHandle<std::string> cellIDHandle{simtrackerhits_handle, edm4hep::CellIDEncoding, Gaudi::DataHandle::Reader};
   const auto                  cellIDstr = cellIDHandle.get();
 
   auto* conv_simtrackerhits = convSimTrackerHits(simtrackerhits_coll, cellIDstr, simtrackerhits_vec, mcparticles_vec);
@@ -128,7 +130,7 @@ void EDM4hep2LcioTool::convertCalorimeterHits(CaloHitMap& calo_hits_vec, const s
   DataHandle<edm4hep::CalorimeterHitCollection> calohit_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
   const auto                                    calohit_coll = calohit_handle.get();
 
-  MetaDataHandle<std::string> cellIDHandle{calohit_handle, "CellIDEncoding", Gaudi::DataHandle::Reader};
+  MetaDataHandle<std::string> cellIDHandle{calohit_handle, edm4hep::CellIDEncoding, Gaudi::DataHandle::Reader};
   const auto                  cellIDstr = cellIDHandle.get();
 
   auto* conv_calohits = convCalorimeterHits(calohit_coll, cellIDstr, calo_hits_vec);
@@ -160,7 +162,7 @@ void EDM4hep2LcioTool::convertSimCalorimeterHits(SimCaloHitMap& sim_calo_hits_ve
   DataHandle<edm4hep::SimCalorimeterHitCollection> sim_calohit_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
   const auto                                       simcalohit_coll = sim_calohit_handle.get();
 
-  MetaDataHandle<std::string> cellIDHandle{sim_calohit_handle, "CellIDEncoding", Gaudi::DataHandle::Reader};
+  MetaDataHandle<std::string> cellIDHandle{sim_calohit_handle, edm4hep::CellIDEncoding, Gaudi::DataHandle::Reader};
   const auto                  cellIDstr = cellIDHandle.get();
 
   // TODO mcparticles_vdc
