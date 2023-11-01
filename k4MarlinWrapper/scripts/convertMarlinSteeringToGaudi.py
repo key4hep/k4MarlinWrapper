@@ -248,9 +248,11 @@ def convertProcessors(lines, tree, globParams, constants):
 def findWarnIncludes(tree):
   """Check the parsed XML structure for include statments and issue a warning"""
   if any(True for _ in tree.iter("include")):
-    print("WARNING: Found at least one <include ref=\"...\"/> statement in the Marlin steering file")
-    print("         These cannot be handled by the conversion script.")
-    print("         Use Marlin -n <input-file> to resolve these includes and convert the output of that")
+    print("ERROR: Found at least one <include ref=\"...\"/> statement in the Marlin steering file")
+    print("       These cannot be handled by the conversion script.")
+    print("       Use Marlin -n <input-file> to resolve these includes and convert the output of that")
+
+    sys.exit(1)
 
 
 def generateGaudiSteering(tree):
