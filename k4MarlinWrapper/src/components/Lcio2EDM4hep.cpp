@@ -162,6 +162,11 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
   std::vector<std::pair<std::string, EVENT::LCCollection*>>               lcRelationColls{};
   std::vector<std::tuple<std::string, EVENT::LCCollection*, std::string>> subsetColls{};
 
+  // If we convert any SimCalorimeterHit collection we also need the
+  // CaloHitContributions in the end, even if all SimCalorimeterHit collections
+  // were empty
+  bool needCaloHitContribs = false;
+
   for (const auto& [lcioName, edm4hepName] : collsToConvert) {
     try {
       auto* lcio_coll = the_event->getCollection(lcioName);
@@ -182,6 +187,8 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
       if (lcio_coll_type_str == "LCRelation") {
         lcRelationColls.emplace_back(std::make_pair(edm4hepName, lcio_coll));
       }
+
+      needCaloHitContribs = (lcio_coll_type_str == "SimCalorimeterHit") && !lcio_coll->isSubset();
 
       for (auto&& e4hColl : LCIO2EDM4hepConv::convertCollection(edm4hepName, lcio_coll, lcio2edm4hepMaps)) {
         if (std::get<1>(e4hColl)) {
@@ -225,11 +232,11 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
     registerCollection(std::move(assocColl));  // TODO: Potentially handle metadata here?
   }
 
-  if (!lcio2edm4hepMaps.simCaloHits.empty()) {
+  if (needCaloHitContribs) {
     registerCollection(name() + "_CaloHitContributions",
                        LCIO2EDM4hepConv::createCaloHitContributions(
                            lcio2edm4hepMaps.simCaloHits,
-                           lcio2edm4hepMaps.mcParticles));  // TODO: Can we do something about meta data here?
+                           globalObjMap.mcParticles));  // TODO: Can we do something about meta data here?
   }
 
   return StatusCode::SUCCESS;
