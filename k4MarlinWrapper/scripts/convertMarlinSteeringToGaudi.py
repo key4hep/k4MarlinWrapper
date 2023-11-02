@@ -86,10 +86,6 @@ def convertConstants(lines, tree):
   """ Find constant tags, write them to python and replace constants within themselves """
   constants = dict()
 
-  constElements = tree.findall('constants/include')
-  if constElements:
-    print('WARNING: include statements found inside constants tag')
-
   constElements = tree.findall('constants/constant')
   for const in constElements:
     constants[const.attrib.get('name')] = getValue(const)
@@ -249,7 +245,18 @@ def convertProcessors(lines, tree, globParams, constants):
   return lines
 
 
+def findWarnIncludes(tree):
+  """Check the parsed XML structure for include statments and issue a warning"""
+  if any(True for _ in tree.iter("include")):
+    print("ERROR: Found at least one <include ref=\"...\"/> statement in the Marlin steering file")
+    print("       These cannot be handled by the conversion script.")
+    print("       Use Marlin -n <input-file> to resolve these includes and convert the output of that")
+
+    sys.exit(1)
+
+
 def generateGaudiSteering(tree):
+  findWarnIncludes(tree)
   globParams = getGlobalParameters(tree)
   lines = []
   createHeader(lines)
