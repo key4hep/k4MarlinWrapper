@@ -236,7 +236,7 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
     registerCollection(name() + "_CaloHitContributions",
                        LCIO2EDM4hepConv::createCaloHitContributions(
                            lcio2edm4hepMaps.simCaloHits,
-                           lcio2edm4hepMaps.mcParticles));  // TODO: Can we do something about meta data here?
+                           globalObjMap.mcParticles));  // TODO: Can we do something about meta data here?
   }
 
   return StatusCode::SUCCESS;
