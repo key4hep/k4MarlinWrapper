@@ -23,6 +23,7 @@
 #include <Exceptions.h>
 
 #include <edm4hep/ClusterCollection.h>
+#include <edm4hep/Constants.h>
 #include <edm4hep/EventHeaderCollection.h>
 #include <edm4hep/MCParticleCollection.h>
 #include <edm4hep/ParticleIDCollection.h>
@@ -107,11 +108,11 @@ void Lcio2EDM4hepTool::registerCollection(
     lcioColl->getParameters().getStringKeys(string_keys);
 
     for (auto& elem : string_keys) {
-      if (elem == "CellIDEncoding") {
+      if (elem == edm4hep::CellIDEncoding) {
         const auto& lcio_coll_cellid_str = lcioColl->getParameters().getStringVal(lcio::LCIO::CellIDEncoding);
         auto&       mdFrame              = m_podioDataSvc->getMetaDataFrame();
-        mdFrame.putParameter(podio::collMetadataParamName(name, "CellIDEncoding"), lcio_coll_cellid_str);
-        debug() << "Storing CellIDEncoding " << podio::collMetadataParamName(name, "CellIDEncoding")
+        mdFrame.putParameter(podio::collMetadataParamName(name, edm4hep::CellIDEncoding), lcio_coll_cellid_str);
+        debug() << "Storing CellIDEncoding " << podio::collMetadataParamName(name, edm4hep::CellIDEncoding)
                 << " value: " << lcio_coll_cellid_str << endmsg;
       } else {
         // TODO: figure out where this actually needs to go

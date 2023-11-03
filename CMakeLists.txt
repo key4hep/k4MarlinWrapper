@@ -56,7 +56,7 @@ include(GNUInstallDirs)
 find_package(Gaudi REQUIRED)
 find_package(LCIO REQUIRED)
 find_package(Marlin REQUIRED)
-find_package(EDM4HEP REQUIRED)
+find_package(EDM4HEP 0.10.1 REQUIRED)
 find_package(k4FWCore REQUIRED)
 find_package(k4EDM4hep2LcioConv REQUIRED)
 
