@@ -1,3 +1,83 @@
+# v00-07
+
+* 2023-11-03 jmcarcell ([PR#156](https://github.com/key4hep/k4MarlinWrapper/pull/156))
+  - Use the new `edm4hep::CellIDEncoding`. Needs https://github.com/key4hep/EDM4hep/pull/234
+
+* 2023-11-02 tmadlener ([PR#157](https://github.com/key4hep/k4MarlinWrapper/pull/157))
+  - Make sure to always create a `CaloHitContribution` collection if any `SimCalorimeterHit` is seen in the conversion even if all of them are empty.
+  - Use the global object map to resolve `MCParticle` relations for these contributions.
+
+* 2023-11-02 tmadlener ([PR#148](https://github.com/key4hep/k4MarlinWrapper/pull/148))
+  - Add a warning message to the steering file converter script to warn users about any `<include ref="..." />` statements in the original Marlin steering file.
+
+* 2023-10-09 jmcarcell ([PR#152](https://github.com/key4hep/k4MarlinWrapper/pull/152))
+  - Fix links since edmConverter.md was removed
+
+* 2023-10-09 tmadlener ([PR#149](https://github.com/key4hep/k4MarlinWrapper/pull/149))
+  - Create a one page summary, including brief how-tos, for the wrapper and related topics.
+    - Compiled from the existing documentation, focusing entirely on things that are part of the wrapper repository, removing things that should be introduced elsewhere (e.g. basics of the Gaudi framework).
+
+* 2023-10-05 tmadlener ([PR#147](https://github.com/key4hep/k4MarlinWrapper/pull/147))
+  - Introduce a *global object map* that is shared by all converter instances (in either direction). This is necessary to properly set all relations even if the related objects are not converted in the same converter instance.
+    - Fixes [key4hep/k4LCIOReader#31](https://github.com/key4hep/k4LCIOReader/issues/31)
+    - Fixes #113 
+  - Add a `global_converter_maps` test case (and a description) that checks that this works as expected.
+
+* 2023-10-04 tmadlener ([PR#146](https://github.com/key4hep/k4MarlinWrapper/pull/146))
+  - Move the EDM4hep to LCIO (and back) converter tests to k4EDM4hep2LcioConv (https://github.com/key4hep/k4EDM4hep2LcioConv/pull/29) as they effectively only test functionality of the converter.
+
+* 2023-10-03 tmadlener ([PR#144](https://github.com/key4hep/k4MarlinWrapper/pull/144))
+  - Move the EDM4hep to LCIO (and back) converter tests to k4EDM4hep2LcioConv (https://github.com/key4hep/k4EDM4hep2LcioConv/pull/29) as they effectively only test functionality of the converter.
+
+* 2023-10-03 tmadlener ([PR#142](https://github.com/key4hep/k4MarlinWrapper/pull/142))
+  - Introduce a *global object map* that is shared by all converter instances (in either direction). This is necessary to properly set all relations even if the related objects are not converted in the same converter instance.
+    - Fixes [key4hep/k4LCIOReader#31](https://github.com/key4hep/k4LCIOReader/issues/31)
+    - Fixes #113 
+  - Add a `global_converter_maps` test case (and a description) that checks that this works as expected.
+
+* 2023-09-13 tmadlener ([PR#141](https://github.com/key4hep/k4MarlinWrapper/pull/141))
+  - Move includes to where they are really necessary and remove unnecessary includes from other headers.
+
+* 2023-09-13 tmadlener ([PR#140](https://github.com/key4hep/k4MarlinWrapper/pull/140))
+  - Remove the workarounds for non-zero exit codes again. They were introduced in #120 to work around key4hep/k4FWCore#125 which has been fixed with key4hep/k4FWCore#132
+
+* 2023-09-13 Andre Sailer ([PR#134](https://github.com/key4hep/k4MarlinWrapper/pull/134))
+  - TrackingCellIDEncodingSvc: add service to set the Cell ID encoding string for iLCSoft track reconstruction
+
+* 2023-09-12 tmadlener ([PR#139](https://github.com/key4hep/k4MarlinWrapper/pull/139))
+  - Make sure to have an `import os` in all gaudi options files that use `os` in some form. This becomes necessary after https://github.com/key4hep/k4FWCore/pull/134
+
+* 2023-09-12 tmadlener ([PR#138](https://github.com/key4hep/k4MarlinWrapper/pull/138))
+  - Use the `EDM4hep2LCIOConv` namespace (introduced in https://github.com/key4hep/k4EDM4hep2LcioConv/pull/27) in the EDM4hep to LCIO conversion tool.
+
+* 2023-09-05 jmcarcell ([PR#137](https://github.com/key4hep/k4MarlinWrapper/pull/137))
+  - Docs: Correct the comment referring to the input file that has to be replaced
+  - Test: no longer ignore the return value of a test. It used to return 4, but that was fixed in  key4hep/k4fwcore#132
+  - Tests: Replace environment variable LCGEO with K4GEO following the usage in other key4hep repositories
+
+* 2023-09-04 jmcarcell ([PR#136](https://github.com/key4hep/k4MarlinWrapper/pull/136))
+  - Fix clang warning "inconsistent-missing-override" by adding final to some virtual functions
+
+* 2023-09-04 tmadlener ([PR#128](https://github.com/key4hep/k4MarlinWrapper/pull/128))
+  - Install the `clicRec_e4h_input.py` script that is used in the documentation in order to make the paths that are used there less confusing. Fixes [#90](https://github.com/key4hep/k4MarlinWrapper/issues/90)
+
+* 2023-08-30 Andre Sailer ([PR#135](https://github.com/key4hep/k4MarlinWrapper/pull/135))
+  - CI: clicrec_edm4hep test: created new edm4hep SIM file compatible with current podio master
+
+* 2023-08-30 tmadlener ([PR#129](https://github.com/key4hep/k4MarlinWrapper/pull/129))
+  - Make sure to convert the `CellIDEncoding` for collections when going from LCIO to EDM4hep.
+
+* 2023-07-26 Andre Sailer ([PR#132](https://github.com/key4hep/k4MarlinWrapper/pull/132))
+  - CI: add pre-commit
+
+* 2023-07-26 Leonhard Reichenbach ([PR#131](https://github.com/key4hep/k4MarlinWrapper/pull/131))
+  - Fixed a typo and creation of trailing white space in convertMarlinSteeringToGaudi.py
+
+* 2023-07-26 Andre Sailer ([PR#130](https://github.com/key4hep/k4MarlinWrapper/pull/130))
+  - Add license to all files
+  - Add pre-commit
+  - Fix some white space
+
 # v00-06
 
 * 2023-03-02 jmcarcell ([PR#108](https://github.com/key4hep/k4MarlinWrapper/pull/108))
