@@ -72,6 +72,7 @@ target_include_directories(EDM4hep2Lcio PUBLIC
   ${PROJECT_SOURCE_DIR}/k4MarlinWrapper
   ${LCIO_INCLUDE_DIRS}
   ${Marlin_INCLUDE_DIRS}
+  $<$<BOOL:${EDM4HEP_SOURCE_DIR}>:${EDM4HEP_SOURCE_DIR}/include>
 )
 
 # LCIO2EDM4hep
@@ -88,6 +89,7 @@ gaudi_add_module(Lcio2EDM4hep
 target_include_directories(Lcio2EDM4hep PUBLIC
   ${PROJECT_SOURCE_DIR}/k4MarlinWrapper
   ${LCIO_INCLUDE_DIRS}
+  $<$<BOOL:${EDM4HEP_SOURCE_DIR}>:${EDM4HEP_SOURCE_DIR}/include>
 )
 
 # Copy python parsing file to genConfDir in Gaudi
