@@ -28,9 +28,6 @@ if(USE_RUNPATH_INSTEAD_OF_RPATH)
   set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--enable-new-dtags")
 endif()
 
-# options
-option(USE_EXTERNAL_CATCH2 "If off, build the catch2 unittest framework locally" ON)
-
 # project version
 SET( ${PROJECT_NAME}_VERSION_MAJOR 0 )
 SET( ${PROJECT_NAME}_VERSION_MINOR 7 )
