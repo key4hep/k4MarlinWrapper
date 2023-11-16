@@ -28,7 +28,6 @@ evtsvc.input = ''
 
 inp = PodioInput('InputReader')
 inp.collections = [
-  'EventHeader',
   'MCParticles',
   'VertexBarrelCollection',
   'VertexEndcapCollection',

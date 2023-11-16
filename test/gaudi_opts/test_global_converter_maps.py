@@ -38,7 +38,7 @@ evtsvc.input = os.path.join(
 )
 
 podioInput = PodioInput("InputReader")
-podioInput.collections = ["MCParticles", "EventHeader"]
+podioInput.collections = ["MCParticles"]
 podioInput.OutputLevel = INFO
 
 PseudoRecoProc = MarlinProcessorWrapper("PseudoReco")
