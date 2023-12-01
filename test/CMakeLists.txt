@@ -88,7 +88,7 @@ if (BASH_PROGRAM)
   # multiple processors
   add_test( global_converter_maps ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/global_converter_maps.sh )
 
-  add_test( event_header ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/event_header.sh )
+  add_test( event_header_conversion ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/event_header.sh )
 
   set_tests_properties (
       simple_processors
