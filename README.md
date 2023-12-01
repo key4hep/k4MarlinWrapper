@@ -7,7 +7,7 @@
   <img src="doc/k4marlinwrapper_logo.svg"/>
 </p>
 
-k4MarlinWrapper runs [Marlin](https://github.com/iLCSoft/Marlin) procesors as [Gaudi](https://gitlab.cern.ch/gaudi/Gaudi) algorithms.
+k4MarlinWrapper runs [Marlin](https://github.com/iLCSoft/Marlin) processors as [Gaudi](https://gitlab.cern.ch/gaudi/Gaudi) algorithms.
 It provides the necessary converters and interfaces between the file types and formats used between both frameworks:
 - Python interface to configure Marlin processors
 - In-memory Event Data Model (EDM) converters between [LCIO](https://github.com/iLCSoft/LCIO) and [EDM4hep](https://github.com/key4hep/EDM4hep)
