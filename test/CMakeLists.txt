@@ -102,7 +102,7 @@ if (BASH_PROGRAM)
       clicRec_edm4hep_input
       clic_geo_test
       global_converter_maps
-      event_header
+      event_header_conversion
     PROPERTIES
       ENVIRONMENT "TEST_DIR=${CMAKE_CURRENT_SOURCE_DIR};LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:${CMAKE_INSTALL_PREFIX}/lib64:$ENV{LD_LIBRARY_PATH};PYTHONPATH=${CMAKE_INSTALL_PREFIX}/python:$ENV{PYTHONPATH};EXAMPLE_DIR=${PROJECT_SOURCE_DIR}/k4MarlinWrapper/examples;MARLIN_DLL=$ENV{MARLIN_DLL}:${CMAKE_CURRENT_BINARY_DIR}/libMarlinTestProcessors.so"
       )
