@@ -123,7 +123,7 @@ convertMarlinSteeringToGaudi.py <input-steering.xml> <output-gaudi-options.py>
 ### Limitations
 This converter script handles almost everything, but there are a few
 short-comings which it cannot yet handle:
-- Marlin XML steering files can have `include` statments, e.g. `<include
+- Marlin XML steering files can have `include` statements, e.g. `<include
   ref="Tracking/TrackingDigi.xml"/>`. These cannot be resolved by the converter
   script, and it will issue a warning. The easiest way to fix this is to simply
   run `Marlin -n` to resolve all these statements and then run the converter
@@ -190,7 +190,7 @@ give them meaningful names in order to avoid any confusion.
 ### Configuration options
 
 By default each converter tool will try to convert the complete event content
-that is currently availble in the transient event store for the corresponding
+that is currently available in the transient event store for the corresponding
 source format. **It will skip the conversion of a collection if the same
 collection already exists in the other format. This check is done by collection
 name.** However, it is possible to control the conversion process with a

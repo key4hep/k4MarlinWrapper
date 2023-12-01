@@ -40,7 +40,7 @@ Gaudi exposes two main levels of parallelism:
 - Inter-event parallelism: running multiple events in parallel
 - Intra-event parallelism: running multiple algorithms in parallel, within an event
 
-The two levels of parallelims can be combined: events can run in parallel, and algorithms within the events can run in parallel.
+The two levels of parallelism can be combined: events can run in parallel, and algorithms within the events can run in parallel.
 
 ### How to run with inter-event parallelism
 
@@ -50,7 +50,7 @@ The following components are used to achieve parallelism:
 from Configurables import (HiveWhiteBoard, HiveSlimEventLoopMgr, AvalancheSchedulerSvc)
 ```
 
-These 3 components need to be configued to adapt the level of parallelism to the sequence, algorithms and hardware to be used.
+These 3 components need to be configured to adapt the level of parallelism to the sequence, algorithms and hardware to be used.
 
 - Event Data Service: `HiveWhiteBoard`
   + *EventSlots*: Number of events that may run in parallel, each with its own EventStore
