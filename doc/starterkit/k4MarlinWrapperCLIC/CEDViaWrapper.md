@@ -27,12 +27,12 @@ The following steps have been tested with the Key4hep nightly builds release whi
 source /cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh
 ```
 
-To get the CLIC detecor description we clone the `CLICPerformance` repository
+To get the CLIC detector description we clone the `CLICPerformance` repository
 ```bash
 git clone https://github.com/iLCSoft/CLICPerformance
 ```
 
-All the following steps assume that the environment is setup like above and that the detector description is in the `CLICPerformance` directory. All commands start from the diretory from which `git clone` has been executed.
+All the following steps assume that the environment is setup like above and that the detector description is in the `CLICPerformance` directory. All commands start from the directory from which `git clone` has been executed.
 
 ## Creating an input file
 
@@ -51,7 +51,7 @@ ddsim --steeringFile CLICPerformance/clicConfig/clic_steer.py \
 
 You should now have a `gamma_10GeV_edm4hep.root` file containing 10 events.
 
-## Runing the event display
+## Running the event display
 
 In order to run the event display via the `DDCEDViewer` we use the Marlin wrapper and attach an EDM4hep to LCIO converter to the wrapped processor. In the following we will build the complete Gaudi options file step by step. Here we simply present the most important steps, but do not go over all details of the `DDCEDViewer` configuration, for that it is probably best to directly look at the [CEDViewer repository](https://github.com/iLCSoft/CEDViewer) directly. The complete Gaudi configuration can be found in [`k4MarlinWrapper/examples/event_display.py`](https://github.com/key4hep/k4MarlinWrapper/blob/master/k4MarlinWrapper/examples/event_display.py) which is also installed at `$K4MARLINWRAPPER/examples/event_display.py`
 
@@ -131,8 +131,8 @@ k4run $K4MARLINWRAPPER/examples/event_display.py --EventDataSvc.input=gamma_10Ge
 
 The `event_display.py` options file that is used above and that is present in the examples has been produced following these steps:
 - Using an `.slcio` input file and the desired geometry, run `ced2go` with the desired arguments.
-  - This produces a Marlin xml steering file on the fly and stores it at `/tmp/ced2go_${USER}_steering.xml`
-- Using the `convertMarlinSteeringToGaudi.py` converter script convert this into a gaudi options file
+  - This produces a Marlin XML steering file on the fly and stores it at `/tmp/ced2go_${USER}_steering.xml`
+- Using the `convertMarlinSteeringToGaudi.py` converter script convert this into a Gaudi options file
 - Exchange the LCIO input reading by the podio input reading (see above)
 - Attach the `EDM4hep2LcioTool` to the wrapped `CEDViewer` processor
 
