@@ -143,8 +143,8 @@ namespace {
 
 StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
   // Convert Event Header outside the collections loop
-  if (!collectionExist("EventHeader")) {
-    registerCollection("EventHeader", LCIO2EDM4hepConv::createEventHeader(the_event));
+  if (!collectionExist(edm4hep::EventHeaderName)) {
+    registerCollection(edm4hep::EventHeaderName, LCIO2EDM4hepConv::createEventHeader(the_event));
   }
 
   // Start off with the pre-defined collection name mappings

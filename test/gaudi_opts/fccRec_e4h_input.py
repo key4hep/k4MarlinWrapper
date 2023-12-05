@@ -41,7 +41,6 @@ evtsvc.input = 'tops_edm4hep.root'
 
 inp = PodioInput('InputReader')
 inp.collections = [
-  'EventHeader',
   'MCParticles',
   'VertexBarrelCollection',
   'VertexEndcapCollection',

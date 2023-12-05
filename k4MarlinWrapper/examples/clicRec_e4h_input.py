@@ -51,7 +51,6 @@ evtsvc.input = os.path.join('$TEST_DIR/inputFiles/', os.environ.get("INPUTFILE",
 
 inp = PodioInput('InputReader')
 inp.collections = [
-  'EventHeader',
   'MCParticles',
   'VertexBarrelCollection',
   'VertexEndcapCollection',
