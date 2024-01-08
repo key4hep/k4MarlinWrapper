@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 ##
-## Copyright (c) 2019-2023 Key4hep-Project.
+## Copyright (c) 2019-2024 Key4hep-Project.
 ##
 ## This file is part of Key4hep.
 ## See https://key4hep.github.io/key4hep-doc/ for further info.
