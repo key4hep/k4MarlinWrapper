@@ -205,7 +205,7 @@ ApplicationMgr( TopAlg = algList,
               )
 ```
 
-changes to 
+changes to
 
 ```python
 ApplicationMgr( TopAlg = algList,
