@@ -156,7 +156,7 @@ k4run clicRec_e4h_input.py --EventDataSvc.input ttbar_edm4hep.root
 
 The ``MarlinDD4hep::InitializeDD4hep`` processor can be replaced by the ``k4SimGeant4::GeoSvc`` and the
 ``TrackingCellIDEncodingSvc`` the latter of which is part of the k4MarlinWrapper repository.
-This requires removing the `InitDD4hep` object from the `algList` and adding `geoservice` and `cellIDSvc` to the `svcList`.
+This requires removing the wrapped `InitDD4hep` processor from the `algList` and adding `geoservice` and `cellIDSvc` to the `ExtSvc` in the `ApplicationMgr`.
 
 We can create the `geoservice` and `cellIDSvc` with;
 
