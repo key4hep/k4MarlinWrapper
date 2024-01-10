@@ -178,7 +178,7 @@ cellIDSvc.OutputLevel = INFO
 
 
 Then we need to make a `svcList` to add them to and pass that to the `ExtSvc` argument.
-At the bottom of the file, change 
+At the bottom of the file, change
 
 ```python
 ApplicationMgr( TopAlg = algList,
