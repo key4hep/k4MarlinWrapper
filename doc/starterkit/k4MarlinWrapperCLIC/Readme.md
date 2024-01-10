@@ -164,6 +164,7 @@ We can create the `geoservice` and `cellIDSvc` with;
 import os
 from Gaudi.Configuration import INFO
 from Configurables import GeoSvc, TrackingCellIDEncodingSvc
+
 geoservice = GeoSvc("GeoSvc")
 geoservice.detectors = [os.environ["K4GEO"]+"/CLIC/compact/CLIC_o3_v15/CLIC_o3_v15.xml"]
 geoservice.OutputLevel = INFO
