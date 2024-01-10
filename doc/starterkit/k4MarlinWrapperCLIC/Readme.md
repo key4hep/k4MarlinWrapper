@@ -192,7 +192,7 @@ ApplicationMgr( TopAlg = algList,
 to
 
 ```python
-svcList = [evtsvc]
+svcList = [evtsvc]  # if an evtsvc is available
 svcList.append(geoservice)
 svcList.append(cellIDSvc)
 ApplicationMgr( TopAlg = algList,
