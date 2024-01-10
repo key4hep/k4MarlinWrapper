@@ -156,23 +156,62 @@ k4run clicRec_e4h_input.py --EventDataSvc.input ttbar_edm4hep.root
 
 The ``MarlinDD4hep::InitializeDD4hep`` processor can be replaced by the ``k4SimGeant4::GeoSvc`` and the
 ``TrackingCellIDEncodingSvc`` the latter of which is part of the k4MarlinWrapper repository.
+This requires removing the wrapped `InitDD4hep` processor from the `algList` and the two new processed be appended to the `ExtSvc` argument in the `ApplicationMgr`.
 
-For example:
+We will create another list, `svcList` for this.
+In the space following
 
 ```python
+from Configurables import k4DataSvc, PodioInput
+evtsvc = k4DataSvc('EventDataSvc')
+evtsvc.input = os.path.join('$TEST_DIR/inputFiles/', os.environ.get("INPUTFILE", "ttbar_edm4hep.root"))
+```
+
+we can start the `svcList` list and add the `GeoSvc` and `TrackingCellIDEncodingSvc` with;
+
+```python
+svcList = []
+svcList.append(evtsvc)
+
+
 import os
 from Gaudi.Configuration import INFO
 from Configurables import GeoSvc, TrackingCellIDEncodingSvc
-svcList = []
+
 geoservice = GeoSvc("GeoSvc")
 geoservice.detectors = [os.environ["K4GEO"]+"/CLIC/compact/CLIC_o3_v15/CLIC_o3_v15.xml"]
 geoservice.OutputLevel = INFO
 geoservice.EnableGeant4Geo = False
 svcList.append(geoservice)
 
+
 cellIDSvc = TrackingCellIDEncodingSvc("CellIDSvc")
 cellIDSvc.EncodingStringParameterName = "GlobalTrackerReadoutID"
 cellIDSvc.GeoSvcName = geoservice.name()
 cellIDSvc.OutputLevel = INFO
 svcList.append(cellIDSvc)
+```
+
+
+Then all that is left is to pass that to the `ExtSvc` argument.
+At the bottom of the file;
+
+```python
+ApplicationMgr( TopAlg = algList,
+                EvtSel = 'NONE',
+                EvtMax   = 3,
+                ExtSvc = [evtsvc],
+                OutputLevel=WARNING
+              )
+```
+
+changes to
+
+```python
+ApplicationMgr( TopAlg = algList,
+                EvtSel = 'NONE',
+                EvtMax   = 3,
+                ExtSvc = svcList,
+                OutputLevel=WARNING
+              )
 ```
