@@ -63,7 +63,7 @@ gaudi_add_module(EDM4hep2Lcio
     k4EDM4hep2LcioConv::k4EDM4hep2LcioConv
     k4FWCore::k4FWCore
     Gaudi::GaudiAlgLib
-    ${LCIO_LIBRARIES}
+    LCIO::lcio
     ${Marlin_LIBRARIES}
     EDM4HEP::edm4hep
 )

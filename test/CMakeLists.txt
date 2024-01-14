@@ -23,6 +23,7 @@ gaudi_add_module(GaudiTestAlgorithms
   LINK
     Gaudi::GaudiAlgLib
     Gaudi::GaudiKernel
+    LCIO::lcio
     k4FWCore::k4FWCore
     EDM4HEP::edm4hep
 )
