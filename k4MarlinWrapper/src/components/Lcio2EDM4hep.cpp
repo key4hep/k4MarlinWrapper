@@ -16,8 +16,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "k4MarlinWrapper/converters/Lcio2EDM4hep.h"
-#include "GlobalConvertedObjectsMap.h"
 
 #include <EVENT/LCCollection.h>
 #include <Exceptions.h>
@@ -35,6 +33,9 @@
 #include <edm4hep/TrackCollection.h>
 #include <edm4hep/TrackerHitPlaneCollection.h>
 #include <edm4hep/VertexCollection.h>
+
+#include "k4MarlinWrapper/converters/Lcio2EDM4hep.h"
+#include "GlobalConvertedObjectsMap.h"
 
 #include "k4EDM4hep2LcioConv/k4Lcio2EDM4hepConv.h"
 
