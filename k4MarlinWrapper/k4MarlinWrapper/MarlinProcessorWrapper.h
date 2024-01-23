@@ -56,7 +56,7 @@ namespace marlin {
   class StringParameters;
 }  // namespace marlin
 
-class MarlinProcessorWrapper : Gaudi::Algorithm {
+class MarlinProcessorWrapper : public Gaudi::Algorithm {
 public:
   explicit MarlinProcessorWrapper(const std::string& name, ISvcLocator* pSL);
   virtual ~MarlinProcessorWrapper() = default;
@@ -83,8 +83,8 @@ private:
   Gaudi::Property<std::string>                                     m_processorType{this, "ProcessorType", {}};
   Gaudi::Property<std::map<std::string, std::vector<std::string>>> m_parameters{this, "Parameters", {}};
 
-  ToolHandle<IEDMConverter> m_edm_conversionTool{"IEDMConverter/EDM4hep2Lcio", this};
-  ToolHandle<IEDMConverter> m_lcio_conversionTool{"IEDMConverter/Lcio2EDM4hep", this};
+  mutable ToolHandle<IEDMConverter> m_edm_conversionTool{"IEDMConverter/EDM4hep2Lcio", this};
+  mutable ToolHandle<IEDMConverter> m_lcio_conversionTool{"IEDMConverter/Lcio2EDM4hep", this};
 
   static std::stack<marlin::Processor*>& ProcessorStack();
 };
