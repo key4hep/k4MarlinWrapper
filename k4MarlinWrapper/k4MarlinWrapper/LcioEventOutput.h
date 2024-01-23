@@ -41,7 +41,7 @@ public:
   explicit LcioEventOutput(const std::string& name, ISvcLocator* pSL);
   virtual ~LcioEventOutput() = default;
   virtual StatusCode initialize() override final;
-  virtual StatusCode execute(const EventContext&) override final;
+  virtual StatusCode execute(const EventContext&) const final;
   virtual StatusCode finalize() override final;
 
 private:
@@ -54,9 +54,9 @@ private:
   Gaudi::Property<std::vector<std::string>> m_drop_coll_types{this, "DropCollectionTypes", {}};
   Gaudi::Property<std::vector<std::string>> m_full_subset_colls{this, "FullSubsetCollections", {}};
 
-  void dropCollections(lcio::LCEventImpl* event, std::vector<lcio::LCCollectionVec*>& subsets);
+  void dropCollections(lcio::LCEventImpl* event, std::vector<lcio::LCCollectionVec*>& subsets) const;
 
-  void revertSubsets(const std::vector<lcio::LCCollectionVec*>& subsets);
+  void revertSubsets(const std::vector<lcio::LCCollectionVec*>& subsets) const;
 };
 
 #endif
