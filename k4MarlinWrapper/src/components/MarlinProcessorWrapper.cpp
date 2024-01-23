@@ -268,7 +268,7 @@ StatusCode MarlinProcessorWrapper::execute(const EventContext&) const {
       m_processor->processEvent(the_event);
     }
 
-    m_processor->setFirstEvent(false, marlin::ExternalProcessorMgrAccessor{this});
+    m_processor->setFirstEvent(false, marlin::ExternalProcessorMgrAccessor{const_cast<MarlinProcessorWrapper*>(this)});
   }
 
   // Handle exceptions that may come from Marlin
