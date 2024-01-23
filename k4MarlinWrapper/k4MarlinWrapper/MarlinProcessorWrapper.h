@@ -66,7 +66,7 @@ public:
 
 private:
   std::string        m_verbosity = "MESSAGE";
-  mutable marlin::Processor* m_processor = nullptr;
+  marlin::Processor* m_processor = nullptr;
 
   /// Load libraries specified by MARLIN_DLL environment variable
   StatusCode loadProcessorLibraries() const;
