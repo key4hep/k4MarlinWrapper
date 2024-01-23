@@ -22,10 +22,10 @@
 
 DECLARE_COMPONENT(LcioEvent)
 
-LcioEvent::LcioEvent(const std::string& name, ISvcLocator* pSL) : GaudiAlgorithm(name, pSL) {}
+LcioEvent::LcioEvent(const std::string& name, ISvcLocator* pSL) : Gaudi::Algorithm(name, pSL) {}
 
 StatusCode LcioEvent::initialize() {
-  StatusCode sc = GaudiAlgorithm::initialize();
+  StatusCode sc = Gaudi::Algorithm::initialize();
   if (sc.isFailure())
     return sc;
 
@@ -37,7 +37,7 @@ StatusCode LcioEvent::initialize() {
   return StatusCode::SUCCESS;
 }
 
-StatusCode LcioEvent::execute() {
+StatusCode LcioEvent::execute(const EventContext&) const {
   auto theEvent = m_reader->readNextEvent(EVENT::LCIO::UPDATE);
 
   if (theEvent == nullptr) {
