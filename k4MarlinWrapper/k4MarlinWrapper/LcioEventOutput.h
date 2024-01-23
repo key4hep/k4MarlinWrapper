@@ -26,7 +26,7 @@
 
 #include <iostream>
 
-#include <GaudiAlg/GaudiAlgorithm.h>
+#include <Gaudi/Algorithm.h>
 
 #include <EVENT/LCIO.h>
 #include <IMPL/LCCollectionVec.h>
@@ -36,12 +36,12 @@
 
 #include "k4MarlinWrapper/LCEventWrapper.h"
 
-class LcioEventOutput : public GaudiAlgorithm {
+class LcioEventOutput : Gaudi::Algorithm {
 public:
   explicit LcioEventOutput(const std::string& name, ISvcLocator* pSL);
   virtual ~LcioEventOutput() = default;
   virtual StatusCode initialize() override final;
-  virtual StatusCode execute() override final;
+  virtual StatusCode execute(const EventContext&) override final;
   virtual StatusCode finalize() override final;
 
 private:
