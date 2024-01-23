@@ -30,7 +30,7 @@
 
 #include <string>
 
-class MCRecoLinkChecker : Gaudi::Algorithm {
+class MCRecoLinkChecker : public Gaudi::Algorithm {
 public:
   explicit MCRecoLinkChecker(const std::string& name, ISvcLocator* pSL);
   StatusCode execute(const EventContext&) const;
