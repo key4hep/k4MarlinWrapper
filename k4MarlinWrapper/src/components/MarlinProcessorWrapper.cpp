@@ -23,7 +23,7 @@
 
 DECLARE_COMPONENT(MarlinProcessorWrapper)
 
-MarlinProcessorWrapper::MarlinProcessorWrapper(const std::string& name, ISvcLocator* pSL) : GaudiAlgorithm(name, pSL) {
+MarlinProcessorWrapper::MarlinProcessorWrapper(const std::string& name, ISvcLocator* pSL) : Gaudi::Algorithm(name, pSL) {
   // register log level names with the logstream ---------
   streamlog::out.addLevelName<streamlog::DEBUG>();
   streamlog::out.addLevelName<streamlog::DEBUG0>();
@@ -207,7 +207,7 @@ StatusCode MarlinProcessorWrapper::initialize() {
   return StatusCode::SUCCESS;
 }
 
-StatusCode MarlinProcessorWrapper::execute() {
+StatusCode MarlinProcessorWrapper::execute(const EventContext&) const {
   // Get flag to know if there was an underlying LCEvent
   DataObject* pStatus  = nullptr;
   StatusCode  scStatus = eventSvc()->retrieveObject("/Event/LCEventStatus", pStatus);
