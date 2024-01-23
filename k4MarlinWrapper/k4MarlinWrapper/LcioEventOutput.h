@@ -36,7 +36,7 @@
 
 #include "k4MarlinWrapper/LCEventWrapper.h"
 
-class LcioEventOutput : Gaudi::Algorithm {
+class LcioEventOutput : public Gaudi::Algorithm {
 public:
   explicit LcioEventOutput(const std::string& name, ISvcLocator* pSL);
   virtual ~LcioEventOutput() = default;
