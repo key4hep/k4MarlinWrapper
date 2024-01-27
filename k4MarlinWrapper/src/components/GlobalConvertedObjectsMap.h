@@ -21,6 +21,21 @@
 
 #include "k4EDM4hep2LcioConv/MappingUtils.h"
 
+#include "edm4hep/Track.h"
+#include "edm4hep/TrackerHit.h"
+#include "edm4hep/TrackerHitPlane.h"
+#include "edm4hep/SimTrackerHit.h"
+#include "edm4hep/CalorimeterHit.h"
+#include "edm4hep/RawCalorimeterHit.h"
+#include "edm4hep/SimCalorimeterHit.h"
+#include "edm4hep/RawTimeSeries.h"
+#include "edm4hep/Cluster.h"
+#include "edm4hep/Vertex.h"
+#include "edm4hep/ReconstructedParticle.h"
+#include "edm4hep/MCParticle.h"
+#include "edm4hep/ParticleID.h"
+
+
 #include <string_view>
 
 namespace EVENT {
@@ -38,22 +53,6 @@ namespace EVENT {
   class MCParticle;
   class ParticleID;
 }  // namespace EVENT
-
-namespace edm4hep {
-  class Track;
-  class TrackerHit;
-  class TrackerHitPlane;
-  class SimTrackerHit;
-  class CalorimeterHit;
-  class RawCalorimeterHit;
-  class SimCalorimeterHit;
-  class RawTimeSeries;
-  class Cluster;
-  class Vertex;
-  class ReconstructedParticle;
-  class MCParticle;
-  class ParticleID;
-}  // namespace edm4hep
 
 namespace k4MarlinWrapper {
 
