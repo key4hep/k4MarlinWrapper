@@ -22,20 +22,6 @@
 #include <EVENT/LCCollection.h>
 #include <Exceptions.h>
 
-#include <edm4hep/ClusterCollection.h>
-#include <edm4hep/Constants.h>
-#include <edm4hep/EventHeaderCollection.h>
-#include <edm4hep/MCParticleCollection.h>
-#include <edm4hep/ParticleIDCollection.h>
-#include <edm4hep/RawCalorimeterHitCollection.h>
-#include <edm4hep/RawTimeSeriesCollection.h>
-#include <edm4hep/ReconstructedParticleCollection.h>
-#include <edm4hep/SimCalorimeterHitCollection.h>
-#include <edm4hep/SimTrackerHitCollection.h>
-#include <edm4hep/TrackCollection.h>
-#include <edm4hep/TrackerHitPlaneCollection.h>
-#include <edm4hep/VertexCollection.h>
-
 #include "k4EDM4hep2LcioConv/k4Lcio2EDM4hepConv.h"
 
 #include <k4FWCore/DataHandle.h>
