@@ -21,9 +21,6 @@
 # exit if command or variable fails
 set -eu
 
-# Clone CLICPerformance for input files
-bash $TEST_DIR/scripts/setup_clic_performance.sh
-
 cd CLICPerformance/clicConfig
 
 python \
