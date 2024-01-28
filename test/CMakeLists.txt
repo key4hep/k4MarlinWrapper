@@ -53,10 +53,10 @@ ExternalData_Add_Test( marlinwrapper_tests NAME simple_processors2 COMMAND ${K4R
 add_test( CLICPerformance_setup bash -c "test -d CLICPerformance || git clone --depth=1 https://github.com/iLCSoft/CLICPerformance")
 
 # Test clicReconstruction
-add_test( clicRec ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/clicRec.sh )
+add_test( clicRec bash -c ${CMAKE_CURRENT_SOURCE_DIR}/scripts/clicRec.sh )
 
 # Test converter constants
-add_test( converter_constants ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/converter_constants.sh )
+add_test( converter_constants bash -c ${CMAKE_CURRENT_SOURCE_DIR}/scripts/converter_constants.sh )
 
 # Test indicating -1 to go over all events
 ExternalData_Add_Test( marlinwrapper_tests NAME all_events_bounds COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/simple_processors.py --num-events=1 --LcioEvent.Files DATA{${PROJECT_SOURCE_DIR}/test/input_files/muons.slcio})
@@ -71,13 +71,13 @@ set_tests_properties ( over_total_events
     PASS_REGULAR_EXPRESSION "Application Manager Terminated successfully with a user requested ScheduledStop")
 
 # Test putting more events than available, stopping on last available event gracefully
-add_test( same_num_io ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/same_num_io.sh )
+add_test( same_num_io bash -c ${CMAKE_CURRENT_SOURCE_DIR}/scripts/same_num_io.sh )
 set_tests_properties ( same_num_io
   PROPERTIES
     PASS_REGULAR_EXPRESSION "Input and output have same number of events")
 
 # Test clicReconstruction with EDM4hep input and output
-ExternalData_Add_Test( marlinwrapper_tests NAME clicRec_edm4hep_input COMMAND ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/clicRec_e4h_input.sh DATA{${PROJECT_SOURCE_DIR}/test/input_files/ttbar_podio230830_edm4hep_frame.root})
+ExternalData_Add_Test( marlinwrapper_tests NAME clicRec_edm4hep_input COMMAND bash -c ${CMAKE_CURRENT_SOURCE_DIR}/scripts/clicRec_e4h_input.sh DATA{${PROJECT_SOURCE_DIR}/test/input_files/ttbar_podio230830_edm4hep_frame.root})
 
 # Run clicReconstruction sequence with LCIO input and output, no converters, with inter-event parallelism
 ExternalData_Add_Test( marlinwrapper_tests NAME clicRec_lcio_mt COMMAND ${BASH_PROGRAM} ${CMAKE_CURRENT_SOURCE_DIR}/scripts/clicRec_lcio_mt.sh DATA{${PROJECT_SOURCE_DIR}/test/input_files/testSimulation.slcio})
