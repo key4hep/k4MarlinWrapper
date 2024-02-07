@@ -162,6 +162,7 @@ We will create another list, `svcList` for this.
 In the space following
 
 ```python
+import os
 from Configurables import k4DataSvc, PodioInput
 evtsvc = k4DataSvc('EventDataSvc')
 evtsvc.input = os.path.join('$TEST_DIR/inputFiles/', os.environ.get("INPUTFILE", "ttbar_edm4hep.root"))
