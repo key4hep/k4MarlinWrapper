@@ -13,10 +13,9 @@ jobs:
                'doc/starterkit/k4MarlinWrapperCLIC/CEDViaWrapper']
     steps:
     - uses: actions/checkout@v3
-    - uses: cvmfs-contrib/github-action-cvmfs@v3.1
     - name: Start container
       run: |
-        docker run -it --name CI_container -v ${GITHUB_WORKSPACE}:/Package -v /cvmfs:/cvmfs:shared -d ghcr.io/aidasoft/centos7:latest /bin/bash
+        docker run -it --name CI_container --privileged -v ${GITHUB_WORKSPACE}:/Package -v /cvmfs:/cvmfs:shared -d ghcr.io/key4hep/key4hep-images/alma9-cvmfs /bin/bash
     - name: Compile
       run: |
         docker exec CI_container /bin/bash -c ' cd Package;/
