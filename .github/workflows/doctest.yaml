@@ -18,11 +18,11 @@ jobs:
         docker run -it --name CI_container --privileged -v ${GITHUB_WORKSPACE}:/Package -d ghcr.io/key4hep/key4hep-images/alma9-cvmfs:latest /bin/bash
     - name: Compile
       run: |
-        docker exec CI_container /bin/bash -c ' cd Package;/
-        source ${{ matrix.SETUP }};\
-        mkdir build; cd build;\
-        cmake .. -GNinja -DCMAKE_INSTALL_PREFIX=../install;\
-        ninja install;\
+        docker exec CI_container /bin/bash -c ' cd Package;
+        source ${{ matrix.SETUP }};
+        mkdir build; cd build;
+        cmake .. -GNinja -DCMAKE_INSTALL_PREFIX=../install;
+        ninja install;
         '
     - name: CheckPage
       run: |
