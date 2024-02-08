@@ -53,7 +53,7 @@ ExternalData_Add_Test( marlinwrapper_tests NAME simple_processors2 COMMAND ${K4R
 add_test( CLICPerformance_setup bash -c "test -d CLICPerformance || git clone --depth=1 https://github.com/iLCSoft/CLICPerformance")
 
 # Test clicReconstruction
-ExternalData_Add_Test( marlinwrapper_tests NAME clicRec COMMAND bash -c ${CMAKE_CURRENT_SOURCE_DIR}/scripts/clicRec.sh DATA{${PROJECT_SOURCE_DIR}/test/input_files/testSimulation.slcio} )
+ExternalData_Add_Test( marlinwrapper_tests NAME clicRec COMMAND bash -c "${CMAKE_CURRENT_SOURCE_DIR}/scripts/clicRec.sh DATA{${PROJECT_SOURCE_DIR}/test/input_files/testSimulation.slcio}" )
 # Test converter constants
 add_test( converter_constants bash -c ${CMAKE_CURRENT_SOURCE_DIR}/scripts/converter_constants.sh )
 
