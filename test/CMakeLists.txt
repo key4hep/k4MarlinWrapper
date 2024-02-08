@@ -60,9 +60,6 @@ add_test( converter_constants bash -c ${CMAKE_CURRENT_SOURCE_DIR}/scripts/conver
 
 # Test indicating -1 to go over all events
 ExternalData_Add_Test( marlinwrapper_tests NAME all_events_bounds COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/simple_processors.py --num-events=1 --LcioEvent.Files DATA{${PROJECT_SOURCE_DIR}/test/input_files/muons.slcio})
-# set_tests_properties ( all_events_bounds
-#   PROPERTIES
-#     PASS_REGULAR_EXPRESSION "Application Manager Terminated successfully with a user requested ScheduledStop")
 
 # Test putting more events than available, stopping on last available event gracefully
 ExternalData_Add_Test( marlinwrapper_tests NAME over_total_events COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/simple_processors.py --num-events=15 --LcioEvent.Files DATA{${PROJECT_SOURCE_DIR}/test/input_files/muons.slcio})
