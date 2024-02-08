@@ -195,24 +195,14 @@ svcList.append(cellIDSvc)
 
 
 Then all that is left is to pass that to the `ExtSvc` argument.
-At the bottom of the file;
+At the bottom of the file:
 
-```python
+```diff
 ApplicationMgr( TopAlg = algList,
                 EvtSel = 'NONE',
                 EvtMax   = 3,
-                ExtSvc = [evtsvc],
-                OutputLevel=WARNING
-              )
-```
-
-changes to
-
-```python
-ApplicationMgr( TopAlg = algList,
-                EvtSel = 'NONE',
-                EvtMax   = 3,
-                ExtSvc = svcList,
+-               ExtSvc = [evtsvc],
++               ExtSvc = svcList,
                 OutputLevel=WARNING
               )
 ```
