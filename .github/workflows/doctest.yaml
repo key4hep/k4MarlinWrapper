@@ -33,6 +33,7 @@ jobs:
         export LD_LIBRARY_PATH=/Package/install/lib64:$LD_LIBRARY_PATH
         export PYTHONPATH=/Package/install/python:$PYTHONPATH
         export K4MARLINWRAPPER=/Package/install/share/k4MarlinWrapper
+        unset KEY4HEP_STACK;
         mkdir testdir;
         cat .github/scripts/yamlheader.md  ${{ matrix.PAGE }}.md > testdir/test.md;
         cd testdir;
