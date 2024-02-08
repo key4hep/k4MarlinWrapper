@@ -28,18 +28,11 @@ python \
   clicReconstruction.xml \
   clicReconstruction.py
 
-# Generate slcio file if not present
-if [ ! -f $TEST_DIR/inputFiles/testSimulation.slcio ]; then
-  echo "Input file not found. Getting it from key4hep..."
-  wget https://key4hep.web.cern.ch/testFiles/ddsimOutput/testSimulation.slcio -P $TEST_DIR/inputFiles/
-fi
-
-
 echo "Modifying clicReconstruction.py file..."
 # Replace SLCIO file path
 # sed -i 's|/run/simulation/with/ctest/to/create/a/file.slcio|testSimulation.slcio|g' clicReconstruction.py
 sed -i '1s/^/import os\n/' clicReconstruction.py
-sed -i 's|/run/simulation/with/ctest/to/create/a/file.slcio|$TEST_DIR/inputFiles/testSimulation.slcio|g' clicReconstruction.py
+sed -i "s|/run/simulation/with/ctest/to/create/a/file.slcio|$1|g" clicReconstruction.py
 # Uncomment selected optional processors
 sed -i 's;EvtMax   = 10,;EvtMax   = 3,;' clicReconstruction.py
 sed -i 's;"MaxRecordNumber": ["10"],;"MaxRecordNumber": ["3"],;' clicReconstruction.py
