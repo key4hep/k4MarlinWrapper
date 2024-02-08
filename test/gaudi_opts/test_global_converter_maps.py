@@ -20,7 +20,6 @@
 
 
 from Gaudi.Configuration import INFO, DEBUG
-import sys
 
 from Configurables import (
     PodioInput,
