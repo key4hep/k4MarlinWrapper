@@ -162,6 +162,7 @@ We will create another list, `svcList` for this.
 In the space following
 
 ```python
+import os
 from Configurables import k4DataSvc, PodioInput
 evtsvc = k4DataSvc('EventDataSvc')
 evtsvc.input = os.path.join('$TEST_DIR/inputFiles/', os.environ.get("INPUTFILE", "ttbar_edm4hep.root"))
@@ -194,24 +195,14 @@ svcList.append(cellIDSvc)
 
 
 Then all that is left is to pass that to the `ExtSvc` argument.
-At the bottom of the file;
+At the bottom of the file:
 
-```python
+```diff
 ApplicationMgr( TopAlg = algList,
                 EvtSel = 'NONE',
                 EvtMax   = 3,
-                ExtSvc = [evtsvc],
-                OutputLevel=WARNING
-              )
-```
-
-changes to
-
-```python
-ApplicationMgr( TopAlg = algList,
-                EvtSel = 'NONE',
-                EvtMax   = 3,
-                ExtSvc = svcList,
+-               ExtSvc = [evtsvc],
++               ExtSvc = svcList,
                 OutputLevel=WARNING
               )
 ```
