@@ -29,7 +29,7 @@ fi
 
 k4run clicReconstruction_mt.py --LcioEvent.Files $1
 
-input_num_events=$(lcio_event_counter $TEST_DIR/inputFiles/testSimulation.slcio)
+input_num_events=$(lcio_event_counter $1)
 output_num_events=$(lcio_event_counter Output_REC_mt_lcio.slcio)
 
 echo $input_num_events
