@@ -21,24 +21,15 @@
 # exit if command or variable fails
 set -eu
 
-# Clone CLICPerformance for input files
-bash $TEST_DIR/scripts/setup_clic_performance.sh
-
 cd CLICPerformance/clicConfig
-
-# Generate slcio file if not present
-if [ ! -f $TEST_DIR/inputFiles/testSimulation.slcio ]; then
-  echo "Input file not found. Getting it from key4hep..."
-  wget https://key4hep.web.cern.ch/testFiles/ddsimOutput/testSimulation.slcio -P $TEST_DIR/inputFiles/
-fi
 
 if [ ! -f clicReconstruction_mt.py ]; then
   ln -s $TEST_DIR/gaudi_opts/clicReconstruction_mt.py clicReconstruction_mt.py
 fi
 
-k4run clicReconstruction_mt.py
+k4run clicReconstruction_mt.py --LcioEvent.Files $1
 
-input_num_events=$(lcio_event_counter $TEST_DIR/inputFiles/testSimulation.slcio)
+input_num_events=$(lcio_event_counter $1)
 output_num_events=$(lcio_event_counter Output_REC_mt_lcio.slcio)
 
 echo $input_num_events

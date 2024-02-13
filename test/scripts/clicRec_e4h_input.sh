@@ -21,22 +21,11 @@
 # exit if command or variable fails
 set -eu
 
-# Clone CLICPerformance for input files
-bash $TEST_DIR/scripts/setup_clic_performance.sh
-
 cd CLICPerformance/clicConfig
 
-export INPUTFILE=ttbar_podio230830_edm4hep_frame.root
+k4run $EXAMPLE_DIR/clicRec_e4h_input.py --EventDataSvc.input=$1
 
-# Download root file if not present
-if [ ! -f $TEST_DIR/inputFiles/$INPUTFILE ]; then
-  echo "Input file not found. Getting it from key4hep..."
-  wget https://key4hep.web.cern.ch/testFiles/ddsimOutput/$INPUTFILE -P $TEST_DIR/inputFiles/
-fi
-
-k4run $EXAMPLE_DIR/clicRec_e4h_input.py
-
-input_num_events=$(python $TEST_DIR/python/root_num_events.py $TEST_DIR/inputFiles/$INPUTFILE)
+input_num_events=$(python $TEST_DIR/python/root_num_events.py $1)
 output_num_events=$(python $TEST_DIR/python/root_num_events.py my_output.root)
 
 # First check do we have the same number of events in input and output

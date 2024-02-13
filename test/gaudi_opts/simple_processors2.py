@@ -18,7 +18,8 @@
 #
 import os
 
-from Gaudi.Configuration import *
+from Gaudi.Configuration import DEBUG
+from Configurables import ApplicationMgr
 
 from Configurables import LcioEvent, EventDataSvc, MarlinProcessorWrapper
 algList = []
@@ -90,7 +91,6 @@ digiVxd2.Parameters = {
                     }
 algList.append(digiVxd2)
 
-from Configurables import ApplicationMgr
 ApplicationMgr( TopAlg = algList,
                 EvtSel = 'NONE',
                 EvtMax   = 4,

@@ -18,9 +18,8 @@
 # limitations under the License.
 #
 
-import os
 
-from Gaudi.Configuration import *
+from Gaudi.Configuration import INFO, DEBUG
 
 from Configurables import (
     PodioInput,
@@ -33,9 +32,6 @@ from Configurables import (
 )
 
 evtsvc = k4DataSvc("EventDataSvc")
-evtsvc.input = os.path.join(
-    "$TEST_DIR/inputFiles/", "ttbar_podio230830_edm4hep_frame.root"
-)
 
 podioInput = PodioInput("InputReader")
 podioInput.collections = ["MCParticles"]
