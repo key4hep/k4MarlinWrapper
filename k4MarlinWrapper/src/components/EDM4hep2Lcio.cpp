@@ -156,9 +156,8 @@ void EDM4hep2LcioTool::convertRawCalorimeterHits(RawCaloHitMap& raw_calo_hits_ve
 // Convert EDM4hep Sim Calorimeter Hits to LCIO
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
 // Add converted LCIO Collection Vector to LCIO event
-void EDM4hep2LcioTool::convertSimCalorimeterHits(SimCaloHitMap& sim_calo_hits_vec, const MCParticleMap& mcparticles,
-                                                 const std::string& e4h_coll_name, const std::string& lcio_coll_name,
-                                                 lcio::LCEventImpl* lcio_event) {
+void EDM4hep2LcioTool::convertSimCalorimeterHits(SimCaloHitMap& sim_calo_hits_vec, const std::string& e4h_coll_name,
+                                                 const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event) {
   DataHandle<edm4hep::SimCalorimeterHitCollection> sim_calohit_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
   const auto                                       simcalohit_coll = sim_calohit_handle.get();
 
@@ -166,7 +165,7 @@ void EDM4hep2LcioTool::convertSimCalorimeterHits(SimCaloHitMap& sim_calo_hits_ve
   const auto                  cellIDstr = cellIDHandle.get();
 
   // TODO mcparticles_vdc
-  auto* conv_simcalohits = convSimCalorimeterHits(simcalohit_coll, cellIDstr, sim_calo_hits_vec, mcparticles);
+  auto* conv_simcalohits = convSimCalorimeterHits(simcalohit_coll, cellIDstr, sim_calo_hits_vec);
 
   // Add all Sim Calorimeter Hits to event
   lcio_event->addCollection(conv_simcalohits, lcio_coll_name);
@@ -189,13 +188,12 @@ void EDM4hep2LcioTool::convertTPCHits(TPCHitMap& tpc_hits_vec, const std::string
 // Convert EDM4hep Clusters to LCIO
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
 // Add converted LCIO Collection Vector to LCIO event
-void EDM4hep2LcioTool::convertClusters(ClusterMap& cluster_vec, const CaloHitMap& calohits_vec,
-                                       const std::string& e4h_coll_name, const std::string& lcio_coll_name,
-                                       lcio::LCEventImpl* lcio_event) {
+void EDM4hep2LcioTool::convertClusters(ClusterMap& cluster_vec, const std::string& e4h_coll_name,
+                                       const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event) {
   DataHandle<edm4hep::ClusterCollection> cluster_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
   const auto                             cluster_coll = cluster_handle.get();
 
-  auto* conv_clusters = convClusters(cluster_coll, cluster_vec, calohits_vec);
+  auto* conv_clusters = convClusters(cluster_coll, cluster_vec);
 
   // Add clusters to event
   lcio_event->addCollection(conv_clusters, lcio_coll_name);
@@ -284,12 +282,11 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
   } else if (fulltype == "edm4hep::RawCalorimeterHit") {
     convertRawCalorimeterHits(collection_pairs.rawCaloHits, e4h_coll_name, lcio_coll_name, lcio_event);
   } else if (fulltype == "edm4hep::SimCalorimeterHit") {
-    convertSimCalorimeterHits(collection_pairs.simCaloHits, collection_pairs.mcParticles, e4h_coll_name, lcio_coll_name,
-                              lcio_event);
+    convertSimCalorimeterHits(collection_pairs.simCaloHits, e4h_coll_name, lcio_coll_name, lcio_event);
   } else if (fulltype == "edm4hep::RawTimeSeries") {
     convertTPCHits(collection_pairs.tpcHits, e4h_coll_name, lcio_coll_name, lcio_event);
   } else if (fulltype == "edm4hep::Cluster") {
-    convertClusters(collection_pairs.clusters, collection_pairs.caloHits, e4h_coll_name, lcio_coll_name, lcio_event);
+    convertClusters(collection_pairs.clusters, e4h_coll_name, lcio_coll_name, lcio_event);
   } else if (fulltype == "edm4hep::Vertex") {
     convertVertices(collection_pairs.vertices, collection_pairs.recoParticles, e4h_coll_name, lcio_coll_name,
                     lcio_event);
