@@ -30,10 +30,6 @@
 
 DECLARE_COMPONENT(EDM4hep2LcioTool);
 
-#ifdef EDM4HEP2LCIOCONV_NAMESPACE
-using namespace EDM4hep2LCIOConv;
-#endif
-
 using namespace k4MarlinWrapper;
 
 using GlobalMapWrapper = AnyDataWrapper<GlobalConvertedObjectsMap>;
@@ -76,9 +72,8 @@ StatusCode EDM4hep2LcioTool::finalize() { return GaudiTool::finalize(); }
 // Convert EDM4hep Tracks to LCIO
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
 // Add LCIO Collection Vector to LCIO event
-void EDM4hep2LcioTool::convertTracks(TrackMap& tracks_vec, const TrackerHitMap& trackerhits_vec,
-                                     const std::string& e4h_coll_name, const std::string& lcio_coll_name,
-                                     lcio::LCEventImpl* lcio_event) {
+void EDM4hep2LcioTool::convertTracks(TrackMap& tracks_vec, const std::string& e4h_coll_name,
+                                     const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event) {
   DataHandle<edm4hep::TrackCollection> tracks_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
   const auto*                          tracks_coll = tracks_handle.get();
 
@@ -108,9 +103,8 @@ void EDM4hep2LcioTool::convertTrackerHits(TrackerHitMap& trackerhits_vec, const 
 // Convert EDM4hep SimTrackerHits to LCIO
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
 // Add LCIO Collection Vector to LCIO event
-void EDM4hep2LcioTool::convertSimTrackerHits(SimTrackerHitMap& simtrackerhits_vec, const MCParticleMap& mcparticles_vec,
-                                             const std::string& e4h_coll_name, const std::string& lcio_coll_name,
-                                             lcio::LCEventImpl* lcio_event) {
+void EDM4hep2LcioTool::convertSimTrackerHits(SimTrackerHitMap& simtrackerhits_vec, const std::string& e4h_coll_name,
+                                             const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event) {
   DataHandle<edm4hep::SimTrackerHitCollection> simtrackerhits_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
   const auto                                   simtrackerhits_coll = simtrackerhits_handle.get();
 
@@ -204,9 +198,8 @@ void EDM4hep2LcioTool::convertClusters(ClusterMap& cluster_vec, const std::strin
 // Convert EDM4hep Vertices to LCIO
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
 // Add converted LCIO Collection Vector to LCIO event
-void EDM4hep2LcioTool::convertVertices(VertexMap& vertex_vec, const RecoParticleMap& recoparticles_vec,
-                                       const std::string& e4h_coll_name, const std::string& lcio_coll_name,
-                                       lcio::LCEventImpl* lcio_event) {
+void EDM4hep2LcioTool::convertVertices(VertexMap& vertex_vec, const std::string& e4h_coll_name,
+                                       const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event) {
   DataHandle<edm4hep::VertexCollection> vertex_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
   const auto                            vertex_coll = vertex_handle.get();
 
@@ -234,8 +227,7 @@ void EDM4hep2LcioTool::convertMCParticles(MCParticleMap& mc_particles_vec, const
 // Convert EDM4hep RecoParticles to LCIO
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
 // Add converted LCIO Collection Vector to LCIO event
-void EDM4hep2LcioTool::convertReconstructedParticles(RecoParticleMap& recoparticles_vec, const TrackMap& tracks_vec,
-                                                     const VertexMap& vertex_vec, const ClusterMap& clusters_vec,
+void EDM4hep2LcioTool::convertReconstructedParticles(RecoParticleMap&   recoparticles_vec,
                                                      const std::string& e4h_coll_name,
                                                      const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event) {
   // ReconstructedParticles handle
@@ -273,12 +265,11 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
   debug() << "Converting type " << fulltype << " from input " << e4h_coll_name << endmsg;
 
   if (fulltype == "edm4hep::Track") {
-    convertTracks(collection_pairs.tracks, collection_pairs.trackerHits, e4h_coll_name, lcio_coll_name, lcio_event);
+    convertTracks(collection_pairs.tracks, e4h_coll_name, lcio_coll_name, lcio_event);
   } else if (fulltype == "edm4hep::TrackerHit") {
     convertTrackerHits(collection_pairs.trackerHits, e4h_coll_name, lcio_coll_name, lcio_event);
   } else if (fulltype == "edm4hep::SimTrackerHit") {
-    convertSimTrackerHits(collection_pairs.simTrackerHits, collection_pairs.mcParticles, e4h_coll_name, lcio_coll_name,
-                          lcio_event);
+    convertSimTrackerHits(collection_pairs.simTrackerHits, e4h_coll_name, lcio_coll_name, lcio_event);
   } else if (fulltype == "edm4hep::CalorimeterHit") {
     convertCalorimeterHits(collection_pairs.caloHits, e4h_coll_name, lcio_coll_name, lcio_event);
   } else if (fulltype == "edm4hep::RawCalorimeterHit") {
@@ -290,13 +281,11 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
   } else if (fulltype == "edm4hep::Cluster") {
     convertClusters(collection_pairs.clusters, e4h_coll_name, lcio_coll_name, lcio_event);
   } else if (fulltype == "edm4hep::Vertex") {
-    convertVertices(collection_pairs.vertices, collection_pairs.recoParticles, e4h_coll_name, lcio_coll_name,
-                    lcio_event);
+    convertVertices(collection_pairs.vertices, e4h_coll_name, lcio_coll_name, lcio_event);
   } else if (fulltype == "edm4hep::MCParticle") {
     convertMCParticles(collection_pairs.mcParticles, e4h_coll_name, lcio_coll_name, lcio_event);
   } else if (fulltype == "edm4hep::ReconstructedParticle") {
-    convertReconstructedParticles(collection_pairs.recoParticles, collection_pairs.tracks, collection_pairs.vertices,
-                                  collection_pairs.clusters, e4h_coll_name, lcio_coll_name, lcio_event);
+    convertReconstructedParticles(collection_pairs.recoParticles, e4h_coll_name, lcio_coll_name, lcio_event);
   } else if (fulltype == "edm4hep::EventHeader") {
     convertEventHeader(e4h_coll_name, lcio_event);
   } else if (fulltype == "edm4hep::CaloHitContribution") {
@@ -332,7 +321,7 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
   CollectionPairMappings collection_pairs{};
   for (const auto& [edm4hepName, lcioName] : collsToConvert) {
     debug() << "Converting collection " << edm4hepName << " (storing it as " << lcioName << ")" << endmsg;
-    if (!collectionExist(lcioName, lcio_event)) {
+    if (!EDM4hep2LCIOConv::collectionExist(lcioName, lcio_event)) {
       convertAdd(edm4hepName, lcioName, lcio_event, collection_pairs);
     } else {
       debug() << " Collection " << lcioName << " already in place, skipping conversion. " << endmsg;
@@ -358,7 +347,7 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
 
   globalObjMap.update(collection_pairs);
 
-  FillMissingCollections(collection_pairs, globalObjMap);
+  EDM4hep2LCIOConv::resolveRelations(collection_pairs, globalObjMap);
 
   return StatusCode::SUCCESS;
 }
