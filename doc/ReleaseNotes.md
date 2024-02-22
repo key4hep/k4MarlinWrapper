@@ -1,3 +1,29 @@
+# v00-08
+
+* 2024-02-13 jmcarcell ([PR#167](https://github.com/key4hep/k4marlinwrapper/pull/167))
+  - Use ExternalData and remove some scripts for testing to fix running tests in parallel
+
+* 2024-02-08 tmadlener ([PR#173](https://github.com/key4hep/k4marlinwrapper/pull/173))
+  - Remove the dedicated `clang-format` workflow since it is part of the `pre-commit` workflow
+
+* 2024-02-08 tmadlener ([PR#172](https://github.com/key4hep/k4marlinwrapper/pull/172))
+  - Switch the `doctest` CI workflows to an alma9 based container with CVMFS inside
+
+* 2024-02-08 jmcarcell ([PR#169](https://github.com/key4hep/k4marlinwrapper/pull/169))
+  - Delete build workflow since we have another one for key4hep that covers builds for nightlies, releases and all the operating systems we support
+
+* 2024-01-27 jmcarcell ([PR#166](https://github.com/key4hep/k4marlinwrapper/pull/166))
+  - Add the edm4hep includes to allow compilation with clang, which currently doesn't compile due to incomplete classes
+
+* 2023-12-05 Leonhard Reichenbach ([PR#162](https://github.com/key4hep/k4marlinwrapper/pull/162))
+  - Modified the edm4hep to lcio converter to always convert the`EventHeader` to have event number etc. available in lcio.
+
+* 2023-12-03 Mateusz Jakub Fila ([PR#163](https://github.com/key4hep/k4marlinwrapper/pull/163))
+  - fixed typos in documentation
+
+* 2023-11-09 BrieucF ([PR#161](https://github.com/key4hep/k4marlinwrapper/pull/161))
+  - Tiny fix to `test/gaudi_opts/fccRec_e4h_input.py`
+
 # v00-07
 
 * 2023-11-03 jmcarcell ([PR#156](https://github.com/key4hep/k4MarlinWrapper/pull/156))
