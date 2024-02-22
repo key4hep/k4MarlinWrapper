@@ -112,7 +112,7 @@ namespace {
 
   struct ObjectMappings {
     ObjMapT<lcio::Track*, edm4hep::MutableTrack>                                 tracks{};
-    ObjMapT<lcio::TrackerHit*, edm4hep::MutableTrackerHit>                       trackerHits{};
+    ObjMapT<lcio::TrackerHit*, edm4hep::MutableTrackerHit3D>                     trackerHits{};
     ObjMapT<lcio::SimTrackerHit*, edm4hep::MutableSimTrackerHit>                 simTrackerHits{};
     ObjMapT<lcio::CalorimeterHit*, edm4hep::MutableCalorimeterHit>               caloHits{};
     ObjMapT<lcio::RawCalorimeterHit*, edm4hep::MutableRawCalorimeterHit>         rawCaloHits{};

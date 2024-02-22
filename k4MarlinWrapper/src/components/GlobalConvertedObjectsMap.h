@@ -31,7 +31,14 @@
 #include "edm4hep/SimCalorimeterHit.h"
 #include "edm4hep/SimTrackerHit.h"
 #include "edm4hep/Track.h"
+#if __has_include("edm4hep/TrackerHit3D.h")
+#include "edm4hep/TrackerHit3D.h"
+#else
 #include "edm4hep/TrackerHit.h"
+namespace edm4hep {
+  using TrackerHit3D = edm4hep::TrackerHit;
+}
+#endif
 #include "edm4hep/TrackerHitPlane.h"
 #include "edm4hep/Vertex.h"
 
@@ -78,7 +85,7 @@ namespace k4MarlinWrapper {
     template <typename K, typename V> using ObjectMapT = k4EDM4hep2LcioConv::VecMapT<K, V>;
 
     ObjectMapT<EVENT::Track*, edm4hep::Track>                                 tracks{};
-    ObjectMapT<EVENT::TrackerHit*, edm4hep::TrackerHit>                       trackerHits{};
+    ObjectMapT<EVENT::TrackerHit*, edm4hep::TrackerHit3D>                     trackerHits{};
     ObjectMapT<EVENT::SimTrackerHit*, edm4hep::SimTrackerHit>                 simTrackerHits{};
     ObjectMapT<EVENT::CalorimeterHit*, edm4hep::CalorimeterHit>               caloHits{};
     ObjectMapT<EVENT::RawCalorimeterHit*, edm4hep::RawCalorimeterHit>         rawCaloHits{};

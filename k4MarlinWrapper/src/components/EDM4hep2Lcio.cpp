@@ -93,8 +93,8 @@ void EDM4hep2LcioTool::convertTracks(TrackMap& tracks_vec, const TrackerHitMap& 
 // Add LCIO Collection Vector to LCIO event
 void EDM4hep2LcioTool::convertTrackerHits(TrackerHitMap& trackerhits_vec, const std::string& e4h_coll_name,
                                           const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event) {
-  DataHandle<edm4hep::TrackerHitCollection> trackerhits_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
-  const auto                                trackerhits_coll = trackerhits_handle.get();
+  DataHandle<edm4hep::TrackerHit3DCollection> trackerhits_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
+  const auto                                  trackerhits_coll = trackerhits_handle.get();
 
   MetaDataHandle<std::string> cellIDStrHandle{trackerhits_handle, edm4hep::CellIDEncoding, Gaudi::DataHandle::Reader};
 
