@@ -73,7 +73,7 @@ set_tests_properties ( same_num_io
     PASS_REGULAR_EXPRESSION "Input and output have same number of events")
 
 # Test clicReconstruction with EDM4hep input and output
-ExternalData_Add_Test( marlinwrapper_tests NAME clicRec_edm4hep_input COMMAND bash -c "${CMAKE_CURRENT_SOURCE_DIR}/scripts/clicRec_e4h_input.sh DATA{${PROJECT_SOURCE_DIR}/test/input_files/ttbar_podio230830_edm4hep_frame.root}")
+ExternalData_Add_Test( marlinwrapper_tests NAME clicRec_edm4hep_input COMMAND bash -c "${CMAKE_CURRENT_SOURCE_DIR}/scripts/clicRec_e4h_input.sh DATA{${PROJECT_SOURCE_DIR}/test/input_files/ttbar_20240223_edm4hep.root}")
 
 # Run clicReconstruction sequence with LCIO input and output, no converters, with inter-event parallelism
 ExternalData_Add_Test( marlinwrapper_tests NAME clicRec_lcio_mt COMMAND bash -c "${CMAKE_CURRENT_SOURCE_DIR}/scripts/clicRec_lcio_mt.sh DATA{${PROJECT_SOURCE_DIR}/test/input_files/testSimulation.slcio}")
@@ -83,7 +83,7 @@ add_test( clic_geo_test ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/geoTest_
 
 # Test for checking whether the converters can resolve relations accross
 # multiple processors
-ExternalData_Add_Test( marlinwrapper_tests NAME global_converter_maps COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_global_converter_maps.py --EventDataSvc.input DATA{${PROJECT_SOURCE_DIR}/test/input_files/ttbar_podio230830_edm4hep_frame.root})
+ExternalData_Add_Test( marlinwrapper_tests NAME global_converter_maps COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_global_converter_maps.py --EventDataSvc.input DATA{${PROJECT_SOURCE_DIR}/test/input_files/ttbar_20240223_edm4hep.root})
 
 add_test( event_header_conversion bash -c "k4run ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/createEventHeader.py && anajob test.slcio | grep 'EVENT: 42'" )
 
