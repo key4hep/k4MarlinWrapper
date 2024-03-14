@@ -38,47 +38,12 @@ parseConstants(CONSTANTS)
 from Configurables import ToolSvc, Lcio2EDM4hepTool, EDM4hep2LcioTool
 
 
-# read = LcioEvent()
-# read.OutputLevel = WARNING
-# read.Files = ["ttbar.slcio"]
-# algList.append(read)
-
-
 from Configurables import k4DataSvc, PodioInput
 evtsvc = k4DataSvc('EventDataSvc')
 evtsvc.input = os.path.join('$TEST_DIR/inputFiles/', os.environ.get("INPUTFILE", "ttbar_edm4hep_frame.root"))
 
 
 inp = PodioInput('InputReader')
-inp.collections = [
-  'MCParticles',
-  'VertexBarrelCollection',
-  'VertexEndcapCollection',
-  'InnerTrackerBarrelCollection',
-  'OuterTrackerBarrelCollection',
-  'InnerTrackerEndcapCollection',
-  'OuterTrackerEndcapCollection',
-  'ECalEndcapCollection',
-  'ECalEndcapCollectionContributions',
-  'ECalBarrelCollection',
-  'ECalBarrelCollectionContributions',
-  'ECalPlugCollection',
-  'ECalPlugCollectionContributions',
-  'HCalBarrelCollection',
-  'HCalBarrelCollectionContributions',
-  'HCalEndcapCollection',
-  'HCalEndcapCollectionContributions',
-  'HCalRingCollection',
-  'HCalRingCollectionContributions',
-  'YokeBarrelCollection',
-  'YokeBarrelCollectionContributions',
-  'YokeEndcapCollection',
-  'YokeEndcapCollectionContributions',
-  'LumiCalCollection',
-  'LumiCalCollectionContributions',
-  'BeamCalCollection',
-  'BeamCalCollectionContributions',
-]
 inp.OutputLevel = DEBUG
 
 
