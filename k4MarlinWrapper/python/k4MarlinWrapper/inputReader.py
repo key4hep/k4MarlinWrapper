@@ -18,7 +18,7 @@
 #
 
 import sys
-from Configurables import LcioEvent, PodioInput
+from Configurables import LcioEvent, PodioInput, MarlinProcessorWrapper, EDM4hep2LcioTool
 
 def create_reader(input_files, evtSvc):
     """Create the appropriate reader for the input files"""
@@ -37,3 +37,20 @@ def create_reader(input_files, evtSvc):
         evtSvc.inputs = input_files
 
     return read
+
+def attach_edm4hep2lcio_conversion(algList, read):
+    """Attach the edm4hep to lcio conversion if necessary e.g. when using create_reader. Should only be run after algList is complete."""
+    if not isinstance(read, PodioInput):
+        # nothing to convert :)
+        return
+
+     # find first wrapper
+    for alg in algList:
+        if isinstance(alg, MarlinProcessorWrapper):
+            break
+
+    EDM4hep2LcioInput = EDM4hep2LcioTool("InputConversion")
+    EDM4hep2LcioInput.convertAll = True
+    # Adjust for the different naming conventions
+    EDM4hep2LcioInput.collNameMapping = {"MCParticles": "MCParticle"}
+    alg.EDM4hep2LcioTool = EDM4hep2LcioInput
