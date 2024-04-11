@@ -18,58 +18,49 @@
 # limitations under the License.
 #
 
-from Gaudi.Configuration import *
+from Gaudi.Configuration import INFO
+from Configurables import MarlinProcessorWrapper, k4DataSvc, GeoSvc
+from k4FWCore.parseArgs import parser
+from k4MarlinWrapper.inputReader import create_reader, attach_edm4hep2lcio_conversion
 
-from Configurables import MarlinProcessorWrapper, k4DataSvc, PodioInput, EDM4hep2LcioTool
+
+parser.add_argument(
+    "--inputFiles",
+    action="extend",
+    nargs="+",
+    metavar=["file1", "file2"],
+    help="One or multiple input files",
+)
+
+parser.add_argument(
+    "--compactFile",
+    help="Compact detector file to use",
+    type=str,
+    default="CLICPerformance/Visualisation/CLIC_o3_v06_CED/CLIC_o3_v06_CED.xml"
+)
+
+reco_args = parser.parse_known_args()[0]
+
 algList = []
+svcList = []
 
-evtsvc = k4DataSvc('EventDataSvc')
-evtsvc.input = ''
+evtsvc = k4DataSvc("EventDataSvc")
+svcList.append(evtsvc)
 
-inp = PodioInput('InputReader')
-inp.collections = [
-  'MCParticles',
-  'VertexBarrelCollection',
-  'VertexEndcapCollection',
-  'InnerTrackerBarrelCollection',
-  'OuterTrackerBarrelCollection',
-  'InnerTrackerEndcapCollection',
-  'OuterTrackerEndcapCollection',
-  'ECalEndcapCollection',
-  'ECalEndcapCollectionContributions',
-  'ECalBarrelCollection',
-  'ECalBarrelCollectionContributions',
-  'ECalPlugCollection',
-  'ECalPlugCollectionContributions',
-  'HCalBarrelCollection',
-  'HCalBarrelCollectionContributions',
-  'HCalEndcapCollection',
-  'HCalEndcapCollectionContributions',
-  'HCalRingCollection',
-  'HCalRingCollectionContributions',
-  'YokeBarrelCollection',
-  'YokeBarrelCollectionContributions',
-  'YokeEndcapCollection',
-  'YokeEndcapCollectionContributions',
-  'LumiCalCollection',
-  'LumiCalCollectionContributions',
-  'BeamCalCollection',
-  'BeamCalCollectionContributions',
-]
 
-MyInitializeDD4hep = MarlinProcessorWrapper("MyInitializeDD4hep")
-MyInitializeDD4hep.OutputLevel = INFO
-MyInitializeDD4hep.ProcessorType = "InitializeDD4hep"
-MyInitializeDD4hep.Parameters = {
-                                 "DD4hepXMLFile": ["CLICPerformance/Visualisation/CLIC_o3_v06_CED/CLIC_o3_v06_CED.xml"]
-                                 }
+geoSvc = GeoSvc("GeoSvc")
+geoSvc.detectors = [reco_args.compactFile]
+geoSvc.OutputLevel = INFO
+geoSvc.EnableGeant4Geo = False
+svcList.append(geoSvc)
 
-MyEventSelector = MarlinProcessorWrapper("MyEventSelector")
-MyEventSelector.OutputLevel = INFO
-MyEventSelector.ProcessorType = "EventSelector"
-MyEventSelector.Parameters = {
-                              "EventList": ["28", "0", "33", "0", "52", "0", "63", "0", "73", "0", "78", "0"]
-                              }
+
+if reco_args.inputFiles:
+    read = create_reader(reco_args.inputFiles, evtsvc)
+    read.OutputLevel = INFO
+    algList.append(read)
+else:
+    read = None
 
 MyCEDViewer = MarlinProcessorWrapper("MyCEDViewer")
 MyCEDViewer.OutputLevel = INFO
@@ -208,21 +199,15 @@ MyCEDViewer.Parameters = {
                           "WaitForKeyboard": ["1"]
                           }
 
-# EDM4hep to LCIO converter
-edmConvTool = EDM4hep2LcioTool("EDM4hep2lcio")
-edmConvTool.convertAll = True
-edmConvTool.collNameMapping = {'MCParticles': 'MCParticle'}
-edmConvTool.OutputLevel = DEBUG
-MyCEDViewer.EDM4hep2LcioTool = edmConvTool
-
-algList.append(inp)
-algList.append(MyInitializeDD4hep)
 algList.append(MyCEDViewer)
+
+# We need to convert the inputs in case we have EDM4hep input
+attach_edm4hep2lcio_conversion(algList, read)
 
 from Configurables import ApplicationMgr
 ApplicationMgr( TopAlg = algList,
                 EvtSel = 'NONE',
-                EvtMax   = 10,
-                ExtSvc = [evtsvc],
-                OutputLevel=INFO
+                EvtMax = 10,
+                ExtSvc = svcList,
+                OutputLevel = INFO
               )
