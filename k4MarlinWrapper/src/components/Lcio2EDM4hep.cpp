@@ -24,6 +24,8 @@
 
 #include "k4EDM4hep2LcioConv/k4Lcio2EDM4hepConv.h"
 
+#include <edm4hep/utils/ParticleIDUtils.h>
+
 #include <k4FWCore/DataHandle.h>
 #include <k4FWCore/MetaDataHandle.h>
 
@@ -154,6 +156,8 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
   // were empty
   bool needCaloHitContribs = false;
 
+  std::map<std::string, edm4hep::utils::ParticleIDMeta> pidInfos{};
+
   for (const auto& [lcioName, edm4hepName] : collsToConvert) {
     try {
       auto* lcio_coll = the_event->getCollection(lcioName);
@@ -174,6 +178,13 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
       if (lcio_coll_type_str == "LCRelation") {
         lcRelationColls.emplace_back(std::make_pair(edm4hepName, lcio_coll));
       }
+      if (lcio_coll_type_str == "ReconstructedParticle") {
+        // Collect the ParticleID meta information because that has to go to the
+        // ParticleID collections
+        for (const auto& pidInfo : LCIO2EDM4hepConv::getPIDMetaInfo(lcio_coll)) {
+          pidInfos.try_emplace(LCIO2EDM4hepConv::getPIDCollName(lcioName, pidInfo.algoName), pidInfo);
+        }
+      }
 
       needCaloHitContribs = (lcio_coll_type_str == "SimCalorimeterHit") && !lcio_coll->isSubset();
 
@@ -189,6 +200,12 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
                 << endmsg;
       continue;
     }
+  }
+
+  // Set the ParticleID meta information
+  auto& metadataFrame = m_podioDataSvc->getMetaDataFrame();
+  for (const auto& [collName, pidInfo] : pidInfos) {
+    edm4hep::utils::PIDHandler::setAlgoInfo(metadataFrame, collName, pidInfo);
   }
 
   // We want one "global" map that is created the first time it is use in the
