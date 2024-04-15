@@ -50,6 +50,7 @@ using RawCaloHitMap    = ObjMapT<lcio::RawCalorimeterHitImpl*, edm4hep::RawCalor
 using TPCHitMap        = ObjMapT<lcio::TPCHitImpl*, edm4hep::RawTimeSeries>;
 using RecoParticleMap  = ObjMapT<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>;
 using MCParticleMap    = ObjMapT<lcio::MCParticleImpl*, edm4hep::MCParticle>;
+using ParticleIDMap    = ObjMapT<lcio::ParticleIDImpl*, edm4hep::ParticleID>;
 
 struct CollectionPairMappings;
 
@@ -99,13 +100,16 @@ private:
   void convertReconstructedParticles(RecoParticleMap& recoparticles_vec, const std::string& e4h_coll_name,
                                      const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event);
 
+  void convertParticleIDs(ParticleIDMap& pidMap, const std::string& e4h_coll_name, int32_t algoId);
+
   void convertMCParticles(MCParticleMap& mc_particles_vec, const std::string& e4h_coll_name,
                           const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event);
 
   void convertEventHeader(const std::string& e4h_coll_name, lcio::LCEventImpl* lcio_event);
 
   void convertAdd(const std::string& e4h_coll_name, const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event,
-                  CollectionPairMappings& collection_pairs);
+                  CollectionPairMappings&                            collection_pairs,
+                  std::vector<EDM4hep2LCIOConv::ParticleIDConvData>& pidCollections);
 };
 
 #endif
