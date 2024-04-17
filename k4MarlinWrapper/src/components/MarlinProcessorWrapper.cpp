@@ -168,6 +168,24 @@ StatusCode MarlinProcessorWrapper::initialize() {
     }
   }
 
+  // Set m_verbosity from OutputLevel of the MarlinProcessorWrapper
+  MSG::Level outputLevel = msgLevel();
+  switch (outputLevel) {
+    case MSG::ERROR:
+      m_verbosity = "ERROR";
+      break;
+    case MSG::WARNING:
+      m_verbosity = "WARNING";
+      break;
+    case MSG::INFO:
+      m_verbosity = "MESSAGE";
+      break;
+    case MSG::DEBUG:
+      m_verbosity = "DEBUG";
+      break;
+  }
+
+  // pass m_verbosity to overwrite it if explicitly stated in wrapped parameters
   auto parameters = parseParameters(m_parameters, m_verbosity);
   if (instantiateProcessor(parameters, m_processorType).isFailure()) {
     return StatusCode::FAILURE;
