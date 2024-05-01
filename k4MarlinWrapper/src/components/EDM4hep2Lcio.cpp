@@ -46,6 +46,7 @@ struct CollectionPairMappings {
   VertexMap        vertices{};
   RecoParticleMap  recoParticles{};
   MCParticleMap    mcParticles{};
+  ParticleIDMap    particleIDs{};
 };
 
 EDM4hep2LcioTool::EDM4hep2LcioTool(const std::string& type, const std::string& name, const IInterface* parent)
@@ -98,6 +99,12 @@ void EDM4hep2LcioTool::convertTrackerHits(TrackerHitMap& trackerhits_vec, const 
 
   // Add all trackerhits to event
   lcio_event->addCollection(conv_trackerhits.release(), lcio_coll_name);
+}
+
+void EDM4hep2LcioTool::convertParticleIDs(ParticleIDMap& pidMap, const std::string& e4h_coll_name, int32_t algoId) {
+  DataHandle<edm4hep::ParticleIDCollection> pidHandle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
+
+  EDM4hep2LCIOConv::convertParticleIDs(pidHandle.get(), pidMap, algoId);
 }
 
 // Convert EDM4hep SimTrackerHits to LCIO
@@ -254,8 +261,10 @@ void EDM4hep2LcioTool::convertEventHeader(const std::string& e4h_coll_name, lcio
 
 // Select the appropiate method to convert a collection given its type
 void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::string& lcio_coll_name,
-                                  lcio::LCEventImpl* lcio_event, CollectionPairMappings& collection_pairs) {
+                                  lcio::LCEventImpl* lcio_event, CollectionPairMappings& collection_pairs,
+                                  std::vector<EDM4hep2LCIOConv::ParticleIDConvData>& pidCollections) {
   const auto& evtFrame = m_podioDataSvc->getEventFrame();
+  const auto& metadata = m_podioDataSvc->getMetaDataFrame();
   const auto  collPtr  = evtFrame.get(e4h_coll_name);
   if (!collPtr) {
     error() << "No collection with name: " << e4h_coll_name << " available for conversion" << endmsg;
@@ -288,7 +297,12 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
     convertReconstructedParticles(collection_pairs.recoParticles, e4h_coll_name, lcio_coll_name, lcio_event);
   } else if (fulltype == "edm4hep::EventHeader") {
     convertEventHeader(e4h_coll_name, lcio_event);
-  } else if (fulltype == "edm4hep::CaloHitContribution") {
+  } else if (fulltype == "edm4hep::ParticleID") {
+    pidCollections.emplace_back(e4h_coll_name, static_cast<const edm4hep::ParticleIDCollection*>(collPtr),
+                                edm4hep::utils::PIDHandler::getAlgoInfo(metadata, e4h_coll_name));
+  }
+
+  else if (fulltype == "edm4hep::CaloHitContribution") {
     debug() << "CaloHitContribution collection cannot be converted standalone. "
             << "SimCalorimeterHit collection to be converted in order to be able to attach to them" << endmsg;
   } else {
@@ -304,7 +318,8 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
 // Parse property parameters and convert the indicated collections.
 // Use the collection names in the parameters to read and write them
 StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
-  const auto collections = m_podioDataSvc->getEventFrame().getAvailableCollections();
+  const auto& edmEvent    = m_podioDataSvc->getEventFrame();
+  const auto  collections = edmEvent.getAvailableCollections();
   // Start off with the pre-defined collection name mappings
   auto collsToConvert{m_collNames.value()};
   // We *always* want to convert the EventHeader
@@ -318,17 +333,29 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
     }
   }
 
-  CollectionPairMappings collection_pairs{};
+  CollectionPairMappings                            collection_pairs{};
+  std::vector<EDM4hep2LCIOConv::ParticleIDConvData> pidCollections{};
+
   for (const auto& [edm4hepName, lcioName] : collsToConvert) {
     debug() << "Converting collection " << edm4hepName << " (storing it as " << lcioName << ")" << endmsg;
     if (!EDM4hep2LCIOConv::collectionExist(lcioName, lcio_event)) {
-      convertAdd(edm4hepName, lcioName, lcio_event, collection_pairs);
+      convertAdd(edm4hepName, lcioName, lcio_event, collection_pairs, pidCollections);
     } else {
       debug() << " Collection " << lcioName << " already in place, skipping conversion. " << endmsg;
     }
   }
-
   debug() << "Event: " << lcio_event->getEventNumber() << " Run: " << lcio_event->getRunNumber() << endmsg;
+
+  // Deal with
+  EDM4hep2LCIOConv::sortParticleIDs(pidCollections);
+  for (const auto& pidCollMeta : pidCollections) {
+    const auto algoId = attachParticleIDMetaData(lcio_event, edmEvent, pidCollMeta);
+    if (!algoId.has_value()) {
+      warning() << "Could not determine algorithm type for ParticleID collection " << pidCollMeta.name
+                << " for setting consistent metadata" << endmsg;
+    }
+    convertParticleIDs(collection_pairs.particleIDs, pidCollMeta.name, algoId.value_or(-1));
+  }
 
   // We want one "global" map that is created the first time it is use in the
   // event.
