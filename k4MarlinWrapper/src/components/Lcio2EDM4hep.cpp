@@ -130,6 +130,11 @@ namespace {
 }  // namespace
 
 StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
+  // Convert event parameters
+  // auto& frame = const_cast<podio::Frame&>(m_podioDataSvc->getEventFrame());
+  auto& frame = m_podioDataSvc->m_eventframe;
+  LCIO2EDM4hepConv::convertObjectParameters<lcio::LCEventImpl>(the_event, frame);
+
   // Convert Event Header outside the collections loop
   if (!collectionExist(edm4hep::EventHeaderName)) {
     registerCollection(edm4hep::EventHeaderName, LCIO2EDM4hepConv::createEventHeader(the_event));
