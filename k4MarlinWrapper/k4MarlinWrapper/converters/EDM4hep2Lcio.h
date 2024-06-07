@@ -34,23 +34,23 @@
 // std
 #include <map>
 #include <string>
-#include <tuple>
 #include <vector>
 
 template <typename K, typename V> using ObjMapT = k4EDM4hep2LcioConv::VecMapT<K, V>;
 
-using TrackMap         = ObjMapT<lcio::TrackImpl*, edm4hep::Track>;
-using ClusterMap       = ObjMapT<lcio::ClusterImpl*, edm4hep::Cluster>;
-using VertexMap        = ObjMapT<lcio::VertexImpl*, edm4hep::Vertex>;
-using TrackerHitMap    = ObjMapT<lcio::TrackerHitImpl*, edm4hep::TrackerHit3D>;
-using SimTrackerHitMap = ObjMapT<lcio::SimTrackerHitImpl*, edm4hep::SimTrackerHit>;
-using CaloHitMap       = ObjMapT<lcio::CalorimeterHitImpl*, edm4hep::CalorimeterHit>;
-using SimCaloHitMap    = ObjMapT<lcio::SimCalorimeterHitImpl*, edm4hep::SimCalorimeterHit>;
-using RawCaloHitMap    = ObjMapT<lcio::RawCalorimeterHitImpl*, edm4hep::RawCalorimeterHit>;
-using TPCHitMap        = ObjMapT<lcio::TPCHitImpl*, edm4hep::RawTimeSeries>;
-using RecoParticleMap  = ObjMapT<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>;
-using MCParticleMap    = ObjMapT<lcio::MCParticleImpl*, edm4hep::MCParticle>;
-using ParticleIDMap    = ObjMapT<lcio::ParticleIDImpl*, edm4hep::ParticleID>;
+using TrackMap           = ObjMapT<lcio::TrackImpl*, edm4hep::Track>;
+using ClusterMap         = ObjMapT<lcio::ClusterImpl*, edm4hep::Cluster>;
+using VertexMap          = ObjMapT<lcio::VertexImpl*, edm4hep::Vertex>;
+using TrackerHitMap      = ObjMapT<lcio::TrackerHitImpl*, edm4hep::TrackerHit3D>;
+using TrackerHitPlaneMap = ObjMapT<lcio::TrackerHitPlaneImpl*, edm4hep::TrackerHitPlane>;
+using SimTrackerHitMap   = ObjMapT<lcio::SimTrackerHitImpl*, edm4hep::SimTrackerHit>;
+using CaloHitMap         = ObjMapT<lcio::CalorimeterHitImpl*, edm4hep::CalorimeterHit>;
+using SimCaloHitMap      = ObjMapT<lcio::SimCalorimeterHitImpl*, edm4hep::SimCalorimeterHit>;
+using RawCaloHitMap      = ObjMapT<lcio::RawCalorimeterHitImpl*, edm4hep::RawCalorimeterHit>;
+using TPCHitMap          = ObjMapT<lcio::TPCHitImpl*, edm4hep::RawTimeSeries>;
+using RecoParticleMap    = ObjMapT<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>;
+using MCParticleMap      = ObjMapT<lcio::MCParticleImpl*, edm4hep::MCParticle>;
+using ParticleIDMap      = ObjMapT<lcio::ParticleIDImpl*, edm4hep::ParticleID>;
 
 struct CollectionPairMappings;
 
@@ -75,6 +75,9 @@ private:
 
   void convertTrackerHits(TrackerHitMap& trackerhits_vec, const std::string& e4h_coll_name,
                           const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event);
+
+  void convertTrackerHitPlanes(TrackerHitPlaneMap& trackerhits_vec, const std::string& e4h_coll_name,
+                               const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event);
 
   void convertSimTrackerHits(SimTrackerHitMap& simtrackerhits_vec, const std::string& e4h_coll_name,
                              const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event);
