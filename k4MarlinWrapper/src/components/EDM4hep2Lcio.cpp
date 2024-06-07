@@ -290,7 +290,7 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
 
   if (fulltype == "edm4hep::Track") {
     convertTracks(collection_pairs.tracks, e4h_coll_name, lcio_coll_name, lcio_event);
-  } else if (fulltype == "edm4hep::TrackerHit") {
+  } else if (fulltype == "edm4hep::TrackerHit" || fulltype == "edm4hep::TrackerHit3D") {
     convertTrackerHits(collection_pairs.trackerHits, e4h_coll_name, lcio_coll_name, lcio_event);
   } else if (fulltype == "edm4hep::TrackerHitPlane") {
     convertTrackerHitPlanes(collection_pairs.trackerHitsPlane, e4h_coll_name, lcio_coll_name, lcio_event);
@@ -325,7 +325,7 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
   } else {
     warning() << "Error trying to convert requested " << fulltype << " with name " << e4h_coll_name << endmsg;
     warning() << "List of supported types: "
-              << "Track, TrackerHit, SimTrackerHit, "
+              << "Track, TrackerHit3D, TrackerHitPlane, SimTrackerHit, "
               << "Cluster, CalorimeterHit, RawCalorimeterHit, "
               << "SimCalorimeterHit, Vertex, ReconstructedParticle, "
               << "MCParticle." << endmsg;
