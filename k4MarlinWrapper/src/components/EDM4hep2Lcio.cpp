@@ -96,7 +96,7 @@ void EDM4hep2LcioTool::convertTrackerHits(TrackerHitMap& trackerhits_vec, const 
   MetaDataHandle<std::string> cellIDStrHandle{trackerhits_handle, edm4hep::CellIDEncoding, Gaudi::DataHandle::Reader};
 
   auto conv_trackerhits =
-      EDM4hep2LCIOConv::convertTrackerHits(trackerhits_coll, cellIDStrHandle.get(), trackerhits_vec);
+      EDM4hep2LCIOConv::convertTrackerHits(trackerhits_coll, cellIDStrHandle.get(""), trackerhits_vec);
 
   // Add all trackerhits to event
   lcio_event->addCollection(conv_trackerhits.release(), lcio_coll_name);
@@ -116,7 +116,7 @@ void EDM4hep2LcioTool::convertTrackerHitPlanes(TrackerHitPlaneMap& trackerhits_v
   MetaDataHandle<std::string> cellIDStrHandle{trackerhits_handle, edm4hep::CellIDEncoding, Gaudi::DataHandle::Reader};
 
   auto conv_trackerhits =
-      EDM4hep2LCIOConv::convertTrackerHitPlanes(trackerhits_coll, cellIDStrHandle.get(), trackerhits_vec);
+      EDM4hep2LCIOConv::convertTrackerHitPlanes(trackerhits_coll, cellIDStrHandle.get(""), trackerhits_vec);
 
   // Add all trackerhits to event
   lcio_event->addCollection(conv_trackerhits.release(), lcio_coll_name);
