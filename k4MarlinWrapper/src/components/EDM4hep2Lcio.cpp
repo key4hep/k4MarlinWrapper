@@ -35,18 +35,19 @@ using namespace k4MarlinWrapper;
 using GlobalMapWrapper = AnyDataWrapper<GlobalConvertedObjectsMap>;
 
 struct CollectionPairMappings {
-  TrackMap         tracks{};
-  TrackerHitMap    trackerHits{};
-  SimTrackerHitMap simTrackerHits{};
-  CaloHitMap       caloHits{};
-  RawCaloHitMap    rawCaloHits{};
-  SimCaloHitMap    simCaloHits{};
-  TPCHitMap        tpcHits{};
-  ClusterMap       clusters{};
-  VertexMap        vertices{};
-  RecoParticleMap  recoParticles{};
-  MCParticleMap    mcParticles{};
-  ParticleIDMap    particleIDs{};
+  TrackMap           tracks{};
+  TrackerHitMap      trackerHits{};
+  TrackerHitPlaneMap trackerHitsPlane{};
+  SimTrackerHitMap   simTrackerHits{};
+  CaloHitMap         caloHits{};
+  RawCaloHitMap      rawCaloHits{};
+  SimCaloHitMap      simCaloHits{};
+  TPCHitMap          tpcHits{};
+  ClusterMap         clusters{};
+  VertexMap          vertices{};
+  RecoParticleMap    recoParticles{};
+  MCParticleMap      mcParticles{};
+  ParticleIDMap      particleIDs{};
 };
 
 EDM4hep2LcioTool::EDM4hep2LcioTool(const std::string& type, const std::string& name, const IInterface* parent)
@@ -95,7 +96,7 @@ void EDM4hep2LcioTool::convertTrackerHits(TrackerHitMap& trackerhits_vec, const 
   MetaDataHandle<std::string> cellIDStrHandle{trackerhits_handle, edm4hep::CellIDEncoding, Gaudi::DataHandle::Reader};
 
   auto conv_trackerhits =
-      EDM4hep2LCIOConv::convertTrackerHits(trackerhits_coll, cellIDStrHandle.get(), trackerhits_vec);
+      EDM4hep2LCIOConv::convertTrackerHits(trackerhits_coll, cellIDStrHandle.get(""), trackerhits_vec);
 
   // Add all trackerhits to event
   lcio_event->addCollection(conv_trackerhits.release(), lcio_coll_name);
@@ -105,6 +106,20 @@ void EDM4hep2LcioTool::convertParticleIDs(ParticleIDMap& pidMap, const std::stri
   DataHandle<edm4hep::ParticleIDCollection> pidHandle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
 
   EDM4hep2LCIOConv::convertParticleIDs(pidHandle.get(), pidMap, algoId);
+}
+
+void EDM4hep2LcioTool::convertTrackerHitPlanes(TrackerHitPlaneMap& trackerhits_vec, const std::string& e4h_coll_name,
+                                               const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event) {
+  DataHandle<edm4hep::TrackerHitPlaneCollection> trackerhits_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
+  const auto                                     trackerhits_coll = trackerhits_handle.get();
+
+  MetaDataHandle<std::string> cellIDStrHandle{trackerhits_handle, edm4hep::CellIDEncoding, Gaudi::DataHandle::Reader};
+
+  auto conv_trackerhits =
+      EDM4hep2LCIOConv::convertTrackerHitPlanes(trackerhits_coll, cellIDStrHandle.get(""), trackerhits_vec);
+
+  // Add all trackerhits to event
+  lcio_event->addCollection(conv_trackerhits.release(), lcio_coll_name);
 }
 
 // Convert EDM4hep SimTrackerHits to LCIO
@@ -275,8 +290,10 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
 
   if (fulltype == "edm4hep::Track") {
     convertTracks(collection_pairs.tracks, e4h_coll_name, lcio_coll_name, lcio_event);
-  } else if (fulltype == "edm4hep::TrackerHit") {
+  } else if (fulltype == "edm4hep::TrackerHit" || fulltype == "edm4hep::TrackerHit3D") {
     convertTrackerHits(collection_pairs.trackerHits, e4h_coll_name, lcio_coll_name, lcio_event);
+  } else if (fulltype == "edm4hep::TrackerHitPlane") {
+    convertTrackerHitPlanes(collection_pairs.trackerHitsPlane, e4h_coll_name, lcio_coll_name, lcio_event);
   } else if (fulltype == "edm4hep::SimTrackerHit") {
     convertSimTrackerHits(collection_pairs.simTrackerHits, e4h_coll_name, lcio_coll_name, lcio_event);
   } else if (fulltype == "edm4hep::CalorimeterHit") {
@@ -308,7 +325,7 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
   } else {
     warning() << "Error trying to convert requested " << fulltype << " with name " << e4h_coll_name << endmsg;
     warning() << "List of supported types: "
-              << "Track, TrackerHit, SimTrackerHit, "
+              << "Track, TrackerHit3D, TrackerHitPlane, SimTrackerHit, "
               << "Cluster, CalorimeterHit, RawCalorimeterHit, "
               << "SimCalorimeterHit, Vertex, ReconstructedParticle, "
               << "MCParticle." << endmsg;
