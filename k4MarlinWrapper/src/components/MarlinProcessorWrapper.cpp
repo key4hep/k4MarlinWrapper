@@ -183,6 +183,9 @@ StatusCode MarlinProcessorWrapper::initialize() {
     case MSG::DEBUG:
       m_verbosity = "DEBUG";
       break;
+    default:
+      m_verbosity = "MESSAGE";
+      break;
   }
 
   // pass m_verbosity to overwrite it if explicitly stated in wrapped parameters
