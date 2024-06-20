@@ -65,7 +65,7 @@ public:
   virtual StatusCode initialize() override final;
 
 private:
-  std::string        m_verbosity = "ERROR";
+  std::string                m_verbosity = "ERROR";
   mutable marlin::Processor* m_processor = nullptr;
 
   /// Load libraries specified by MARLIN_DLL environment variable
