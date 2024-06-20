@@ -19,6 +19,7 @@
 
 #include "k4MarlinWrapper/LcioEventAlgo.h"
 #include "k4MarlinWrapper/util/k4MarlinWrapperUtil.h"
+#include "k4MarlinWrapper/LCEventWrapper.h"
 
 DECLARE_COMPONENT(LcioEvent)
 
