@@ -23,7 +23,8 @@
 
 DECLARE_COMPONENT(MarlinProcessorWrapper)
 
-MarlinProcessorWrapper::MarlinProcessorWrapper(const std::string& name, ISvcLocator* pSL) : Gaudi::Algorithm(name, pSL) {
+MarlinProcessorWrapper::MarlinProcessorWrapper(const std::string& name, ISvcLocator* pSL)
+    : Gaudi::Algorithm(name, pSL) {
   // register log level names with the logstream ---------
   streamlog::out.addLevelName<streamlog::DEBUG>();
   streamlog::out.addLevelName<streamlog::DEBUG0>();
