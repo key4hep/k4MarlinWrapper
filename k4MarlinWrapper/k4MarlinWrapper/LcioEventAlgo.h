@@ -25,9 +25,6 @@
  * later retrieval by wrapped Marlin Processors
  */
 
-#include <iostream>
-#include <memory>
-
 #include <Gaudi/Algorithm.h>
 #include <GaudiKernel/IEventProcessor.h>
 
