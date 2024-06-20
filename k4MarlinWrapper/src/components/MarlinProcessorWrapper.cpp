@@ -19,6 +19,7 @@
 
 #include "k4MarlinWrapper/MarlinProcessorWrapper.h"
 #include "IMPL/LCEventImpl.h"
+#include "k4MarlinWrapper/LCEventWrapper.h"
 #include "k4MarlinWrapper/util/k4MarlinWrapperUtil.h"
 
 DECLARE_COMPONENT(MarlinProcessorWrapper)
