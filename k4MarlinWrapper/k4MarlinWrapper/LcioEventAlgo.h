@@ -25,10 +25,7 @@
  * later retrieval by wrapped Marlin Processors
  */
 
-#include <iostream>
-#include <memory>
-
-#include <GaudiAlg/GaudiAlgorithm.h>
+#include <Gaudi/Algorithm.h>
 #include <GaudiKernel/IEventProcessor.h>
 
 #include <EVENT/LCIO.h>
@@ -36,16 +33,17 @@
 
 #include "k4MarlinWrapper/LCEventWrapper.h"
 
-class LcioEvent : public GaudiAlgorithm {
+class LcioEvent : public Gaudi::Algorithm {
 public:
   explicit LcioEvent(const std::string& name, ISvcLocator* pSL);
   virtual ~LcioEvent() = default;
   virtual StatusCode initialize() override final;
-  virtual StatusCode execute() override final;
+  virtual StatusCode execute(const EventContext&) const override;
 
 private:
   Gaudi::Property<std::vector<std::string>> m_fileNames{this, "Files", {}};
   MT::LCReader*                             m_reader = nullptr;
+  bool                                      isReEntrant() const override { return false; }
 };
 
 #endif

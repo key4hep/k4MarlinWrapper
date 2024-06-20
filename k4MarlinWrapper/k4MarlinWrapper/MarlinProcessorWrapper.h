@@ -20,13 +20,11 @@
 #define K4MARLINWRAPPER_MARLINPROCESSORWRAPPER_H
 
 // std
-#include <cstdlib>
-#include <iostream>
 #include <stack>
 #include <string>
 
 // Gaudi
-#include <GaudiAlg/GaudiAlgorithm.h>
+#include <Gaudi/Algorithm.h>
 #include <GaudiKernel/IEventProcessor.h>
 #include <GaudiKernel/IRndmEngine.h>
 #include <GaudiKernel/MsgStream.h>
@@ -48,7 +46,6 @@
 #include <TSystem.h>
 
 // k4MarlinWrapper
-#include "k4MarlinWrapper/LCEventWrapper.h"
 #include "k4MarlinWrapper/converters/IEDMConverter.h"
 
 namespace marlin {
@@ -56,17 +53,17 @@ namespace marlin {
   class StringParameters;
 }  // namespace marlin
 
-class MarlinProcessorWrapper : public GaudiAlgorithm {
+class MarlinProcessorWrapper : public Gaudi::Algorithm {
 public:
   explicit MarlinProcessorWrapper(const std::string& name, ISvcLocator* pSL);
   virtual ~MarlinProcessorWrapper() = default;
-  virtual StatusCode execute() override final;
+  virtual StatusCode execute(const EventContext&) const override final;
   virtual StatusCode finalize() override final;
   virtual StatusCode initialize() override final;
 
 private:
-  std::string        m_verbosity = "ERROR";
-  marlin::Processor* m_processor = nullptr;
+  std::string                m_verbosity = "ERROR";
+  mutable marlin::Processor* m_processor = nullptr;
 
   /// Load libraries specified by MARLIN_DLL environment variable
   StatusCode loadProcessorLibraries() const;
@@ -83,10 +80,12 @@ private:
   Gaudi::Property<std::string>                                     m_processorType{this, "ProcessorType", {}};
   Gaudi::Property<std::map<std::string, std::vector<std::string>>> m_parameters{this, "Parameters", {}};
 
-  ToolHandle<IEDMConverter> m_edm_conversionTool{"IEDMConverter/EDM4hep2Lcio", this};
-  ToolHandle<IEDMConverter> m_lcio_conversionTool{"IEDMConverter/Lcio2EDM4hep", this};
+  mutable ToolHandle<IEDMConverter> m_edm_conversionTool{"IEDMConverter/EDM4hep2Lcio", this};
+  mutable ToolHandle<IEDMConverter> m_lcio_conversionTool{"IEDMConverter/Lcio2EDM4hep", this};
 
   static std::stack<marlin::Processor*>& ProcessorStack();
+
+  bool isReEntrant() const override { return false; }
 };
 
 std::stack<marlin::Processor*>& MarlinProcessorWrapper::ProcessorStack() {
