@@ -46,6 +46,8 @@ public:
 private:
   Gaudi::Property<std::vector<std::string>> m_fileNames{this, "Files", {}};
   MT::LCReader*                             m_reader = nullptr;
+  bool isReEntrant() const override { return false; }
+
 };
 
 #endif
