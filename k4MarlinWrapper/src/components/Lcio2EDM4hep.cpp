@@ -96,11 +96,11 @@ void Lcio2EDM4hepTool::registerCollection(
     lcioColl->getParameters().getStringKeys(string_keys);
 
     for (auto& elem : string_keys) {
-      if (elem == edm4hep::CellIDEncoding) {
+      if (elem == edm4hep::labels::CellIDEncoding) {
         const auto& lcio_coll_cellid_str = lcioColl->getParameters().getStringVal(lcio::LCIO::CellIDEncoding);
         auto&       mdFrame              = m_podioDataSvc->getMetaDataFrame();
-        mdFrame.putParameter(podio::collMetadataParamName(name, edm4hep::CellIDEncoding), lcio_coll_cellid_str);
-        debug() << "Storing CellIDEncoding " << podio::collMetadataParamName(name, edm4hep::CellIDEncoding)
+        mdFrame.putParameter(podio::collMetadataParamName(name, edm4hep::labels::CellIDEncoding), lcio_coll_cellid_str);
+        debug() << "Storing CellIDEncoding " << podio::collMetadataParamName(name, edm4hep::labels::CellIDEncoding)
                 << " value: " << lcio_coll_cellid_str << endmsg;
       } else {
         // TODO: figure out where this actually needs to go
@@ -136,8 +136,8 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
   LCIO2EDM4hepConv::convertObjectParameters<lcio::LCEventImpl>(the_event, frame);
 
   // Convert Event Header outside the collections loop
-  if (!collectionExist(edm4hep::EventHeaderName)) {
-    registerCollection(edm4hep::EventHeaderName, LCIO2EDM4hepConv::createEventHeader(the_event));
+  if (!collectionExist(edm4hep::labels::EventHeader)) {
+    registerCollection(edm4hep::labels::EventHeader, LCIO2EDM4hepConv::createEventHeader(the_event));
   }
 
   // Start off with the pre-defined collection name mappings
