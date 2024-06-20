@@ -20,8 +20,6 @@
 #define K4MARLINWRAPPER_MARLINPROCESSORWRAPPER_H
 
 // std
-#include <cstdlib>
-#include <iostream>
 #include <stack>
 #include <string>
 
@@ -48,7 +46,6 @@
 #include <TSystem.h>
 
 // k4MarlinWrapper
-#include "k4MarlinWrapper/LCEventWrapper.h"
 #include "k4MarlinWrapper/converters/IEDMConverter.h"
 
 namespace marlin {
@@ -87,6 +84,8 @@ private:
   mutable ToolHandle<IEDMConverter> m_lcio_conversionTool{"IEDMConverter/Lcio2EDM4hep", this};
 
   static std::stack<marlin::Processor*>& ProcessorStack();
+
+  bool isReEntrant() const override { return false; }
 };
 
 std::stack<marlin::Processor*>& MarlinProcessorWrapper::ProcessorStack() {
