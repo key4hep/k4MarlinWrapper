@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2024 Key4hep-Project.
+ * Copyright (c) 2019-2024 Key4hep-Project.
  *
  * This file is part of Key4hep.
  * See https://key4hep.github.io/key4hep-doc/ for further info.
@@ -38,7 +38,9 @@ struct PseudoRecoAlgorithm final
     for (const auto& particle : input) {
       auto new_particle = coll_out.create();
       new_particle.setCharge(particle.getCharge());
-      new_particle.setMomentum({static_cast<float>(particle.getMomentum()[0]), static_cast<float>(particle.getMomentum()[1]), static_cast<float>(particle.getMomentum()[2])});
+      new_particle.setMomentum({static_cast<float>(particle.getMomentum()[0]),
+                                static_cast<float>(particle.getMomentum()[1]),
+                                static_cast<float>(particle.getMomentum()[2])});
       new_particle.setEnergy(particle.getEnergy());
     }
     return coll_out;
