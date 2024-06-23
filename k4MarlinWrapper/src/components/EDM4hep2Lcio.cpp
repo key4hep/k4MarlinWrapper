@@ -284,9 +284,16 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
                                   std::vector<EDM4hep2LCIOConv::ParticleIDConvData>& pidCollections) {
   const auto& evtFrame = m_podioDataSvc->getEventFrame();
   const auto& metadata = m_podioDataSvc->getMetaDataFrame();
-  const auto  collPtr  = evtFrame.get(e4h_coll_name);
+  auto        collPtr  = evtFrame.get(e4h_coll_name);
   if (!collPtr) {
-    error() << "No collection with name: " << e4h_coll_name << " available for conversion" << endmsg;
+    DataObject* p;
+    auto        sc  = m_podioDataSvc->retrieveObject(e4h_coll_name, p);
+    auto        ptr = dynamic_cast<AnyDataWrapper<std::shared_ptr<podio::CollectionBase>>*>(p);
+    if (sc.isFailure() || !ptr) {
+      error() << "No collection with name: " << e4h_coll_name << " available for conversion" << endmsg;
+    } else {
+      collPtr = dynamic_cast<podio::CollectionBase*>(ptr->getData().get());
+    }
   }
   const auto fulltype = collPtr->getValueTypeName();
 
