@@ -285,6 +285,9 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
   const auto& evtFrame = m_podioDataSvc->getEventFrame();
   const auto& metadata = m_podioDataSvc->getMetaDataFrame();
   auto        collPtr  = evtFrame.get(e4h_coll_name);
+  // When the collection can't be retrieved from the frame
+  // there is still the possibility that it was generated
+  // from a functional algorithm
   if (!collPtr) {
     DataObject* p;
     auto        sc  = m_podioDataSvc->retrieveObject(e4h_coll_name, p);
