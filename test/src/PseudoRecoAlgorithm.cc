@@ -30,9 +30,6 @@ struct PseudoRecoAlgorithm final
       : Transformer(name, svcLoc, {KeyValues("InputMCs", {"MCParticles"})},
                     {KeyValues("OutputRecos", {"PseudoRecoParticles"})}) {}
 
-  // This is the function that will be called to transform the data
-  // Note that the function has to be const, as well as all pointers to collections
-  // we get from the input
   edm4hep::ReconstructedParticleCollection operator()(const edm4hep::MCParticleCollection& input) const override {
     auto coll_out = edm4hep::ReconstructedParticleCollection();
     for (const auto& particle : input) {
