@@ -37,18 +37,18 @@ The test is using the
 [`global_converter_maps.sh`](./scripts/global_converter_maps.sh) script which
 effectively simply runs the
 [`test_global_converter_maps.py`](./gaudi_opts/test_global_converter_maps.py)
-options file after downloading some input data. This options file uses two
-wrapped MarlinProcessors and one GaudiAlgorithm plus some converters inbetween
-them:
+options file after downloading some input data. This options file uses one
+wrapped MarlinProcessor, one GaudiAlgorithm and one Gaudi Functional algorithm
+plus some converters inbetween them:
 - `PodioInput` to read the *MCParticles* collection from the input file (in
   EDM4hep format)
-- [`PseudoRecoProcessor`](./src/PseudoRecoProcessor.cc) creates a reco particle
+- [`PseudoRecoAlgorithm`](./src/PseudoRecoAlgorithm.cc) creates a reco particle
   for every MC particle in the input collection
-  - An EDM4hep to LCIO converter converts the input MC particles up front
-  - An LCIO to EDM4hep converter converts the output reco particles afterwards
+  - An EDM4hep to LCIO converter converts the input MC particles and the
+    reconstructed particles that are created by the algorithm
 - [`TrivalMCTruthLinkerProcessor`](./src/TrivialMCTruthLinkerProcessor.cc)
   creates trivial links from the MC particles to the reco particles.
-  - An LCIO to EDM4hep converter converts the output collction to EDM4hep
+  - An LCIO to EDM4hep converter converts the output collection to EDM4hep
 - [`MCRecoLinkChecker`](./src/MCRecoLinkChecker.cc) is a Gaudi algorithm that
   simply checks whether the MC-reco links are as expected.
 

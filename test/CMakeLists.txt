@@ -38,7 +38,7 @@ set(ExternalData_URL_TEMPLATES
 # Compile the Marlin test processors into a shared library
 find_package(Marlin REQUIRED)
 
-add_library(MarlinTestProcessors SHARED src/PseudoRecoProcessor.cc src/TrivialMCTruthLinkerProcessor.cc)
+add_library(MarlinTestProcessors SHARED src/TrivialMCTruthLinkerProcessor.cc)
 target_link_libraries(MarlinTestProcessors PUBLIC ${Marlin_LIBRARIES})
 target_include_directories(MarlinTestProcessors PUBLIC ${Marlin_INCLUDE_DIRS})
 
@@ -85,8 +85,6 @@ add_test( clic_geo_test ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/geoTest_
 # Test for checking whether the converters can resolve relations accross
 # multiple processors
 ExternalData_Add_Test( marlinwrapper_tests NAME global_converter_maps COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_global_converter_maps.py --EventDataSvc.input DATA{${PROJECT_SOURCE_DIR}/test/input_files/ttbar_20240223_edm4hep.root})
-
-ExternalData_Add_Test( marlinwrapper_tests_functional NAME global_converter_maps_functional COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_global_converter_maps_functional.py --EventDataSvc.input DATA{${PROJECT_SOURCE_DIR}/test/input_files/ttbar_20240223_edm4hep.root})
 
 add_test( event_header_conversion bash -c "k4run ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/createEventHeader.py && anajob test.slcio | grep 'EVENT: 42'" )
 
