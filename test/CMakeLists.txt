@@ -20,6 +20,7 @@ limitations under the License.
 gaudi_add_module(GaudiTestAlgorithms
   SOURCES
     src/MCRecoLinkChecker.cc
+    src/PseudoRecoAlgorithm.cc
   LINK
     Gaudi::GaudiAlgLib
     Gaudi::GaudiKernel
@@ -37,7 +38,7 @@ set(ExternalData_URL_TEMPLATES
 # Compile the Marlin test processors into a shared library
 find_package(Marlin REQUIRED)
 
-add_library(MarlinTestProcessors SHARED src/PseudoRecoProcessor.cc src/TrivialMCTruthLinkerProcessor.cc)
+add_library(MarlinTestProcessors SHARED src/TrivialMCTruthLinkerProcessor.cc)
 target_link_libraries(MarlinTestProcessors PUBLIC ${Marlin_LIBRARIES})
 target_include_directories(MarlinTestProcessors PUBLIC ${Marlin_INCLUDE_DIRS})
 

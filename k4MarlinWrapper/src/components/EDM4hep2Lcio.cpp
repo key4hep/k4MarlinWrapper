@@ -282,11 +282,27 @@ void EDM4hep2LcioTool::convertEventHeader(const std::string& e4h_coll_name, lcio
 void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::string& lcio_coll_name,
                                   lcio::LCEventImpl* lcio_event, CollectionPairMappings& collection_pairs,
                                   std::vector<EDM4hep2LCIOConv::ParticleIDConvData>& pidCollections) {
-  const auto& evtFrame = m_podioDataSvc->getEventFrame();
-  const auto& metadata = m_podioDataSvc->getMetaDataFrame();
-  const auto  collPtr  = evtFrame.get(e4h_coll_name);
-  if (!collPtr) {
-    error() << "No collection with name: " << e4h_coll_name << " available for conversion" << endmsg;
+  const auto&            metadata = m_podioDataSvc->getMetaDataFrame();
+  podio::CollectionBase* collPtr  = nullptr;
+  DataObject*            p;
+  auto                   sc = m_podioDataSvc->retrieveObject(e4h_coll_name, p);
+  if (sc.isFailure()) {
+    throw GaudiException("Collection not found", name(), StatusCode::FAILURE);
+  }
+  auto ptr = dynamic_cast<DataWrapperBase*>(p);
+  if (ptr) {
+    collPtr = ptr->collectionBase();
+  }
+  // When the collection can't be retrieved from the frame
+  // there is still the possibility that it was generated
+  // from a functional algorithm
+  else {
+    auto ptr = dynamic_cast<AnyDataWrapper<std::shared_ptr<podio::CollectionBase>>*>(p);
+    if (!ptr) {
+      throw GaudiException("Collection could not be casted to the expected type", name(), StatusCode::FAILURE);
+    } else {
+      collPtr = dynamic_cast<podio::CollectionBase*>(ptr->getData().get());
+    }
   }
   const auto fulltype = collPtr->getValueTypeName();
 
