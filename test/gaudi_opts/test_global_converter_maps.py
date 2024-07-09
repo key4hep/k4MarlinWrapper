@@ -29,6 +29,7 @@ from Configurables import (
     EDM4hep2LcioTool,
     MCRecoLinkChecker,
     ApplicationMgr,
+    PseudoRecoAlgorithm,
 )
 
 evtsvc = k4DataSvc("EventDataSvc")
@@ -37,34 +38,26 @@ podioInput = PodioInput("InputReader")
 podioInput.collections = ["MCParticles"]
 podioInput.OutputLevel = INFO
 
-PseudoRecoProc = MarlinProcessorWrapper("PseudoReco")
-PseudoRecoProc.ProcessorType = "PseudoRecoProcessor"
-PseudoRecoProc.Parameters = {
-    "InputMCs": ["MCParticles"],
-    "OutputRecos": ["PseudoRecoParticles"],
-}
+PseudoRecoAlg = PseudoRecoAlgorithm("PseudoRecoAlgorithm",
+                                     InputMCs=["MCParticles"],
+                                     OutputRecos=["PseudoRecoParticles"])
 
 inputConverter = EDM4hep2LcioTool("InputConverter")
 inputConverter.convertAll = False
-inputConverter.collNameMapping = {"MCParticles": "MCParticles"}
+inputConverter.collNameMapping = {"MCParticles": "MCParticles",
+                                  "PseudoRecoParticles": "PseudoRecoParticles"
+                                  }
 inputConverter.OutputLevel = DEBUG
 
-PseudoRecoProc.EDM4hep2LcioTool = inputConverter
-
-pseudoRecConverter = Lcio2EDM4hepTool("PseudoRecoConverter")
-pseudoRecConverter.convertAll = False
-pseudoRecConverter.collNameMapping = {"PseudoRecoParticles": "PseudoRecoParticles"}
-pseudoRecConverter.OutputLevel = DEBUG
-
-PseudoRecoProc.Lcio2EDM4hepTool = pseudoRecConverter
-
-TrivialMCTruthLinkerProc = MarlinProcessorWrapper("TvivialMCTruthLinker")
+TrivialMCTruthLinkerProc = MarlinProcessorWrapper("TrivialMCTruthLinker")
 TrivialMCTruthLinkerProc.ProcessorType = "TrivialMCTruthLinkerProcessor"
 TrivialMCTruthLinkerProc.Parameters = {
     "InputMCs": ["MCParticles"],
     "InputRecos": ["PseudoRecoParticles"],
     "OutputMCRecoLinks": ["TrivialMCRecoLinks"],
 }
+
+TrivialMCTruthLinkerProc.EDM4hep2LcioTool = inputConverter
 
 mcTruthConverter = Lcio2EDM4hepTool("TrivialMCTruthLinkerConverter")
 mcTruthConverter.convertAll = False
@@ -81,11 +74,11 @@ mcLinkChecker.OutputLevel = DEBUG
 
 algList = [
     podioInput,
-    PseudoRecoProc,
+    PseudoRecoAlg,
     TrivialMCTruthLinkerProc,
     mcLinkChecker,
 ]
 
 ApplicationMgr(
-    TopAlg=algList, EvtSel="NONE", EvtMax=3, ExtSvc=[evtsvc], OutputLevel=INFO
+    TopAlg=algList, EvtSel="NONE", EvtMax=3, ExtSvc=[evtsvc], OutputLevel=DEBUG
 )
