@@ -373,7 +373,15 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
   CollectionPairMappings                            collection_pairs{};
   std::vector<EDM4hep2LCIOConv::ParticleIDConvData> pidCollections{};
 
+  std::vector<std::tuple<std::string, const podio::CollectionBase*>> associations{};
+
   for (const auto& [edm4hepName, lcioName] : collsToConvert) {
+    const auto coll = edmEvent.get(edm4hepName);
+    if (coll->getTypeName().find("Association") != std::string_view::npos) {
+      debug() << edm4hepName << " is an association collection, converting it later" << endmsg;
+      associations.emplace_back(lcioName, coll);
+      continue;
+    }
     debug() << "Converting collection " << edm4hepName << " (storing it as " << lcioName << ")" << endmsg;
     if (!EDM4hep2LCIOConv::collectionExist(lcioName, lcio_event)) {
       convertAdd(edm4hepName, lcioName, lcio_event, collection_pairs, pidCollections);
@@ -412,6 +420,11 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
   globalObjMap.update(collection_pairs);
 
   EDM4hep2LCIOConv::resolveRelations(collection_pairs, globalObjMap);
+
+  // Now we can convert the assocations and add them to the event
+  for (auto& [name, coll] : EDM4hep2LCIOConv::createLCRelationCollections(associations, globalObjMap)) {
+    lcio_event->addCollection(coll.release(), name);
+  }
 
   return StatusCode::SUCCESS;
 }
