@@ -278,14 +278,10 @@ void EDM4hep2LcioTool::convertEventHeader(const std::string& e4h_coll_name, lcio
   EDM4hep2LCIOConv::convertEventHeader(header_coll, lcio_event);
 }
 
-// Select the appropiate method to convert a collection given its type
-void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::string& lcio_coll_name,
-                                  lcio::LCEventImpl* lcio_event, CollectionPairMappings& collection_pairs,
-                                  std::vector<EDM4hep2LCIOConv::ParticleIDConvData>& pidCollections) {
-  const auto&            metadata = m_podioDataSvc->getMetaDataFrame();
-  podio::CollectionBase* collPtr  = nullptr;
+podio::CollectionBase* EDM4hep2LcioTool::getEDM4hepCollection(const std::string& collName) const {
+  podio::CollectionBase* collPtr{nullptr};
   DataObject*            p;
-  auto                   sc = m_podioDataSvc->retrieveObject(e4h_coll_name, p);
+  auto                   sc = m_podioDataSvc->retrieveObject(collName, p);
   if (sc.isFailure()) {
     throw GaudiException("Collection not found", name(), StatusCode::FAILURE);
   }
@@ -304,7 +300,17 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
       collPtr = dynamic_cast<podio::CollectionBase*>(ptr->getData().get());
     }
   }
-  const auto fulltype = collPtr->getValueTypeName();
+
+  return collPtr;
+}
+
+// Select the appropiate method to convert a collection given its type
+void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::string& lcio_coll_name,
+                                  lcio::LCEventImpl* lcio_event, CollectionPairMappings& collection_pairs,
+                                  std::vector<EDM4hep2LCIOConv::ParticleIDConvData>& pidCollections) {
+  const auto& metadata = m_podioDataSvc->getMetaDataFrame();
+  const auto  collPtr  = getEDM4hepCollection(e4h_coll_name);
+  const auto  fulltype = collPtr->getValueTypeName();
 
   debug() << "Converting type " << fulltype << " from input " << e4h_coll_name << endmsg;
 
@@ -376,7 +382,7 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
   std::vector<std::tuple<std::string, const podio::CollectionBase*>> associations{};
 
   for (const auto& [edm4hepName, lcioName] : collsToConvert) {
-    const auto coll = edmEvent.get(edm4hepName);
+    const auto coll = getEDM4hepCollection(edm4hepName);
     if (coll->getTypeName().find("Association") != std::string_view::npos) {
       debug() << edm4hepName << " is an association collection, converting it later" << endmsg;
       associations.emplace_back(lcioName, coll);
