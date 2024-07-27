@@ -37,10 +37,8 @@ DECLARE_COMPONENT(Lcio2EDM4hepTool);
 
 using namespace k4MarlinWrapper;
 
-using GlobalMapWrapper = AnyDataWrapper<GlobalConvertedObjectsMap>;
-
 Lcio2EDM4hepTool::Lcio2EDM4hepTool(const std::string& type, const std::string& name, const IInterface* parent)
-    : GaudiTool(type, name, parent), m_eds("EventDataSvc", "Lcio2EDM4hepTool") {
+    : AlgTool(type, name, parent), m_eds("EventDataSvc", "Lcio2EDM4hepTool") {
   declareInterface<IEDMConverter>(this);
 
   StatusCode sc = m_eds.retrieve();
@@ -53,10 +51,10 @@ StatusCode Lcio2EDM4hepTool::initialize() {
   if (nullptr == m_podioDataSvc)
     return StatusCode::FAILURE;
 
-  return GaudiTool::initialize();
+  return AlgTool::initialize();
 }
 
-StatusCode Lcio2EDM4hepTool::finalize() { return GaudiTool::finalize(); }
+StatusCode Lcio2EDM4hepTool::finalize() { return AlgTool::finalize(); }
 
 // **********************************
 // Check if a collection was already registered to skip it
@@ -215,17 +213,20 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
 
   // We want one "global" map that is created the first time it is use in the
   // event.
-  //
-  // Technically getOrCreate is a thing in GaudiTool but that doesn't seem to
-  // easily work with the AnyDataWrapper we want to use here. So doing the two
-  // step process here
-  if (!exist<GlobalMapWrapper>(GlobalConvertedObjectsMap::TESpath.data())) {
+  DataObject* obj = nullptr;
+  auto        sc  = evtSvc()->retrieveObject(GlobalConvertedObjectsMap::TESpath.data(), obj);
+  if (sc.isFailure()) {
     debug() << "Creating GlobalconvertedObjectsMap for this event since it is not already in the EventStore" << endmsg;
-    auto globalObjMapWrapper = std::make_unique<GlobalMapWrapper>(GlobalConvertedObjectsMap{});
-    put(std::move(globalObjMapWrapper), GlobalConvertedObjectsMap::TESpath.data());
+    auto globalObjMapWrapper = new AnyDataWrapper(GlobalConvertedObjectsMap{});
+    auto nsc                 = evtSvc()->registerObject(GlobalConvertedObjectsMap::TESpath.data(), globalObjMapWrapper);
+    if (nsc.isFailure()) {
+      error() << "Could not register GlobalConvertedObjectsMap in the EventStore" << endmsg;
+      return StatusCode::FAILURE;
+    }
+    obj = globalObjMapWrapper;
   }
 
-  auto  globalObjMapWrapper = get<GlobalMapWrapper>(GlobalConvertedObjectsMap::TESpath.data());
+  auto  globalObjMapWrapper = static_cast<AnyDataWrapper<GlobalConvertedObjectsMap>*>(obj);
   auto& globalObjMap        = globalObjMapWrapper->getData();
 
   globalObjMap.update(lcio2edm4hepMaps);

@@ -32,8 +32,6 @@ DECLARE_COMPONENT(EDM4hep2LcioTool);
 
 using namespace k4MarlinWrapper;
 
-using GlobalMapWrapper = AnyDataWrapper<GlobalConvertedObjectsMap>;
-
 struct CollectionPairMappings {
   TrackMap           tracks{};
   TrackerHitMap      trackerHits{};
@@ -51,7 +49,7 @@ struct CollectionPairMappings {
 };
 
 EDM4hep2LcioTool::EDM4hep2LcioTool(const std::string& type, const std::string& name, const IInterface* parent)
-    : GaudiTool(type, name, parent), m_eventDataSvc("EventDataSvc", "EDM4hep2LcioTool") {
+    : AlgTool(type, name, parent), m_eventDataSvc("EventDataSvc", "EDM4hep2LcioTool") {
   declareInterface<IEDMConverter>(this);
 }
 
@@ -66,10 +64,10 @@ StatusCode EDM4hep2LcioTool::initialize() {
     return StatusCode::FAILURE;
   }
 
-  return GaudiTool::initialize();
+  return AlgTool::initialize();
 }
 
-StatusCode EDM4hep2LcioTool::finalize() { return GaudiTool::finalize(); }
+StatusCode EDM4hep2LcioTool::finalize() { return AlgTool::finalize(); }
 
 // Convert EDM4hep Tracks to LCIO
 // Add converted LCIO ptr and original EDM4hep collection to vector of pairs
@@ -410,17 +408,20 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
 
   // We want one "global" map that is created the first time it is use in the
   // event.
-  //
-  // Technically getOrCreate is a thing in GaudiTool but that doesn't seem to
-  // easily work with the AnyDataWrapper we want to use here. So doing the two
-  // step process here
-  if (!exist<GlobalMapWrapper>(GlobalConvertedObjectsMap::TESpath.data())) {
+  DataObject* obj = nullptr;
+  auto        sc  = evtSvc()->retrieveObject(GlobalConvertedObjectsMap::TESpath.data(), obj);
+  if (sc.isFailure()) {
     debug() << "Creating GlobalconvertedObjectsMap for this event since it is not already in the EventStore" << endmsg;
-    auto globalObjMapWrapper = std::make_unique<GlobalMapWrapper>(GlobalConvertedObjectsMap{});
-    put(std::move(globalObjMapWrapper), GlobalConvertedObjectsMap::TESpath.data());
+    auto globalObjMapWrapper = new AnyDataWrapper(GlobalConvertedObjectsMap{});
+    auto nsc                 = evtSvc()->registerObject(GlobalConvertedObjectsMap::TESpath.data(), globalObjMapWrapper);
+    if (nsc.isFailure()) {
+      error() << "Could not register GlobalConvertedObjectsMap in the EventStore" << endmsg;
+      return StatusCode::FAILURE;
+    }
+    obj = globalObjMapWrapper;
   }
 
-  auto  globalObjMapWrapper = get<GlobalMapWrapper>(GlobalConvertedObjectsMap::TESpath.data());
+  auto  globalObjMapWrapper = static_cast<AnyDataWrapper<GlobalConvertedObjectsMap>*>(obj);
   auto& globalObjMap        = globalObjMapWrapper->getData();
 
   globalObjMap.update(collection_pairs);

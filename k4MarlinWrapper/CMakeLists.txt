@@ -26,7 +26,7 @@ gaudi_add_module(k4MarlinWrapperPlugins
     src/components/LcioEventAlgo.cpp
     src/components/LcioEventOutput.cpp
   LINK
-    Gaudi::GaudiAlgLib
+    Gaudi::GaudiKernel
     ${Marlin_LIBRARIES}
 )
 
@@ -42,7 +42,6 @@ gaudi_add_module(MarlinWrapper
     src/components/MarlinProcessorWrapper.cpp
     src/components/TrackingCellIDEncodingSvc.cpp
   LINK
-    Gaudi::GaudiAlgLib
     k4FWCore::k4FWCore
     k4FWCore::k4Interface
     ${Marlin_LIBRARIES}
@@ -62,7 +61,6 @@ gaudi_add_module(EDM4hep2Lcio
   LINK
     k4EDM4hep2LcioConv::k4EDM4hep2LcioConv
     k4FWCore::k4FWCore
-    Gaudi::GaudiAlgLib
     ${LCIO_LIBRARIES}
     ${Marlin_LIBRARIES}
     EDM4HEP::edm4hep
@@ -79,7 +77,6 @@ gaudi_add_module(Lcio2EDM4hep
   SOURCES
     src/components/Lcio2EDM4hep.cpp
   LINK
-    Gaudi::GaudiAlgLib
     EDM4HEP::edm4hep
     k4FWCore::k4FWCore
     k4EDM4hep2LcioConv::k4EDM4hep2LcioConv
