@@ -22,7 +22,6 @@ gaudi_add_module(GaudiTestAlgorithms
     src/MCRecoLinkChecker.cc
     src/PseudoRecoAlgorithm.cc
   LINK
-    Gaudi::GaudiAlgLib
     Gaudi::GaudiKernel
     k4FWCore::k4FWCore
     EDM4HEP::edm4hep

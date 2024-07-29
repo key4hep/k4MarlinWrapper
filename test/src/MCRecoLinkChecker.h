@@ -25,22 +25,22 @@
 
 #include "k4FWCore/DataHandle.h"
 
-#include <GaudiAlg/GaudiAlgorithm.h>
+#include <Gaudi/Algorithm.h>
 #include <GaudiKernel/ISvcLocator.h>
 
 #include <string>
 
-class MCRecoLinkChecker : public GaudiAlgorithm {
+class MCRecoLinkChecker : public Gaudi::Algorithm {
 public:
   explicit MCRecoLinkChecker(const std::string& name, ISvcLocator* pSL);
-  StatusCode execute() final;
+  StatusCode execute(const EventContext&) const;
 
 private:
-  DataHandle<edm4hep::MCRecoParticleAssociationCollection> m_relationCollHandle{"MCRecoTruthLinks",
+  mutable DataHandle<edm4hep::MCRecoParticleAssociationCollection> m_relationCollHandle{
+      "MCRecoTruthLinks", Gaudi::DataHandle::Reader, this};
+  mutable DataHandle<edm4hep::MCParticleCollection> m_mcCollHandle{"MCParticles", Gaudi::DataHandle::Reader, this};
+  mutable DataHandle<edm4hep::ReconstructedParticleCollection> m_recoCollHandle{"RecoParticles",
                                                                                 Gaudi::DataHandle::Reader, this};
-  DataHandle<edm4hep::MCParticleCollection>            m_mcCollHandle{"MCParticles", Gaudi::DataHandle::Reader, this};
-  DataHandle<edm4hep::ReconstructedParticleCollection> m_recoCollHandle{"RecoParticles", Gaudi::DataHandle::Reader,
-                                                                        this};
 };
 
 #endif  // K4MARLINWRAPPER_TEST_MCRECOLINKCHECKER_H

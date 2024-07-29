@@ -21,13 +21,13 @@
 
 DECLARE_COMPONENT(LcioEventOutput)
 
-LcioEventOutput::LcioEventOutput(const std::string& name, ISvcLocator* pSL) : GaudiAlgorithm(name, pSL) {}
+LcioEventOutput::LcioEventOutput(const std::string& name, ISvcLocator* pSL) : Gaudi::Algorithm(name, pSL) {}
 
 ////////////////////////////////////////////
 // Init MT writer and write mode
 ////////////////////////////////////////////
 StatusCode LcioEventOutput::initialize() {
-  StatusCode sc = GaudiAlgorithm::initialize();
+  StatusCode sc = Gaudi::Algorithm::initialize();
   if (sc.isFailure())
     return sc;
 
@@ -52,7 +52,7 @@ StatusCode LcioEventOutput::initialize() {
 ////////////////////////////////////////////
 // Go over all collections and drop based on input parameters
 ////////////////////////////////////////////
-void LcioEventOutput::dropCollections(lcio::LCEventImpl* event, std::vector<lcio::LCCollectionVec*>& subsets) {
+void LcioEventOutput::dropCollections(lcio::LCEventImpl* event, std::vector<lcio::LCCollectionVec*>& subsets) const {
   const std::vector<std::string>* evt_coll_names = event->getCollectionNames();
 
   bool th_drop, ch_drop = false;
@@ -118,7 +118,7 @@ void LcioEventOutput::dropCollections(lcio::LCEventImpl* event, std::vector<lcio
 ////////////////////////////////////////////
 // Revert subsets marked while dropping collections
 ////////////////////////////////////////////
-void LcioEventOutput::revertSubsets(const std::vector<lcio::LCCollectionVec*>& subsets) {
+void LcioEventOutput::revertSubsets(const std::vector<lcio::LCCollectionVec*>& subsets) const {
   // revert subset flag - if any
   for (auto& subset : subsets) {
     (*subset).setSubset(true);
@@ -128,7 +128,7 @@ void LcioEventOutput::revertSubsets(const std::vector<lcio::LCCollectionVec*>& s
 ////////////////////////////////////////////
 // Get LCIO event from event service, write it to output file
 ////////////////////////////////////////////
-StatusCode LcioEventOutput::execute() {
+StatusCode LcioEventOutput::execute(const EventContext&) const {
   // Get event
   DataObject*        pObject   = nullptr;
   StatusCode         sc        = evtSvc()->retrieveObject("/Event/LCEvent", pObject);

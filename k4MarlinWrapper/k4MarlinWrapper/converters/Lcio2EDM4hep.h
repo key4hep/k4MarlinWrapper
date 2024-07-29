@@ -20,7 +20,8 @@
 #define K4MARLINWRAPPER_LCIO2EDM4HEP_H
 
 // GAUDI
-#include <GaudiAlg/GaudiTool.h>
+#include <Gaudi/Property.h>
+#include <GaudiKernel/AlgTool.h>
 
 // k4FWCore
 #include <k4FWCore/PodioDataSvc.h>
@@ -33,7 +34,6 @@
 #include <map>
 #include <string>
 #include <tuple>
-#include <vector>
 
 namespace podio {
   class CollectionBase;
@@ -43,7 +43,7 @@ namespace EVENT {
   class LCCollection;
 }
 
-class Lcio2EDM4hepTool : public GaudiTool, virtual public IEDMConverter {
+class Lcio2EDM4hepTool : public AlgTool, virtual public IEDMConverter {
 public:
   Lcio2EDM4hepTool(const std::string& type, const std::string& name, const IInterface* parent);
   virtual ~Lcio2EDM4hepTool();

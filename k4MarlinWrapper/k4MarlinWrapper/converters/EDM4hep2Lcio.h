@@ -29,7 +29,8 @@
 #include "k4EDM4hep2LcioConv/k4EDM4hep2LcioConv.h"
 
 // GAUDI
-#include <GaudiAlg/GaudiTool.h>
+#include <Gaudi/Property.h>
+#include <GaudiKernel/AlgTool.h>
 
 // std
 #include <map>
@@ -54,7 +55,7 @@ using ParticleIDMap      = ObjMapT<lcio::ParticleIDImpl*, edm4hep::ParticleID>;
 
 struct CollectionPairMappings;
 
-class EDM4hep2LcioTool : public GaudiTool, virtual public IEDMConverter {
+class EDM4hep2LcioTool : public AlgTool, virtual public IEDMConverter {
 public:
   EDM4hep2LcioTool(const std::string& type, const std::string& name, const IInterface* parent);
   virtual ~EDM4hep2LcioTool();

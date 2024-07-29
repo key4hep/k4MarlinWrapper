@@ -20,13 +20,13 @@
 
 DECLARE_COMPONENT(MCRecoLinkChecker)
 
-MCRecoLinkChecker::MCRecoLinkChecker(const std::string& name, ISvcLocator* pSL) : GaudiAlgorithm(name, pSL) {
+MCRecoLinkChecker::MCRecoLinkChecker(const std::string& name, ISvcLocator* pSL) : Gaudi::Algorithm(name, pSL) {
   declareProperty("InputMCRecoLinks", m_relationCollHandle, "Name of the input MC Reco link collection");
   declareProperty("InputMCs", m_mcCollHandle, "Name of the input MC collection");
   declareProperty("InputRecos", m_recoCollHandle, "Name of the input Reco collection");
 }
 
-StatusCode MCRecoLinkChecker::execute() {
+StatusCode MCRecoLinkChecker::execute(const EventContext&) const {
   const auto relationColl = m_relationCollHandle.get();
   const auto mcColl       = m_mcCollHandle.get();
   const auto recoColl     = m_recoCollHandle.get();
