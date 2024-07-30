@@ -113,7 +113,8 @@ private:
 
   void convertAdd(const std::string& e4h_coll_name, const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event,
                   CollectionPairMappings&                            collection_pairs,
-                  std::vector<EDM4hep2LCIOConv::ParticleIDConvData>& pidCollections);
+                  std::vector<EDM4hep2LCIOConv::ParticleIDConvData>& pidCollections,
+                  std::vector<EDM4hep2LCIOConv::TrackDqdxConvData>&  dQdxCollections);
 
   /// Get an EDM4hep collection by name, consulting either the podio based data
   /// svc or the IOSvc

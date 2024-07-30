@@ -305,7 +305,8 @@ podio::CollectionBase* EDM4hep2LcioTool::getEDM4hepCollection(const std::string&
 // Select the appropiate method to convert a collection given its type
 void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::string& lcio_coll_name,
                                   lcio::LCEventImpl* lcio_event, CollectionPairMappings& collection_pairs,
-                                  std::vector<EDM4hep2LCIOConv::ParticleIDConvData>& pidCollections) {
+                                  std::vector<EDM4hep2LCIOConv::ParticleIDConvData>& pidCollections,
+                                  std::vector<EDM4hep2LCIOConv::TrackDqdxConvData>&  dQdxCollections) {
   const auto& metadata = m_podioDataSvc->getMetaDataFrame();
   const auto  collPtr  = getEDM4hepCollection(e4h_coll_name);
   const auto  fulltype = collPtr->getValueTypeName();
@@ -341,6 +342,8 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
   } else if (fulltype == "edm4hep::ParticleID") {
     pidCollections.emplace_back(e4h_coll_name, static_cast<const edm4hep::ParticleIDCollection*>(collPtr),
                                 edm4hep::utils::PIDHandler::getAlgoInfo(metadata, e4h_coll_name));
+  } else if (fulltype == "edm4hep::RecDqDx") {
+    dQdxCollections.emplace_back(e4h_coll_name, static_cast<const edm4hep::RecDqdxCollection*>(collPtr));
   }
 
   else if (fulltype == "edm4hep::CaloHitContribution") {
@@ -376,6 +379,7 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
 
   CollectionPairMappings                            collection_pairs{};
   std::vector<EDM4hep2LCIOConv::ParticleIDConvData> pidCollections{};
+  std::vector<EDM4hep2LCIOConv::TrackDqdxConvData>  dQdxCollections{};
 
   std::vector<std::tuple<std::string, const podio::CollectionBase*>> associations{};
 
@@ -388,7 +392,7 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
     }
     debug() << "Converting collection " << edm4hepName << " (storing it as " << lcioName << ")" << endmsg;
     if (!EDM4hep2LCIOConv::collectionExist(lcioName, lcio_event)) {
-      convertAdd(edm4hepName, lcioName, lcio_event, collection_pairs, pidCollections);
+      convertAdd(edm4hepName, lcioName, lcio_event, collection_pairs, pidCollections, dQdxCollections);
     } else {
       debug() << " Collection " << lcioName << " already in place, skipping conversion. " << endmsg;
     }
@@ -405,6 +409,8 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
     }
     convertParticleIDs(collection_pairs.particleIDs, pidCollMeta.name, algoId.value_or(-1));
   }
+
+  EDM4hep2LCIOConv::attachDqdxInfo(collection_pairs.tracks, dQdxCollections);
 
   // We want one "global" map that is created the first time it is use in the
   // event.
