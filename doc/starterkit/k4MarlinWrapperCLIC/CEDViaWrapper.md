@@ -22,7 +22,7 @@ It is possible to run the [C Event Display (CED)](https://github.com/iLCSoft/CED
 
 ## Setting up an environment
 
-The following steps have been tested with the Key4hep nightly builds release which can be setup using
+The following steps have been tested with the latest Key4hep release which can be setup using
 ```bash
 source /cvmfs/sw.hsf.org/key4hep/setup.sh
 ```
