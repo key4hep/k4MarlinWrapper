@@ -48,8 +48,8 @@ StatusCode MCRecoLinkChecker::execute(const EventContext&) const {
       return StatusCode::FAILURE;
     }
 
-    if (!(relation.getSim() == mc)) {
-      auto relMC = relation.getSim();
+    if (!(relation.getTo() == mc)) {
+      auto relMC = relation.getTo();
       error() << "Relation " << i
               << " does not point to the correct MCParticle (expected: " << mc.getObjectID().collectionID << "|"
               << mc.getObjectID().index << ", actual: " << relMC.getObjectID().collectionID << "|"
@@ -57,8 +57,8 @@ StatusCode MCRecoLinkChecker::execute(const EventContext&) const {
       return StatusCode::FAILURE;
     }
 
-    if (!(relation.getRec() == reco)) {
-      auto relRec = relation.getRec();
+    if (!(relation.getFrom() == reco)) {
+      auto relRec = relation.getFrom();
       error() << "Relation " << i
               << " does not point to the correct RecoParticle (expected: " << reco.getObjectID().collectionID << "|"
               << reco.getObjectID().index << ", actual: " << relRec.getObjectID().collectionID << "|"

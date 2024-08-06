@@ -20,7 +20,7 @@
 #define K4MARLINWRAPPER_TEST_MCRECOLINKCHECKER_H
 
 #include "edm4hep/MCParticleCollection.h"
-#include "edm4hep/MCRecoParticleAssociationCollection.h"
+#include "edm4hep/RecoMCParticleLinkCollection.h"
 #include "edm4hep/ReconstructedParticleCollection.h"
 
 #include "k4FWCore/DataHandle.h"
@@ -36,7 +36,7 @@ public:
   StatusCode execute(const EventContext&) const;
 
 private:
-  mutable DataHandle<edm4hep::MCRecoParticleAssociationCollection> m_relationCollHandle{
+  mutable DataHandle<edm4hep::RecoMCParticleLinkCollection> m_relationCollHandle{
       "MCRecoTruthLinks", Gaudi::DataHandle::Reader, this};
   mutable DataHandle<edm4hep::MCParticleCollection> m_mcCollHandle{"MCParticles", Gaudi::DataHandle::Reader, this};
   mutable DataHandle<edm4hep::ReconstructedParticleCollection> m_recoCollHandle{"RecoParticles",
