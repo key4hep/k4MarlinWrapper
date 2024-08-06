@@ -21,7 +21,8 @@ import os
 from Gaudi.Configuration import *
 
 # Parallel stuff
-from Configurables import (HiveWhiteBoard, HiveSlimEventLoopMgr, AvalancheSchedulerSvc, GaudiSequencer)
+from Configurables import (HiveWhiteBoard, HiveSlimEventLoopMgr, AvalancheSchedulerSvc, Gaudi__Sequencer as Sequencer)
+
 
 evtslots = 4
 cardinality = 1
@@ -1462,7 +1463,7 @@ for algo in algList:
     algo.Cardinality = cardinality
     algo.OutputLevel = DEBUG
 
-seq = GaudiSequencer(
+seq = Sequencer(
     "createViewSeq",
     Members=algList,
     Sequential=True,
