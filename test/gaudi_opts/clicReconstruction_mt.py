@@ -1463,7 +1463,7 @@ for algo in algList:
     algo.Cardinality = cardinality
     algo.OutputLevel = DEBUG
 
-seq = GaudiSequencer(
+seq = Sequencer(
     "createViewSeq",
     Members=algList,
     Sequential=True,
