@@ -33,9 +33,6 @@ public:
 
   marlin::Processor* newProcessor() override { return new MarlinMCRecoLinkChecker; }
 
-  /** process the event - In this case simply link MCparticle[i] with
-   * ReconstructedParticle[i]
-   */
   void processEvent(LCEvent* evt) override;
 
 private:
