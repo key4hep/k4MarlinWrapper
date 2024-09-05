@@ -21,6 +21,7 @@ gaudi_add_module(GaudiTestAlgorithms
   SOURCES
     src/MCRecoLinkChecker.cc
     src/PseudoRecoAlgorithm.cc
+    src/TrivialMCRecoLinker.cc
   LINK
     Gaudi::GaudiKernel
     k4FWCore::k4FWCore
@@ -37,7 +38,10 @@ set(ExternalData_URL_TEMPLATES
 # Compile the Marlin test processors into a shared library
 find_package(Marlin REQUIRED)
 
-add_library(MarlinTestProcessors SHARED src/TrivialMCTruthLinkerProcessor.cc)
+add_library(MarlinTestProcessors SHARED
+  src/TrivialMCTruthLinkerProcessor.cc
+  src/MarlinMCRecoLinkChecker.cc
+)
 target_link_libraries(MarlinTestProcessors PUBLIC ${Marlin_LIBRARIES})
 target_include_directories(MarlinTestProcessors PUBLIC ${Marlin_INCLUDE_DIRS})
 
@@ -85,6 +89,11 @@ add_test( clic_geo_test ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/geoTest_
 # multiple processors
 ExternalData_Add_Test( marlinwrapper_tests NAME global_converter_maps COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_global_converter_maps.py --EventDataSvc.input DATA{${PROJECT_SOURCE_DIR}/test/input_files/ttbar_20240223_edm4hep.root})
 
+ExternalData_Add_Test( marlinwrapper_tests
+  NAME link_conversion_edm4hep_to_lcio
+  COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_link_conversion_edm4hep.py --inputfile DATA{${PROJECT_SOURCE_DIR}/test/input_files/ttbar_20240223_edm4hep.root}
+)
+
 add_test( event_header_conversion bash -c "k4run ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/createEventHeader.py && anajob test.slcio | grep 'EVENT: 42'" )
 
 ExternalData_Add_Target(marlinwrapper_tests)
@@ -102,6 +111,7 @@ set_tests_properties (
     clic_geo_test
     global_converter_maps
     event_header_conversion
+    link_conversion_edm4hep_to_lcio
   PROPERTIES
     ENVIRONMENT "TEST_DIR=${CMAKE_CURRENT_SOURCE_DIR};LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:${CMAKE_INSTALL_PREFIX}/lib64:$ENV{LD_LIBRARY_PATH};PYTHONPATH=${CMAKE_INSTALL_PREFIX}/python:$ENV{PYTHONPATH};EXAMPLE_DIR=${PROJECT_SOURCE_DIR}/k4MarlinWrapper/examples;MARLIN_DLL=$ENV{MARLIN_DLL}:${CMAKE_CURRENT_BINARY_DIR}/libMarlinTestProcessors.so"
     )
