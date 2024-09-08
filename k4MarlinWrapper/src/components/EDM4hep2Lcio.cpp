@@ -287,15 +287,14 @@ podio::CollectionBase* EDM4hep2LcioTool::getEDM4hepCollection(const std::string&
   if (ptr) {
     collPtr = ptr->collectionBase();
   }
-  // When the collection can't be retrieved from the frame
-  // there is still the possibility that it was generated
-  // from a functional algorithm
+  // When the collection can't be retrieved from the frame there is still the
+  // possibility that it was generated from a functional algorithm
   else {
-    auto ptr = dynamic_cast<AnyDataWrapper<std::shared_ptr<podio::CollectionBase>>*>(p);
-    if (!ptr) {
+    auto nptr = dynamic_cast<AnyDataWrapper<std::shared_ptr<podio::CollectionBase>>*>(p);
+    if (!nptr) {
       throw GaudiException("Collection could not be casted to the expected type", name(), StatusCode::FAILURE);
     } else {
-      collPtr = dynamic_cast<podio::CollectionBase*>(ptr->getData().get());
+      collPtr = dynamic_cast<podio::CollectionBase*>(nptr->getData().get());
     }
   }
 

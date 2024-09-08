@@ -19,7 +19,6 @@
 #ifndef K4MARLINWRAPPER_UTIL_H
 #define K4MARLINWRAPPER_UTIL_H
 
-#include <iostream>
 #include <regex>
 #include <string>
 #include <vector>
