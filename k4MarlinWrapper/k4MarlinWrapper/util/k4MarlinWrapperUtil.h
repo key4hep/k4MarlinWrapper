@@ -43,8 +43,8 @@ namespace k4MW::util {
 
   /// singleton helper to initialize global Marlin parameters exactly once. This
   marlin::StringParameters* marlinGlobalParameters() {
-    static marlin::StringParameters p{};
-    const static auto               initMarlinGlobal = []() {
+    static marlin::StringParameters    p{};
+    [[maybe_unused]] const static auto initMarlinGlobal = []() {
       marlin::Global::parameters = &p;
       return true;  // need a non-void return type
     }();
