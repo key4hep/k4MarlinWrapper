@@ -276,8 +276,8 @@ StatusCode MarlinProcessorWrapper::execute(const EventContext&) const {
   // Handle exceptions that may come from Marlin
   catch (marlin::SkipEventException& e) {
     // Store flag to prevent the rest of the event from processing
-    auto             upStatus  = std::make_unique<LCEventWrapperStatus>(false);
-    const StatusCode code = eventSvc()->registerObject("/Event/LCEventStatus", upStatus.release());
+    auto             upStatus = std::make_unique<LCEventWrapperStatus>(false);
+    const StatusCode code     = eventSvc()->registerObject("/Event/LCEventStatus", upStatus.release());
     if (code.isFailure()) {
       error() << "Failed to store flag to skip event on Marlin marlin::SkipEventException" << endmsg;
       return scStatus;
@@ -287,8 +287,8 @@ StatusCode MarlinProcessorWrapper::execute(const EventContext&) const {
     return StatusCode::FAILURE;
   } catch (marlin::StopProcessingException& e) {
     // Store flag to prevent the rest of the event from processing
-    auto             upStatus  = std::make_unique<LCEventWrapperStatus>(false);
-    const StatusCode code = eventSvc()->registerObject("/Event/LCEventStatus", upStatus.release());
+    auto             upStatus = std::make_unique<LCEventWrapperStatus>(false);
+    const StatusCode code     = eventSvc()->registerObject("/Event/LCEventStatus", upStatus.release());
     if (code.isFailure()) {
       error() << "Failed to store flag to skip event on Marlin marlin::StopProcessingException" << endmsg;
       return scStatus;

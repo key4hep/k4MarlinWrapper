@@ -130,8 +130,8 @@ void LcioEventOutput::revertSubsets(const std::vector<lcio::LCCollectionVec*>& s
 ////////////////////////////////////////////
 StatusCode LcioEventOutput::execute(const EventContext&) const {
   // Get event
-  DataObject*        pObject   = nullptr;
-  StatusCode         sc        = evtSvc()->retrieveObject("/Event/LCEvent", pObject);
+  DataObject* pObject = nullptr;
+  StatusCode  sc      = evtSvc()->retrieveObject("/Event/LCEvent", pObject);
   if (sc.isFailure()) {
     error() << "Could not retrieve LCEvent from event service" << endmsg;
     return StatusCode::FAILURE;
