@@ -381,13 +381,13 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
   std::vector<EDM4hep2LCIOConv::ParticleIDConvData> pidCollections{};
   std::vector<EDM4hep2LCIOConv::TrackDqdxConvData>  dQdxCollections{};
 
-  std::vector<std::tuple<std::string, const podio::CollectionBase*>> associations{};
+  std::vector<std::tuple<std::string, const podio::CollectionBase*>> linkCollections{};
 
   for (const auto& [edm4hepName, lcioName] : collsToConvert) {
     const auto coll = getEDM4hepCollection(edm4hepName);
-    if (coll->getTypeName().find("Association") != std::string_view::npos) {
-      debug() << edm4hepName << " is an association collection, converting it later" << endmsg;
-      associations.emplace_back(lcioName, coll);
+    if (coll->getTypeName().find("LinkCollection") != std::string_view::npos) {
+      debug() << edm4hepName << " is a link collection, converting it later" << endmsg;
+      linkCollections.emplace_back(lcioName, coll);
       continue;
     }
     debug() << "Converting collection " << edm4hepName << " (storing it as " << lcioName << ")" << endmsg;
@@ -435,7 +435,7 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
   EDM4hep2LCIOConv::resolveRelations(collection_pairs, globalObjMap);
 
   // Now we can convert the assocations and add them to the event
-  for (auto& [name, coll] : EDM4hep2LCIOConv::createLCRelationCollections(associations, globalObjMap)) {
+  for (auto& [name, coll] : EDM4hep2LCIOConv::createLCRelationCollections(linkCollections, globalObjMap)) {
     lcio_event->addCollection(coll.release(), name);
   }
 
