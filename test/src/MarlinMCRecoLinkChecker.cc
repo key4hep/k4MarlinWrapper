@@ -73,11 +73,11 @@ void MarlinMCRecoLinkChecker::processEvent(LCEvent* evt) {
                                std::to_string(i) + ", actual: " + std::to_string(rel->getWeight()) + ")");
     }
 
-    if (!(rel->getTo() == mc)) {
+    if (rel->getTo() != mc) {
       throw std::runtime_error("Relation " + std::to_string(i) + " does not point to the correct MCParticle");
     }
 
-    if (!(rel->getFrom() == reco)) {
+    if (rel->getFrom() != reco) {
       throw std::runtime_error("Relation " + std::to_string(i) + " does not point to the correct MCParticle");
     }
   }
