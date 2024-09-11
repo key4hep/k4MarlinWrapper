@@ -21,13 +21,6 @@ cmake_minimum_required(VERSION 3.14)
 cmake_policy(SET CMP0074 NEW) # use package_ROOT env var to find packages
 project(k4MarlinWrapper LANGUAGES CXX)
 
-# RPATH settings
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE CACHE BOOL "RPATH USE LINK PATH")
-option(USE_RUNPATH_INSTEAD_OF_RPATH "Use runpath instead of rpath (allow specifying linked libraries via LD_LIBRARY_PATH)" OFF)
-if(USE_RUNPATH_INSTEAD_OF_RPATH)
-  set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--enable-new-dtags")
-endif()
-
 # project version
 SET( ${PROJECT_NAME}_VERSION_MAJOR 0 )
 SET( ${PROJECT_NAME}_VERSION_MINOR 8 )
@@ -35,18 +28,7 @@ SET( ${PROJECT_NAME}_VERSION_PATCH 0 )
 
 SET( ${PROJECT_NAME}_VERSION  "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_PATCH}" )
 
-set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -g -DNDEBUG")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
-set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g")
-
-set(CMAKE_CXX_STANDARD 20 CACHE STRING "")
-
-if(NOT CMAKE_CXX_STANDARD MATCHES "20|23")
-  message(FATAL_ERROR "Unsupported C++ standard: ${CMAKE_CXX_STANDARD}")
-endif()
-
-# Ninja compiler output
-include(cmake/compiler_output.cmake)
+include(cmake/Key4hepConfig.cmake)
 
 include(GNUInstallDirs)
 

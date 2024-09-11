@@ -63,7 +63,7 @@ void MarlinMCRecoLinkChecker::processEvent(LCEvent* evt) {
                              std::to_string(relColl->getNumberOfElements()) + ")");
   }
 
-  for (size_t i = 0; i < mcColl->getNumberOfElements(); ++i) {
+  for (size_t i = 0; i < static_cast<size_t>(mcColl->getNumberOfElements()); ++i) {
     const auto mc   = static_cast<EVENT::MCParticle*>(mcColl->getElementAt(i));
     const auto reco = static_cast<EVENT::ReconstructedParticle*>(recoColl->getElementAt(i));
     const auto rel  = static_cast<EVENT::LCRelation*>(relColl->getElementAt(i));
