@@ -1,3 +1,78 @@
+# v00-09
+
+* 2024-09-11 jmcarcell ([PR#203](https://github.com/key4hep/k4MarlinWrapper/pull/203))
+  - Use the Key4hepConfig flag to set the standard, compiler flags and rpath magic.
+  - Fiw a few warnings about shadowing variables
+
+* 2024-09-09 tmadlener ([PR#200](https://github.com/key4hep/k4MarlinWrapper/pull/200))
+  - Switch from `Association` to `Link` in the conversion from EDM4hep to LCIO to accomodate for the new naming from ([EDM4hep#341](https://github.com/key4hep/EDM4hep/pull/341))
+  - Add test to make sure that conversion of Links from EDM4hep to LCIO works as expected
+
+* 2024-08-06 jmcarcell ([PR#198](https://github.com/key4hep/k4MarlinWrapper/pull/198))
+  - Use Gaudi__Sequencer instead of the Sequencer coming from GaudiAlg
+
+* 2024-08-06 jmcarcell ([PR#197](https://github.com/key4hep/k4MarlinWrapper/pull/197))
+  - Move Associations to Links
+
+* 2024-08-02 tmadlener ([PR#195](https://github.com/key4hep/k4MarlinWrapper/pull/195))
+  - Bump the minimum required version of EDM4hep to 0.99
+
+* 2024-08-01 tmadlener ([PR#196](https://github.com/key4hep/k4MarlinWrapper/pull/196))
+  - Default to building with c++20 and remove support for c++14 and c++17, add possibility to build with c++23
+
+* 2024-07-30 tmadlener ([PR#194](https://github.com/key4hep/k4MarlinWrapper/pull/194))
+  - Make sure to attach dQ/dx information to LCIO tracks when converting from EDM4hep
+
+* 2024-07-29 jmcarcell ([PR#165](https://github.com/key4hep/k4MarlinWrapper/pull/165))
+  - Change headers and add EventContext in algorithms not to use GaudiAlg
+  - Replace `GaudiTool` with `AlgTool`
+
+* 2024-07-19 tmadlener ([PR#189](https://github.com/key4hep/k4MarlinWrapper/pull/189))
+  - Add the conversion of `Association` collections to `LCRelation` collections after the functionality has been added to the converter library ([key4hep/k4EDM4hep2LcioConv#81](https://github.com/key4hep/k4EDM4hep2LcioConv/pull/81)
+
+* 2024-07-09 jmcarcell ([PR#188](https://github.com/key4hep/k4MarlinWrapper/pull/188))
+  - Add support for running together with functional algorithms
+  - Add a test that creates MCParticles in EDM4hep with a functional algorithm that are later used by Marlin processors
+
+* 2024-06-20 jmcarcell ([PR#187](https://github.com/key4hep/k4MarlinWrapper/pull/187))
+  - Fix warnings after https://github.com/key4hep/EDM4hep/pull/315
+  - Fix a warning by adding a default case in a switch statement
+
+* 2024-06-09 tmadlener ([PR#185](https://github.com/key4hep/k4MarlinWrapper/pull/185))
+  - Make sure to convert `TrackerHitPlane` and `TrackerHit3D` from EDM4hep to LCIO
+
+* 2024-05-24 Leonhard Reichenbach ([PR#184](https://github.com/key4hep/k4MarlinWrapper/pull/184))
+  - Add lcio to edm4hep event parameter conversion
+
+* 2024-05-01 tmadlener ([PR#181](https://github.com/key4hep/k4MarlinWrapper/pull/181))
+  - Make the on-the-fly EDM conversion deal with the reversed ParticleID relations and the related metadata
+
+* 2024-04-24 Leonhard Reichenbach ([PR#183](https://github.com/key4hep/k4MarlinWrapper/pull/183))
+  - Reintroduce missing minus sign in test over all events
+
+* 2024-04-24 Leonhard Reichenbach ([PR#182](https://github.com/key4hep/k4MarlinWrapper/pull/182))
+  - By default use the `MarlinProcessorWrapper.OutputLevel` to set the verbosity of the wrapped Marlin processor.
+
+* 2024-04-11 Leonhard Reichenbach ([PR#178](https://github.com/key4hep/k4MarlinWrapper/pull/178))
+  - Modernize event display example
+
+* 2024-04-09 tmadlener ([PR#176](https://github.com/key4hep/k4MarlinWrapper/pull/176))
+  - Switch to the non-deprecated conversion functions that have been introduced in [k4EDM4hep2LcioConv#54](https://github.com/key4hep/k4EDM4hep2LcioConv/pull/54)
+
+* 2024-03-21 Leonhard Reichenbach ([PR#179](https://github.com/key4hep/k4MarlinWrapper/pull/179))
+  - Add inputReader for easy reading of edm4hep or lcio files
+
+* 2024-03-14 tmadlener ([PR#171](https://github.com/key4hep/k4MarlinWrapper/pull/171))
+  - Cleanup the clic reconstruction from EDM4hep inputs example a bit.
+    - Remove commented LCIO input
+    - Remove explicit listing of input collections, which is no longer necessary after [k4FWCore#162](https://github.com/key4hep/k4FWCore/pull/162)
+
+* 2024-02-26 tmadlener ([PR#177](https://github.com/key4hep/k4MarlinWrapper/pull/177))
+  - Update the test input file for the clic reconstruction starting from EDM4hep inputs.
+
+* 2024-02-22 tmadlener ([PR#168](https://github.com/key4hep/k4MarlinWrapper/pull/168))
+  - Switch to use `edm4hep::TrackerHit3D` after it has been renamed upstream (https://github.com/key4hep/EDM4hep/pull/252)
+
 # v00-08
 
 * 2024-02-13 jmcarcell ([PR#167](https://github.com/key4hep/k4marlinwrapper/pull/167))
