@@ -292,12 +292,10 @@ podio::CollectionBase* EDM4hep2LcioTool::getEDM4hepCollection(const std::string&
   // std::shared_ptr but this has been removed in k4FWCore so it can be deleted
   // at some point
   auto uptr = dynamic_cast<AnyDataWrapper<std::unique_ptr<podio::CollectionBase>>*>(p);
-  AnyDataWrapper<std::shared_ptr<podio::CollectionBase>>* sptr = nullptr;
-  if (!uptr) {
-    sptr = dynamic_cast<AnyDataWrapper<std::shared_ptr<podio::CollectionBase>>*>(p);
-  } else {
+  if (uptr) {
     return uptr->getData().get();
   }
+  auto sptr = dynamic_cast<AnyDataWrapper<std::shared_ptr<podio::CollectionBase>>*>(p);
   if (sptr) {
     return sptr->getData().get();
   }
