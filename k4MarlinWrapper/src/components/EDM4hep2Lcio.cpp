@@ -277,8 +277,8 @@ void EDM4hep2LcioTool::convertEventHeader(const std::string& e4h_coll_name, lcio
 }
 
 podio::CollectionBase* EDM4hep2LcioTool::getEDM4hepCollection(const std::string& collName) const {
-  DataObject*            p;
-  auto                   sc = m_podioDataSvc->retrieveObject(collName, p);
+  DataObject* p;
+  auto        sc = m_podioDataSvc->retrieveObject(collName, p);
   if (sc.isFailure()) {
     throw GaudiException("Collection not found", name(), StatusCode::FAILURE);
   }
