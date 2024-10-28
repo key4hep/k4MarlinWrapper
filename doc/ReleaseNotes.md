@@ -1,3 +1,8 @@
+# v00-10
+
+* 2024-10-28 jmcarcell ([PR#204](https://github.com/key4hep/k4MarlinWrapper/pull/204))
+  - Retrieve unique_ptrs for collections produced by functional algorithms. Needed after https://github.com/key4hep/k4FWCore/pull/250. It should also be able to handle the case for the previous approach with `std::shared_ptr`.
+
 # v00-09
 
 * 2024-09-11 jmcarcell ([PR#203](https://github.com/key4hep/k4MarlinWrapper/pull/203))
