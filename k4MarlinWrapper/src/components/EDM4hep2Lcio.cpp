@@ -277,7 +277,6 @@ void EDM4hep2LcioTool::convertEventHeader(const std::string& e4h_coll_name, lcio
 }
 
 podio::CollectionBase* EDM4hep2LcioTool::getEDM4hepCollection(const std::string& collName) const {
-  podio::CollectionBase* collPtr{nullptr};
   DataObject*            p;
   auto                   sc = m_podioDataSvc->retrieveObject(collName, p);
   if (sc.isFailure()) {
@@ -285,20 +284,25 @@ podio::CollectionBase* EDM4hep2LcioTool::getEDM4hepCollection(const std::string&
   }
   auto ptr = dynamic_cast<DataWrapperBase*>(p);
   if (ptr) {
-    collPtr = ptr->collectionBase();
+    return ptr->collectionBase();
   }
   // When the collection can't be retrieved from the frame there is still the
   // possibility that it was generated from a functional algorithm
-  else {
-    auto nptr = dynamic_cast<AnyDataWrapper<std::shared_ptr<podio::CollectionBase>>*>(p);
-    if (!nptr) {
-      throw GaudiException("Collection could not be casted to the expected type", name(), StatusCode::FAILURE);
-    } else {
-      collPtr = dynamic_cast<podio::CollectionBase*>(nptr->getData().get());
-    }
+  // We keep for a while the possibility of obtaining the collections from
+  // std::shared_ptr but this has been removed in k4FWCore so it can be deleted
+  // at some point
+  auto uptr = dynamic_cast<AnyDataWrapper<std::unique_ptr<podio::CollectionBase>>*>(p);
+  AnyDataWrapper<std::shared_ptr<podio::CollectionBase>>* sptr = nullptr;
+  if (!uptr) {
+    sptr = dynamic_cast<AnyDataWrapper<std::shared_ptr<podio::CollectionBase>>*>(p);
+  } else {
+    return uptr->getData().get();
+  }
+  if (sptr) {
+    return sptr->getData().get();
   }
 
-  return collPtr;
+  throw GaudiException("Collection could not be casted to the expected type", name(), StatusCode::FAILURE);
 }
 
 // Select the appropiate method to convert a collection given its type
