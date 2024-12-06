@@ -20,6 +20,7 @@
 import sys
 from Configurables import LcioEvent, PodioInput, MarlinProcessorWrapper, EDM4hep2LcioTool
 
+
 def create_reader(input_files, evtSvc):
     """Create the appropriate reader for the input files"""
     if input_files[0].endswith(".slcio"):
@@ -38,13 +39,14 @@ def create_reader(input_files, evtSvc):
 
     return read
 
+
 def attach_edm4hep2lcio_conversion(algList, read):
     """Attach the edm4hep to lcio conversion if necessary e.g. when using create_reader. Should only be run after algList is complete."""
     if not isinstance(read, PodioInput):
         # nothing to convert :)
         return
 
-     # find first wrapper
+    # find first wrapper
     for alg in algList:
         if isinstance(alg, MarlinProcessorWrapper):
             break

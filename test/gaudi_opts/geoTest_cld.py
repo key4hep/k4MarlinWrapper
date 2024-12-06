@@ -21,11 +21,12 @@ import os
 from Gaudi.Configuration import *
 
 from Configurables import TrackingCellIDEncodingSvc, GeoSvc
+
 algList = []
 svcList = []
 
 geoservice = GeoSvc("GeoSvc")
-geoservice.detectors = [os.environ["K4GEO"]+"/CLIC/compact/CLIC_o3_v15/CLIC_o3_v15.xml"]
+geoservice.detectors = [os.environ["K4GEO"] + "/CLIC/compact/CLIC_o3_v15/CLIC_o3_v15.xml"]
 geoservice.OutputLevel = INFO
 geoservice.EnableGeant4Geo = False
 svcList.append(geoservice)
@@ -37,9 +38,5 @@ cellIDSvc.OutputLevel = DEBUG
 svcList.append(cellIDSvc)
 
 from Configurables import ApplicationMgr
-ApplicationMgr( TopAlg = algList,
-                EvtSel = 'NONE',
-                EvtMax = 3,
-                ExtSvc = svcList,
-                OutputLevel=WARNING
-              )
+
+ApplicationMgr(TopAlg=algList, EvtSel="NONE", EvtMax=3, ExtSvc=svcList, OutputLevel=WARNING)

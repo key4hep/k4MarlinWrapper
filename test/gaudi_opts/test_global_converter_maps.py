@@ -38,15 +38,16 @@ podioInput = PodioInput("InputReader")
 podioInput.collections = ["MCParticles"]
 podioInput.OutputLevel = INFO
 
-PseudoRecoAlg = PseudoRecoAlgorithm("PseudoRecoAlgorithm",
-                                     InputMCs=["MCParticles"],
-                                     OutputRecos=["PseudoRecoParticles"])
+PseudoRecoAlg = PseudoRecoAlgorithm(
+    "PseudoRecoAlgorithm", InputMCs=["MCParticles"], OutputRecos=["PseudoRecoParticles"]
+)
 
 inputConverter = EDM4hep2LcioTool("InputConverter")
 inputConverter.convertAll = False
-inputConverter.collNameMapping = {"MCParticles": "MCParticles",
-                                  "PseudoRecoParticles": "PseudoRecoParticles"
-                                  }
+inputConverter.collNameMapping = {
+    "MCParticles": "MCParticles",
+    "PseudoRecoParticles": "PseudoRecoParticles",
+}
 inputConverter.OutputLevel = DEBUG
 
 TrivialMCTruthLinkerProc = MarlinProcessorWrapper("TrivialMCTruthLinker")
@@ -79,6 +80,4 @@ algList = [
     mcLinkChecker,
 ]
 
-ApplicationMgr(
-    TopAlg=algList, EvtSel="NONE", EvtMax=3, ExtSvc=[evtsvc], OutputLevel=DEBUG
-)
+ApplicationMgr(TopAlg=algList, EvtSel="NONE", EvtMax=3, ExtSvc=[evtsvc], OutputLevel=DEBUG)
