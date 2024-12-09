@@ -41,7 +41,7 @@ StatusCode LcioEvent::initialize() {
 StatusCode LcioEvent::execute(const EventContext&) const {
   auto theEvent = m_reader->readNextEvent(EVENT::LCIO::UPDATE);
 
-  if (theEvent == nullptr) {
+  if (!theEvent) {
     // Store flag to indicate there was NOT a LCEvent
     auto             pStatus  = std::make_unique<LCEventWrapperStatus>(false);
     const StatusCode scStatus = eventSvc()->registerObject("/Event/LCEventStatus", pStatus.release());

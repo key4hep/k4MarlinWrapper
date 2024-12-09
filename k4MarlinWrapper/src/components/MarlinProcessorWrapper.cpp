@@ -81,7 +81,7 @@ StatusCode MarlinProcessorWrapper::loadProcessorLibraries() const {
   // Load all libraries from the marlin_dll
   info() << "looking for marlindll" << endmsg;
   const char* const marlin_dll = getenv("MARLIN_DLL");
-  if (marlin_dll == nullptr) {
+  if (!marlin_dll) {
     warning() << "MARLIN_DLL not set, not loading any processors " << endmsg;
   } else {
     info() << "Found marlin_dll " << marlin_dll << endmsg;
