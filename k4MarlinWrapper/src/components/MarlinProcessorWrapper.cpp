@@ -131,12 +131,12 @@ std::shared_ptr<marlin::StringParameters> MarlinProcessorWrapper::parseParameter
 StatusCode MarlinProcessorWrapper::instantiateProcessor(std::shared_ptr<marlin::StringParameters>& parameters,
                                                         Gaudi::Property<std::string>&              processorTypeStr) {
   auto processorType = marlin::ProcessorMgr::instance()->getProcessor(processorTypeStr);
-  if (not processorType) {
+  if (!processorType) {
     error() << " Failed to instantiate " << name() << " because processor type could not be determined" << endmsg;
     return StatusCode::FAILURE;
   }
   m_processor = processorType->newProcessor();
-  if (not m_processor) {
+  if (!m_processor) {
     error() << " Failed to instantiate " << name() << endmsg;
     return StatusCode::FAILURE;
   }
@@ -215,7 +215,7 @@ StatusCode MarlinProcessorWrapper::execute(const EventContext&) const {
   StatusCode  scStatus = eventSvc()->retrieveObject("/Event/LCEventStatus", pStatus);
   if (scStatus.isSuccess()) {
     bool hasLCEvent = static_cast<LCEventWrapperStatus*>(pStatus)->hasLCEvent;
-    if (not hasLCEvent) {
+    if (!hasLCEvent) {
       warning() << "LCIO Event reading returned nullptr, so MarlinProcessorWrapper won't execute" << endmsg;
       return StatusCode::SUCCESS;
     }
