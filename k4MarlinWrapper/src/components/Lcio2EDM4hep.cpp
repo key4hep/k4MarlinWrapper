@@ -40,6 +40,11 @@ using namespace k4MarlinWrapper;
 Lcio2EDM4hepTool::Lcio2EDM4hepTool(const std::string& type, const std::string& name, const IInterface* parent)
     : AlgTool(type, name, parent), m_eds("EventDataSvc", "Lcio2EDM4hepTool") {
   declareInterface<IEDMConverter>(this);
+
+  StatusCode sc = m_eds.retrieve();
+  if (sc.isFailure()) {
+    error() << "Could not retrieve EventDataSvc" << endmsg;
+  }
 }
 
 StatusCode Lcio2EDM4hepTool::initialize() {
