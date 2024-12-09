@@ -53,8 +53,6 @@ EDM4hep2LcioTool::EDM4hep2LcioTool(const std::string& type, const std::string& n
   declareInterface<IEDMConverter>(this);
 }
 
-EDM4hep2LcioTool::~EDM4hep2LcioTool() { ; }
-
 StatusCode EDM4hep2LcioTool::initialize() {
   StatusCode sc  = m_eventDataSvc.retrieve();
   m_podioDataSvc = dynamic_cast<PodioDataSvc*>(m_eventDataSvc.get());

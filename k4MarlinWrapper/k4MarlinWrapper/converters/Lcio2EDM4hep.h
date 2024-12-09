@@ -46,7 +46,7 @@ namespace EVENT {
 class Lcio2EDM4hepTool : public AlgTool, virtual public IEDMConverter {
 public:
   Lcio2EDM4hepTool(const std::string& type, const std::string& name, const IInterface* parent);
-  virtual ~Lcio2EDM4hepTool();
+  ~Lcio2EDM4hepTool() override = default;
   StatusCode initialize() final;
   StatusCode finalize() final;
 

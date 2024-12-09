@@ -297,10 +297,10 @@ StatusCode MarlinProcessorWrapper::execute(const EventContext&) const {
     error() << e.what() << endmsg;
 
     // Send stop to EventProcessor
-    IEventProcessor* evt = nullptr;
-    if (service("ApplicationMgr", evt, true).isSuccess()) {
-      evt->stopRun().ignore();
-      evt->release();
+    auto svc = service<IEventProcessor>("ApplicationMgr");
+    if (svc) {
+      svc->stopRun().ignore();
+      svc->release();
     } else {
       abort();
     }

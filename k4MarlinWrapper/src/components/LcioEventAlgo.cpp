@@ -52,10 +52,10 @@ StatusCode LcioEvent::execute(const EventContext&) const {
       return scStatus;
     }
 
-    IEventProcessor* evt = nullptr;
-    if (service("ApplicationMgr", evt, true).isSuccess()) {
-      evt->stopRun().ignore();
-      evt->release();
+    auto svc = service<IEventProcessor>("ApplicationMgr");
+    if (svc) {
+      svc->stopRun().ignore();
+      svc->release();
     } else {
       abort();
     }
