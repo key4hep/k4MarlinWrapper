@@ -31,14 +31,7 @@
 #include "edm4hep/SimCalorimeterHit.h"
 #include "edm4hep/SimTrackerHit.h"
 #include "edm4hep/Track.h"
-#if __has_include("edm4hep/TrackerHit3D.h")
 #include "edm4hep/TrackerHit3D.h"
-#else
-#include "edm4hep/TrackerHit.h"
-namespace edm4hep {
-  using TrackerHit3D = edm4hep::TrackerHit;
-}
-#endif
 #include "edm4hep/TrackerHitPlane.h"
 #include "edm4hep/Vertex.h"
 
