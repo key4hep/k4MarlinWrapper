@@ -22,6 +22,7 @@ from __future__ import absolute_import, unicode_literals, print_function
 from copy import deepcopy
 import re
 import sys
+import os.path
 
 from xml.etree.ElementTree import fromstring, ElementTree
 
@@ -277,6 +278,25 @@ def escapeIllegalChars(file_str):
   return file_str.replace("&&", "&amp;&amp;")
 
 
+def includeFiles(tree, infile):
+  wdir = os.path.dirname(os.path.abspath(infile))
+  for p_item in tree.findall('.//include/..'):
+    for if_item in p_item.findall('./include'):
+      try:
+        nested_file = if_item.attrib['ref']
+        if not os.path.isabs(nested_file):
+            nested_file = os.path.join(wdir, nested_file)
+        with open(nested_file, "r+") as iFile:
+          # workaround: part files are not xml compliant
+          fStr = r'<%s>%s</%s>' % (p_item.tag, escapeIllegalChars(iFile.read()), p_item.tag)
+          iTree = ElementTree(fromstring(fStr))
+          includeFiles(iTree, nested_file)
+          for e_item in iTree.findall('./*'):
+            p_item.append(e_item)
+      except Exception as ex:
+        print("Exception when including file: %r " % ex)
+
+
 def run(inputfile, outputfile):
   with open(inputfile, "r+") as infile:
     escaped_str = escapeIllegalChars(infile.read())
@@ -286,6 +306,9 @@ def run(inputfile, outputfile):
   except Exception as ex:
     print("Exception when getting trees: %r " % ex)
     sys.exit(1)
+
+  # TODO check compliance with https://www.w3.org/TR/xinclude/
+  includeFiles(tree, inputfile)
 
   with open(outputfile, 'w') as wf_file:
     wf_file.write("\n".join(generateGaudiSteering(tree)))
