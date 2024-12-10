@@ -16,9 +16,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+#include <UTIL/LCTrackerConf.h>
+
 #include "k4MarlinWrapper/TrackingCellIDEncodingSvc.h"
 
-// k4fwcore
 #include <k4Interface/IGeoSvc.h>
 
 #include <GaudiKernel/MsgStream.h>
@@ -27,8 +29,6 @@ DECLARE_COMPONENT(TrackingCellIDEncodingSvc);
 
 TrackingCellIDEncodingSvc::TrackingCellIDEncodingSvc(const std::string& name, ISvcLocator* svc)
     : base_class(name, svc) {}
-
-TrackingCellIDEncodingSvc::~TrackingCellIDEncodingSvc() {}
 
 StatusCode TrackingCellIDEncodingSvc::initialize() {
   try {

@@ -17,7 +17,13 @@
  * limitations under the License.
  */
 
+#include <MT/LCWriter.h>
+
+#include "k4MarlinWrapper/LCEventWrapper.h"
 #include "k4MarlinWrapper/LcioEventOutput.h"
+
+#include <string>
+#include <vector>
 
 DECLARE_COMPONENT(LcioEventOutput)
 

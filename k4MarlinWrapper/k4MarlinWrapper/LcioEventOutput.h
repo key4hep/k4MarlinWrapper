@@ -24,25 +24,27 @@
 // LCEventOutput: Write out LCIO events using MT writer from LCIO
 ////////////////////////////////////////////
 
-#include <iostream>
-
 #include <Gaudi/Algorithm.h>
+#include <Gaudi/Property.h>
 
 #include <EVENT/LCIO.h>
 #include <IMPL/LCCollectionVec.h>
 #include <IMPL/LCEventImpl.h>
-#include <MT/LCWriter.h>
 #include <lcio.h>
 
-#include "k4MarlinWrapper/LCEventWrapper.h"
+#include <string>
+#include <vector>
+
+namespace MT {
+  class LCWriter;
+}
 
 class LcioEventOutput : public Gaudi::Algorithm {
 public:
   explicit LcioEventOutput(const std::string& name, ISvcLocator* pSL);
-  virtual ~LcioEventOutput() = default;
-  virtual StatusCode initialize() override final;
-  virtual StatusCode execute(const EventContext&) const final;
-  virtual StatusCode finalize() override final;
+  StatusCode initialize() override final;
+  StatusCode execute(const EventContext&) const final;
+  StatusCode finalize() override final;
 
 private:
   MT::LCWriter* m_writer = nullptr;

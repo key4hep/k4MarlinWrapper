@@ -19,22 +19,18 @@
 #ifndef K4MARLINWRAPPER_MARLINPROCESSORWRAPPER_H
 #define K4MARLINWRAPPER_MARLINPROCESSORWRAPPER_H
 
-// std
 #include <stack>
 #include <string>
 
-// Gaudi
 #include <Gaudi/Algorithm.h>
 #include <GaudiKernel/IEventProcessor.h>
 #include <GaudiKernel/IRndmEngine.h>
 #include <GaudiKernel/MsgStream.h>
 #include <GaudiKernel/ToolHandle.h>
 
-// LCIO
 #include <EVENT/LCEvent.h>
 #include <EVENT/LCRunHeader.h>
 
-// Marlin
 #include <marlin/EventModifier.h>
 #include <marlin/Exceptions.h>
 #include <marlin/Global.h>
@@ -42,10 +38,8 @@
 #include <marlin/ProcessorMgr.h>
 #include <marlin/StringParameters.h>
 
-// ROOT
 #include <TSystem.h>
 
-// k4MarlinWrapper
 #include "k4MarlinWrapper/converters/IEDMConverter.h"
 
 namespace marlin {
@@ -56,10 +50,9 @@ namespace marlin {
 class MarlinProcessorWrapper : public Gaudi::Algorithm {
 public:
   explicit MarlinProcessorWrapper(const std::string& name, ISvcLocator* pSL);
-  virtual ~MarlinProcessorWrapper() = default;
-  virtual StatusCode execute(const EventContext&) const override final;
-  virtual StatusCode finalize() override final;
-  virtual StatusCode initialize() override final;
+  StatusCode execute(const EventContext&) const override final;
+  StatusCode finalize() override final;
+  StatusCode initialize() override final;
 
 private:
   std::string                m_verbosity = "ERROR";

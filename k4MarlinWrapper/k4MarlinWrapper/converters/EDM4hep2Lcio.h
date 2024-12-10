@@ -21,8 +21,6 @@
 
 #include "k4MarlinWrapper/converters/IEDMConverter.h"
 
-#include <k4FWCore/PodioDataSvc.h>
-
 #include "k4EDM4hep2LcioConv/k4EDM4hep2LcioConv.h"
 
 #include <Gaudi/Property.h>
@@ -31,6 +29,8 @@
 #include <map>
 #include <string>
 #include <vector>
+
+class PodioDataSvc;
 
 template <typename K, typename V> using ObjMapT = k4EDM4hep2LcioConv::VecMapT<K, V>;
 
@@ -53,7 +53,6 @@ struct CollectionPairMappings;
 class EDM4hep2LcioTool : public AlgTool, virtual public IEDMConverter {
 public:
   EDM4hep2LcioTool(const std::string& type, const std::string& name, const IInterface* parent);
-  ~EDM4hep2LcioTool() override = default;
   StatusCode initialize() override;
   StatusCode finalize() override;
 

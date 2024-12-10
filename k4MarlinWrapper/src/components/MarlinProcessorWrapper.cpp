@@ -22,6 +22,10 @@
 #include "k4MarlinWrapper/LCEventWrapper.h"
 #include "k4MarlinWrapper/util/k4MarlinWrapperUtil.h"
 
+#include <map>
+#include <string>
+#include <vector>
+
 DECLARE_COMPONENT(MarlinProcessorWrapper)
 
 MarlinProcessorWrapper::MarlinProcessorWrapper(const std::string& name, ISvcLocator* pSL)

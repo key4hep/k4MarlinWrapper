@@ -17,9 +17,19 @@
  * limitations under the License.
  */
 
-#include "k4MarlinWrapper/LcioEventAlgo.h"
+#include <GaudiKernel/IEventProcessor.h>
+
 #include "k4MarlinWrapper/LCEventWrapper.h"
-#include "k4MarlinWrapper/util/k4MarlinWrapperUtil.h"
+#include "k4MarlinWrapper/LcioEventAlgo.h"
+
+#include "marlin/Global.h"
+#include "marlin/StringParameters.h"
+
+#include <EVENT/LCIO.h>
+#include <MT/LCReader.h>
+
+#include <memory>
+#include <string>
 
 DECLARE_COMPONENT(LcioEvent)
 
