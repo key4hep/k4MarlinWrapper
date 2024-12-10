@@ -220,3 +220,25 @@ collection in the process, you would configure the tool like so
 lcio2edm4hepConv = Lcio2EDM4hepTool("Lcio2EDM4hep")
 lcio2edm4hepConv.collNameMapping = {"MCParticle": "MCParticles"}
 ```
+
+## Potential pitfals when using other Gaudi Algorithms
+
+Although mixing wrapped Marlin Processors with other Gaudi Algorithms is working
+for most cases, there are a few conceptual differences that have not yet been
+completely mapped. This might lead to unexpected or different results when
+running in Gaudi vs. running the same processors via Marlin (as far as
+possible). This list aims to collect them and where possible also tries to point
+out ways to work around them.
+
+- In Marlin processors can use a `marlin::SkipEventException` to skip the
+  processing of the rest of the event.
+- In Marlin a `marlin::StopProcessingException` will immediately stop the
+  processing of the event loop. However, in Gaudi the current event will still
+  finish processing.
+
+For the `MarlinProcessorWrapper` algorithm we have put in checks and effectively
+skip the execution of the actual wrapped processor in these cases. However,
+other Gaudi algorithms will not have this check. Hence, execution chains that
+**only consist of wrapped Marlin processors will work as expected** here.
+However, **mixed chains will most likely not work as expected** (e.g. algorithms
+will not find expected inputs, etc.).
