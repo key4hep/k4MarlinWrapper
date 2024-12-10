@@ -28,6 +28,7 @@
 
 #include <k4FWCore/DataHandle.h>
 #include <k4FWCore/MetaDataHandle.h>
+#include <k4FWCore/PodioDataSvc.h>
 
 #include "GaudiKernel/AnyDataWrapper.h"
 
