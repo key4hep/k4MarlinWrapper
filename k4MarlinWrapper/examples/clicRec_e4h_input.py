@@ -2433,7 +2433,7 @@ VertexFinderUnconstrained.Parameters = {
 from Configurables import PodioOutput
 
 out = PodioOutput("PodioOutput", filename="my_output.root")
-out.outputCommands = ["keep *"]
+out.outputCommands = ["keep *", "drop RefinedVertexJets_PID_RefinedVertex"]
 
 
 algList.append(inp)
