@@ -136,7 +136,7 @@ included with k4MarlinWrapper. Note that:
   + *MarlinProcessorWrappers* need input in LCIO format: EDM4hep collections need to be converted to LCIO
   + The output collections of *MarlinProcessorWrappers* may be used later by other algorithms:
     * Output collections of *MarlinProcessorWrappers* will be in LCIO format unless these are explicitly converted
-    * Some *MarlinProcessorWrappers* may modify collections instead of producing new ones: the original EDM4hep collection wont be updated in this case and would need conversion from LCIO to EDM4hep.
+    * Some *MarlinProcessorWrappers* may modify collections instead of producing new ones: the original EDM4hep collection won't be updated in this case and would need conversion from LCIO to EDM4hep.
 
 - To run *clicReconstruction* with EDM4hep format, use the steering file found in the `examples` folder of k4MarlinWrapper:
 `k4MarlinWrapper/examples/clicRec_e4h_input.py` (this also gets installed to `$K4MARLINWRAPPER/examples` in Key4hep releases)

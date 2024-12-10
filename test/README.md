@@ -20,7 +20,7 @@ limitations under the License.
 
 The test cases for the k4MarlinWrapper are somewhat involved in some cases.
 Hence, we try to describe their intent and their high level layout a bit here.
-We will be refering to the test cases by name as they are defined in the
+We will be referring to the test cases by name as they are defined in the
 [`CMakeLists.txt`](./CMakeLists.txt) file in here.
 
 ## `global_converter_maps`
@@ -39,7 +39,7 @@ effectively simply runs the
 [`test_global_converter_maps.py`](./gaudi_opts/test_global_converter_maps.py)
 options file after downloading some input data. This options file uses one
 wrapped MarlinProcessor, one GaudiAlgorithm and one Gaudi Functional algorithm
-plus some converters inbetween them:
+plus some converters in-between them:
 - `PodioInput` to read the *MCParticles* collection from the input file (in
   EDM4hep format)
 - [`PseudoRecoAlgorithm`](./src/PseudoRecoAlgorithm.cc) creates a reco particle

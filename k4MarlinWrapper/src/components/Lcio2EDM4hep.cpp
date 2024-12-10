@@ -213,8 +213,7 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
     edm4hep::utils::PIDHandler::setAlgoInfo(metadataFrame, collName, pidInfo);
   }
 
-  // We want one "global" map that is created the first time it is use in the
-  // event.
+  // We want one "global" map that is created the first time it is used in the event.
   DataObject* obj = nullptr;
   auto        sc  = evtSvc()->retrieveObject(GlobalConvertedObjectsMap::TESpath.data(), obj);
   if (sc.isFailure()) {

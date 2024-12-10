@@ -302,7 +302,7 @@ podio::CollectionBase* EDM4hep2LcioTool::getEDM4hepCollection(const std::string&
   throw GaudiException("Collection could not be casted to the expected type", name(), StatusCode::FAILURE);
 }
 
-// Select the appropiate method to convert a collection given its type
+// Select the appropriate method to convert a collection given its type
 void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::string& lcio_coll_name,
                                   lcio::LCEventImpl* lcio_event, CollectionPairMappings& collection_pairs,
                                   std::vector<EDM4hep2LCIOConv::ParticleIDConvData>& pidCollections,
@@ -412,8 +412,7 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
 
   EDM4hep2LCIOConv::attachDqdxInfo(collection_pairs.tracks, dQdxCollections);
 
-  // We want one "global" map that is created the first time it is use in the
-  // event.
+  // We want one "global" map that is created the first time it is used in the event.
   DataObject* obj = nullptr;
   auto        sc  = evtSvc()->retrieveObject(GlobalConvertedObjectsMap::TESpath.data(), obj);
   if (sc.isFailure()) {
@@ -434,7 +433,7 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
 
   EDM4hep2LCIOConv::resolveRelations(collection_pairs, globalObjMap);
 
-  // Now we can convert the assocations and add them to the event
+  // Now we can convert the associations and add them to the event
   for (auto& [name, coll] : EDM4hep2LCIOConv::createLCRelationCollections(linkCollections, globalObjMap)) {
     lcio_event->addCollection(coll.release(), name);
   }

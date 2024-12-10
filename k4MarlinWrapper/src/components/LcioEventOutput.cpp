@@ -107,7 +107,7 @@ void LcioEventOutput::dropCollections(lcio::LCEventImpl* event, std::vector<lcio
       }
     }
 
-    // don't store hit pointers if hits are droped
+    // don't store hit pointers if hits are dropped
     if (evt_coll_type == lcio::LCIO::TRACK && th_drop) {
       std::bitset<32> flag(evt_coll->getFlag());
       flag[lcio::LCIO::TRBIT_HITS] = 0;

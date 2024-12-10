@@ -152,7 +152,7 @@ StatusCode MarlinProcessorWrapper::instantiateProcessor(std::shared_ptr<marlin::
 }
 
 StatusCode MarlinProcessorWrapper::initialize() {
-  // initalize global marlin information, maybe betters as a _tool_
+  // initialize global marlin information, maybe betters as a _tool_
   static bool once = true;
   if (once) {
     once = false;
