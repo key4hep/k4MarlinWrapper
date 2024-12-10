@@ -42,9 +42,9 @@ namespace MT {
 class LcioEventOutput : public Gaudi::Algorithm {
 public:
   explicit LcioEventOutput(const std::string& name, ISvcLocator* pSL);
-  StatusCode initialize() override final;
+  StatusCode initialize() final;
   StatusCode execute(const EventContext&) const final;
-  StatusCode finalize() override final;
+  StatusCode finalize() final;
 
 private:
   MT::LCWriter* m_writer = nullptr;

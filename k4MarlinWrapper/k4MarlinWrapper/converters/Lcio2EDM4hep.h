@@ -52,7 +52,7 @@ public:
   // - Convert associated collections from LCRelation for existing EDM4hep relations
   // - Converted collections are put into TES
   // **********************************
-  StatusCode convertCollections(lcio::LCEventImpl* lcio_event) override;
+  StatusCode convertCollections(lcio::LCEventImpl* lcio_event) final;
 
 private:
   Gaudi::Property<std::map<std::string, std::string>> m_collNames{this, "collNameMapping", {}};

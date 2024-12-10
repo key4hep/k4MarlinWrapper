@@ -24,12 +24,12 @@ class TrivialMCTruthLinkerProcessor : public marlin::Processor {
 public:
   TrivialMCTruthLinkerProcessor();
 
-  marlin::Processor* newProcessor() override { return new TrivialMCTruthLinkerProcessor; }
+  marlin::Processor* newProcessor() final { return new TrivialMCTruthLinkerProcessor; }
 
   /** process the event - In this case simply link MCparticle[i] with
    * ReconstructedParticle[i]
    */
-  void processEvent(LCEvent* evt) override;
+  void processEvent(LCEvent* evt) final;
 
 private:
   std::string m_mcCollName{};

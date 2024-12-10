@@ -50,9 +50,9 @@ namespace marlin {
 class MarlinProcessorWrapper : public Gaudi::Algorithm {
 public:
   explicit MarlinProcessorWrapper(const std::string& name, ISvcLocator* pSL);
-  StatusCode execute(const EventContext&) const override final;
-  StatusCode finalize() override final;
-  StatusCode initialize() override final;
+  StatusCode execute(const EventContext&) const final;
+  StatusCode finalize() final;
+  StatusCode initialize() final;
 
 private:
   std::string                m_verbosity = "ERROR";
@@ -78,7 +78,7 @@ private:
 
   static std::stack<marlin::Processor*>& ProcessorStack();
 
-  bool isReEntrant() const override { return false; }
+  bool isReEntrant() const final { return false; }
 };
 
 std::stack<marlin::Processor*>& MarlinProcessorWrapper::ProcessorStack() {

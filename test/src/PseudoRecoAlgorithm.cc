@@ -30,7 +30,7 @@ struct PseudoRecoAlgorithm final
       : Transformer(name, svcLoc, {KeyValues("InputMCs", {"MCParticles"})},
                     {KeyValues("OutputRecos", {"PseudoRecoParticles"})}) {}
 
-  edm4hep::ReconstructedParticleCollection operator()(const edm4hep::MCParticleCollection& input) const override {
+  edm4hep::ReconstructedParticleCollection operator()(const edm4hep::MCParticleCollection& input) const final {
     auto coll_out = edm4hep::ReconstructedParticleCollection();
     for (const auto& particle : input) {
       auto new_particle = coll_out.create();

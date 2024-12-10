@@ -53,10 +53,10 @@ struct CollectionPairMappings;
 class EDM4hep2LcioTool : public AlgTool, virtual public IEDMConverter {
 public:
   EDM4hep2LcioTool(const std::string& type, const std::string& name, const IInterface* parent);
-  StatusCode initialize() override;
-  StatusCode finalize() override;
+  StatusCode initialize() final;
+  StatusCode finalize() final;
 
-  StatusCode convertCollections(lcio::LCEventImpl* lcio_event) override;
+  StatusCode convertCollections(lcio::LCEventImpl* lcio_event) final;
 
 private:
   Gaudi::Property<std::map<std::string, std::string>> m_collNames{this, "collNameMapping", {}};
