@@ -30,8 +30,6 @@ class LCEventWrapper : public DataObject {
 public:
   LCEventWrapper(std::unique_ptr<EVENT::LCEvent>&& theEvent) : m_event(std::move(theEvent)) {}
 
-  ~LCEventWrapper() = default;
-
   EVENT::LCEvent* getEvent() const { return m_event.get(); }
 
 private:

@@ -19,14 +19,9 @@
 #ifndef K4MARLINWRAPPER_LCIO2EDM4HEP_H
 #define K4MARLINWRAPPER_LCIO2EDM4HEP_H
 
-// GAUDI
 #include <Gaudi/Property.h>
 #include <GaudiKernel/AlgTool.h>
 
-// k4FWCore
-#include <k4FWCore/PodioDataSvc.h>
-
-// Converter Interface
 #include "k4MarlinWrapper/converters/IEDMConverter.h"
 
 #include <lcio.h>
@@ -43,10 +38,11 @@ namespace EVENT {
   class LCCollection;
 }
 
+class PodioDataSvc;
+
 class Lcio2EDM4hepTool : public AlgTool, virtual public IEDMConverter {
 public:
   Lcio2EDM4hepTool(const std::string& type, const std::string& name, const IInterface* parent);
-  virtual ~Lcio2EDM4hepTool();
   StatusCode initialize() final;
   StatusCode finalize() final;
 
@@ -56,7 +52,7 @@ public:
   // - Convert associated collections from LCRelation for existing EDM4hep relations
   // - Converted collections are put into TES
   // **********************************
-  StatusCode convertCollections(lcio::LCEventImpl* lcio_event) override;
+  StatusCode convertCollections(lcio::LCEventImpl* lcio_event) final;
 
 private:
   Gaudi::Property<std::map<std::string, std::string>> m_collNames{this, "collNameMapping", {}};

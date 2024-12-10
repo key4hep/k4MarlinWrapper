@@ -19,10 +19,8 @@
 #ifndef CELLIDSVC_H
 #define CELLIDSVC_H
 
+#include <Gaudi/Property.h>
 #include <GaudiKernel/Service.h>
-
-//LCIO Includes
-#include <UTIL/LCTrackerConf.h>
 
 #include <string>
 
@@ -32,7 +30,6 @@ class TrackingCellIDEncodingSvc : public extends<Service, IService> {
 public:
   TrackingCellIDEncodingSvc(const std::string& name, ISvcLocator* svc);
 
-  ~TrackingCellIDEncodingSvc();
   StatusCode initialize() final;
   StatusCode finalize() final;
 

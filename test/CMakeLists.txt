@@ -98,28 +98,15 @@ add_test( event_header_conversion bash -c "k4run ${CMAKE_CURRENT_SOURCE_DIR}/gau
 
 ExternalData_Add_Target(marlinwrapper_tests)
 
-set_tests_properties (
-    simple_processors
-    simple_processors2
-    clicRec
-    converter_constants
-    all_events_bounds
-    over_total_events
-    same_num_io
-    clicRec_lcio_mt
-    clicRec_edm4hep_input
-    clic_geo_test
-    global_converter_maps
-    event_header_conversion
-    link_conversion_edm4hep_to_lcio
-  PROPERTIES
-    ENVIRONMENT "TEST_DIR=${CMAKE_CURRENT_SOURCE_DIR};LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:${CMAKE_INSTALL_PREFIX}/lib64:$ENV{LD_LIBRARY_PATH};PYTHONPATH=${CMAKE_INSTALL_PREFIX}/python:$ENV{PYTHONPATH};EXAMPLE_DIR=${PROJECT_SOURCE_DIR}/k4MarlinWrapper/examples;MARLIN_DLL=$ENV{MARLIN_DLL}:${CMAKE_CURRENT_BINARY_DIR}/libMarlinTestProcessors.so"
-    )
+get_property(test_names DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY TESTS)
+set_tests_properties(${test_names} PROPERTIES ENVIRONMENT
+"TEST_DIR=${CMAKE_CURRENT_SOURCE_DIR};LD_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib:${CMAKE_INSTALL_PREFIX}/lib64:$ENV{LD_LIBRARY_PATH};PYTHONPATH=${CMAKE_INSTALL_PREFIX}/python:$ENV{PYTHONPATH};EXAMPLE_DIR=${PROJECT_SOURCE_DIR}/k4MarlinWrapper/examples;MARLIN_DLL=$ENV{MARLIN_DLL}:${CMAKE_CURRENT_BINARY_DIR}/libMarlinTestProcessors.so"
+)
 
-  set_tests_properties(
-    clicRec clicRec_lcio_mt clicRec_edm4hep_input
-    PROPERTIES
-    DEPENDS CLICPerformance_setup
-    )
+set_tests_properties(
+  clicRec clicRec_lcio_mt clicRec_edm4hep_input
+  PROPERTIES
+  DEPENDS CLICPerformance_setup
+)
 
 

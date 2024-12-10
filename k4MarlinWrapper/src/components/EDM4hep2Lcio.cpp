@@ -23,6 +23,7 @@
 
 #include "k4FWCore/DataHandle.h"
 #include "k4FWCore/MetaDataHandle.h"
+#include "k4FWCore/PodioDataSvc.h"
 
 #include "GaudiKernel/AnyDataWrapper.h"
 
@@ -52,8 +53,6 @@ EDM4hep2LcioTool::EDM4hep2LcioTool(const std::string& type, const std::string& n
     : AlgTool(type, name, parent), m_eventDataSvc("EventDataSvc", "EDM4hep2LcioTool") {
   declareInterface<IEDMConverter>(this);
 }
-
-EDM4hep2LcioTool::~EDM4hep2LcioTool() { ; }
 
 StatusCode EDM4hep2LcioTool::initialize() {
   StatusCode sc  = m_eventDataSvc.retrieve();

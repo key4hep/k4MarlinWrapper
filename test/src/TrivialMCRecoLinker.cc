@@ -36,7 +36,7 @@ struct TrivialMCRecoLinker final
 
   edm4hep::RecoMCParticleLinkCollection operator()(
       const edm4hep::MCParticleCollection&            mcParticles,
-      const edm4hep::ReconstructedParticleCollection& recoParticles) const override {
+      const edm4hep::ReconstructedParticleCollection& recoParticles) const final {
     auto links = edm4hep::RecoMCParticleLinkCollection{};
 
     for (size_t i = 0; i < mcParticles.size(); ++i) {

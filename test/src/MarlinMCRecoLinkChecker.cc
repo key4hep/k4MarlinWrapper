@@ -31,9 +31,9 @@ class MarlinMCRecoLinkChecker : public marlin::Processor {
 public:
   MarlinMCRecoLinkChecker();
 
-  marlin::Processor* newProcessor() override { return new MarlinMCRecoLinkChecker; }
+  marlin::Processor* newProcessor() final { return new MarlinMCRecoLinkChecker; }
 
-  void processEvent(LCEvent* evt) override;
+  void processEvent(LCEvent* evt) final;
 
 private:
   std::string m_mcCollName{};

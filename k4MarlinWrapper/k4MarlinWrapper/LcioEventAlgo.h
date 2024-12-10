@@ -26,24 +26,22 @@
  */
 
 #include <Gaudi/Algorithm.h>
-#include <GaudiKernel/IEventProcessor.h>
+#include <Gaudi/Property.h>
 
-#include <EVENT/LCIO.h>
-#include <MT/LCReader.h>
-
-#include "k4MarlinWrapper/LCEventWrapper.h"
+namespace MT {
+  class LCReader;
+}
 
 class LcioEvent : public Gaudi::Algorithm {
 public:
   explicit LcioEvent(const std::string& name, ISvcLocator* pSL);
-  virtual ~LcioEvent() = default;
-  virtual StatusCode initialize() override final;
-  virtual StatusCode execute(const EventContext&) const override;
+  StatusCode initialize() final;
+  StatusCode execute(const EventContext&) const final;
 
 private:
   Gaudi::Property<std::vector<std::string>> m_fileNames{this, "Files", {}};
   MT::LCReader*                             m_reader = nullptr;
-  bool                                      isReEntrant() const override { return false; }
+  bool                                      isReEntrant() const final { return false; }
 };
 
 #endif

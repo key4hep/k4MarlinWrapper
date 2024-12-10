@@ -19,23 +19,18 @@
 #ifndef K4MARLINWRAPPER_EDM4HEP2LCIO_H
 #define K4MARLINWRAPPER_EDM4HEP2LCIO_H
 
-// k4MarlinWrapper
 #include "k4MarlinWrapper/converters/IEDMConverter.h"
 
-// FWCore
-#include <k4FWCore/PodioDataSvc.h>
-
-//k4EDM4hep2LcioConv
 #include "k4EDM4hep2LcioConv/k4EDM4hep2LcioConv.h"
 
-// GAUDI
 #include <Gaudi/Property.h>
 #include <GaudiKernel/AlgTool.h>
 
-// std
 #include <map>
 #include <string>
 #include <vector>
+
+class PodioDataSvc;
 
 template <typename K, typename V> using ObjMapT = k4EDM4hep2LcioConv::VecMapT<K, V>;
 
@@ -58,11 +53,10 @@ struct CollectionPairMappings;
 class EDM4hep2LcioTool : public AlgTool, virtual public IEDMConverter {
 public:
   EDM4hep2LcioTool(const std::string& type, const std::string& name, const IInterface* parent);
-  virtual ~EDM4hep2LcioTool();
-  virtual StatusCode initialize();
-  virtual StatusCode finalize();
+  StatusCode initialize() final;
+  StatusCode finalize() final;
 
-  StatusCode convertCollections(lcio::LCEventImpl* lcio_event);
+  StatusCode convertCollections(lcio::LCEventImpl* lcio_event) final;
 
 private:
   Gaudi::Property<std::map<std::string, std::string>> m_collNames{this, "collNameMapping", {}};

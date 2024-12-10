@@ -28,6 +28,7 @@
 
 #include <k4FWCore/DataHandle.h>
 #include <k4FWCore/MetaDataHandle.h>
+#include <k4FWCore/PodioDataSvc.h>
 
 #include "GaudiKernel/AnyDataWrapper.h"
 
@@ -42,13 +43,14 @@ Lcio2EDM4hepTool::Lcio2EDM4hepTool(const std::string& type, const std::string& n
   declareInterface<IEDMConverter>(this);
 
   StatusCode sc = m_eds.retrieve();
+  if (sc.isFailure()) {
+    error() << "Could not retrieve EventDataSvc" << endmsg;
+  }
 }
-
-Lcio2EDM4hepTool::~Lcio2EDM4hepTool() { ; }
 
 StatusCode Lcio2EDM4hepTool::initialize() {
   m_podioDataSvc = dynamic_cast<PodioDataSvc*>(m_eds.get());
-  if (nullptr == m_podioDataSvc)
+  if (!m_podioDataSvc)
     return StatusCode::FAILURE;
 
   return AlgTool::initialize();
@@ -73,7 +75,7 @@ bool Lcio2EDM4hepTool::collectionExist(const std::string& collection_name) {
 void Lcio2EDM4hepTool::registerCollection(
     std::tuple<const std::string&, std::unique_ptr<podio::CollectionBase>> namedColl, EVENT::LCCollection* lcioColl) {
   auto& [name, e4hColl] = namedColl;
-  if (e4hColl == nullptr) {
+  if (!e4hColl) {
     error() << "Could not convert collection " << name << endmsg;
     return;
   }
@@ -198,7 +200,7 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
           error() << "Could not convert collection " << lcioName << " (type: " << lcio_coll_type_str << ")" << endmsg;
         }
       }
-    } catch (const lcio::DataNotAvailableException& ex) {
+    } catch (const lcio::DataNotAvailableException&) {
       warning() << "LCIO Collection " << lcioName << " not found in the event, skipping conversion to EDM4hep"
                 << endmsg;
       continue;

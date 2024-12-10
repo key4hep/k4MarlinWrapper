@@ -17,9 +17,19 @@
  * limitations under the License.
  */
 
-#include "k4MarlinWrapper/LcioEventAlgo.h"
+#include <GaudiKernel/IEventProcessor.h>
+
 #include "k4MarlinWrapper/LCEventWrapper.h"
-#include "k4MarlinWrapper/util/k4MarlinWrapperUtil.h"
+#include "k4MarlinWrapper/LcioEventAlgo.h"
+
+#include "marlin/Global.h"
+#include "marlin/StringParameters.h"
+
+#include <EVENT/LCIO.h>
+#include <MT/LCReader.h>
+
+#include <memory>
+#include <string>
 
 DECLARE_COMPONENT(LcioEvent)
 
@@ -41,7 +51,7 @@ StatusCode LcioEvent::initialize() {
 StatusCode LcioEvent::execute(const EventContext&) const {
   auto theEvent = m_reader->readNextEvent(EVENT::LCIO::UPDATE);
 
-  if (theEvent == nullptr) {
+  if (!theEvent) {
     // Store flag to indicate there was NOT a LCEvent
     auto             pStatus  = std::make_unique<LCEventWrapperStatus>(false);
     const StatusCode scStatus = eventSvc()->registerObject("/Event/LCEventStatus", pStatus.release());
@@ -52,10 +62,10 @@ StatusCode LcioEvent::execute(const EventContext&) const {
       return scStatus;
     }
 
-    IEventProcessor* evt = nullptr;
-    if (service("ApplicationMgr", evt, true).isSuccess()) {
-      evt->stopRun().ignore();
-      evt->release();
+    auto svc = service<IEventProcessor>("ApplicationMgr");
+    if (svc) {
+      svc->stopRun().ignore();
+      svc->release();
     } else {
       abort();
     }
