@@ -433,7 +433,7 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
 
   EDM4hep2LCIOConv::resolveRelations(collection_pairs, globalObjMap);
 
-  // Now we can convert the associations and add them to the event
+  // Now we can convert the links and add them to the event
   for (auto& [name, coll] : EDM4hep2LCIOConv::createLCRelationCollections(linkCollections, globalObjMap)) {
     lcio_event->addCollection(coll.release(), name);
   }
