@@ -85,7 +85,7 @@ ExternalData_Add_Test( marlinwrapper_tests NAME clicRec_lcio_mt COMMAND bash -c 
 # Test the GeoSvc and TrackingCellIDEncodingSvc
 add_test( clic_geo_test ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/geoTest_cld.py )
 
-# Test for checking whether the converters can resolve relations accross
+# Test for checking whether the converters can resolve relations across
 # multiple processors
 ExternalData_Add_Test( marlinwrapper_tests NAME global_converter_maps COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_global_converter_maps.py --EventDataSvc.input DATA{${PROJECT_SOURCE_DIR}/test/input_files/ttbar_20240223_edm4hep.root})
 

@@ -225,7 +225,7 @@ def verbosityTranslator(marlinLogLevel):
 
 
 def convertParameters(params, proc, globParams, constants):
-    """convert json of parameters to gaudi"""
+    """convert json of parameters to Gaudi"""
     lines = []
     if "Verbosity" in params:
         lines.append(
@@ -259,7 +259,7 @@ def convertProcessors(lines, tree, globParams, constants):
 
 
 def findWarnIncludes(tree):
-    """Check the parsed XML structure for include statments and issue a warning"""
+    """Check the parsed XML structure for include statements and issue a warning"""
     if any(True for _ in tree.iter("include")):
         print(
             'ERROR: Found at least one <include ref="..."/> statement in the Marlin steering file'

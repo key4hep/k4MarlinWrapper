@@ -34,7 +34,7 @@ limitations under the License.
 
 ## Running Gaudi with multithreading support
 
-Gaudi uses [Intel TBB](https://oneapi-src.github.io/oneTBB/) under the hood for multithreading.
+Gaudi uses [oneTBB](https://uxlfoundation.github.io/oneTBB/) under the hood for multithreading.
 
 Gaudi exposes two main levels of parallelism:
 - Inter-event parallelism: running multiple events in parallel
