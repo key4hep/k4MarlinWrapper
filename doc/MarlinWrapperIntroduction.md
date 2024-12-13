@@ -221,7 +221,7 @@ lcio2edm4hepConv = Lcio2EDM4hepTool("Lcio2EDM4hep")
 lcio2edm4hepConv.collNameMapping = {"MCParticle": "MCParticles"}
 ```
 
-## Potential pitfals when using other Gaudi Algorithms
+## Potential pitfalls when using other Gaudi Algorithms
 
 Although mixing wrapped Marlin Processors with other Gaudi Algorithms is working
 for most cases, there are a few conceptual differences that have not yet been
