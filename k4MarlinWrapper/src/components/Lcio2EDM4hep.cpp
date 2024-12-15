@@ -177,11 +177,11 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
       // We deal with subset collections and LCRelations once we have all data
       // converted
       if (lcio_coll->isSubset()) {
-        subsetColls.emplace_back(std::make_tuple(edm4hepName, lcio_coll, lcio_coll_type_str));
+        subsetColls.emplace_back(edm4hepName, lcio_coll, lcio_coll_type_str);
         continue;
       }
       if (lcio_coll_type_str == "LCRelation") {
-        lcRelationColls.emplace_back(std::make_pair(edm4hepName, lcio_coll));
+        lcRelationColls.emplace_back(edm4hepName, lcio_coll);
       }
       if (lcio_coll_type_str == "ReconstructedParticle") {
         // Collect the ParticleID meta information because that has to go to the
