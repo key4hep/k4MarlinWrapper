@@ -214,7 +214,7 @@ StatusCode MarlinProcessorWrapper::initialize() {
 }
 
 StatusCode MarlinProcessorWrapper::execute(const EventContext&) const {
-  // Get flag to know if there was an underlying LCEvent
+  // Get flag to check if this processor should be skipped or not
   DataObject* pStatus  = nullptr;
   StatusCode  scStatus = eventSvc()->retrieveObject("/Event/LCEventStatus", pStatus);
   if (scStatus.isSuccess()) {
@@ -279,6 +279,9 @@ StatusCode MarlinProcessorWrapper::execute(const EventContext&) const {
 
   // Handle exceptions that may come from Marlin
   catch (marlin::SkipEventException& e) {
+    warning() << "Caught marlin::SkipEventException. Skipping the wrapped Processors, but Gaudi Algorithms will still "
+                 "execute and may fail"
+              << endmsg;
     // Store flag to prevent the rest of the event from processing
     auto             upStatus = std::make_unique<LCEventWrapperStatus>(false);
     const StatusCode code     = eventSvc()->registerObject("/Event/LCEventStatus", upStatus.release());

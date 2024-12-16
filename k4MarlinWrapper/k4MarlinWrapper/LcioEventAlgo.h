@@ -41,6 +41,8 @@ public:
 private:
   Gaudi::Property<std::vector<std::string>> m_fileNames{this, "Files", {}};
   MT::LCReader*                             m_reader = nullptr;
+  int                                       m_numberOfEvents{};
+  mutable int                               m_currentEvent{};  // No atomicity necessary since not re-entrant
   bool                                      isReEntrant() const final { return false; }
 };
 

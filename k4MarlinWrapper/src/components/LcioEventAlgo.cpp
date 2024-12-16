@@ -16,11 +16,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#include <GaudiKernel/IEventProcessor.h>
-
-#include "k4MarlinWrapper/LCEventWrapper.h"
 #include "k4MarlinWrapper/LcioEventAlgo.h"
+#include "k4MarlinWrapper/LCEventWrapper.h"
 
 #include "marlin/Global.h"
 #include "marlin/StringParameters.h"
@@ -28,7 +25,9 @@
 #include <EVENT/LCIO.h>
 #include <MT/LCReader.h>
 
-#include <memory>
+#include <GaudiKernel/IEventProcessor.h>
+
+#include <stdexcept>
 #include <string>
 
 DECLARE_COMPONENT(LcioEvent)
@@ -44,53 +43,41 @@ StatusCode LcioEvent::initialize() {
 
   m_reader = new MT::LCReader(0);
   m_reader->open(m_fileNames);
-  info() << "Initialized the LcioEvent Algo: " << m_fileNames[0] << endmsg;
+  m_numberOfEvents = m_reader->getNumberOfEvents();
+  info() << "Initialized the LcioEvent Algo. Reading from " << m_fileNames.size() << " with " << m_numberOfEvents
+         << " events in total." << endmsg;
   return StatusCode::SUCCESS;
 }
 
 StatusCode LcioEvent::execute(const EventContext&) const {
+  debug() << "Reading event " << ++m_currentEvent << " / " << m_numberOfEvents << endmsg;
   auto theEvent = m_reader->readNextEvent(EVENT::LCIO::UPDATE);
 
-  if (!theEvent) {
-    // Store flag to indicate there was NOT a LCEvent
-    auto             pStatus  = std::make_unique<LCEventWrapperStatus>(false);
-    const StatusCode scStatus = eventSvc()->registerObject("/Event/LCEventStatus", pStatus.release());
-    if (scStatus.isFailure()) {
-      error() << "Failed to store flag for underlying LCEvent: MarlinProcessorWrapper may try to run over non existing "
-                 "event"
-              << endmsg;
-      return scStatus;
-    }
+  if (theEvent == nullptr) {
+    fatal() << "Failed to read event " << m_currentEvent << endmsg;
+    throw std::runtime_error("LCEvent could not be read");
+  }
 
-    auto svc = service<IEventProcessor>("ApplicationMgr");
-    if (svc) {
-      svc->stopRun().ignore();
-      svc->release();
-    } else {
-      abort();
+  // Since this is presumably the first algorithm to run we have to check here
+  // to see if we need to stop the run. Events in flight will still be
+  // processed, so technically this signals that we want to end the run after
+  // all of the algorithms for this event have finished.
+  if (m_currentEvent >= m_numberOfEvents) {
+    info() << "This is the last event in the input files. Stopping the run" << endmsg;
+    auto evtProcService = service<IEventProcessor>("ApplicationMgr", false);
+    if (!evtProcService) {
+      fatal() << "Could not get the ApplicationMgr for stopping the run" << endmsg;
     }
-  } else {
-    // pass theEvent to the DataStore, so we can access them in our processor
-    // wrappers
-    info() << "Reading from file: " << m_fileNames[0] << endmsg;
+    if (evtProcService->stopRun().isFailure()) {
+      error() << "Out of events, but could not signal to stop the run" << endmsg;
+    }
+  }
 
-    auto             myEvWr = new LCEventWrapper(std::move(theEvent));
-    const StatusCode sc     = eventSvc()->registerObject("/Event/LCEvent", myEvWr);
-    if (sc.isFailure()) {
-      error() << "Failed to store the LCEvent" << endmsg;
-      return sc;
-    } else {
-      // Store flag to indicate there was a LCEvent
-      auto pStatus = std::make_unique<LCEventWrapperStatus>(true);
-      std::cout << "Saving status: " << pStatus->hasLCEvent << std::endl;
-      const StatusCode scStatus = eventSvc()->registerObject("/Event/LCEventStatus", pStatus.release());
-      if (scStatus.isFailure()) {
-        error() << "Failed to store flag for underlying LCEvent: MarlinProcessorWrapper may try to run over non "
-                   "existing event"
-                << endmsg;
-        return scStatus;
-      }
-    }
+  auto             myEvWr = new LCEventWrapper(std::move(theEvent));
+  const StatusCode sc     = eventSvc()->registerObject("/Event/LCEvent", myEvWr);
+  if (sc.isFailure()) {
+    error() << "Failed to store the LCEvent" << endmsg;
+    return sc;
   }
 
   return StatusCode::SUCCESS;
