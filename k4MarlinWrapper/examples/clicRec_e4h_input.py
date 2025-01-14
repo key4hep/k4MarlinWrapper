@@ -2445,18 +2445,6 @@ VertexFinderUnconstrained.Parameters = {
     "UseMCP": ["0"],
 }
 
-
-<<<<<<< HEAD
-# Write output to EDM4hep
-from Configurables import PodioOutput
-
-out = PodioOutput("PodioOutput", filename="my_output.root")
-out.outputCommands = ["keep *", "drop RefinedVertexJets_PID_RefinedVertex"]
-
-
-algList.append(inp)
-=======
->>>>>>> cb3c7a3 (Add support for running with IOSvc)
 algList.append(MyAIDAProcessor)
 algList.append(EventNumber)
 algList.append(InitDD4hep)
