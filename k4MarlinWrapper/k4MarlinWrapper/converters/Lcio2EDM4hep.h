@@ -58,7 +58,7 @@ private:
   Gaudi::Property<std::map<std::string, std::string>> m_collNames{this, "collNameMapping", {}};
   Gaudi::Property<bool>                               m_convertAll{this, "convertAll", true};
 
-  ServiceHandle<IDataProviderSvc> m_eds;
+  ServiceHandle<IDataProviderSvc> m_eventDataSvc;
   PodioDataSvc*                   m_podioDataSvc;
 
   // **********************************

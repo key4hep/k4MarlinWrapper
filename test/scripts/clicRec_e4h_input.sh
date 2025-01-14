@@ -23,7 +23,19 @@ set -eu
 
 cd CLICPerformance/clicConfig
 
-k4run $EXAMPLE_DIR/clicRec_e4h_input.py --EventDataSvc.input=$1
+if [ "$2" = "--iosvc" ]; then
+  iosvc="_iosvc"
+  echo "Running with IO service"
+  file_arg="--iosvc --IOSvc.Input=$1"
+elif [ "$2" = "--no-iosvc" ]; then
+  iosvc=""
+  echo "Running without IO service"
+  file_arg="--EventDataSvc.input=$1"
+else
+  echo "Wrong argument $2"
+  return 1
+fi
+k4run $EXAMPLE_DIR/clicRec_e4h_input.py ${file_arg} --rec-output Output_REC_e4h_input$iosvc.slcio --dst-output Output_DST_e4h_input$iosvc.slcio
 
 input_num_events=$(python $TEST_DIR/python/root_num_events.py $1)
 output_num_events=$(python $TEST_DIR/python/root_num_events.py my_output.root)
@@ -35,14 +47,15 @@ if [ "$input_num_events" != "$output_num_events" ]; then
 fi
 
 # Second check: contents (at least superficially)
-echo "Comparing contents of Output_REC_e4h_input.slcio"
-if ! diff <(anajob Output_REC_e4h_input.slcio) $TEST_DIR/inputFiles/anajob_Output_REC.expected; then
+# Exclude the file name since it is different when using the IOSvc
+echo "Comparing contents of Output_REC_e4h_input$iosvc.slcio"
+if ! diff -I "Output_REC_e4h_input.*\.slcio" <(anajob Output_REC_e4h_input$iosvc.slcio) $TEST_DIR/inputFiles/anajob_Output_REC.expected; then
   echo "File contents of REC slcio file are not as expected"
   exit 1
 fi
 
-echo "Comparing contents of Output_DST_e4h_input.slcio"
-if ! diff <(anajob Output_DST_e4h_input.slcio) $TEST_DIR/inputFiles/anajob_Output_DST.expected; then
+echo "Comparing contents of Output_DST_e4h_input$iosvc.slcio"
+if ! diff -I "Output_DST_e4h_input.*\.slcio" <(anajob Output_DST_e4h_input$iosvc.slcio) $TEST_DIR/inputFiles/anajob_Output_DST.expected; then
   echo "File contents of DST slcio file are not as expected"
   exit 1
 fi

@@ -32,6 +32,7 @@
 
 #include "GaudiKernel/AnyDataWrapper.h"
 
+#include <functional>
 #include <memory>
 
 DECLARE_COMPONENT(Lcio2EDM4hepTool);
@@ -39,19 +40,17 @@ DECLARE_COMPONENT(Lcio2EDM4hepTool);
 using namespace k4MarlinWrapper;
 
 Lcio2EDM4hepTool::Lcio2EDM4hepTool(const std::string& type, const std::string& name, const IInterface* parent)
-    : AlgTool(type, name, parent), m_eds("EventDataSvc", "Lcio2EDM4hepTool") {
+    : AlgTool(type, name, parent), m_eventDataSvc("EventDataSvc", "Lcio2EDM4hepTool") {
   declareInterface<IEDMConverter>(this);
 
-  StatusCode sc = m_eds.retrieve();
+  StatusCode sc = m_eventDataSvc.retrieve();
   if (sc.isFailure()) {
     error() << "Could not retrieve EventDataSvc" << endmsg;
   }
 }
 
 StatusCode Lcio2EDM4hepTool::initialize() {
-  m_podioDataSvc = dynamic_cast<PodioDataSvc*>(m_eds.get());
-  if (!m_podioDataSvc)
-    return StatusCode::FAILURE;
+  m_podioDataSvc = dynamic_cast<PodioDataSvc*>(m_eventDataSvc.get());
 
   return AlgTool::initialize();
 }
@@ -62,9 +61,13 @@ StatusCode Lcio2EDM4hepTool::finalize() { return AlgTool::finalize(); }
 // Check if a collection was already registered to skip it
 // **********************************
 bool Lcio2EDM4hepTool::collectionExist(const std::string& collection_name) {
-  auto collections = m_podioDataSvc->getEventFrame().getAvailableCollections();
+  std::vector<std::string> collections;
+  //TODO:
+  if (m_podioDataSvc) {
+    collections = m_podioDataSvc->getEventFrame().getAvailableCollections();
+  }
   for (const auto& name : collections) {
-    if (collection_name == name) {
+    if (name == collection_name) {
       debug() << "Collection named " << name << " already registered, skipping conversion." << endmsg;
       return true;
     }
@@ -85,7 +88,7 @@ void Lcio2EDM4hepTool::registerCollection(
 
   // No need to check for pre-existing collections, since we only ever end up
   // here if that is not the case
-  auto sc = m_podioDataSvc->registerObject("/Event", "/" + std::string(name), wrapper);
+  auto sc = m_eventDataSvc->registerObject("/Event", "/" + std::string(name), wrapper);
   if (sc == StatusCode::FAILURE) {
     error() << "Could not register collection " << name << endmsg;
   }
@@ -98,8 +101,14 @@ void Lcio2EDM4hepTool::registerCollection(
     for (auto& elem : string_keys) {
       if (elem == edm4hep::labels::CellIDEncoding) {
         const auto& lcio_coll_cellid_str = lcioColl->getParameters().getStringVal(lcio::LCIO::CellIDEncoding);
-        auto&       mdFrame              = m_podioDataSvc->getMetaDataFrame();
-        mdFrame.putParameter(podio::collMetadataParamName(name, edm4hep::labels::CellIDEncoding), lcio_coll_cellid_str);
+        if (m_podioDataSvc) {
+          auto& mdFrame = m_podioDataSvc->getMetaDataFrame();
+          mdFrame.putParameter(podio::collMetadataParamName(name, edm4hep::labels::CellIDEncoding),
+                               lcio_coll_cellid_str);
+        } else {
+          k4FWCore::putParameter(podio::collMetadataParamName(name, edm4hep::labels::CellIDEncoding),
+                                 lcio_coll_cellid_str);
+        }
         debug() << "Storing CellIDEncoding " << podio::collMetadataParamName(name, edm4hep::labels::CellIDEncoding)
                 << " value: " << lcio_coll_cellid_str << endmsg;
       } else {
@@ -131,8 +140,10 @@ namespace {
 
 StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
   // Convert event parameters
-  // auto& frame = const_cast<podio::Frame&>(m_podioDataSvc->getEventFrame());
-  auto& frame = m_podioDataSvc->m_eventframe;
+  std::optional<std::reference_wrapper<podio::Frame>> frame;
+  if (m_podioDataSvc) {
+    frame = m_podioDataSvc->m_eventframe;
+  }
   LCIO2EDM4hepConv::convertObjectParameters<lcio::LCEventImpl>(the_event, frame);
 
   // Convert Event Header outside the collections loop
@@ -208,9 +219,19 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
   }
 
   // Set the ParticleID meta information
-  auto& metadataFrame = m_podioDataSvc->getMetaDataFrame();
-  for (const auto& [collName, pidInfo] : pidInfos) {
-    edm4hep::utils::PIDHandler::setAlgoInfo(metadataFrame, collName, pidInfo);
+  // TODO: Clean up
+  if (m_podioDataSvc) {
+    auto& metadataFrame = m_podioDataSvc->getMetaDataFrame();
+    for (const auto& [collName, pidInfo] : pidInfos) {
+      edm4hep::utils::PIDHandler::setAlgoInfo(metadataFrame, collName, pidInfo);
+    }
+  } else {
+    for (const auto& [collName, pidInfo] : pidInfos) {
+      k4FWCore::putParameter(podio::collMetadataParamName(collName, edm4hep::labels::PIDAlgoName), pidInfo.algoName);
+      k4FWCore::putParameter(podio::collMetadataParamName(collName, edm4hep::labels::PIDAlgoType), pidInfo.algoType());
+      k4FWCore::putParameter(podio::collMetadataParamName(collName, edm4hep::labels::PIDParameterNames),
+                             pidInfo.paramNames);
+    }
   }
 
   // We want one "global" map that is created the first time it is used in the event.
