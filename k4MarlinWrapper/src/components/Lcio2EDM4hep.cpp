@@ -32,7 +32,6 @@
 
 #include "GaudiKernel/AnyDataWrapper.h"
 
-#include <functional>
 #include <memory>
 
 DECLARE_COMPONENT(Lcio2EDM4hepTool);
