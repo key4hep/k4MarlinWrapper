@@ -357,10 +357,7 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
                                   lcio::LCEventImpl* lcio_event, CollectionPairMappings& collection_pairs,
                                   std::vector<EDM4hep2LCIOConv::ParticleIDConvData>& pidCollections,
                                   std::vector<EDM4hep2LCIOConv::TrackDqdxConvData>&  dQdxCollections) {
-  std::optional<std::reference_wrapper<podio::Frame>> metadata;
-  if (m_podioDataSvc) {
-    metadata = m_podioDataSvc->getMetaDataFrame();
-  }
+  const auto& metadata = m_podioDataSvc->getMetaDataFrame();
   const auto collPtr  = getEDM4hepCollection(e4h_coll_name);
   const auto fulltype = collPtr->getValueTypeName();
 
@@ -398,12 +395,11 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
     std::optional<std::vector<std::string>> maybeParamNames;
 
     if (m_podioDataSvc) {
-      const auto& frame = metadata.value().get();
       maybeAlgoName =
-          frame.getParameter<std::string>(podio::collMetadataParamName(e4h_coll_name, edm4hep::labels::PIDAlgoName));
+          metadata.getParameter<std::string>(podio::collMetadataParamName(e4h_coll_name, edm4hep::labels::PIDAlgoName));
       maybeAlgoType =
-          frame.getParameter<int>(podio::collMetadataParamName(e4h_coll_name, edm4hep::labels::PIDAlgoType));
-      maybeParamNames = frame.getParameter<std::vector<std::string>>(
+          metadata.getParameter<int>(podio::collMetadataParamName(e4h_coll_name, edm4hep::labels::PIDAlgoType));
+      maybeParamNames = metadata.getParameter<std::vector<std::string>>(
           podio::collMetadataParamName(e4h_coll_name, edm4hep::labels::PIDParameterNames));
 
     } else {
