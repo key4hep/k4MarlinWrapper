@@ -358,8 +358,8 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
                                   std::vector<EDM4hep2LCIOConv::ParticleIDConvData>& pidCollections,
                                   std::vector<EDM4hep2LCIOConv::TrackDqdxConvData>&  dQdxCollections) {
   const auto& metadata = m_podioDataSvc->getMetaDataFrame();
-  const auto collPtr  = getEDM4hepCollection(e4h_coll_name);
-  const auto fulltype = collPtr->getValueTypeName();
+  const auto  collPtr  = getEDM4hepCollection(e4h_coll_name);
+  const auto  fulltype = collPtr->getValueTypeName();
 
   debug() << "Converting type " << fulltype << " from input " << e4h_coll_name << endmsg;
 
