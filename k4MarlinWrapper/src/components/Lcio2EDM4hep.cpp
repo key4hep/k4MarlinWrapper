@@ -52,7 +52,7 @@ StatusCode Lcio2EDM4hepTool::initialize() {
   m_podioDataSvc = dynamic_cast<PodioDataSvc*>(m_eventDataSvc.get());
 
   m_metadataSvc = service("MetadataSvc", false);
-  if(!m_metadataSvc) {
+  if (!m_metadataSvc) {
     error() << "Could not retrieve MetadataSvc" << endmsg;
     return StatusCode::FAILURE;
   }
@@ -70,8 +70,7 @@ bool Lcio2EDM4hepTool::collectionExist(const std::string& collection_name) {
   //TODO:
   if (m_podioDataSvc) {
     collections = m_podioDataSvc->getEventFrame().getAvailableCollections();
-  }
-  else {
+  } else {
   }
   if (std::find(collections.begin(), collections.end(), collection_name) != collections.end()) {
     debug() << "Collection named " << collection_name << " already registered, skipping conversion." << endmsg;
