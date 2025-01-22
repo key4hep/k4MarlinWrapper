@@ -51,6 +51,12 @@ Lcio2EDM4hepTool::Lcio2EDM4hepTool(const std::string& type, const std::string& n
 StatusCode Lcio2EDM4hepTool::initialize() {
   m_podioDataSvc = dynamic_cast<PodioDataSvc*>(m_eventDataSvc.get());
 
+  m_metadataSvc = service("MetadataSvc", false);
+  if(!m_metadataSvc) {
+    error() << "Could not retrieve MetadataSvc" << endmsg;
+    return StatusCode::FAILURE;
+  }
+
   return AlgTool::initialize();
 }
 
@@ -227,10 +233,7 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
     }
   } else {
     for (const auto& [collName, pidInfo] : pidInfos) {
-      k4FWCore::putParameter(podio::collMetadataParamName(collName, edm4hep::labels::PIDAlgoName), pidInfo.algoName);
-      k4FWCore::putParameter(podio::collMetadataParamName(collName, edm4hep::labels::PIDAlgoType), pidInfo.algoType());
-      k4FWCore::putParameter(podio::collMetadataParamName(collName, edm4hep::labels::PIDParameterNames),
-                             pidInfo.paramNames);
+      m_metadataSvc->put(collName, pidInfo);
     }
   }
 
