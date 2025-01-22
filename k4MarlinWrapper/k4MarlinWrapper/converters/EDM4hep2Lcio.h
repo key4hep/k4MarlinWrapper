@@ -21,6 +21,8 @@
 
 #include "k4MarlinWrapper/converters/IEDMConverter.h"
 
+#include "k4FWCore/IMetadataSvc.h"
+
 #include "k4EDM4hep2LcioConv/k4EDM4hep2LcioConv.h"
 
 #include <Gaudi/Property.h>
@@ -31,6 +33,7 @@
 #include <vector>
 
 class PodioDataSvc;
+class MetadataSvc;
 
 template <typename K, typename V> using ObjMapT = k4EDM4hep2LcioConv::VecMapT<K, V>;
 
@@ -64,6 +67,7 @@ private:
 
   PodioDataSvc*                   m_podioDataSvc;
   ServiceHandle<IDataProviderSvc> m_eventDataSvc;
+  SmartIF<IMetadataSvc>           m_metadataSvc;
   std::vector<std::string>        m_collectionNames;
   std::map<uint32_t, std::string> m_idToName;
 

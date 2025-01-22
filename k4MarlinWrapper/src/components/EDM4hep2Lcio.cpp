@@ -23,6 +23,7 @@
 #include "UTIL/PIDHandler.h"
 
 #include "edm4hep/Constants.h"
+#include "edm4hep/utils/ParticleIDUtils.h"
 
 #include "k4FWCore/DataHandle.h"
 #include "k4FWCore/FunctionalUtils.h"
@@ -70,6 +71,12 @@ StatusCode EDM4hep2LcioTool::initialize() {
   }
 
   m_podioDataSvc = dynamic_cast<PodioDataSvc*>(m_eventDataSvc.get());
+
+  m_metadataSvc = service("MetadataSvc", false);
+  if (!m_metadataSvc) {
+    error() << "Could not retrieve MetadataSvc" << endmsg;
+    return StatusCode::FAILURE;
+  }
 
   return AlgTool::initialize();
 }
@@ -390,29 +397,12 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
   } else if (fulltype == "edm4hep::EventHeader") {
     convertEventHeader(e4h_coll_name, lcio_event);
   } else if (fulltype == "edm4hep::ParticleID") {
-    std::optional<std::string>              maybeAlgoName;
-    std::optional<int>                      maybeAlgoType;
-    std::optional<std::vector<std::string>> maybeParamNames;
-
+    std::optional<edm4hep::utils::ParticleIDMeta> pidInfo;
     if (m_podioDataSvc) {
-      maybeAlgoName =
-          metadata.getParameter<std::string>(podio::collMetadataParamName(e4h_coll_name, edm4hep::labels::PIDAlgoName));
-      maybeAlgoType =
-          metadata.getParameter<int>(podio::collMetadataParamName(e4h_coll_name, edm4hep::labels::PIDAlgoType));
-      maybeParamNames = metadata.getParameter<std::vector<std::string>>(
-          podio::collMetadataParamName(e4h_coll_name, edm4hep::labels::PIDParameterNames));
-
+      pidInfo = edm4hep::utils::PIDHandler::getAlgoInfo(metadata, e4h_coll_name);
     } else {
-      maybeAlgoName = k4FWCore::getParameter<std::string>(
-          podio::collMetadataParamName(e4h_coll_name, edm4hep::labels::PIDAlgoName));
-      maybeAlgoType =
-          k4FWCore::getParameter<int>(podio::collMetadataParamName(e4h_coll_name, edm4hep::labels::PIDAlgoType));
-      maybeParamNames = k4FWCore::getParameter<std::vector<std::string>>(
-          podio::collMetadataParamName(e4h_coll_name, edm4hep::labels::PIDParameterNames));
+      pidInfo = m_metadataSvc->get<edm4hep::utils::ParticleIDMeta>(e4h_coll_name);
     }
-
-    edm4hep::utils::ParticleIDMeta pidInfo{std::move(maybeAlgoName.value()), maybeAlgoType.value(),
-                                           maybeParamNames.value()};
 
     pidCollections.emplace_back(e4h_coll_name, static_cast<const edm4hep::ParticleIDCollection*>(collPtr), pidInfo);
   } else if (fulltype == "edm4hep::RecDqDx") {
