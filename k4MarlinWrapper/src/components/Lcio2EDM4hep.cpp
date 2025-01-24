@@ -52,7 +52,7 @@ StatusCode Lcio2EDM4hepTool::initialize() {
   m_podioDataSvc = dynamic_cast<PodioDataSvc*>(m_eventDataSvc.get());
 
   m_metadataSvc = service("MetadataSvc", false);
-  if (!m_metadataSvc) {
+  if (!m_podioDataSvc && !m_metadataSvc) {
     error() << "Could not retrieve MetadataSvc" << endmsg;
     return StatusCode::FAILURE;
   }
