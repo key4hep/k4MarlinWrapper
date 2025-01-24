@@ -54,7 +54,7 @@ if args.iosvc:
         "$TEST_DIR/inputFiles/", os.environ.get("INPUTFILE", "ttbar_edm4hep_frame.root")
     )
     iosvc.Output = "my_output.root"
-    iosvc.outputCommands = ["keep *, drop RefinedVertexJets_PID_RefinedVertex"]
+    iosvc.outputCommands = ["keep *", "drop RefinedVertexJets_PID_RefinedVertex"]
 else:
     evtsvc = k4DataSvc("EventDataSvc")
     evtsvc.input = os.path.join(
@@ -65,7 +65,7 @@ else:
     inp.OutputLevel = DEBUG
 
     out = PodioOutput("PodioOutput", filename="my_output.root")
-    out.outputCommands = ["keep *, drop RefinedVertexJets_PID_RefinedVertex"]
+    out.outputCommands = ["keep *", "drop RefinedVertexJets_PID_RefinedVertex"]
 
 MyAIDAProcessor = MarlinProcessorWrapper("MyAIDAProcessor")
 MyAIDAProcessor.OutputLevel = WARNING
