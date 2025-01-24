@@ -54,7 +54,7 @@ if args.iosvc:
         "$TEST_DIR/inputFiles/", os.environ.get("INPUTFILE", "ttbar_edm4hep_frame.root")
     )
     iosvc.Output = "my_output.root"
-    iosvc.outputDstName = ["keep *, drop RefinedVertexJets_PID_RefinedVertex"]
+    iosvc.outputCommands = ["keep *, drop RefinedVertexJets_PID_RefinedVertex"]
 else:
     evtsvc = k4DataSvc("EventDataSvc")
     evtsvc.input = os.path.join(
