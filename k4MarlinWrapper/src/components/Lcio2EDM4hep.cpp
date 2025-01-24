@@ -68,7 +68,6 @@ StatusCode Lcio2EDM4hepTool::finalize() { return AlgTool::finalize(); }
 // **********************************
 bool Lcio2EDM4hepTool::collectionExist(const std::string& collection_name) {
   std::vector<std::string> collections;
-  //TODO:
   if (m_podioDataSvc) {
     collections = m_podioDataSvc->getEventFrame().getAvailableCollections();
   } else {
