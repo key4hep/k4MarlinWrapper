@@ -19,6 +19,7 @@
 #include "k4MarlinWrapper/converters/EDM4hep2Lcio.h"
 #include <GaudiKernel/StatusCode.h>
 #include "GlobalConvertedObjectsMap.h"
+#include "StoreUtils.h"
 
 #include "UTIL/PIDHandler.h"
 
@@ -317,48 +318,6 @@ podio::CollectionBase* EDM4hep2LcioTool::getEDM4hepCollection(const std::string&
   throw GaudiException("Collection could not be casted to the expected type", name(), StatusCode::FAILURE);
 }
 
-StatusCode EDM4hep2LcioTool::getAvailableCollectionsFromStore() {
-  SmartIF<IDataManagerSvc> mgr;
-  mgr = evtSvc();
-
-  SmartDataPtr<DataObject> root(evtSvc(), "/Event");
-  if (!root) {
-    error() << "Failed to retrieve root object /Event" << endmsg;
-    return StatusCode::FAILURE;
-  }
-
-  auto pObj = root->registry();
-  if (!pObj) {
-    error() << "Failed to retrieve the root registry object" << endmsg;
-    return StatusCode::FAILURE;
-  }
-  std::vector<IRegistry*> leaves;
-  StatusCode              sc = mgr->objectLeaves(pObj, leaves);
-  if (!sc.isSuccess()) {
-    error() << "Failed to retrieve object leaves" << endmsg;
-    return StatusCode::FAILURE;
-  }
-  for (const auto& pReg : leaves) {
-    if (pReg->name() == k4FWCore::frameLocation) {
-      continue;
-    }
-    DataObject* p;
-    sc = m_eventDataSvc->retrieveObject("/Event" + pReg->name(), p);
-    if (sc.isFailure()) {
-      error() << "Could not retrieve object " << pReg->name() << " from the EventStore" << endmsg;
-      return sc;
-    }
-    auto wrapper = dynamic_cast<AnyDataWrapper<std::unique_ptr<podio::CollectionBase>>*>(p);
-    if (!wrapper) {
-      continue;
-    }
-    // Remove the leading /
-    m_collectionNames.push_back(pReg->name().substr(1, pReg->name().size() - 1));
-    m_idToName.emplace(wrapper->getData()->getID(), pReg->name());
-  }
-  return StatusCode::SUCCESS;
-}
-
 // Select the appropriate method to convert a collection given its type
 void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::string& lcio_coll_name,
                                   lcio::LCEventImpl* lcio_event, CollectionPairMappings& collection_pairs,
@@ -430,11 +389,10 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
     edmEvent          = m_podioDataSvc->getEventFrame();
     m_collectionNames = edmEvent.value().get().getAvailableCollections();
   } else if (m_collectionNames.empty()) {
-    auto sc = getAvailableCollectionsFromStore();
-    if (sc.isFailure()) {
-      warning() << "Could not retrieve available collections from the EventStore" << endmsg;
-      return sc;
-    }
+    std::optional<std::map<uint32_t, std::string>> idToNameOpt(std::move(m_idToName));
+    auto collections = getAvailableCollectionsFromStore(this, idToNameOpt);
+    m_idToName = std::move(idToNameOpt.value());
+    m_collectionNames.insert(m_collectionNames.end(), collections.begin(), collections.end());
   }
   // Start off with the pre-defined collection name mappings
   auto collsToConvert{m_collNames.value()};
