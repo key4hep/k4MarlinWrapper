@@ -390,8 +390,8 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
     m_collectionNames = edmEvent.value().get().getAvailableCollections();
   } else if (m_collectionNames.empty()) {
     std::optional<std::map<uint32_t, std::string>> idToNameOpt(std::move(m_idToName));
-    auto collections = getAvailableCollectionsFromStore(this, idToNameOpt);
-    m_idToName = std::move(idToNameOpt.value());
+    auto                                           collections = getAvailableCollectionsFromStore(this, idToNameOpt);
+    m_idToName                                                 = std::move(idToNameOpt.value());
     m_collectionNames.insert(m_collectionNames.end(), collections.begin(), collections.end());
   }
   // Start off with the pre-defined collection name mappings
