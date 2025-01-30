@@ -34,7 +34,6 @@
 #include "GaudiKernel/AnyDataWrapper.h"
 #include "GaudiKernel/IDataManagerSvc.h"
 #include "GaudiKernel/IDataProviderSvc.h"
-#include "GaudiKernel/SmartDataPtr.h"
 
 #include <functional>
 #include <memory>

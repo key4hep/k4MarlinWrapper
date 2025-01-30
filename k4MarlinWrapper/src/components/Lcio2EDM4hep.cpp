@@ -147,9 +147,9 @@ namespace {
 StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
   // Convert event parameters
   if (m_podioDataSvc) {
-    LCIO2EDM4hepConv::convertObjectParameters<lcio::LCEventImpl>(the_event, m_podioDataSvc->m_eventframe);
+    LCIO2EDM4hepConv::convertObjectParameters(the_event, m_podioDataSvc->m_eventframe);
   } else {
-    LCIO2EDM4hepConv::convertObjectParameters<lcio::LCEventImpl>(
+    LCIO2EDM4hepConv::convertObjectParameters(
         the_event, [](const std::string& key, const auto& value) { k4FWCore::putParameter(key, value); });
   }
 

@@ -16,13 +16,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include "StoreUtils.h"
+
 #include "GaudiKernel/AlgTool.h"
 #include "GaudiKernel/AnyDataWrapper.h"
 #include "GaudiKernel/IDataManagerSvc.h"
 #include "GaudiKernel/IDataProviderSvc.h"
 #include "GaudiKernel/SmartDataPtr.h"
 
-#include "StoreUtils.h"
 #include "podio/Frame.h"
 
 #include "k4FWCore/FunctionalUtils.h"
