@@ -35,10 +35,10 @@ else
   echo "Wrong argument $2"
   return 1
 fi
-k4run $EXAMPLE_DIR/clicRec_e4h_input.py ${file_arg} --rec-output Output_REC_e4h_input$iosvc.slcio --dst-output Output_DST_e4h_input$iosvc.slcio
+k4run $EXAMPLE_DIR/clicRec_e4h_input.py ${file_arg} --rec-output Output_REC_e4h_input$iosvc.slcio --dst-output Output_DST_e4h_input$iosvc.slcio --gaudi-output my_output$iosvc.root
 
 input_num_events=$(python $TEST_DIR/python/root_num_events.py $1)
-output_num_events=$(python $TEST_DIR/python/root_num_events.py my_output.root)
+output_num_events=$(python $TEST_DIR/python/root_num_events.py my_output$iosvc.root)
 
 # First check do we have the same number of events in input and output
 if [ "$input_num_events" != "$output_num_events" ]; then

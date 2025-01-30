@@ -44,6 +44,7 @@ parser.add_argument(
 )
 parser.add_argument("--rec-output", help="Output file name for the REC file")
 parser.add_argument("--dst-output", help="Output file name for the DST file")
+parser.add_argument("--gaudi-output", help="Output file name for the Gaudi file")
 
 args = parser.parse_known_args()[0]
 
@@ -53,7 +54,7 @@ if args.iosvc:
     iosvc.Input = os.path.join(
         "$TEST_DIR/inputFiles/", os.environ.get("INPUTFILE", "ttbar_edm4hep_frame.root")
     )
-    iosvc.Output = "my_output.root"
+    iosvc.Output = args.gaudi_output
     iosvc.outputCommands = ["keep *", "drop RefinedVertexJets_PID_RefinedVertex"]
 else:
     evtsvc = k4DataSvc("EventDataSvc")
@@ -64,7 +65,7 @@ else:
     inp = PodioInput("InputReader")
     inp.OutputLevel = DEBUG
 
-    out = PodioOutput("PodioOutput", filename="my_output.root")
+    out = PodioOutput("PodioOutput", filename=args.gaudi_output)
     out.outputCommands = ["keep *", "drop RefinedVertexJets_PID_RefinedVertex"]
 
 MyAIDAProcessor = MarlinProcessorWrapper("MyAIDAProcessor")
