@@ -30,6 +30,7 @@
 #include <k4FWCore/DataHandle.h>
 #include <k4FWCore/MetaDataHandle.h>
 #include <k4FWCore/PodioDataSvc.h>
+#include <k4FWCore/FunctionalUtils.h>
 
 #include "GaudiKernel/AnyDataWrapper.h"
 
@@ -149,8 +150,14 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
   if (m_podioDataSvc) {
     LCIO2EDM4hepConv::convertObjectParameters(the_event, m_podioDataSvc->m_eventframe);
   } else {
-    LCIO2EDM4hepConv::convertObjectParameters(
-        the_event, [](const std::string& key, const auto& value) { k4FWCore::putParameter(key, value); });
+    DataObject* p;
+    StatusCode  code = m_eventDataSvc->retrieveObject("/Event" + k4FWCore::frameLocation, p);
+    if (code.isSuccess()) {
+      auto* frameWrapper = dynamic_cast<AnyDataWrapper<podio::Frame>*>(p);
+      LCIO2EDM4hepConv::convertObjectParameters(the_event, frameWrapper->getData());
+    } else {
+      warning() << "Could not retrieve the event frame; event parameters will not be converted" << endmsg;
+    }
   }
 
   // Convert Event Header outside the collections loop
