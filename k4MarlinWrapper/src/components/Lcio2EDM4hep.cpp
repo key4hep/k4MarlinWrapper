@@ -156,7 +156,9 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
       auto* frameWrapper = dynamic_cast<AnyDataWrapper<podio::Frame>*>(p);
       LCIO2EDM4hepConv::convertObjectParameters(the_event, frameWrapper->getData());
     } else {
-      warning() << "Could not retrieve the event frame; event parameters will not be converted. This is a known limitation when running with IOSvc without an input file." << endmsg;
+      warning() << "Could not retrieve the event frame; event parameters will not be converted. This is a known "
+                   "limitation when running with IOSvc without an input file."
+                << endmsg;
     }
   }
 
