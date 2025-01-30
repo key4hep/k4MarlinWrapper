@@ -28,9 +28,14 @@
 
 #include "k4FWCore/FunctionalUtils.h"
 
+#include <stdexcept>
 #include <string>
 #include <vector>
 
+// This is a reimplementation of functionality to retrieve collections from the
+// store that can be found in Writer.cpp in k4FWCore with some modifications
+// that are specific to the usage of this function in the converters, like
+// returning also a map from collection ID to collection name
 std::vector<std::string> getAvailableCollectionsFromStore(const AlgTool*                                  thisClass,
                                                           std::optional<std::map<uint32_t, std::string>>& idToName,
                                                           bool returnFrameCollections) {
@@ -46,12 +51,12 @@ std::vector<std::string> getAvailableCollectionsFromStore(const AlgTool*        
 
   auto pObj = root->registry();
   if (!pObj) {
-    thisClass->error() << "Failed to retrieve the root registry object" << endmsg;
+    throw std::runtime_error("Failed to retrieve the root registry object");
   }
   std::vector<IRegistry*> leaves;
   StatusCode              sc = mgr->objectLeaves(pObj, leaves);
   if (!sc.isSuccess()) {
-    thisClass->error() << "Failed to retrieve object leaves" << endmsg;
+    throw std::runtime_error("Failed to retrieve object leaves");
   }
   for (const auto& pReg : leaves) {
     if (pReg->name() == k4FWCore::frameLocation) {
