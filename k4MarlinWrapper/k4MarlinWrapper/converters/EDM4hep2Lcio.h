@@ -64,7 +64,7 @@ private:
   Gaudi::Property<std::map<std::string, std::string>> m_collNames{this, "collNameMapping", {}};
   Gaudi::Property<bool>                               m_convertAll{this, "convertAll", true};
 
-  PodioDataSvc*                   m_podioDataSvc;
+  PodioDataSvc* m_podioDataSvc;
   // EventDataSvc that is used together with IOSvc
   ServiceHandle<IDataProviderSvc> m_eventDataSvc;
   // Metadata service from k4FWCore that is used together with IOSvc
