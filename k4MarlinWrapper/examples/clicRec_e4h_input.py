@@ -42,9 +42,15 @@ parseConstants(CONSTANTS)
 parser.add_argument(
     "--iosvc", action="store_true", default=False, help="Use IOSvc instead of PodioDataSvc"
 )
-parser.add_argument("--rec-output", help="Output file name for the REC file")
-parser.add_argument("--dst-output", help="Output file name for the DST file")
-parser.add_argument("--gaudi-output", help="Output file name for the Gaudi file")
+parser.add_argument(
+    "--rec-output", default="Output_REC_e4h_input.slcio", help="Output file name for the REC file"
+)
+parser.add_argument(
+    "--dst-output", default="Output_DST_e4h_input.slcio", help="Output file name for the DST file"
+)
+parser.add_argument(
+    "--gaudi-output", default="my_output.root", help="Output file name for the Gaudi file"
+)
 
 args = parser.parse_known_args()[0]
 

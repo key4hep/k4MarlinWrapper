@@ -226,7 +226,6 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
   }
 
   // Set the ParticleID meta information
-  // TODO: Clean up
   if (m_podioDataSvc) {
     auto& metadataFrame = m_podioDataSvc->getMetaDataFrame();
     for (const auto& [collName, pidInfo] : pidInfos) {
