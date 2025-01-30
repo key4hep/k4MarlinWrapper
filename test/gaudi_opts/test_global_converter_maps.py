@@ -40,8 +40,14 @@ from k4FWCore.parseArgs import parser
 parser.add_argument(
     "--iosvc", action="store_true", default=False, help="Use IOSvc instead of PodioDataSvc"
 )
+parser.add_argument(
+    "--use-functional-checker", action="store_true", default=False, help="Use functional checker"
+)
 
 args = parser.parse_known_args()[0]
+
+if args.use_functional_checker:
+    from Configurables import MCRecoLinkCheckerFunctional as MCRecoLinkChecker
 
 if args.iosvc:
     evtsvc = EventDataSvc("EventDataSvc")
@@ -50,7 +56,10 @@ else:
 
 if args.iosvc:
     iosvc = IOSvc()
-    iosvc.Output = "global_converter_maps_iosvc.root"
+    if not args.use_functional_checker:
+        iosvc.Output = "global_converter_maps_iosvc.root"
+    else:
+        iosvc.Output = "global_converter_maps_iosvc_functional.root"
 else:
     podioInput = PodioInput("InputReader")
     podioInput.collections = ["MCParticles"]
@@ -88,9 +97,13 @@ mcTruthConverter.OutputLevel = DEBUG
 TrivialMCTruthLinkerProc.Lcio2EDM4hepTool = mcTruthConverter
 
 mcLinkChecker = MCRecoLinkChecker("MCRecoLinkChecker")
-mcLinkChecker.InputMCRecoLinks = "TrivialMCRecoLinks"
-mcLinkChecker.InputMCs = "MCParticles"
-mcLinkChecker.InputRecos = "PseudoRecoParticles"
+mcLinkChecker.InputMCRecoLinks = (
+    "TrivialMCRecoLinks" if not args.use_functional_checker else ["TrivialMCRecoLinks"]
+)
+mcLinkChecker.InputMCs = "MCParticles" if not args.use_functional_checker else ["MCParticles"]
+mcLinkChecker.InputRecos = (
+    "PseudoRecoParticles" if not args.use_functional_checker else ["PseudoRecoParticles"]
+)
 mcLinkChecker.OutputLevel = DEBUG
 
 algList = [
