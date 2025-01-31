@@ -20,8 +20,7 @@
 
 MCRecoLinkCheckerFunctional::MCRecoLinkCheckerFunctional(const std::string& name, ISvcLocator* svcLoc)
     : Consumer(name, svcLoc,
-               {KeyValues("InputMCRecoLinks", {"InputMCRecoLinks"}),
-                KeyValues("InputMCs", {"InputMCs"}),
+               {KeyValues("InputMCRecoLinks", {"InputMCRecoLinks"}), KeyValues("InputMCs", {"InputMCs"}),
                 KeyValues("InputRecos", {"InputRecos"})}) {}
 
 void MCRecoLinkCheckerFunctional::operator()(const edm4hep::RecoMCParticleLinkCollection&    relationColl,
