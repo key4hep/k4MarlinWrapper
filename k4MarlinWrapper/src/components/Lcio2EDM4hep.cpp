@@ -73,7 +73,7 @@ bool Lcio2EDM4hepTool::collectionExist(const std::string& collection_name) {
     collections = m_podioDataSvc->getEventFrame().getAvailableCollections();
   } else {
     std::optional<std::map<uint32_t, std::string>> dummy = std::nullopt;
-    collections = getAvailableCollectionsFromStore(this, dummy, true);
+    collections                                          = getAvailableCollectionsFromStore(this, dummy, true);
   }
   if (std::find(collections.begin(), collections.end(), collection_name) != collections.end()) {
     debug() << "Collection named " << collection_name << " already registered, skipping conversion." << endmsg;
