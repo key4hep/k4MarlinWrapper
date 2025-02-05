@@ -23,24 +23,33 @@ from Gaudi.Configuration import INFO, DEBUG
 from Configurables import (
     PodioInput,
     k4DataSvc,
-    ApplicationMgr,
     PseudoRecoAlgorithm,
     TrivialMCRecoLinker,
     MarlinProcessorWrapper,
     EDM4hep2LcioTool,
+    EventDataSvc,
 )
+
+from k4FWCore import ApplicationMgr, IOSvc
 
 from k4FWCore.parseArgs import parser
 
 parser.add_argument("--inputfile", help="Input file")
-my_args = parser.parse_known_args()[0]
+parser.add_argument(
+    "--iosvc", action="store_true", default=False, help="Use IOSvc instead of PodioDataSvc"
+)
+args = parser.parse_known_args()[0]
 
-evtsvc = k4DataSvc("EventDataSvc")
-evtsvc.input = my_args.inputfile
-
-podioInput = PodioInput("InputReader")
-podioInput.collections = ["MCParticles"]
-podioInput.OutputLevel = INFO
+if args.iosvc:
+    evtsvc = EventDataSvc("EventDataSvc")
+    iosvc = IOSvc()
+    iosvc.Input = args.inputfile
+else:
+    evtsvc = k4DataSvc("EventDataSvc")
+    evtsvc.input = args.inputfile
+    podioInput = PodioInput("InputReader")
+    podioInput.collections = ["MCParticles"]
+    podioInput.OutputLevel = INFO
 
 
 PseudoRecoAlg = PseudoRecoAlgorithm(
@@ -74,9 +83,13 @@ mcLinkConverter.collNameMapping = {
 mcLinkConverter.OutputLevel = DEBUG
 MarlinMCLinkChecker.EDM4hep2LcioTool = mcLinkConverter
 
+algList = [PseudoRecoAlg, MCRecoLinker, MarlinMCLinkChecker]
+
+if not args.iosvc:
+    algList = [podioInput] + algList
 
 ApplicationMgr(
-    TopAlg=[podioInput, PseudoRecoAlg, MCRecoLinker, MarlinMCLinkChecker],
+    TopAlg=algList,
     ExtSvc=[evtsvc],
     EvtMax=-1,
     EvtSel="NONE",

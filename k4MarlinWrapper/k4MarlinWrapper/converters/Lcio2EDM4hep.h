@@ -22,6 +22,8 @@
 #include <Gaudi/Property.h>
 #include <GaudiKernel/AlgTool.h>
 
+#include "k4FWCore/IMetadataSvc.h"
+
 #include "k4MarlinWrapper/converters/IEDMConverter.h"
 
 #include <lcio.h>
@@ -58,7 +60,8 @@ private:
   Gaudi::Property<std::map<std::string, std::string>> m_collNames{this, "collNameMapping", {}};
   Gaudi::Property<bool>                               m_convertAll{this, "convertAll", true};
 
-  ServiceHandle<IDataProviderSvc> m_eds;
+  ServiceHandle<IDataProviderSvc> m_eventDataSvc;
+  SmartIF<IMetadataSvc>           m_metadataSvc;
   PodioDataSvc*                   m_podioDataSvc;
 
   // **********************************

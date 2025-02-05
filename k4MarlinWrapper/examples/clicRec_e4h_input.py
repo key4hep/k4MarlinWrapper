@@ -19,10 +19,16 @@
 
 import os
 
-from Gaudi.Configuration import *
+from Gaudi.Configuration import DEBUG, WARNING
 
-from Configurables import LcioEvent, MarlinProcessorWrapper
-from k4MarlinWrapper.parseConstants import *
+from Configurables import MarlinProcessorWrapper
+from k4MarlinWrapper.parseConstants import parseConstants
+
+from Configurables import Lcio2EDM4hepTool, EDM4hep2LcioTool
+from Configurables import k4DataSvc, PodioInput, PodioOutput, EventDataSvc
+
+from k4FWCore import ApplicationMgr, IOSvc
+from k4FWCore.parseArgs import parser
 
 algList = []
 
@@ -33,22 +39,40 @@ CONSTANTS = {
 
 parseConstants(CONSTANTS)
 
-
-# For converters
-from Configurables import ToolSvc, Lcio2EDM4hepTool, EDM4hep2LcioTool
-
-
-from Configurables import k4DataSvc, PodioInput
-
-evtsvc = k4DataSvc("EventDataSvc")
-evtsvc.input = os.path.join(
-    "$TEST_DIR/inputFiles/", os.environ.get("INPUTFILE", "ttbar_edm4hep_frame.root")
+parser.add_argument(
+    "--iosvc", action="store_true", default=False, help="Use IOSvc instead of PodioDataSvc"
+)
+parser.add_argument(
+    "--rec-output", default="Output_REC_e4h_input.slcio", help="Output file name for the REC file"
+)
+parser.add_argument(
+    "--dst-output", default="Output_DST_e4h_input.slcio", help="Output file name for the DST file"
+)
+parser.add_argument(
+    "--gaudi-output", default="my_output.root", help="Output file name for the Gaudi file"
 )
 
+args = parser.parse_known_args()[0]
 
-inp = PodioInput("InputReader")
-inp.OutputLevel = DEBUG
+if args.iosvc:
+    evtsvc = EventDataSvc("EventDataSvc")
+    iosvc = IOSvc()
+    iosvc.Input = os.path.join(
+        "$TEST_DIR/inputFiles/", os.environ.get("INPUTFILE", "ttbar_edm4hep_frame.root")
+    )
+    iosvc.Output = args.gaudi_output
+    iosvc.outputCommands = ["keep *", "drop RefinedVertexJets_PID_RefinedVertex"]
+else:
+    evtsvc = k4DataSvc("EventDataSvc")
+    evtsvc.input = os.path.join(
+        "$TEST_DIR/inputFiles/", os.environ.get("INPUTFILE", "ttbar_edm4hep_frame.root")
+    )
 
+    inp = PodioInput("InputReader")
+    inp.OutputLevel = DEBUG
+
+    out = PodioOutput("PodioOutput", filename=args.gaudi_output)
+    out.outputCommands = ["keep *", "drop RefinedVertexJets_PID_RefinedVertex"]
 
 MyAIDAProcessor = MarlinProcessorWrapper("MyAIDAProcessor")
 MyAIDAProcessor.OutputLevel = WARNING
@@ -1167,7 +1191,7 @@ Output_REC.Parameters = {
     "DropCollectionTypes": [],
     "FullSubsetCollections": ["EfficientMCParticles", "InefficientMCParticles"],
     "KeepCollectionNames": [],
-    "LCIOOutputFile": ["Output_REC_e4h_input.slcio"],
+    "LCIOOutputFile": [args.rec_output],
     "LCIOWriteMode": ["WRITE_NEW"],
 }
 
@@ -1233,7 +1257,7 @@ Output_DST.Parameters = {
         "RefinedVertices",
         "RefinedVertices_RP",
     ],
-    "LCIOOutputFile": ["Output_DST_e4h_input.slcio"],
+    "LCIOOutputFile": [args.dst_output],
     "LCIOWriteMode": ["WRITE_NEW"],
 }
 
@@ -2428,15 +2452,6 @@ VertexFinderUnconstrained.Parameters = {
     "UseMCP": ["0"],
 }
 
-
-# Write output to EDM4hep
-from Configurables import PodioOutput
-
-out = PodioOutput("PodioOutput", filename="my_output.root")
-out.outputCommands = ["keep *", "drop RefinedVertexJets_PID_RefinedVertex"]
-
-
-algList.append(inp)
 algList.append(MyAIDAProcessor)
 algList.append(EventNumber)
 algList.append(InitDD4hep)
@@ -2486,8 +2501,8 @@ algList.append(JetClusteringAndRefiner)
 # # algList.append(VertexFinderUnconstrained)  # Config.VertexUnconstrainedON
 algList.append(Output_REC)
 algList.append(Output_DST)
-algList.append(out)
 
-from Configurables import ApplicationMgr
+if not args.iosvc:
+    algList = [inp] + algList + [out]
 
 ApplicationMgr(TopAlg=algList, EvtSel="NONE", EvtMax=3, ExtSvc=[evtsvc], OutputLevel=WARNING)

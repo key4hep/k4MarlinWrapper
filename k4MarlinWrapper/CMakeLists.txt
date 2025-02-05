@@ -54,6 +54,13 @@ target_include_directories(MarlinWrapper PUBLIC
   ${LCIO_INCLUDE_DIRS}
 )
 
+# k4MarlinWrapperUtils
+gaudi_add_library(k4MarlinWrapperUtils SHARED
+  SOURCES
+    src/components/StoreUtils.cpp
+  LINK k4FWCore::k4FWCore
+)
+
 # EDM4hep2lcio
 gaudi_add_module(EDM4hep2Lcio
   SOURCES
@@ -64,6 +71,7 @@ gaudi_add_module(EDM4hep2Lcio
     ${LCIO_LIBRARIES}
     ${Marlin_LIBRARIES}
     EDM4HEP::edm4hep
+    k4MarlinWrapperUtils
 )
 
 target_include_directories(EDM4hep2Lcio PUBLIC
@@ -80,6 +88,7 @@ gaudi_add_module(Lcio2EDM4hep
     EDM4HEP::edm4hep
     k4FWCore::k4FWCore
     k4EDM4hep2LcioConv::k4EDM4hep2LcioConv
+    k4MarlinWrapperUtils
 )
 
 target_include_directories(Lcio2EDM4hep PUBLIC
