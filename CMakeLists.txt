@@ -37,7 +37,7 @@ find_package(LCIO REQUIRED)
 find_package(Marlin REQUIRED)
 find_package(EDM4HEP 0.99 REQUIRED)
 find_package(k4FWCore 1.2.0 REQUIRED)
-find_package(k4EDM4hep2LcioConv 0.10 REQUIRED)
+find_package(k4EDM4hep2LcioConv 0.11 REQUIRED)
 
 include(CTest)
 
