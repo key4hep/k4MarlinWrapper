@@ -1,3 +1,46 @@
+# v00-11
+
+* 2025-02-06 Thomas Madlener ([PR#217](https://github.com/key4hep/k4MarlinWrapper/pull/217))
+  - Require the minimal version of k4EDM4hep2LcioConv to be 0.11 as that is a working tag
+
+* 2025-02-05 jmcarcell ([PR#216](https://github.com/key4hep/k4MarlinWrapper/pull/216))
+  - Add support for running the wrapper with `IOSvc` with a few tests:
+    - Run the CLIC reconstruction with `IOSvc` (proves processors run under IOSvc, producing the same output).
+    - Run `global_converter_maps` with `IOSvc`, where a functional algorithm produces output that is used by a Marlin processor and the output of the two is used either by a `Gaudi::Algorithm` or a functional algorithm (proves processors can take input from functional algorithms and functional algorithms can take input from processors).
+    - Run `test_link_conversion_edm4hep` with `IOSvc`, where links produced by functional algorithms are checked by Marlin processors.
+
+* 2024-12-16 Thomas Madlener ([PR#210](https://github.com/key4hep/k4MarlinWrapper/pull/210))
+  - Stop the reading of the LCIO events early enough, such that no empty event is processed after the last event (which breaks "regular" Algorithms in the same chain)
+  - Make it a hard error (exception) when reading an event fails
+  - Add documentation about the small conceptual differences that might lead to unexpected results
+
+* 2024-12-15 Mateusz Jakub Fila ([PR#213](https://github.com/key4hep/k4MarlinWrapper/pull/213))
+  - Fixed implicit conversions int to bool, creating temporary to be emplaced in collection
+
+* 2024-12-13 Thomas Madlener ([PR#211](https://github.com/key4hep/k4MarlinWrapper/pull/211))
+  - Make sure to not fail the example in case of some spuriously missing ParticleID object that is not consistently created by LCFIPlus
+
+* 2024-12-12 Mateusz Jakub Fila ([PR#212](https://github.com/key4hep/k4MarlinWrapper/pull/212))
+  - Updated link to TBB in documentation and fixed typos
+
+* 2024-12-10 jmcarcell ([PR#209](https://github.com/key4hep/k4MarlinWrapper/pull/209))
+  - Remove the check for TrackerHit3D from edm4hep
+
+* 2024-12-10 jmcarcell ([PR#207](https://github.com/key4hep/k4MarlinWrapper/pull/207))
+  - Don't use the deprecated service retrieval
+  - Add `final` when possible and use the default destructors instead of implementing them
+  - Use `!` instead of `not` in `if(...)`
+  - Use `!` instead of comparing to `nullptr`
+  - Simplify setting the environment for tests, avoiding having to duplicate the names
+  - Clean up some includes in header and source files
+
+* 2024-12-10 Thomas Madlener ([PR#206](https://github.com/key4hep/k4MarlinWrapper/pull/206))
+  - Add `ruff` configuration and add it to `pre-commit`
+  - Format all python source files to make them conformant
+
+* 2024-12-09 Thomas Madlener ([PR#205](https://github.com/key4hep/k4MarlinWrapper/pull/205))
+  - Only set the `OutputLevel` for converted MarlinProcessors if `Verbosity` was set in the original XML steering file
+
 # v00-10
 
 * 2024-10-28 jmcarcell ([PR#204](https://github.com/key4hep/k4MarlinWrapper/pull/204))
