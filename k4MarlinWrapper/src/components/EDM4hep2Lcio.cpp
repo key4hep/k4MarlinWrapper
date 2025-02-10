@@ -72,10 +72,12 @@ StatusCode EDM4hep2LcioTool::initialize() {
 
   m_podioDataSvc = dynamic_cast<PodioDataSvc*>(m_eventDataSvc.get());
 
-  m_metadataSvc = service("MetadataSvc", false);
-  if (!m_podioDataSvc && !m_metadataSvc) {
-    error() << "Could not retrieve MetadataSvc" << endmsg;
-    return StatusCode::FAILURE;
+  if (!m_podioDataSvc) {
+    m_metadataSvc = service("MetadataSvc", false);
+    if (!m_metadataSvc) {
+      error() << "Could not retrieve MetadataSvc" << endmsg;
+      return StatusCode::FAILURE;
+    }
   }
 
   return AlgTool::initialize();
