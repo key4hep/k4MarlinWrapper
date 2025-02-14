@@ -45,6 +45,8 @@ StatusCode LcioEvent::initialize() {
   m_reader->open(m_fileNames);
   m_numberOfEvents = m_reader->getNumberOfEvents();
   m_reader->skipNEvents(m_skipNEvents.value());
+  // Make sure that we still stop at the right time even if we skip events
+  m_currentEvent = m_skipNEvents;
   info() << "Initialized the LcioEvent Algo. Reading from " << m_fileNames.size() << " with " << m_numberOfEvents
          << " events in total. Skipping the first " << m_skipNEvents << " events." << endmsg;
   return StatusCode::SUCCESS;
