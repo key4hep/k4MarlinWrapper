@@ -21,6 +21,11 @@ import os
 from Gaudi.Configuration import *
 
 from Configurables import LcioEvent, EventDataSvc, MarlinProcessorWrapper
+from k4FWCore.parseArgs import parser
+
+parser.add_argument("--outputFile", help="The name of the output file", default="Output_DST.slcio")
+
+my_args = parser.parse_known_args()[0]
 
 algList = []
 evtsvc = EventDataSvc()
@@ -92,7 +97,7 @@ Output_DST.Parameters = {
         "RefinedVertices",
         "RefinedVertices_RP",
     ],
-    "LCIOOutputFile": ["Output_DST.slcio"],
+    "LCIOOutputFile": [my_args.outputFile],
     "LCIOWriteMode": ["WRITE_NEW"],
 }
 

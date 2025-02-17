@@ -77,6 +77,11 @@ set_tests_properties ( same_num_io
   PROPERTIES
     PASS_REGULAR_EXPRESSION "Input and output have same number of events")
 
+add_test( skip_events bash -c ${CMAKE_CURRENT_SOURCE_DIR}/scripts/skip_events.sh )
+set_tests_properties( skip_events
+  PROPERTIES
+    PASS_REGULAR_EXPRESSION "Output has expected number of events")
+
 # Test clicReconstruction with EDM4hep input and output
 ExternalData_Add_Test( marlinwrapper_tests NAME clicRec_edm4hep_input COMMAND bash -c "${CMAKE_CURRENT_SOURCE_DIR}/scripts/clicRec_e4h_input.sh DATA{${PROJECT_SOURCE_DIR}/test/input_files/ttbar_20240223_edm4hep.root} --no-iosvc")
 ExternalData_Add_Test( marlinwrapper_tests NAME clicRec_edm4hep_input_iosvc COMMAND bash -c "${CMAKE_CURRENT_SOURCE_DIR}/scripts/clicRec_e4h_input.sh DATA{${PROJECT_SOURCE_DIR}/test/input_files/ttbar_20240223_edm4hep.root} --iosvc")
