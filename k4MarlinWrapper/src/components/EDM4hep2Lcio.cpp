@@ -486,12 +486,16 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
   auto  globalObjMapWrapper = static_cast<AnyDataWrapper<GlobalConvertedObjectsMap>*>(obj);
   auto& globalObjMap        = globalObjMapWrapper->getData();
 
+  debug() << "Updating global object map" << endmsg;
   globalObjMap.update(collection_pairs);
 
+  debug() << "Resolving relations between objects" << endmsg;
   EDM4hep2LCIOConv::resolveRelations(collection_pairs, globalObjMap);
 
   // Now we can convert the links and add them to the event
+  debug() << "Converting " << linkCollections.size() << " link collections to LCRelation collections" << endmsg;
   for (auto& [name, coll] : EDM4hep2LCIOConv::createLCRelationCollections(linkCollections, globalObjMap)) {
+    debug() << "Adding LCRelation collection " << name << " of type " << coll->getTypeName() << endmsg;
     lcio_event->addCollection(coll.release(), name);
   }
 
