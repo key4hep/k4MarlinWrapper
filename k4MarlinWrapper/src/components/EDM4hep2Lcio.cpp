@@ -45,7 +45,7 @@ using namespace k4MarlinWrapper;
 struct CollectionPairMappings {
   TrackMap           tracks{};
   TrackerHitMap      trackerHits{};
-  TrackerHitPlaneMap trackerHitsPlane{};
+  TrackerHitPlaneMap trackerHitPlanes{};
   SimTrackerHitMap   simTrackerHits{};
   CaloHitMap         caloHits{};
   RawCaloHitMap      rawCaloHits{};
@@ -335,7 +335,7 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
   } else if (fulltype == "edm4hep::TrackerHit" || fulltype == "edm4hep::TrackerHit3D") {
     convertTrackerHits(collection_pairs.trackerHits, e4h_coll_name, lcio_coll_name, lcio_event);
   } else if (fulltype == "edm4hep::TrackerHitPlane") {
-    convertTrackerHitPlanes(collection_pairs.trackerHitsPlane, e4h_coll_name, lcio_coll_name, lcio_event);
+    convertTrackerHitPlanes(collection_pairs.trackerHitPlanes, e4h_coll_name, lcio_coll_name, lcio_event);
   } else if (fulltype == "edm4hep::SimTrackerHit") {
     convertSimTrackerHits(collection_pairs.simTrackerHits, e4h_coll_name, lcio_coll_name, lcio_event);
   } else if (fulltype == "edm4hep::CalorimeterHit") {
