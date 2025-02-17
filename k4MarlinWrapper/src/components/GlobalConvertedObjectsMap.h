@@ -64,12 +64,6 @@ namespace k4MarlinWrapper {
     }
   }
 
-  namespace detail {
-    /// Detectors for checking whether T has a trackerHitPlanes and a particleIDs map
-    template <typename T> using has_trkhit_plane = decltype(std::declval<T>().trackerHitPlanes);
-    template <typename T> using has_particle_id  = decltype(std::declval<T>().particleIDs);
-  }  // namespace detail
-
   /**
    * The LCIO <-> EDM4hep object mapping that holds the relations between all
    * converted objects from all converters that are running.
@@ -108,13 +102,8 @@ namespace k4MarlinWrapper {
       updateMap(vertices, localMap.vertices);
       updateMap(recoParticles, localMap.recoParticles);
       updateMap(mcParticles, localMap.mcParticles);
-
-      if constexpr (det::is_detected_v<detail::has_trkhit_plane, ObjectMap>) {
-        updateMap(trackerHitPlanes, localMap.trackerHitPlanes);
-      }
-      if constexpr (det::is_detected_v<detail::has_particle_id, ObjectMap>) {
-        updateMap(particleIDs, localMap.particleIDs);
-      }
+      updateMap(trackerHitPlanes, localMap.trackerHitPlanes);
+      updateMap(particleIDs, localMap.particleIDs);
     }
   };
 }  // namespace k4MarlinWrapper

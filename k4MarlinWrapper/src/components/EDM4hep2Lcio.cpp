@@ -45,7 +45,7 @@ using namespace k4MarlinWrapper;
 struct CollectionPairMappings {
   TrackMap           tracks{};
   TrackerHitMap      trackerHits{};
-  TrackerHitPlaneMap trackerHitsPlane{};
+  TrackerHitPlaneMap trackerHitPlanes{};
   SimTrackerHitMap   simTrackerHits{};
   CaloHitMap         caloHits{};
   RawCaloHitMap      rawCaloHits{};
@@ -335,7 +335,7 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
   } else if (fulltype == "edm4hep::TrackerHit" || fulltype == "edm4hep::TrackerHit3D") {
     convertTrackerHits(collection_pairs.trackerHits, e4h_coll_name, lcio_coll_name, lcio_event);
   } else if (fulltype == "edm4hep::TrackerHitPlane") {
-    convertTrackerHitPlanes(collection_pairs.trackerHitsPlane, e4h_coll_name, lcio_coll_name, lcio_event);
+    convertTrackerHitPlanes(collection_pairs.trackerHitPlanes, e4h_coll_name, lcio_coll_name, lcio_event);
   } else if (fulltype == "edm4hep::SimTrackerHit") {
     convertSimTrackerHits(collection_pairs.simTrackerHits, e4h_coll_name, lcio_coll_name, lcio_event);
   } else if (fulltype == "edm4hep::CalorimeterHit") {
@@ -486,12 +486,16 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
   auto  globalObjMapWrapper = static_cast<AnyDataWrapper<GlobalConvertedObjectsMap>*>(obj);
   auto& globalObjMap        = globalObjMapWrapper->getData();
 
+  debug() << "Updating global object map" << endmsg;
   globalObjMap.update(collection_pairs);
 
+  debug() << "Resolving relations between objects" << endmsg;
   EDM4hep2LCIOConv::resolveRelations(collection_pairs, globalObjMap);
 
   // Now we can convert the links and add them to the event
+  debug() << "Converting " << linkCollections.size() << " link collections to LCRelation collections" << endmsg;
   for (auto& [name, coll] : EDM4hep2LCIOConv::createLCRelationCollections(linkCollections, globalObjMap)) {
+    debug() << "Adding LCRelation collection " << name << " of type " << coll->getTypeName() << endmsg;
     lcio_event->addCollection(coll.release(), name);
   }
 
