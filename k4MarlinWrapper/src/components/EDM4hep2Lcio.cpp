@@ -296,7 +296,7 @@ podio::CollectionBase* EDM4hep2LcioTool::getEDM4hepCollection(const std::string&
   DataObject* p;
   auto        sc = m_eventDataSvc->retrieveObject(collName, p);
   if (sc.isFailure()) {
-    throw GaudiException("Collection not found", name(), StatusCode::FAILURE);
+    throw GaudiException("Collection not found: " + collName, name(), StatusCode::FAILURE);
   }
   auto ptr = dynamic_cast<DataWrapperBase*>(p);
   if (ptr) {
