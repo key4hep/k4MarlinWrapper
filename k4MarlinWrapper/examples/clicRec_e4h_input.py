@@ -40,7 +40,10 @@ CONSTANTS = {
 parseConstants(CONSTANTS)
 
 parser.add_argument(
-    "--iosvc", action="store_true", default=False, help="Use IOSvc instead of PodioDataSvc"
+    "--no-iosvc",
+    action="store_true",
+    default=False,
+    help="Use PodioDataSvc instead of IOSvc",
 )
 parser.add_argument(
     "--rec-output", default="Output_REC_e4h_input.slcio", help="Output file name for the REC file"
@@ -53,8 +56,7 @@ parser.add_argument(
 )
 
 args = parser.parse_known_args()[0]
-
-if args.iosvc:
+if not args.no_iosvc:
     evtsvc = EventDataSvc("EventDataSvc")
     iosvc = IOSvc()
     iosvc.Input = os.path.join(
@@ -2502,7 +2504,7 @@ algList.append(JetClusteringAndRefiner)
 algList.append(Output_REC)
 algList.append(Output_DST)
 
-if not args.iosvc:
+if args.no_iosvc:
     algList = [inp] + algList + [out]
 
 ApplicationMgr(TopAlg=algList, EvtSel="NONE", EvtMax=3, ExtSvc=[evtsvc], OutputLevel=WARNING)
