@@ -42,8 +42,10 @@ wrapped MarlinProcessor, one GaudiAlgorithm and one Gaudi Functional algorithm
 plus some converters in-between them:
 - `PodioInput` to read the *MCParticles* collection from the input file (in
   EDM4hep format)
-- [`PseudoRecoAlgorithm`](./src/PseudoRecoAlgorithm.cc) creates a reco particle
-  for every MC particle in the input collection
+- [`PseudoRecoFunctional`](./src/PseudoRecoFunctional.cc) creates a reco
+  particle for every MC particle in the input collection (`PseudoRecoAlgorithm`
+  does the same but implementing a `Gaudi::Algorithm` instead of a functional
+  algorithm
   - An EDM4hep to LCIO converter converts the input MC particles and the
     reconstructed particles that are created by the algorithm
 - [`TrivalMCTruthLinkerProcessor`](./src/TrivialMCTruthLinkerProcessor.cc)

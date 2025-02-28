@@ -29,7 +29,7 @@ from Configurables import (
     Lcio2EDM4hepTool,
     EDM4hep2LcioTool,
     MCRecoLinkChecker,
-    PseudoRecoAlgorithm,
+    PseudoRecoFunctional,
     EventDataSvc,
 )
 
@@ -68,8 +68,8 @@ else:
     podioOutput = PodioOutput("OutputWriter")
     podioOutput.filename = "global_converter_maps.root"
 
-PseudoRecoAlg = PseudoRecoAlgorithm(
-    "PseudoRecoAlgorithm", InputMCs=["MCParticles"], OutputRecos=["PseudoRecoParticles"]
+PseudoRecoAlg = PseudoRecoFunctional(
+    "PseudoRecoFunctional", InputMCs=["MCParticles"], OutputRecos=["PseudoRecoParticles"]
 )
 
 inputConverter = EDM4hep2LcioTool("InputConverter")

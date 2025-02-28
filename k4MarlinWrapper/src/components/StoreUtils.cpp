@@ -75,14 +75,26 @@ std::vector<std::string> getAvailableCollectionsFromStore(const AlgTool*        
     if (sc.isFailure()) {
       thisClass->error() << "Could not retrieve object " << pReg->name() << " from the EventStore" << endmsg;
     }
-    auto wrapper = dynamic_cast<AnyDataWrapper<std::unique_ptr<podio::CollectionBase>>*>(p);
-    if (!wrapper) {
-      continue;
+    auto*            functionalWrapper = dynamic_cast<AnyDataWrapper<std::unique_ptr<podio::CollectionBase>>*>(p);
+    DataWrapperBase* algorithmWrapper  = nullptr;
+    if (!functionalWrapper) {
+      // This may be a collection created by a Gaudi::Algorithm
+      algorithmWrapper = dynamic_cast<DataWrapperBase*>(p);
+      if (!algorithmWrapper) {
+        // This can happen for objects that are not collections like in the
+        // MarlinWrapper for converter maps or a LCEvent, or, in general,
+        // anything else
+        continue;
+      }
     }
     // Remove the leading /
     collectionNames.push_back(pReg->name().substr(1, pReg->name().size() - 1));
     if (idToName) {
-      idToName->emplace(wrapper->getData()->getID(), pReg->name());
+      if (functionalWrapper) {
+        idToName->emplace(functionalWrapper->getData()->getID(), pReg->name());
+      } else {
+        idToName->emplace(algorithmWrapper->collectionBase()->getID(), pReg->name());
+      }
     }
   }
   return collectionNames;

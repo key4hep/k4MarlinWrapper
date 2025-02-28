@@ -17,31 +17,32 @@
  * limitations under the License.
  */
 
+#include "PseudoRecoAlgorithm.h"
+
 #include "edm4hep/MCParticleCollection.h"
 #include "edm4hep/ReconstructedParticleCollection.h"
 
-#include "k4FWCore/Transformer.h"
+#include "Gaudi/Algorithm.h"
 
 #include <string>
 
-struct PseudoRecoAlgorithm final
-    : k4FWCore::Transformer<edm4hep::ReconstructedParticleCollection(const edm4hep::MCParticleCollection&)> {
-  PseudoRecoAlgorithm(const std::string& name, ISvcLocator* svcLoc)
-      : Transformer(name, svcLoc, {KeyValues("InputMCs", {"MCParticles"})},
-                    {KeyValues("OutputRecos", {"PseudoRecoParticles"})}) {}
+PseudoRecoAlgorithm::PseudoRecoAlgorithm(const std::string& name, ISvcLocator* pSL) : Gaudi::Algorithm(name, pSL) {
+  declareProperty("InputMCs", m_mcCollHandle, "Name of the input MC collection");
+  declareProperty("OutputRecos", m_recoCollHandle, "Name of the input Reco collection");
+}
 
-  edm4hep::ReconstructedParticleCollection operator()(const edm4hep::MCParticleCollection& input) const final {
-    auto coll_out = edm4hep::ReconstructedParticleCollection();
-    for (const auto& particle : input) {
-      auto new_particle = coll_out.create();
-      new_particle.setCharge(particle.getCharge());
-      new_particle.setMomentum({static_cast<float>(particle.getMomentum()[0]),
-                                static_cast<float>(particle.getMomentum()[1]),
-                                static_cast<float>(particle.getMomentum()[2])});
-      new_particle.setEnergy(particle.getEnergy());
-    }
-    return coll_out;
+StatusCode PseudoRecoAlgorithm::execute(const EventContext&) const {
+  auto* coll_out = m_recoCollHandle.createAndPut();
+  auto* coll_in  = m_mcCollHandle.get();
+  for (const auto& particle : *coll_in) {
+    auto new_particle = coll_out->create();
+    new_particle.setCharge(particle.getCharge());
+    new_particle.setMomentum({static_cast<float>(particle.getMomentum()[0]),
+                              static_cast<float>(particle.getMomentum()[1]),
+                              static_cast<float>(particle.getMomentum()[2])});
+    new_particle.setEnergy(particle.getEnergy());
   }
-};
+  return StatusCode::SUCCESS;
+}
 
 DECLARE_COMPONENT(PseudoRecoAlgorithm)
