@@ -43,7 +43,7 @@ parser.add_argument(
     "--use-gaudi-algorithm",
     action="store_true",
     default=False,
-    help="Use IOSvc instead of PodioDataSvc",
+    help="Use an algorithm based on Gaudi::Algorithm instead of a functional algorithm",
 )
 args = parser.parse_known_args()[0]
 
