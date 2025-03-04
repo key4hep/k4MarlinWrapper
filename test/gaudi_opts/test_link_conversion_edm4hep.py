@@ -87,15 +87,7 @@ MarlinMCLinkChecker = MarlinProcessorWrapper(
 )
 
 mcLinkConverter = EDM4hep2LcioTool("MCLinkConverterToEDM4hep")
-if args.use_gaudi_algorithm:
-    mcLinkConverter.convertAll = True
-else:
-    mcLinkConverter.convertAll = False
-    mcLinkConverter.collNameMapping = {
-        "TrivialMCRecoLinks": "TrivialMCRecoLinks",
-        "MCParticles": "MCParticles",
-        "PseudoRecoParticles": "PseudoRecoParticles",
-    }
+mcLinkConverter.convertAll = True
 mcLinkConverter.OutputLevel = DEBUG
 MarlinMCLinkChecker.EDM4hep2LcioTool = mcLinkConverter
 
