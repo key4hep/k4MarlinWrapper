@@ -81,9 +81,10 @@ def replaceConstants(value, constants):
     return ", ".join(formatted_array)
 
 
-def convertConstants(lines, tree):
+def convertConstants(tree):
     """Find constant tags, write them to python and replace constants within themselves"""
     constants = dict()
+    lines = []
 
     constElements = tree.findall("constants/constant")
     for const in constElements:
@@ -121,7 +122,7 @@ def convertConstants(lines, tree):
 
     lines.append("parseConstants(CONSTANTS)\n")
 
-    return constants
+    return constants, lines
 
 
 def getValue(element, default=None):
@@ -148,32 +149,45 @@ def getGlobalParameters(tree):
     return getGlobalDict(tree.findall("global/parameter"))
 
 
-def resolveGroup(lines, proc, execGroup):
+def resolveGroup(proc, execGroup):
+    procNames = []
     for member in execGroup:
         if member.get("name") == proc:
             for child in member:
                 if child.tag == "processor":
-                    lines.append(f"algList.append({child.get('name').replace('.', '_')})")
+                    procNames.append(child.get("name").replace(".", "_"))
+    return procNames
 
 
-def getExecutingProcessors(lines, tree):
+def getExecutingProcessors(tree):
     """compare the list of processors to execute, order matters"""
     execProc = tree.findall("execute/*")
     execGroup = tree.findall("group")
-    optProcessors = False
+    procs = []
 
     for proc in execProc:
         if proc.tag == "if":
             for child in proc:
                 if child.tag == "processor":
-                    optProcessors = True
-                    lines.append(
-                        f"# algList.append({child.get('name').replace('.', '_')})  # {proc.get('condition')}"
-                    )
+                    procs.append((child.get("name").replace(".", "_"), proc.get("condition")))
         if proc.tag == "processor":
-            lines.append(f"algList.append({proc.get('name')})")
+            procs.append((proc.get("name").replace(".", "_"), ""))
         if proc.tag == "group":
-            resolveGroup(lines, proc.get("name"), execGroup)
+            for p in resolveGroup(proc.get("name"), execGroup):
+                procs.append((p, ""))
+
+    return procs
+
+
+def dumpAlgList(execProcs, lines):
+    """Dump the algorithms into the algList"""
+    optProcessors = False
+    for name, condition in execProcs:
+        if condition:
+            optProcessors = True
+            lines.append(f"# algList.append({name})  # {condition}")
+        else:
+            lines.append(f"algList.append({name})")
     return optProcessors
 
 
@@ -241,9 +255,8 @@ def convertParameters(params, proc, globParams, constants):
     return lines
 
 
-def convertProcessors(lines, tree, globParams, constants):
+def convertProcessors(lines, processors, globParams, constants):
     """convert XML tree to list of strings"""
-    processors = getProcessors(tree)
     for proc in processors:
         proc_name = proc.replace(".", "_")
         lines.append(f'{proc_name} = MarlinProcessorWrapper("{proc}")')
@@ -268,12 +281,15 @@ def findWarnIncludes(tree):
 def generateGaudiSteering(tree):
     findWarnIncludes(tree)
     globParams = getGlobalParameters(tree)
+    processors = getProcessors(tree)
+    constants, constLines = convertConstants(tree)
+    procExecList = getExecutingProcessors(tree)
     lines = []
     createHeader(lines)
-    constants = convertConstants(lines, tree)
+    lines.extend(constLines)
     createLcioReader(lines, globParams)
-    convertProcessors(lines, tree, globParams, constants)
-    optProcessors = getExecutingProcessors(lines, tree)
+    convertProcessors(lines, processors, globParams, constants)
+    optProcessors = dumpAlgList(procExecList, lines)
     if optProcessors:
         print("Optional Processors were found!")
         print("Please uncomment the desired ones at the bottom of the resulting file\n")
