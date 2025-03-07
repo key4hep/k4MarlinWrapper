@@ -76,7 +76,7 @@ def replaceConstants(value, constants):
             formatted_array.append('"{}"'.format(val))
         elif captured_patterns:
             val_format = re.sub(r"\$\{(\w*)\}", r"%(\1)s", val)
-            val_format = '"{}" % CONSTANTS'.format(val_format)
+            val_format = f'"{val_format}" % CONSTANTS'
             formatted_array.append(val_format)
 
     return ", ".join(formatted_array)
@@ -117,7 +117,9 @@ def convertConstants(lines, tree):
 
     lines.append("\nCONSTANTS = {")
     for key in constants:
-        lines.append(" " * len("CONSTANTS = {") + "'{}': {},".format(key, constants[key]))
+        lines.append(
+            " " * len("CONSTANTS = {") + "'{}': {},".format(key, constants[key])
+        )
     lines.append("}\n")
 
     lines.append("parseConstants(CONSTANTS)\n")
@@ -154,7 +156,7 @@ def resolveGroup(lines, proc, execGroup):
         if member.get("name") == proc:
             for child in member:
                 if child.tag == "processor":
-                    lines.append("algList.append(%s)" % child.get("name").replace(".", "_"))
+                    lines.append(f"algList.append({child.get('name').replace('.', '_')})")
 
 
 def getExecutingProcessors(lines, tree):
@@ -169,11 +171,10 @@ def getExecutingProcessors(lines, tree):
                 if child.tag == "processor":
                     optProcessors = True
                     lines.append(
-                        "# algList.append(%s)  # %s"
-                        % (child.get("name").replace(".", "_"), proc.get("condition"))
+                        f"# algList.append({child.get('name').replace('.', '_')})  # {proc.get('condition')}"
                     )
         if proc.tag == "processor":
-            lines.append("algList.append(%s)" % proc.get("name"))
+            lines.append(f"algList.append({proc.get('name')})")
         if proc.tag == "group":
             resolveGroup(lines, proc.get("name"), execGroup)
     return optProcessors
@@ -190,8 +191,8 @@ def createHeader(lines):
 
 def createLcioReader(lines, glob):
     lines.append("read = LcioEvent()")
-    lines.append("read.OutputLevel = %s" % verbosityTranslator(glob.get("Verbosity", "DEBUG")))
-    lines.append('read.Files = ["%s"]' % glob.get("LCIOInputFiles"))
+    lines.append(f"read.OutputLevel = {verbosityTranslator(glob.get('Verbosity', 'DEBUG'))}")
+    lines.append(f"read.Files = [\"{glob.get('LCIOInputFiles')}\"]")
     lines.append("algList.append(read)\n")
 
 
@@ -202,7 +203,7 @@ def createFooter(lines, glob):
     lines.append("                EvtMax   = 10,")
     lines.append("                ExtSvc = [evtsvc],")
     lines.append(
-        "                OutputLevel=%s" % verbosityTranslator(glob.get("Verbosity", "DEBUG"))
+        f"                OutputLevel={verbosityTranslator(glob.get('Verbosity', 'DEBUG'))}"
     )
     lines.append("              )\n")
 
@@ -227,25 +228,20 @@ def verbosityTranslator(marlinLogLevel):
 def convertParameters(params, proc, globParams, constants):
     """convert json of parameters to Gaudi"""
     lines = []
+    proc = proc.replace(".", "_")
     if "Verbosity" in params:
-        lines.append(
-            "%s.OutputLevel = %s"
-            % (proc.replace(".", "_"), verbosityTranslator(params["Verbosity"]))
-        )
+        lines.append(f"{proc}.OutputLevel = {verbosityTranslator(params['Verbosity'])}")
 
-    lines.append('%s.ProcessorType = "%s"' % (proc.replace(".", "_"), params.get("type")))
-    lines.append("%s.Parameters = {" % proc.replace(".", "_"))
+    lines.append(f"{proc}.ProcessorType = \"{params.get('type')}\"")
+    lines.append(f"{proc}.Parameters = {{")
     for para in sorted(params):
         if para not in ["type", "Verbosity"]:
             value = params[para].replace("\n", " ")
             value = " ".join(value.split())
-            lines.append(
-                '%s"%s": [%s],'
-                % (" " * (len(proc) + 15), para, replaceConstants(value, constants))
-            )
+            lines.append(f'    "{para}": [{replaceConstants(value, constants)}],')
 
     lines[-1] = lines[-1][:-1]
-    lines.append("%s}\n" % (" " * (len(proc) + 15)))
+    lines.append("    }\n")
     return lines
 
 
@@ -253,7 +249,8 @@ def convertProcessors(lines, tree, globParams, constants):
     """convert XML tree to list of strings"""
     processors = getProcessors(tree)
     for proc in processors:
-        lines.append('%s = MarlinProcessorWrapper("%s")' % (proc.replace(".", "_"), proc))
+        proc_name = proc.replace(".", "_")
+        lines.append(f'{proc_name} = MarlinProcessorWrapper("{proc}")')
         lines += convertParameters(processors[proc], proc, globParams, constants)
     return lines
 
@@ -299,7 +296,7 @@ def run(inputfile, outputfile):
     try:
         tree = ElementTree(fromstring(escaped_str))
     except Exception as ex:
-        print("Exception when getting trees: %r " % ex)
+        print(f"Exception when getting trees: {ex}")
         sys.exit(1)
 
     with open(outputfile, "w") as wf_file:
