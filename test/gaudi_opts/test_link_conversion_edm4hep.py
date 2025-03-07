@@ -40,7 +40,7 @@ parser.add_argument(
     "--no-iosvc",
     action="store_true",
     default=False,
-    help="Use PodioDataSvc instead of IOSvc",
+    help="Use k4DataSvc instead of IOSvc",
 )
 parser.add_argument(
     "--use-gaudi-algorithm",

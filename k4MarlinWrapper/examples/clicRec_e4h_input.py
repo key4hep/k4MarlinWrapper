@@ -43,7 +43,7 @@ parser.add_argument(
     "--no-iosvc",
     action="store_true",
     default=False,
-    help="Use PodioDataSvc instead of IOSvc",
+    help="Use k4DataSvc instead of IOSvc",
 )
 parser.add_argument(
     "--rec-output", default="Output_REC_e4h_input.slcio", help="Output file name for the REC file"
