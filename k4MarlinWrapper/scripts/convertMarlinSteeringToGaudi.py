@@ -239,7 +239,7 @@ def convertParameters(params, proc, globParams, constants):
             lines.append(f'    "{para}": [{replaceConstants(value, constants)}],')
 
     lines[-1] = lines[-1][:-1]
-    lines.append("    }\n")
+    lines.append("}\n")
     return lines
 
 
