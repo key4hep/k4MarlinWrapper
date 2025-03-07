@@ -112,7 +112,7 @@ def convertConstants(lines, tree):
                     val_format = re.sub(r"\$\{(\w*)\}", r"%(\1)s", val)
                     val_format = '"{val_format}"'
                     formatted_array.append(val_format)
-            constants[key] = f'[{", ".join(formatted_array)}]'
+            constants[key] = f"[{', '.join(formatted_array)}]"
 
     lines.append("\nCONSTANTS = {")
     for key in constants:
@@ -182,14 +182,15 @@ def createHeader(lines):
     lines.append("from Configurables import LcioEvent, EventDataSvc, MarlinProcessorWrapper")
     lines.append("from k4MarlinWrapper.parseConstants import *")
     lines.append("algList = []")
+    lines.append("svcList = []")
     lines.append("evtsvc = EventDataSvc()\n")
-    # lines.append("END_TAG = \"END_TAG\"\n")
+    lines.append("svcList.append(evtsvc)")
 
 
 def createLcioReader(lines, glob):
     lines.append("read = LcioEvent()")
     lines.append(f"read.OutputLevel = {verbosityTranslator(glob.get('Verbosity', 'DEBUG'))}")
-    lines.append(f"read.Files = [\"{glob.get('LCIOInputFiles')}\"]")
+    lines.append(f'read.Files = ["{glob.get("LCIOInputFiles")}"]')
     lines.append("algList.append(read)\n")
 
 
@@ -198,7 +199,7 @@ def createFooter(lines, glob):
     lines.append("ApplicationMgr( TopAlg = algList,")
     lines.append("                EvtSel = 'NONE',")
     lines.append("                EvtMax   = 10,")
-    lines.append("                ExtSvc = [evtsvc],")
+    lines.append("                ExtSvc = svcList,")
     lines.append(
         f"                OutputLevel={verbosityTranslator(glob.get('Verbosity', 'DEBUG'))}"
     )
@@ -228,7 +229,7 @@ def convertParameters(params, proc, globParams, constants):
     if "Verbosity" in params:
         lines.append(f"{proc}.OutputLevel = {verbosityTranslator(params['Verbosity'])}")
 
-    lines.append(f"{proc}.ProcessorType = \"{params.get('type')}\"")
+    lines.append(f'{proc}.ProcessorType = "{params.get("type")}"')
     lines.append(f"{proc}.Parameters = {{")
     for para in sorted(params):
         if para not in ["type", "Verbosity"]:
