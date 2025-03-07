@@ -72,7 +72,7 @@ def replaceConstants(value, constants):
     for val in split_values:
         captured_patterns = re.findall("\$\{\w*\}", val)
         if not captured_patterns:
-            formatted_array.append('"{}"'.format(val))
+            formatted_array.append(f'"{val}"')
         elif captured_patterns:
             val_format = re.sub(r"\$\{(\w*)\}", r"%(\1)s", val)
             val_format = f'"{val_format}" % CONSTANTS'
@@ -100,25 +100,23 @@ def convertConstants(lines, tree):
             for pattern in captured_patterns:
                 # replace every ${constant} for %(constant)s
                 constants[key] = re.sub(r"\$\{(\w*)\}", r"%(\1)s", constants[key])
-            constants[key] = '"{}"'.format(constants[key])
+            constants[key] = f'"{constants[key]}"'
         elif len(split_values) > 1:
             for val in split_values:
                 # capture all ${constant}
                 captured_patterns = re.findall("\$\{\w*\}", val)
                 if len(captured_patterns) == 0:
-                    formatted_array.append('"{}"'.format(val))
+                    formatted_array.append('"{val}"')
                 elif len(captured_patterns) >= 1:
                     # replace every ${constant} for %(constant)s
                     val_format = re.sub(r"\$\{(\w*)\}", r"%(\1)s", val)
-                    val_format = '"{}"'.format(val_format)
+                    val_format = '"{val_format}"'
                     formatted_array.append(val_format)
-            constants[key] = "[{}]".format(", ".join(formatted_array))
+            constants[key] = f'[{", ".join(formatted_array)}]'
 
     lines.append("\nCONSTANTS = {")
     for key in constants:
-        lines.append(
-            " " * len("CONSTANTS = {") + "'{}': {},".format(key, constants[key])
-        )
+        lines.append(f'    "{key}": {constants[key]},')
     lines.append("}\n")
 
     lines.append("parseConstants(CONSTANTS)\n")
