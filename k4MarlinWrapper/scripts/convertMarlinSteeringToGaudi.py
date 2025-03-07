@@ -227,7 +227,6 @@ def verbosityTranslator(marlinLogLevel):
 def convertParameters(params, proc, globParams, constants):
     """convert json of parameters to Gaudi"""
     lines = []
-    proc = proc.replace(".", "_")
     if "Verbosity" in params:
         lines.append(f"{proc}.OutputLevel = {verbosityTranslator(params['Verbosity'])}")
 
@@ -250,7 +249,7 @@ def convertProcessors(lines, tree, globParams, constants):
     for proc in processors:
         proc_name = proc.replace(".", "_")
         lines.append(f'{proc_name} = MarlinProcessorWrapper("{proc}")')
-        lines += convertParameters(processors[proc], proc, globParams, constants)
+        lines += convertParameters(processors[proc], proc_name, globParams, constants)
     return lines
 
 
