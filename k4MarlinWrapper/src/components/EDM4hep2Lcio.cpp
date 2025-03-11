@@ -386,25 +386,32 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
 // Use the collection names in the parameters to read and write them
 StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
   std::optional<std::reference_wrapper<const podio::Frame>> edmEvent;
-  if (m_collectionNames.empty() && m_podioDataSvc) {
-    edmEvent = m_podioDataSvc->getEventFrame();
-    m_collectionNames = edmEvent.value().get().getAvailableCollections();
-  } else if (m_collectionNames.empty()) {
-    std::optional<std::map<uint32_t, std::string>> idToNameOpt(std::move(m_idToName));
-    auto collections = getAvailableCollectionsFromStore(this, idToNameOpt);
-    m_idToName = std::move(idToNameOpt.value());
-    m_collectionNames.insert(m_collectionNames.end(), collections.begin(), collections.end());
-  }
-  // Start off with the pre-defined collection name mappings
-  auto collsToConvert{m_collNames.value()};
-  // We *always* want to convert the EventHeader
-  collsToConvert.emplace(edm4hep::labels::EventHeader, "<directly into LCEvent>");
-  if (m_convertAll) {
-    info() << "Converting all collections from EDM4hep to LCIO" << endmsg;
-    // And simply add the rest, exploiting the fact that emplace will not
-    // replace existing entries with the same key
-    for (const auto& name : m_collectionNames) {
-      collsToConvert.emplace(name, name);
+  // use m_collsToConvert to detect whether we run the first time and cache the
+  // results as we can assume that all the events have the same contents
+  if (m_collsToConvert.empty()) {
+    // Start off with the pre-defined collection name mappings
+    m_collsToConvert = {m_collNames.value().begin(), m_collNames.value().end()};
+    // We *always* want to convert the EventHeader
+    m_collsToConvert.emplace(edm4hep::labels::EventHeader, "<directly into LCEvent>");
+
+    if (m_convertAll) {
+      info() << "Converting all collections from EDM4hep to LCIO" << endmsg;
+      std::vector<std::string> collectionNames{};
+      if (m_podioDataSvc) {
+        edmEvent = m_podioDataSvc->getEventFrame();
+        collectionNames = edmEvent.value().get().getAvailableCollections();
+      } else {
+        std::optional<std::map<uint32_t, std::string>> idToNameOpt(std::move(m_idToName));
+        auto collections = getAvailableCollectionsFromStore(this, idToNameOpt);
+        m_idToName = std::move(idToNameOpt.value());
+        collectionNames.insert(collectionNames.end(), collections.begin(), collections.end());
+      }
+
+      // And simply add the rest, exploiting the fact that emplace will not
+      // replace existing entries with the same key
+      for (const auto& name : collectionNames) {
+        m_collsToConvert.emplace(name, name);
+      }
     }
   }
 
@@ -414,7 +421,7 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
 
   std::vector<std::tuple<std::string, const podio::CollectionBase*>> linkCollections{};
 
-  for (const auto& [edm4hepName, lcioName] : collsToConvert) {
+  for (const auto& [edm4hepName, lcioName] : m_collsToConvert) {
     const auto coll = getEDM4hepCollection(edm4hepName);
     if (coll->getTypeName().find("LinkCollection") != std::string_view::npos) {
       debug() << edm4hepName << " is a link collection, converting it later" << endmsg;
