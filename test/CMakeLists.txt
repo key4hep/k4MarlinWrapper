@@ -53,6 +53,10 @@ ExternalData_Add_Test( marlinwrapper_tests NAME simple_processors COMMAND ${K4RU
 # Test simple_processors2
 ExternalData_Add_Test( marlinwrapper_tests NAME simple_processors2 COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/simple_processors2.py --LcioEvent.Files DATA{${PROJECT_SOURCE_DIR}/test/input_files/testSimulation.slcio})
 
+ExternalData_Add_Test( marlinwraper_tests NAME convert_empty_parameters
+  COMMAND bash -c "${CMAKE_CURRENT_SOURCE_DIR}/scripts/convert_empty_parameters.sh DATA{${PROJECT_SOURCE_DIR}/test/input_files/testSimulation.slcio}"
+)
+
 # CLICPerformance setup is added as a simple test that will always succeed, on
 # which other tests that need it can depend, in order to make concurrent
 # running of those more easily possible
