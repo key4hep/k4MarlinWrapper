@@ -56,13 +56,14 @@ else:
 
 if args.iosvc:
     iosvc = IOSvc()
+    iosvc.CollectionNames = ["EventHeader", "MCParticles"]
     if not args.use_functional_checker:
         iosvc.Output = "global_converter_maps_iosvc.root"
     else:
         iosvc.Output = "global_converter_maps_iosvc_functional.root"
 else:
     podioInput = PodioInput("InputReader")
-    podioInput.collections = ["MCParticles"]
+    podioInput.collections = ["EventHeader", "MCParticles"]
     podioInput.OutputLevel = INFO
     podioOutput = PodioOutput("OutputWriter")
     podioOutput.filename = "global_converter_maps.root"
