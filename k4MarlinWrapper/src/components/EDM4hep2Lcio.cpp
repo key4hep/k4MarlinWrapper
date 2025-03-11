@@ -398,7 +398,7 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
   // Start off with the pre-defined collection name mappings
   auto collsToConvert{m_collNames.value()};
   // We *always* want to convert the EventHeader
-  collsToConvert.emplace(edm4hep::labels::EventHeader, "");
+  collsToConvert.emplace(edm4hep::labels::EventHeader, "<directly into LCEvent>");
   if (m_convertAll) {
     info() << "Converting all collections from EDM4hep to LCIO" << endmsg;
     // And simply add the rest, exploiting the fact that emplace will not
