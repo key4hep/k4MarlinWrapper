@@ -221,6 +221,12 @@ lcio2edm4hepConv = Lcio2EDM4hepTool("Lcio2EDM4hep")
 lcio2edm4hepConv.collNameMapping = {"MCParticle": "MCParticles"}
 ```
 
+```{note}
+The `"EventHeader"` collection will be added to the collections to convert
+unconditionally. Hence, if it's missing the conversion will fail. Make sure to
+read it in, or create it on the fly.
+```
+
 ## Potential pitfalls when using other Gaudi Algorithms
 
 Although mixing wrapped Marlin Processors with other Gaudi Algorithms is working
