@@ -68,9 +68,11 @@ private:
   // EventDataSvc that is used together with IOSvc
   ServiceHandle<IDataProviderSvc> m_eventDataSvc;
   // Metadata service from k4FWCore that is used together with IOSvc
-  SmartIF<IMetadataSvc>           m_metadataSvc;
-  std::vector<std::string>        m_collectionNames;
-  std::map<uint32_t, std::string> m_idToName;
+  SmartIF<IMetadataSvc> m_metadataSvc;
+  /// A (caching) map of original to new collection names that will be populated
+  /// during the first conversion
+  std::unordered_map<std::string, std::string> m_collsToConvert{};
+  std::map<uint32_t, std::string>              m_idToName;
 
   void convertTracks(TrackMap& tracks_vec, const std::string& e4h_coll_name, const std::string& lcio_coll_name,
                      lcio::LCEventImpl* lcio_event);

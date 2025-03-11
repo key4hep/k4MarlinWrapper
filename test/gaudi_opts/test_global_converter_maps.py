@@ -90,11 +90,7 @@ else:
     )
 
 inputConverter = EDM4hep2LcioTool("InputConverter")
-inputConverter.convertAll = False
-inputConverter.collNameMapping = {
-    "MCParticles": "MCParticles",
-    "PseudoRecoParticles": "PseudoRecoParticles",
-}
+inputConverter.convertAll = True
 inputConverter.OutputLevel = DEBUG
 
 TrivialMCTruthLinkerProc = MarlinProcessorWrapper("TrivialMCTruthLinker")
@@ -108,8 +104,7 @@ TrivialMCTruthLinkerProc.Parameters = {
 TrivialMCTruthLinkerProc.EDM4hep2LcioTool = inputConverter
 
 mcTruthConverter = Lcio2EDM4hepTool("TrivialMCTruthLinkerConverter")
-mcTruthConverter.convertAll = False
-mcTruthConverter.collNameMapping = {"TrivialMCRecoLinks": "TrivialMCRecoLinks"}
+mcTruthConverter.convertAll = True
 mcTruthConverter.OutputLevel = DEBUG
 
 TrivialMCTruthLinkerProc.Lcio2EDM4hepTool = mcTruthConverter
