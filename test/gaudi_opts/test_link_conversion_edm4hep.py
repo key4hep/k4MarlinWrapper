@@ -44,11 +44,12 @@ if args.iosvc:
     evtsvc = EventDataSvc("EventDataSvc")
     iosvc = IOSvc()
     iosvc.Input = args.inputfile
+    iosvc.CollectionNames = ["EventHeader", "MCParticles"]
 else:
     evtsvc = k4DataSvc("EventDataSvc")
     evtsvc.input = args.inputfile
     podioInput = PodioInput("InputReader")
-    podioInput.collections = ["MCParticles"]
+    podioInput.collections = ["EventHeader", "MCParticles"]
     podioInput.OutputLevel = INFO
 
 
