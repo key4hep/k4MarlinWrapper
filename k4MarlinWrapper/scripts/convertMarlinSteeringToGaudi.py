@@ -191,9 +191,14 @@ def dumpAlgList(execProcs, lines):
     return optProcessors
 
 
-def createHeader(lines):
+def createHeader(lines, geo_svc=False, cellid_svc=False):
     lines.append("from Gaudi.Configuration import *\n")
-    lines.append("from Configurables import LcioEvent, EventDataSvc, MarlinProcessorWrapper")
+    imports = ["LcioEvent", "EventDataSvc", "MarlinProcessorWrapper"]
+    if geo_svc:
+        imports.append("GeoSvc")
+    if cellid_svc:
+        imports.append("TrackingCellIDEncodingSvc")
+    lines.append(f"from Configurables import {', '.join(imports)}")
     lines.append("from k4MarlinWrapper.parseConstants import *")
     lines.append("algList = []")
     lines.append("svcList = []")
@@ -255,6 +260,52 @@ def convertParameters(params, proc, globParams, constants):
     return lines
 
 
+def filterInitDD4hep(processors, constants, tree, procList):
+    """Check if an InitDD4hep Processor is in the list of processors"""
+    init_proc = [k for k, v in processors.items() if v.get("type", "") == "InitializeDD4hep"]
+    exec_init = list(filter(lambda x: x[0] in init_proc and not x[1], procList))
+
+    if not exec_init:
+        return []
+
+    if len(exec_init) > 1:
+        print("WARNING: Found two InitDD4hep processors in the execute section.")
+        print("         Only the first one will be converted to use the GeoSvc.")
+
+    # extract the processor from the processor conversion and from the list of
+    # algs to execute
+    proc = processors.pop(exec_init[0][0])
+    procList[:] = [i for i in procList if i[0] != exec_init[0][0]]
+
+    lines = [
+        'geoSvc = GeoSvc("GeoSvc")',
+        f"geoSvc.OutputLevel = {verbosityTranslator(proc.get('Verbosity', 'MESSAGE'))}",
+        "geoSvc.EnableGeant4Geo = False",
+    ]
+
+    compactFile = proc.get("DD4hepXMLFile", None)
+    if compactFile:
+        value = compactFile.replace("\n", " ")
+        value = " ".join(value.split())
+        lines.append(f"geoSvc.detectors = [{replaceConstants(value, constants)}]")
+
+    lines.append("svcList.append(geoSvc)\n")
+
+    encString = proc.get("EncodingStringParameter", None)
+    if encString:
+        lines.extend(
+            [
+                'cellIDSvc = TrackingCellIDEncodingSvc("CellIDSvc")',
+                "cellIDSvc.GeoSvcName = geoSvc.name()",
+                f'cellIDSvc.EncodingStringParameterName = "{encString}"',
+                f"cellIDSvc.OutputLevel = {verbosityTranslator(proc.get('Verbosity', 'MESSAGE'))}",
+                "svcList.append(cellIDSvc)\n",
+            ]
+        )
+
+    return lines
+
+
 def convertProcessors(lines, processors, globParams, constants):
     """convert XML tree to list of strings"""
     for proc in processors:
@@ -284,10 +335,12 @@ def generateGaudiSteering(tree):
     processors = getProcessors(tree)
     constants, constLines = convertConstants(tree)
     procExecList = getExecutingProcessors(tree)
+    geoSvcLines = filterInitDD4hep(processors, constants, tree, procExecList)
     lines = []
-    createHeader(lines)
+    createHeader(lines, len(geoSvcLines) != 0, len(geoSvcLines) > 6)
     lines.extend(constLines)
     createLcioReader(lines, globParams)
+    lines.extend(geoSvcLines)
     convertProcessors(lines, processors, globParams, constants)
     optProcessors = dumpAlgList(procExecList, lines)
     if optProcessors:
