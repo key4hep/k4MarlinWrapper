@@ -105,6 +105,11 @@ ExternalData_Add_Test( marlinwrapper_tests
   COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_global_converter_maps.py --no-iosvc --EventDataSvc.input DATA{${PROJECT_SOURCE_DIR}/test/input_files/ttbar_20240223_edm4hep.root}
 )
 ExternalData_Add_Test( marlinwrapper_tests
+  NAME global_converter_maps_algorithm
+  COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_global_converter_maps.py --no-iosvc --use-gaudi-algorithm --OutputWriter.filename=global_converter_maps_algorithm.root --EventDataSvc.input DATA{${PROJECT_SOURCE_DIR}/test/input_files/ttbar_20240223_edm4hep.root}
+)
+
+ExternalData_Add_Test( marlinwrapper_tests
   NAME global_converter_maps_iosvc
   COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_global_converter_maps.py --IOSvc.Input DATA{${PROJECT_SOURCE_DIR}/test/input_files/ttbar_20240223_edm4hep.root}
 )
