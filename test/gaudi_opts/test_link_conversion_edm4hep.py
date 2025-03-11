@@ -24,6 +24,7 @@ from Configurables import (
     PodioInput,
     k4DataSvc,
     PseudoRecoAlgorithm,
+    PseudoRecoFunctional,
     TrivialMCRecoLinker,
     MarlinProcessorWrapper,
     EDM4hep2LcioTool,
@@ -37,6 +38,12 @@ from k4FWCore.parseArgs import parser
 parser.add_argument("--inputfile", help="Input file")
 parser.add_argument(
     "--iosvc", action="store_true", default=False, help="Use IOSvc instead of PodioDataSvc"
+)
+parser.add_argument(
+    "--use-gaudi-algorithm",
+    action="store_true",
+    default=False,
+    help="Use an algorithm based on Gaudi::Algorithm instead of a functional algorithm",
 )
 args = parser.parse_known_args()[0]
 
@@ -53,9 +60,14 @@ else:
     podioInput.OutputLevel = INFO
 
 
-PseudoRecoAlg = PseudoRecoAlgorithm(
-    "PseudoRecoAlgorithm", InputMCs=["MCParticles"], OutputRecos=["PseudoRecoParticles"]
-)
+if args.use_gaudi_algorithm:
+    PseudoRecoAlg = PseudoRecoAlgorithm(
+        "PseudoRecoAlgorithm", InputMCs="MCParticles", OutputRecos="PseudoRecoParticles"
+    )
+else:
+    PseudoRecoAlg = PseudoRecoFunctional(
+        "PseudoRecoFunctional", InputMCs=["MCParticles"], OutputRecos=["PseudoRecoParticles"]
+    )
 
 MCRecoLinker = TrivialMCRecoLinker(
     InputMCs=["MCParticles"],
@@ -75,7 +87,7 @@ MarlinMCLinkChecker = MarlinProcessorWrapper(
 )
 
 mcLinkConverter = EDM4hep2LcioTool("MCLinkConverterToEDM4hep")
-mcLinkConverter.convertAll = False
+mcLinkConverter.convertAll = True
 mcLinkConverter.collNameMapping = {
     "TrivialMCRecoLinks": "TrivialMCRecoLinks",
     "MCParticles": "MCParticles",

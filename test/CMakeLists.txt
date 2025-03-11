@@ -22,6 +22,7 @@ gaudi_add_module(GaudiTestAlgorithms
     src/MCRecoLinkChecker.cc
     src/MCRecoLinkCheckerFunctional.cc
     src/PseudoRecoAlgorithm.cc
+    src/PseudoRecoFunctional.cc
     src/TrivialMCRecoLinker.cc
   LINK
     Gaudi::GaudiKernel
@@ -98,6 +99,8 @@ add_test( clic_geo_test ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/geoTest_
 ExternalData_Add_Test( marlinwrapper_tests NAME global_converter_maps COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_global_converter_maps.py --EventDataSvc.input DATA{${PROJECT_SOURCE_DIR}/test/input_files/ttbar_20240223_edm4hep.root})
 ExternalData_Add_Test( marlinwrapper_tests NAME global_converter_maps_iosvc COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_global_converter_maps.py --iosvc --IOSvc.Input DATA{${PROJECT_SOURCE_DIR}/test/input_files/ttbar_20240223_edm4hep.root})
 ExternalData_Add_Test( marlinwrapper_tests NAME global_converter_maps_iosvc_functional COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_global_converter_maps.py --iosvc --use-functional-checker --IOSvc.Input DATA{${PROJECT_SOURCE_DIR}/test/input_files/ttbar_20240223_edm4hep.root})
+ExternalData_Add_Test( marlinwrapper_tests NAME global_converter_maps_iosvc_algorithm COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_global_converter_maps.py --iosvc --use-gaudi-algorithm --IOSvc.Input DATA{${PROJECT_SOURCE_DIR}/test/input_files/ttbar_20240223_edm4hep.root} --IOSvc.Output=global_converter_maps_iosvc_algorithm.root)
+ExternalData_Add_Test( marlinwrapper_tests NAME global_converter_maps_iosvc_algorithm_functional COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_global_converter_maps.py --iosvc --use-gaudi-algorithm --use-functional-checker --IOSvc.Input DATA{${PROJECT_SOURCE_DIR}/test/input_files/ttbar_20240223_edm4hep.root} --IOSvc.Output=global_converter_maps_iosvc_algorithm_functional.root)
 
 ExternalData_Add_Test( marlinwrapper_tests
   NAME link_conversion_edm4hep_to_lcio
@@ -106,6 +109,10 @@ ExternalData_Add_Test( marlinwrapper_tests
 ExternalData_Add_Test( marlinwrapper_tests
   NAME link_conversion_edm4hep_to_lcio_iosvc
   COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_link_conversion_edm4hep.py --iosvc --inputfile DATA{${PROJECT_SOURCE_DIR}/test/input_files/ttbar_20240223_edm4hep.root}
+)
+ExternalData_Add_Test( marlinwrapper_tests
+  NAME link_conversion_edm4hep_to_lcio_iosvc_gaudi_algorithm
+  COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_link_conversion_edm4hep.py --iosvc --use-gaudi-algorithm --inputfile DATA{${PROJECT_SOURCE_DIR}/test/input_files/ttbar_20240223_edm4hep.root}
 )
 
 add_test( event_header_conversion bash -c "k4run ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/createEventHeader.py && anajob test.slcio | grep 'EVENT: 42'" )
