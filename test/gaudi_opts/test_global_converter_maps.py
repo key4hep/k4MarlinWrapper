@@ -30,6 +30,7 @@ from Configurables import (
     EDM4hep2LcioTool,
     MCRecoLinkChecker,
     PseudoRecoFunctional,
+    PseudoRecoAlgorithm,
     EventDataSvc,
 )
 
@@ -42,6 +43,12 @@ parser.add_argument(
 )
 parser.add_argument(
     "--use-functional-checker", action="store_true", default=False, help="Use functional checker"
+)
+parser.add_argument(
+    "--use-gaudi-algorithm",
+    action="store_true",
+    default=False,
+    help="Use an algorithm based on Gaudi::Algorithm to populate the TES",
 )
 
 args = parser.parse_known_args()[0]
@@ -68,9 +75,16 @@ else:
     podioOutput = PodioOutput("OutputWriter")
     podioOutput.filename = "global_converter_maps.root"
 
-PseudoRecoAlg = PseudoRecoFunctional(
-    "PseudoRecoFunctional", InputMCs=["MCParticles"], OutputRecos=["PseudoRecoParticles"]
-)
+if args.use_gaudi_algorithm:
+    PseudoRecoAlg = PseudoRecoAlgorithm(
+        "PseudoRecoAlgorithm", InputMCs="MCParticles", OutputRecos="PseudoRecoParticles"
+    )
+else:
+    PseudoRecoAlg = PseudoRecoFunctional(
+        "PseudoRecoFunctional",
+        InputMCs=["MCParticles"],
+        OutputRecos=["PseudoRecoParticles"],
+    )
 
 inputConverter = EDM4hep2LcioTool("InputConverter")
 inputConverter.convertAll = False
