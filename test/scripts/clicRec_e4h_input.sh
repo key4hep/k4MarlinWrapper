@@ -26,11 +26,11 @@ cd CLICPerformance/clicConfig
 if [ "$2" = "--iosvc" ]; then
   iosvc="_iosvc"
   echo "Running with IO service"
-  file_arg="--iosvc --IOSvc.Input=$1"
+  file_arg="--IOSvc.Input=$1"
 elif [ "$2" = "--no-iosvc" ]; then
   iosvc=""
   echo "Running without IO service"
-  file_arg="--EventDataSvc.input=$1"
+  file_arg="--no-iosvc --EventDataSvc.input=$1"
 else
   echo "Wrong argument $2"
   return 1

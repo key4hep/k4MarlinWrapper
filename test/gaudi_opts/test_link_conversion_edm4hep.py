@@ -37,7 +37,10 @@ from k4FWCore.parseArgs import parser
 
 parser.add_argument("--inputfile", help="Input file")
 parser.add_argument(
-    "--iosvc", action="store_true", default=False, help="Use IOSvc instead of PodioDataSvc"
+    "--no-iosvc",
+    action="store_true",
+    default=False,
+    help="Use k4DataSvc instead of IOSvc",
 )
 parser.add_argument(
     "--use-gaudi-algorithm",
@@ -47,7 +50,7 @@ parser.add_argument(
 )
 args = parser.parse_known_args()[0]
 
-if args.iosvc:
+if not args.no_iosvc:
     evtsvc = EventDataSvc("EventDataSvc")
     iosvc = IOSvc()
     iosvc.Input = args.inputfile
@@ -98,7 +101,7 @@ MarlinMCLinkChecker.EDM4hep2LcioTool = mcLinkConverter
 
 algList = [PseudoRecoAlg, MCRecoLinker, MarlinMCLinkChecker]
 
-if not args.iosvc:
+if args.no_iosvc:
     algList = [podioInput] + algList
 
 ApplicationMgr(

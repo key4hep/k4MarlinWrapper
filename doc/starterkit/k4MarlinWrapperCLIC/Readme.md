@@ -140,7 +140,7 @@ included with k4MarlinWrapper. Note that:
 
 - To run *clicReconstruction* with EDM4hep format, use the steering file found in the `examples` folder of k4MarlinWrapper:
 `k4MarlinWrapper/examples/clicRec_e4h_input.py` (this also gets installed to `$K4MARLINWRAPPER/examples` in Key4hep releases)
-  + Change the line where `evtsvc.input` is defined to point to the location of your input file.
+  + Change the line where `IOSvc.Input` is defined to point to the location of your input file.
   + At the bottom of the file, in the `ApplicationMgr` parameters, change `EvtMax   = 3,` to the number of events to run.
 
 This can be run in the following way.
@@ -149,7 +149,7 @@ cd CLICPerformance/clicConfig
 
 cp $K4MARLINWRAPPER/examples/clicRec_e4h_input.py .
 
-k4run clicRec_e4h_input.py --EventDataSvc.input ttbar_edm4hep.root
+k4run clicRec_e4h_input.py --IOSvc.Input ttbar_edm4hep.root
 ```
 
 ### DD4hep Geometry Information
@@ -163,16 +163,16 @@ In the space following
 
 ```python
 import os
-from Configurables import k4DataSvc, PodioInput
-evtsvc = k4DataSvc('EventDataSvc')
-evtsvc.input = os.path.join('$TEST_DIR/inputFiles/', os.environ.get("INPUTFILE", "ttbar_edm4hep.root"))
+from k4FWCore import IOSvc, ApplicationMgr
+io_svc = IOSvc()
+io_svc.Input = os.path.join('$TEST_DIR/inputFiles/', os.environ.get("INPUTFILE", "ttbar_edm4hep.root"))
 ```
 
 we can start the `svcList` list and add the `GeoSvc` and `TrackingCellIDEncodingSvc` with;
 
 ```python
 svcList = []
-svcList.append(evtsvc)
+svcList.append(io_svc)
 
 
 import os
