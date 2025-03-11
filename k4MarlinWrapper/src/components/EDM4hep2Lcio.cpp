@@ -398,14 +398,15 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
       info() << "Converting all collections from EDM4hep to LCIO" << endmsg;
       std::vector<std::string> collectionNames{};
       if (m_podioDataSvc) {
+        // If we have the PodioDataSvc get the collections available from frame
         edmEvent = m_podioDataSvc->getEventFrame();
         collectionNames = edmEvent.value().get().getAvailableCollections();
-      } else {
-        std::optional<std::map<uint32_t, std::string>> idToNameOpt(std::move(m_idToName));
-        auto collections = getAvailableCollectionsFromStore(this, idToNameOpt);
-        m_idToName = std::move(idToNameOpt.value());
-        collectionNames.insert(collectionNames.end(), collections.begin(), collections.end());
       }
+      // Always check the contents of the TES
+      std::optional<std::map<uint32_t, std::string>> idToNameOpt(std::move(m_idToName));
+      auto collections = getAvailableCollectionsFromStore(this, idToNameOpt);
+      m_idToName = std::move(idToNameOpt.value());
+      collectionNames.insert(collectionNames.end(), collections.begin(), collections.end());
 
       // And simply add the rest, exploiting the fact that emplace will not
       // replace existing entries with the same key
