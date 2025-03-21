@@ -101,7 +101,7 @@ during [Simulation](#simulation).
 
 - When using **LCIO** format for the input events to be used in reconstruction:
   + Modify the `clicReconstruction.py` file to point to the `ttbar.slcio` input file, and change the
-  `converters` parameter for the `geoSvc` service.  In addition the two processors with the comment `#
+  `detectors` parameter for the `geoSvc` service.  In addition the two processors with the comment `#
   Config.OverlayFalse` and `# Config.TrackingConformal` should be enabled by uncommenting their line in the `algList`
   at the end of the file.
 
