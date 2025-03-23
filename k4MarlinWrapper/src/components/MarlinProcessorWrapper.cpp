@@ -89,8 +89,8 @@ StatusCode MarlinProcessorWrapper::loadProcessorLibraries() const {
     warning() << "MARLIN_DLL not set, not loading any processors " << endmsg;
   } else {
     info() << "Found marlin_dll " << marlin_dll << endmsg;
-    const std::string        marlin_dll_str(marlin_dll);
-    std::regex               re{":+"};
+    const std::string marlin_dll_str(marlin_dll);
+    std::regex re{":+"};
     std::vector<std::string> libraries = k4MW::util::split(marlin_dll_str, re);
     if (libraries.back().empty())
       libraries.pop_back();
@@ -133,7 +133,7 @@ std::shared_ptr<marlin::StringParameters> MarlinProcessorWrapper::parseParameter
 }
 
 StatusCode MarlinProcessorWrapper::instantiateProcessor(std::shared_ptr<marlin::StringParameters>& parameters,
-                                                        Gaudi::Property<std::string>&              processorTypeStr) {
+                                                        Gaudi::Property<std::string>& processorTypeStr) {
   auto processorType = marlin::ProcessorMgr::instance()->getProcessor(processorTypeStr);
   if (!processorType) {
     error() << " Failed to instantiate " << name() << " because processor type could not be determined" << endmsg;
@@ -161,7 +161,7 @@ StatusCode MarlinProcessorWrapper::initialize() {
 
     // Get seed set for random engine
     std::vector<long> got_seeds{};
-    StatusCode        got_seeds_sc = randSvc()->engine()->seeds(got_seeds);
+    StatusCode got_seeds_sc = randSvc()->engine()->seeds(got_seeds);
     if (!got_seeds_sc.isSuccess())
       warning() << "Random Service seeds could not be set" << endmsg;
 
@@ -177,21 +177,21 @@ StatusCode MarlinProcessorWrapper::initialize() {
   // Set m_verbosity from OutputLevel of the MarlinProcessorWrapper
   MSG::Level outputLevel = msgLevel();
   switch (outputLevel) {
-    case MSG::ERROR:
-      m_verbosity = "ERROR";
-      break;
-    case MSG::WARNING:
-      m_verbosity = "WARNING";
-      break;
-    case MSG::INFO:
-      m_verbosity = "MESSAGE";
-      break;
-    case MSG::DEBUG:
-      m_verbosity = "DEBUG";
-      break;
-    default:
-      m_verbosity = "MESSAGE";
-      break;
+  case MSG::ERROR:
+    m_verbosity = "ERROR";
+    break;
+  case MSG::WARNING:
+    m_verbosity = "WARNING";
+    break;
+  case MSG::INFO:
+    m_verbosity = "MESSAGE";
+    break;
+  case MSG::DEBUG:
+    m_verbosity = "DEBUG";
+    break;
+  default:
+    m_verbosity = "MESSAGE";
+    break;
   }
 
   // pass m_verbosity to overwrite it if explicitly stated in wrapped parameters
@@ -215,8 +215,8 @@ StatusCode MarlinProcessorWrapper::initialize() {
 
 StatusCode MarlinProcessorWrapper::execute(const EventContext&) const {
   // Get flag to check if this processor should be skipped or not
-  DataObject* pStatus  = nullptr;
-  StatusCode  scStatus = eventSvc()->retrieveObject("/Event/LCEventStatus", pStatus);
+  DataObject* pStatus = nullptr;
+  StatusCode scStatus = eventSvc()->retrieveObject("/Event/LCEventStatus", pStatus);
   if (scStatus.isSuccess()) {
     bool hasLCEvent = static_cast<LCEventWrapperStatus*>(pStatus)->hasLCEvent;
     if (!hasLCEvent) {
@@ -227,15 +227,15 @@ StatusCode MarlinProcessorWrapper::execute(const EventContext&) const {
 
   // Get LCIO Event
   debug() << "Retrieving LCIO Event for wrapped processor " << m_processor->name() << endmsg;
-  DataObject*        pObject   = nullptr;
-  StatusCode         sc        = eventSvc()->retrieveObject("/Event/LCEvent", pObject);
+  DataObject* pObject = nullptr;
+  StatusCode sc = eventSvc()->retrieveObject("/Event/LCEvent", pObject);
   lcio::LCEventImpl* the_event = nullptr;
 
   if (sc.isFailure()) {
     // Register empty event
     debug() << "Registering empty Event for EDM4hep to LCIO conversion event in TES" << endmsg;
-    auto pO           = std::make_unique<LCEventWrapper>(std::make_unique<lcio::LCEventImpl>());
-    the_event         = static_cast<IMPL::LCEventImpl*>(pO->getEvent());
+    auto pO = std::make_unique<LCEventWrapper>(std::make_unique<lcio::LCEventImpl>());
+    the_event = static_cast<IMPL::LCEventImpl*>(pO->getEvent());
     StatusCode reg_sc = evtSvc()->registerObject("/Event/LCEvent", pO.release());
     if (reg_sc.isFailure()) {
       error() << "Failed to register empty LCIO Event" << endmsg;
@@ -283,8 +283,8 @@ StatusCode MarlinProcessorWrapper::execute(const EventContext&) const {
                  "execute and may fail"
               << endmsg;
     // Store flag to prevent the rest of the event from processing
-    auto             upStatus = std::make_unique<LCEventWrapperStatus>(false);
-    const StatusCode code     = eventSvc()->registerObject("/Event/LCEventStatus", upStatus.release());
+    auto upStatus = std::make_unique<LCEventWrapperStatus>(false);
+    const StatusCode code = eventSvc()->registerObject("/Event/LCEventStatus", upStatus.release());
     if (code.isFailure()) {
       error() << "Failed to store flag to skip event on Marlin marlin::SkipEventException" << endmsg;
       return scStatus;
@@ -294,8 +294,8 @@ StatusCode MarlinProcessorWrapper::execute(const EventContext&) const {
     return StatusCode::FAILURE;
   } catch (marlin::StopProcessingException& e) {
     // Store flag to prevent the rest of the event from processing
-    auto             upStatus = std::make_unique<LCEventWrapperStatus>(false);
-    const StatusCode code     = eventSvc()->registerObject("/Event/LCEventStatus", upStatus.release());
+    auto upStatus = std::make_unique<LCEventWrapperStatus>(false);
+    const StatusCode code = eventSvc()->registerObject("/Event/LCEventStatus", upStatus.release());
     if (code.isFailure()) {
       error() << "Failed to store flag to skip event on Marlin marlin::StopProcessingException" << endmsg;
       return scStatus;

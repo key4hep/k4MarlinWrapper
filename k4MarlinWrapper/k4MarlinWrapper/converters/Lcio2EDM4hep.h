@@ -33,11 +33,11 @@
 #include <tuple>
 
 namespace podio {
-  class CollectionBase;
+class CollectionBase;
 }
 
 namespace EVENT {
-  class LCCollection;
+class LCCollection;
 }
 
 class PodioDataSvc;
@@ -58,11 +58,11 @@ public:
 
 private:
   Gaudi::Property<std::map<std::string, std::string>> m_collNames{this, "collNameMapping", {}};
-  Gaudi::Property<bool>                               m_convertAll{this, "convertAll", true};
+  Gaudi::Property<bool> m_convertAll{this, "convertAll", true};
 
   ServiceHandle<IDataProviderSvc> m_eventDataSvc;
-  SmartIF<IMetadataSvc>           m_metadataSvc;
-  PodioDataSvc*                   m_podioDataSvc;
+  SmartIF<IMetadataSvc> m_metadataSvc;
+  PodioDataSvc* m_podioDataSvc;
 
   // **********************************
   // Check if a collection was already registered to skip it
@@ -74,12 +74,12 @@ private:
    * convert the metadata from the input lcio collection.
    */
   void registerCollection(std::tuple<const std::string&, std::unique_ptr<podio::CollectionBase>> namedColl,
-                          EVENT::LCCollection*                                                   lcioColl = nullptr);
+                          EVENT::LCCollection* lcioColl = nullptr);
 
   /**
-    * Register a collection into the TES. If the lcioColl is not a nullptr also
-    * convert the metadata from the input lcio collection.
-    */
+   * Register a collection into the TES. If the lcioColl is not a nullptr also
+   * convert the metadata from the input lcio collection.
+   */
   void registerCollection(const std::string& name, std::unique_ptr<podio::CollectionBase>&& coll,
                           EVENT::LCCollection* lcioColl = nullptr) {
     registerCollection(std::make_tuple(name, std::move(coll)), lcioColl);

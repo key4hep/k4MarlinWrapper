@@ -17,10 +17,10 @@
  * limitations under the License.
  */
 
-#include <GaudiKernel/ISvcLocator.h>
 #include "edm4hep/MCParticleCollection.h"
 #include "edm4hep/RecoMCParticleLinkCollection.h"
 #include "edm4hep/ReconstructedParticleCollection.h"
+#include <GaudiKernel/ISvcLocator.h>
 
 #include "k4FWCore/Transformer.h"
 
@@ -34,13 +34,13 @@ struct TrivialMCRecoLinker final
                     {KeyValues("InputMCs", {"MCParticles"}), KeyValues("InputRecos", {"PseudoRecoParticles"})},
                     KeyValues("OutputLinks", {"TrivialMCRecoLinks"})) {}
 
-  edm4hep::RecoMCParticleLinkCollection operator()(
-      const edm4hep::MCParticleCollection&            mcParticles,
-      const edm4hep::ReconstructedParticleCollection& recoParticles) const final {
+  edm4hep::RecoMCParticleLinkCollection
+  operator()(const edm4hep::MCParticleCollection& mcParticles,
+             const edm4hep::ReconstructedParticleCollection& recoParticles) const final {
     auto links = edm4hep::RecoMCParticleLinkCollection{};
 
     for (size_t i = 0; i < mcParticles.size(); ++i) {
-      const auto mc   = mcParticles[i];
+      const auto mc = mcParticles[i];
       const auto reco = recoParticles[i];
 
       auto link = links.create();

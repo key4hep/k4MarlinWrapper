@@ -37,7 +37,7 @@ TrivialMCTruthLinkerProcessor::TrivialMCTruthLinkerProcessor() : marlin::Process
 }
 
 void TrivialMCTruthLinkerProcessor::processEvent(LCEvent* evt) {
-  const auto mcColl   = evt->getCollection(m_mcCollName);
+  const auto mcColl = evt->getCollection(m_mcCollName);
   const auto recoColl = evt->getCollection(m_recoCollName);
 
   // NOTE: Not using LCRelationNavigator here because the internal map might

@@ -43,4 +43,4 @@ private:
                                                                                 Gaudi::DataHandle::Reader, this};
 };
 
-#endif  // K4MARLINWRAPPER_TEST_MCRECOLINKCHECKER_H
+#endif // K4MARLINWRAPPER_TEST_MCRECOLINKCHECKER_H

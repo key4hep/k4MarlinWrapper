@@ -24,6 +24,6 @@
 // This functionality is used in the Writer from k4FWCore and is reimplemented
 // here with some additions to make it useful for converting both from EDM4hep
 // to LCIO and vice versa
-std::vector<std::string> getAvailableCollectionsFromStore(const AlgTool*                                  thisClass,
+std::vector<std::string> getAvailableCollectionsFromStore(const AlgTool* thisClass,
                                                           std::optional<std::map<uint32_t, std::string>>& idToName,
                                                           bool returnFrameCollections = false);

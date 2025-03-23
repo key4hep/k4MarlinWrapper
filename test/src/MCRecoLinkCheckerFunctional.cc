@@ -23,8 +23,8 @@ MCRecoLinkCheckerFunctional::MCRecoLinkCheckerFunctional(const std::string& name
                {KeyValues("InputMCRecoLinks", {"InputMCRecoLinks"}), KeyValues("InputMCs", {"InputMCs"}),
                 KeyValues("InputRecos", {"InputRecos"})}) {}
 
-void MCRecoLinkCheckerFunctional::operator()(const edm4hep::RecoMCParticleLinkCollection&    relationColl,
-                                             const edm4hep::MCParticleCollection&            mcColl,
+void MCRecoLinkCheckerFunctional::operator()(const edm4hep::RecoMCParticleLinkCollection& relationColl,
+                                             const edm4hep::MCParticleCollection& mcColl,
                                              const edm4hep::ReconstructedParticleCollection& recoColl) const {
   if (relationColl.size() != mcColl.size()) {
     error() << "The MCReco relation collection does not have the expected size (expected: " << relationColl.size()
@@ -34,8 +34,8 @@ void MCRecoLinkCheckerFunctional::operator()(const edm4hep::RecoMCParticleLinkCo
   }
 
   for (size_t i = 0; i < mcColl.size(); ++i) {
-    const auto mc       = mcColl[i];
-    const auto reco     = recoColl[i];
+    const auto mc = mcColl[i];
+    const auto reco = recoColl[i];
     const auto relation = relationColl[i];
 
     if (relation.getWeight() != i) {

@@ -43,9 +43,9 @@
 #include "k4MarlinWrapper/converters/IEDMConverter.h"
 
 namespace marlin {
-  class Processor;
-  class StringParameters;
-}  // namespace marlin
+class Processor;
+class StringParameters;
+} // namespace marlin
 
 class MarlinProcessorWrapper : public Gaudi::Algorithm {
 public:
@@ -55,7 +55,7 @@ public:
   StatusCode initialize() final;
 
 private:
-  std::string                m_verbosity = "ERROR";
+  std::string m_verbosity = "ERROR";
   mutable marlin::Processor* m_processor = nullptr;
 
   /// Load libraries specified by MARLIN_DLL environment variable
@@ -63,14 +63,15 @@ private:
 
   /// Instantiate the Marlin processor and assign name and parameters
   StatusCode instantiateProcessor(std::shared_ptr<marlin::StringParameters>& parameters,
-                                  Gaudi::Property<std::string>&              processorTypeStr);
+                                  Gaudi::Property<std::string>& processorTypeStr);
 
   /// Parse the parameters from the Property
-  std::shared_ptr<marlin::StringParameters> parseParameters(
-      const Gaudi::Property<std::map<std::string, std::vector<std::string>>>& parameters, std::string& verbosity) const;
+  std::shared_ptr<marlin::StringParameters>
+  parseParameters(const Gaudi::Property<std::map<std::string, std::vector<std::string>>>& parameters,
+                  std::string& verbosity) const;
 
   /// ProcessorType: The Type of the MarlinProcessor to use
-  Gaudi::Property<std::string>                                     m_processorType{this, "ProcessorType", {}};
+  Gaudi::Property<std::string> m_processorType{this, "ProcessorType", {}};
   Gaudi::Property<std::map<std::string, std::vector<std::string>>> m_parameters{this, "Parameters", {}};
 
   mutable ToolHandle<IEDMConverter> m_edm_conversionTool{"IEDMConverter/EDM4hep2Lcio", this};

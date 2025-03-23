@@ -53,9 +53,9 @@ MarlinMCRecoLinkChecker::MarlinMCRecoLinkChecker() : marlin::Processor("MarlinMC
 }
 
 void MarlinMCRecoLinkChecker::processEvent(LCEvent* evt) {
-  const auto mcColl   = evt->getCollection(m_mcCollName);
+  const auto mcColl = evt->getCollection(m_mcCollName);
   const auto recoColl = evt->getCollection(m_recoCollName);
-  const auto relColl  = evt->getCollection(m_relCollName);
+  const auto relColl = evt->getCollection(m_relCollName);
 
   if (relColl->getNumberOfElements() != mcColl->getNumberOfElements()) {
     throw std::runtime_error("The LCRelation collection does not have the expected number of elements: (expected " +
@@ -64,9 +64,9 @@ void MarlinMCRecoLinkChecker::processEvent(LCEvent* evt) {
   }
 
   for (size_t i = 0; i < static_cast<size_t>(mcColl->getNumberOfElements()); ++i) {
-    const auto mc   = static_cast<EVENT::MCParticle*>(mcColl->getElementAt(i));
+    const auto mc = static_cast<EVENT::MCParticle*>(mcColl->getElementAt(i));
     const auto reco = static_cast<EVENT::ReconstructedParticle*>(recoColl->getElementAt(i));
-    const auto rel  = static_cast<EVENT::LCRelation*>(relColl->getElementAt(i));
+    const auto rel = static_cast<EVENT::LCRelation*>(relColl->getElementAt(i));
 
     if (rel->getWeight() != i) {
       throw std::runtime_error("Relation " + std::to_string(i) + " does not have the correct weight (expected: " +

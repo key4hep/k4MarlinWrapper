@@ -34,21 +34,22 @@ class PodioDataSvc;
 class IDataProviderSvc;
 class IMetadataSvc;
 
-template <typename K, typename V> using ObjMapT = k4EDM4hep2LcioConv::VecMapT<K, V>;
+template <typename K, typename V>
+using ObjMapT = k4EDM4hep2LcioConv::VecMapT<K, V>;
 
-using TrackMap           = ObjMapT<lcio::TrackImpl*, edm4hep::Track>;
-using ClusterMap         = ObjMapT<lcio::ClusterImpl*, edm4hep::Cluster>;
-using VertexMap          = ObjMapT<lcio::VertexImpl*, edm4hep::Vertex>;
-using TrackerHitMap      = ObjMapT<lcio::TrackerHitImpl*, edm4hep::TrackerHit3D>;
+using TrackMap = ObjMapT<lcio::TrackImpl*, edm4hep::Track>;
+using ClusterMap = ObjMapT<lcio::ClusterImpl*, edm4hep::Cluster>;
+using VertexMap = ObjMapT<lcio::VertexImpl*, edm4hep::Vertex>;
+using TrackerHitMap = ObjMapT<lcio::TrackerHitImpl*, edm4hep::TrackerHit3D>;
 using TrackerHitPlaneMap = ObjMapT<lcio::TrackerHitPlaneImpl*, edm4hep::TrackerHitPlane>;
-using SimTrackerHitMap   = ObjMapT<lcio::SimTrackerHitImpl*, edm4hep::SimTrackerHit>;
-using CaloHitMap         = ObjMapT<lcio::CalorimeterHitImpl*, edm4hep::CalorimeterHit>;
-using SimCaloHitMap      = ObjMapT<lcio::SimCalorimeterHitImpl*, edm4hep::SimCalorimeterHit>;
-using RawCaloHitMap      = ObjMapT<lcio::RawCalorimeterHitImpl*, edm4hep::RawCalorimeterHit>;
-using TPCHitMap          = ObjMapT<lcio::TPCHitImpl*, edm4hep::RawTimeSeries>;
-using RecoParticleMap    = ObjMapT<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>;
-using MCParticleMap      = ObjMapT<lcio::MCParticleImpl*, edm4hep::MCParticle>;
-using ParticleIDMap      = ObjMapT<lcio::ParticleIDImpl*, edm4hep::ParticleID>;
+using SimTrackerHitMap = ObjMapT<lcio::SimTrackerHitImpl*, edm4hep::SimTrackerHit>;
+using CaloHitMap = ObjMapT<lcio::CalorimeterHitImpl*, edm4hep::CalorimeterHit>;
+using SimCaloHitMap = ObjMapT<lcio::SimCalorimeterHitImpl*, edm4hep::SimCalorimeterHit>;
+using RawCaloHitMap = ObjMapT<lcio::RawCalorimeterHitImpl*, edm4hep::RawCalorimeterHit>;
+using TPCHitMap = ObjMapT<lcio::TPCHitImpl*, edm4hep::RawTimeSeries>;
+using RecoParticleMap = ObjMapT<lcio::ReconstructedParticleImpl*, edm4hep::ReconstructedParticle>;
+using MCParticleMap = ObjMapT<lcio::MCParticleImpl*, edm4hep::MCParticle>;
+using ParticleIDMap = ObjMapT<lcio::ParticleIDImpl*, edm4hep::ParticleID>;
 
 struct CollectionPairMappings;
 
@@ -62,14 +63,14 @@ public:
 
 private:
   Gaudi::Property<std::map<std::string, std::string>> m_collNames{this, "collNameMapping", {}};
-  Gaudi::Property<bool>                               m_convertAll{this, "convertAll", true};
+  Gaudi::Property<bool> m_convertAll{this, "convertAll", true};
 
   PodioDataSvc* m_podioDataSvc;
   // EventDataSvc that is used together with IOSvc
   ServiceHandle<IDataProviderSvc> m_eventDataSvc;
   // Metadata service from k4FWCore that is used together with IOSvc
-  SmartIF<IMetadataSvc>           m_metadataSvc;
-  std::vector<std::string>        m_collectionNames;
+  SmartIF<IMetadataSvc> m_metadataSvc;
+  std::vector<std::string> m_collectionNames;
   std::map<uint32_t, std::string> m_idToName;
 
   void convertTracks(TrackMap& tracks_vec, const std::string& e4h_coll_name, const std::string& lcio_coll_name,
@@ -113,9 +114,9 @@ private:
   void convertEventHeader(const std::string& e4h_coll_name, lcio::LCEventImpl* lcio_event);
 
   void convertAdd(const std::string& e4h_coll_name, const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event,
-                  CollectionPairMappings&                            collection_pairs,
+                  CollectionPairMappings& collection_pairs,
                   std::vector<EDM4hep2LCIOConv::ParticleIDConvData>& pidCollections,
-                  std::vector<EDM4hep2LCIOConv::TrackDqdxConvData>&  dQdxCollections);
+                  std::vector<EDM4hep2LCIOConv::TrackDqdxConvData>& dQdxCollections);
 
   /// Get an EDM4hep collection by name, consulting either the podio based data
   /// svc or the IOSvc

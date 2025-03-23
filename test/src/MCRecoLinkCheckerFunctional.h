@@ -30,9 +30,9 @@ struct MCRecoLinkCheckerFunctional final
                               const edm4hep::ReconstructedParticleCollection&)> {
   MCRecoLinkCheckerFunctional(const std::string& name, ISvcLocator* svcLoc);
 
-  void operator()(const edm4hep::RecoMCParticleLinkCollection&    relationColl,
-                  const edm4hep::MCParticleCollection&            mcColl,
+  void operator()(const edm4hep::RecoMCParticleLinkCollection& relationColl,
+                  const edm4hep::MCParticleCollection& mcColl,
                   const edm4hep::ReconstructedParticleCollection& recoColl) const override;
 };
 
-#endif  // K4MARLINWRAPPER_TEST_MCRECOLINKCHECKERFUNCTIONAL_H
+#endif // K4MARLINWRAPPER_TEST_MCRECOLINKCHECKERFUNCTIONAL_H

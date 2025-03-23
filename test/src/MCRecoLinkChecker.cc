@@ -28,8 +28,8 @@ MCRecoLinkChecker::MCRecoLinkChecker(const std::string& name, ISvcLocator* pSL) 
 
 StatusCode MCRecoLinkChecker::execute(const EventContext&) const {
   const auto relationColl = m_relationCollHandle.get();
-  const auto mcColl       = m_mcCollHandle.get();
-  const auto recoColl     = m_recoCollHandle.get();
+  const auto mcColl = m_mcCollHandle.get();
+  const auto recoColl = m_recoCollHandle.get();
 
   if (relationColl->size() != mcColl->size()) {
     error() << "The MCReco relation collection does not have the expected size (expected: " << relationColl->size()
@@ -38,8 +38,8 @@ StatusCode MCRecoLinkChecker::execute(const EventContext&) const {
   }
 
   for (size_t i = 0; i < mcColl->size(); ++i) {
-    const auto mc       = (*mcColl)[i];
-    const auto reco     = (*recoColl)[i];
+    const auto mc = (*mcColl)[i];
+    const auto reco = (*recoColl)[i];
     const auto relation = (*relationColl)[i];
 
     if (relation.getWeight() != i) {

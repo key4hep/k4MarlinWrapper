@@ -33,7 +33,7 @@ PseudoRecoAlgorithm::PseudoRecoAlgorithm(const std::string& name, ISvcLocator* p
 
 StatusCode PseudoRecoAlgorithm::execute(const EventContext&) const {
   auto* coll_out = m_recoCollHandle.createAndPut();
-  auto* coll_in  = m_mcCollHandle.get();
+  auto* coll_in = m_mcCollHandle.get();
   for (const auto& particle : *coll_in) {
     auto new_particle = coll_out->create();
     new_particle.setCharge(particle.getCharge());
