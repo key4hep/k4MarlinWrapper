@@ -76,8 +76,8 @@ StatusCode LcioEvent::execute(const EventContext&) const {
     }
   }
 
-  auto             myEvWr = new LCEventWrapper(std::move(theEvent));
-  const StatusCode sc     = eventSvc()->registerObject("/Event/LCEvent", myEvWr);
+  auto myEvWr = new LCEventWrapper(std::move(theEvent));
+  const StatusCode sc = eventSvc()->registerObject("/Event/LCEvent", myEvWr);
   if (sc.isFailure()) {
     error() << "Failed to store the LCEvent" << endmsg;
     return sc;

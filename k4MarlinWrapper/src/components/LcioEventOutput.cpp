@@ -73,8 +73,8 @@ void LcioEventOutput::dropCollections(lcio::LCEventImpl* event, std::vector<lcio
   }
 
   for (const auto& evt_coll_name : *evt_coll_names) {
-    auto* evt_coll      = dynamic_cast<lcio::LCCollectionVec*>(event->getCollection(evt_coll_name));
-    auto  evt_coll_type = evt_coll->getTypeName();
+    auto* evt_coll = dynamic_cast<lcio::LCCollectionVec*>(event->getCollection(evt_coll_name));
+    auto evt_coll_type = evt_coll->getTypeName();
 
     // Drop types
     for (const auto& drop_type : m_drop_coll_types) {
@@ -137,7 +137,7 @@ void LcioEventOutput::revertSubsets(const std::vector<lcio::LCCollectionVec*>& s
 StatusCode LcioEventOutput::execute(const EventContext&) const {
   // Get event
   DataObject* pObject = nullptr;
-  StatusCode  sc      = evtSvc()->retrieveObject("/Event/LCEvent", pObject);
+  StatusCode sc = evtSvc()->retrieveObject("/Event/LCEvent", pObject);
   if (sc.isFailure()) {
     error() << "Could not retrieve LCEvent from event service" << endmsg;
     return StatusCode::FAILURE;

@@ -36,7 +36,7 @@
 // store that can be found in Writer.cpp in k4FWCore with some modifications
 // that are specific to the usage of this function in the converters, like
 // returning also a map from collection ID to collection name
-std::vector<std::string> getAvailableCollectionsFromStore(const AlgTool*                                  thisClass,
+std::vector<std::string> getAvailableCollectionsFromStore(const AlgTool* thisClass,
                                                           std::optional<std::map<uint32_t, std::string>>& idToName,
                                                           bool returnFrameCollections) {
   std::vector<std::string> collectionNames;
@@ -54,7 +54,7 @@ std::vector<std::string> getAvailableCollectionsFromStore(const AlgTool*        
     throw std::runtime_error("Failed to retrieve the root registry object");
   }
   std::vector<IRegistry*> leaves;
-  StatusCode              sc = mgr->objectLeaves(pObj, leaves);
+  StatusCode sc = mgr->objectLeaves(pObj, leaves);
   if (!sc.isSuccess()) {
     throw std::runtime_error("Failed to retrieve object leaves");
   }
@@ -75,8 +75,8 @@ std::vector<std::string> getAvailableCollectionsFromStore(const AlgTool*        
     if (sc.isFailure()) {
       thisClass->error() << "Could not retrieve object " << pReg->name() << " from the EventStore" << endmsg;
     }
-    auto*            functionalWrapper = dynamic_cast<AnyDataWrapper<std::unique_ptr<podio::CollectionBase>>*>(p);
-    DataWrapperBase* algorithmWrapper  = nullptr;
+    auto* functionalWrapper = dynamic_cast<AnyDataWrapper<std::unique_ptr<podio::CollectionBase>>*>(p);
+    DataWrapperBase* algorithmWrapper = nullptr;
     if (!functionalWrapper) {
       // This may be a collection created by a Gaudi::Algorithm
       algorithmWrapper = dynamic_cast<DataWrapperBase*>(p);

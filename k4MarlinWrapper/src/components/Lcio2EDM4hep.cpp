@@ -75,7 +75,7 @@ bool Lcio2EDM4hepTool::collectionExist(const std::string& collection_name) {
     collections = m_podioDataSvc->getEventFrame().getAvailableCollections();
   } else {
     std::optional<std::map<uint32_t, std::string>> dummy = std::nullopt;
-    collections                                          = getAvailableCollectionsFromStore(this, dummy, true);
+    collections = getAvailableCollectionsFromStore(this, dummy, true);
   }
   if (std::find(collections.begin(), collections.end(), collection_name) != collections.end()) {
     debug() << "Collection named " << collection_name << " already registered, skipping conversion." << endmsg;
@@ -128,24 +128,25 @@ void Lcio2EDM4hepTool::registerCollection(
 }
 
 namespace {
-  template <typename K, typename V> using ObjMapT = k4EDM4hep2LcioConv::VecMapT<K, V>;
+template <typename K, typename V>
+using ObjMapT = k4EDM4hep2LcioConv::VecMapT<K, V>;
 
-  struct ObjectMappings {
-    ObjMapT<lcio::Track*, edm4hep::MutableTrack>                                 tracks{};
-    ObjMapT<lcio::TrackerHit*, edm4hep::MutableTrackerHit3D>                     trackerHits{};
-    ObjMapT<lcio::SimTrackerHit*, edm4hep::MutableSimTrackerHit>                 simTrackerHits{};
-    ObjMapT<lcio::CalorimeterHit*, edm4hep::MutableCalorimeterHit>               caloHits{};
-    ObjMapT<lcio::RawCalorimeterHit*, edm4hep::MutableRawCalorimeterHit>         rawCaloHits{};
-    ObjMapT<lcio::SimCalorimeterHit*, edm4hep::MutableSimCalorimeterHit>         simCaloHits{};
-    ObjMapT<lcio::TPCHit*, edm4hep::MutableRawTimeSeries>                        tpcHits{};
-    ObjMapT<lcio::Cluster*, edm4hep::MutableCluster>                             clusters{};
-    ObjMapT<lcio::Vertex*, edm4hep::MutableVertex>                               vertices{};
-    ObjMapT<lcio::ReconstructedParticle*, edm4hep::MutableReconstructedParticle> recoParticles{};
-    ObjMapT<lcio::MCParticle*, edm4hep::MutableMCParticle>                       mcParticles{};
-    ObjMapT<lcio::TrackerHitPlane*, edm4hep::MutableTrackerHitPlane>             trackerHitPlanes{};
-    ObjMapT<lcio::ParticleID*, edm4hep::MutableParticleID>                       particleIDs{};
-  };
-}  // namespace
+struct ObjectMappings {
+  ObjMapT<lcio::Track*, edm4hep::MutableTrack> tracks{};
+  ObjMapT<lcio::TrackerHit*, edm4hep::MutableTrackerHit3D> trackerHits{};
+  ObjMapT<lcio::SimTrackerHit*, edm4hep::MutableSimTrackerHit> simTrackerHits{};
+  ObjMapT<lcio::CalorimeterHit*, edm4hep::MutableCalorimeterHit> caloHits{};
+  ObjMapT<lcio::RawCalorimeterHit*, edm4hep::MutableRawCalorimeterHit> rawCaloHits{};
+  ObjMapT<lcio::SimCalorimeterHit*, edm4hep::MutableSimCalorimeterHit> simCaloHits{};
+  ObjMapT<lcio::TPCHit*, edm4hep::MutableRawTimeSeries> tpcHits{};
+  ObjMapT<lcio::Cluster*, edm4hep::MutableCluster> clusters{};
+  ObjMapT<lcio::Vertex*, edm4hep::MutableVertex> vertices{};
+  ObjMapT<lcio::ReconstructedParticle*, edm4hep::MutableReconstructedParticle> recoParticles{};
+  ObjMapT<lcio::MCParticle*, edm4hep::MutableMCParticle> mcParticles{};
+  ObjMapT<lcio::TrackerHitPlane*, edm4hep::MutableTrackerHitPlane> trackerHitPlanes{};
+  ObjMapT<lcio::ParticleID*, edm4hep::MutableParticleID> particleIDs{};
+};
+} // namespace
 
 StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
   // Convert event parameters
@@ -153,7 +154,7 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
     LCIO2EDM4hepConv::convertObjectParameters(the_event, m_podioDataSvc->m_eventframe);
   } else {
     DataObject* p;
-    StatusCode  code = m_eventDataSvc->retrieveObject("/Event" + k4FWCore::frameLocation, p);
+    StatusCode code = m_eventDataSvc->retrieveObject("/Event" + k4FWCore::frameLocation, p);
     if (code.isSuccess()) {
       auto* frameWrapper = dynamic_cast<AnyDataWrapper<podio::Frame>*>(p);
       LCIO2EDM4hepConv::convertObjectParameters(the_event, frameWrapper->getData());
@@ -182,7 +183,7 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
 
   auto lcio2edm4hepMaps = ::ObjectMappings{};
 
-  std::vector<std::pair<std::string, EVENT::LCCollection*>>               lcRelationColls{};
+  std::vector<std::pair<std::string, EVENT::LCCollection*>> lcRelationColls{};
   std::vector<std::tuple<std::string, EVENT::LCCollection*, std::string>> subsetColls{};
 
   // If we convert any SimCalorimeterHit collection we also need the
@@ -198,7 +199,7 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
       debug() << "Converting collection " << lcioName << " (storing it as " << edm4hepName << "). ";
       if (collectionExist(edm4hepName)) {
         debug() << "Collection already exists, skipping." << endmsg;
-        continue;  // No need to convert again
+        continue; // No need to convert again
       }
       const auto& lcio_coll_type_str = lcio_coll->getTypeName();
       debug() << "LCIO type of the collection is " << lcio_coll_type_str << endmsg;
@@ -250,11 +251,11 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
 
   // We want one "global" map that is created the first time it is used in the event.
   DataObject* obj = nullptr;
-  auto        sc  = evtSvc()->retrieveObject(GlobalConvertedObjectsMap::TESpath.data(), obj);
+  auto sc = evtSvc()->retrieveObject(GlobalConvertedObjectsMap::TESpath.data(), obj);
   if (sc.isFailure()) {
     debug() << "Creating GlobalconvertedObjectsMap for this event since it is not already in the EventStore" << endmsg;
     auto globalObjMapWrapper = new AnyDataWrapper(GlobalConvertedObjectsMap{});
-    auto nsc                 = evtSvc()->registerObject(GlobalConvertedObjectsMap::TESpath.data(), globalObjMapWrapper);
+    auto nsc = evtSvc()->registerObject(GlobalConvertedObjectsMap::TESpath.data(), globalObjMapWrapper);
     if (nsc.isFailure()) {
       error() << "Could not register GlobalConvertedObjectsMap in the EventStore" << endmsg;
       return StatusCode::FAILURE;
@@ -262,8 +263,8 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
     obj = globalObjMapWrapper;
   }
 
-  auto  globalObjMapWrapper = static_cast<AnyDataWrapper<GlobalConvertedObjectsMap>*>(obj);
-  auto& globalObjMap        = globalObjMapWrapper->getData();
+  auto globalObjMapWrapper = static_cast<AnyDataWrapper<GlobalConvertedObjectsMap>*>(obj);
+  auto& globalObjMap = globalObjMapWrapper->getData();
 
   globalObjMap.update(lcio2edm4hepMaps);
 
@@ -275,14 +276,14 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
   }
 
   for (auto&& assocColl : LCIO2EDM4hepConv::createLinks(globalObjMap, lcRelationColls)) {
-    registerCollection(std::move(assocColl));  // TODO: Potentially handle metadata here?
+    registerCollection(std::move(assocColl)); // TODO: Potentially handle metadata here?
   }
 
   if (needCaloHitContribs) {
     registerCollection(name() + "_CaloHitContributions",
                        LCIO2EDM4hepConv::createCaloHitContributions(
                            lcio2edm4hepMaps.simCaloHits,
-                           globalObjMap.mcParticles));  // TODO: Can we do something about meta data here?
+                           globalObjMap.mcParticles)); // TODO: Can we do something about meta data here?
   }
 
   return StatusCode::SUCCESS;

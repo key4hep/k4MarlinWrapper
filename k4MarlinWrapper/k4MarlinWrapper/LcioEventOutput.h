@@ -36,7 +36,7 @@
 #include <vector>
 
 namespace MT {
-  class LCWriter;
+class LCWriter;
 }
 
 class LcioEventOutput : public Gaudi::Algorithm {
@@ -49,8 +49,8 @@ public:
 private:
   MT::LCWriter* m_writer = nullptr;
 
-  Gaudi::Property<std::string>              m_write_mode{this, "WriteMode", {}};
-  Gaudi::Property<std::string>              m_filename{this, "OutputFileName", {}};
+  Gaudi::Property<std::string> m_write_mode{this, "WriteMode", {}};
+  Gaudi::Property<std::string> m_filename{this, "OutputFileName", {}};
   Gaudi::Property<std::vector<std::string>> m_drop_coll_names{this, "DropCollectionNames", {}};
   Gaudi::Property<std::vector<std::string>> m_keep_coll_names{this, "KeepCollectionNames", {}};
   Gaudi::Property<std::vector<std::string>> m_drop_coll_types{this, "DropCollectionTypes", {}};

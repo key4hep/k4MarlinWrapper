@@ -44,4 +44,4 @@ private:
   SmartIF<IGeoSvc> m_geoSvc;
 };
 
-#endif  // CELLIDSVC_H
+#endif // CELLIDSVC_H

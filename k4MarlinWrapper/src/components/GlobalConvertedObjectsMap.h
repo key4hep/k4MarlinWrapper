@@ -38,74 +38,77 @@
 #include <string_view>
 
 namespace EVENT {
-  class Track;
-  class TrackerHit;
-  class TrackerHitPlane;
-  class SimTrackerHit;
-  class CalorimeterHit;
-  class RawCalorimeterHit;
-  class SimCalorimeterHit;
-  class TPCHit;
-  class Cluster;
-  class Vertex;
-  class ReconstructedParticle;
-  class MCParticle;
-  class ParticleID;
-}  // namespace EVENT
+class Track;
+class TrackerHit;
+class TrackerHitPlane;
+class SimTrackerHit;
+class CalorimeterHit;
+class RawCalorimeterHit;
+class SimCalorimeterHit;
+class TPCHit;
+class Cluster;
+class Vertex;
+class ReconstructedParticle;
+class MCParticle;
+class ParticleID;
+} // namespace EVENT
 
 namespace k4MarlinWrapper {
 
-  /**
-   * Fill all key value pairs from updates into map
-   */
-  template <typename Map, typename UpdateMap> void updateMap(Map& map, const UpdateMap& updates) {
-    for (const auto& [k, v] : updates) {
-      k4EDM4hep2LcioConv::detail::mapInsert(k, v, map);
-    }
+/**
+ * Fill all key value pairs from updates into map
+ */
+template <typename Map, typename UpdateMap>
+void updateMap(Map& map, const UpdateMap& updates) {
+  for (const auto& [k, v] : updates) {
+    k4EDM4hep2LcioConv::detail::mapInsert(k, v, map);
   }
+}
+
+/**
+ * The LCIO <-> EDM4hep object mapping that holds the relations between all
+ * converted objects from all converters that are running.
+ */
+struct GlobalConvertedObjectsMap {
+  template <typename K, typename V>
+  using ObjectMapT = k4EDM4hep2LcioConv::VecMapT<K, V>;
+
+  ObjectMapT<EVENT::Track*, edm4hep::Track> tracks{};
+  ObjectMapT<EVENT::TrackerHit*, edm4hep::TrackerHit3D> trackerHits{};
+  ObjectMapT<EVENT::SimTrackerHit*, edm4hep::SimTrackerHit> simTrackerHits{};
+  ObjectMapT<EVENT::CalorimeterHit*, edm4hep::CalorimeterHit> caloHits{};
+  ObjectMapT<EVENT::RawCalorimeterHit*, edm4hep::RawCalorimeterHit> rawCaloHits{};
+  ObjectMapT<EVENT::SimCalorimeterHit*, edm4hep::SimCalorimeterHit> simCaloHits{};
+  ObjectMapT<EVENT::TPCHit*, edm4hep::RawTimeSeries> tpcHits{};
+  ObjectMapT<EVENT::Cluster*, edm4hep::Cluster> clusters{};
+  ObjectMapT<EVENT::Vertex*, edm4hep::Vertex> vertices{};
+  ObjectMapT<EVENT::ReconstructedParticle*, edm4hep::ReconstructedParticle> recoParticles{};
+  ObjectMapT<EVENT::MCParticle*, edm4hep::MCParticle> mcParticles{};
+  ObjectMapT<EVENT::TrackerHitPlane*, edm4hep::TrackerHitPlane> trackerHitPlanes{};
+  ObjectMapT<EVENT::ParticleID*, edm4hep::ParticleID> particleIDs{};
+
+  constexpr static auto TESpath = std::string_view{"/Event/EDMConvGlobalObjMap"};
 
   /**
-   * The LCIO <-> EDM4hep object mapping that holds the relations between all
-   * converted objects from all converters that are running.
+   * Update the map with contents from one converter run
    */
-  struct GlobalConvertedObjectsMap {
-    template <typename K, typename V> using ObjectMapT = k4EDM4hep2LcioConv::VecMapT<K, V>;
-
-    ObjectMapT<EVENT::Track*, edm4hep::Track>                                 tracks{};
-    ObjectMapT<EVENT::TrackerHit*, edm4hep::TrackerHit3D>                     trackerHits{};
-    ObjectMapT<EVENT::SimTrackerHit*, edm4hep::SimTrackerHit>                 simTrackerHits{};
-    ObjectMapT<EVENT::CalorimeterHit*, edm4hep::CalorimeterHit>               caloHits{};
-    ObjectMapT<EVENT::RawCalorimeterHit*, edm4hep::RawCalorimeterHit>         rawCaloHits{};
-    ObjectMapT<EVENT::SimCalorimeterHit*, edm4hep::SimCalorimeterHit>         simCaloHits{};
-    ObjectMapT<EVENT::TPCHit*, edm4hep::RawTimeSeries>                        tpcHits{};
-    ObjectMapT<EVENT::Cluster*, edm4hep::Cluster>                             clusters{};
-    ObjectMapT<EVENT::Vertex*, edm4hep::Vertex>                               vertices{};
-    ObjectMapT<EVENT::ReconstructedParticle*, edm4hep::ReconstructedParticle> recoParticles{};
-    ObjectMapT<EVENT::MCParticle*, edm4hep::MCParticle>                       mcParticles{};
-    ObjectMapT<EVENT::TrackerHitPlane*, edm4hep::TrackerHitPlane>             trackerHitPlanes{};
-    ObjectMapT<EVENT::ParticleID*, edm4hep::ParticleID>                       particleIDs{};
-
-    constexpr static auto TESpath = std::string_view{"/Event/EDMConvGlobalObjMap"};
-
-    /**
-     * Update the map with contents from one converter run
-     */
-    template <typename ObjectMap> void update(const ObjectMap& localMap) {
-      updateMap(tracks, localMap.tracks);
-      updateMap(trackerHits, localMap.trackerHits);
-      updateMap(simTrackerHits, localMap.simTrackerHits);
-      updateMap(caloHits, localMap.caloHits);
-      updateMap(rawCaloHits, localMap.rawCaloHits);
-      updateMap(simCaloHits, localMap.simCaloHits);
-      updateMap(tpcHits, localMap.tpcHits);
-      updateMap(clusters, localMap.clusters);
-      updateMap(vertices, localMap.vertices);
-      updateMap(recoParticles, localMap.recoParticles);
-      updateMap(mcParticles, localMap.mcParticles);
-      updateMap(trackerHitPlanes, localMap.trackerHitPlanes);
-      updateMap(particleIDs, localMap.particleIDs);
-    }
-  };
-}  // namespace k4MarlinWrapper
+  template <typename ObjectMap>
+  void update(const ObjectMap& localMap) {
+    updateMap(tracks, localMap.tracks);
+    updateMap(trackerHits, localMap.trackerHits);
+    updateMap(simTrackerHits, localMap.simTrackerHits);
+    updateMap(caloHits, localMap.caloHits);
+    updateMap(rawCaloHits, localMap.rawCaloHits);
+    updateMap(simCaloHits, localMap.simCaloHits);
+    updateMap(tpcHits, localMap.tpcHits);
+    updateMap(clusters, localMap.clusters);
+    updateMap(vertices, localMap.vertices);
+    updateMap(recoParticles, localMap.recoParticles);
+    updateMap(mcParticles, localMap.mcParticles);
+    updateMap(trackerHitPlanes, localMap.trackerHitPlanes);
+    updateMap(particleIDs, localMap.particleIDs);
+  }
+};
+} // namespace k4MarlinWrapper
 
 #endif

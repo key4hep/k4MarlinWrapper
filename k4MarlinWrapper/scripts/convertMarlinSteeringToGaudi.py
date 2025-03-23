@@ -112,7 +112,7 @@ def convertConstants(lines, tree):
                     val_format = re.sub(r"\$\{(\w*)\}", r"%(\1)s", val)
                     val_format = '"{val_format}"'
                     formatted_array.append(val_format)
-            constants[key] = f'[{", ".join(formatted_array)}]'
+            constants[key] = f"[{', '.join(formatted_array)}]"
 
     lines.append("\nCONSTANTS = {")
     for key in constants:
@@ -189,7 +189,7 @@ def createHeader(lines):
 def createLcioReader(lines, glob):
     lines.append("read = LcioEvent()")
     lines.append(f"read.OutputLevel = {verbosityTranslator(glob.get('Verbosity', 'DEBUG'))}")
-    lines.append(f"read.Files = [\"{glob.get('LCIOInputFiles')}\"]")
+    lines.append(f'read.Files = ["{glob.get("LCIOInputFiles")}"]')
     lines.append("algList.append(read)\n")
 
 
@@ -228,7 +228,7 @@ def convertParameters(params, proc, globParams, constants):
     if "Verbosity" in params:
         lines.append(f"{proc}.OutputLevel = {verbosityTranslator(params['Verbosity'])}")
 
-    lines.append(f"{proc}.ProcessorType = \"{params.get('type')}\"")
+    lines.append(f'{proc}.ProcessorType = "{params.get("type")}"')
     lines.append(f"{proc}.Parameters = {{")
     for para in sorted(params):
         if para not in ["type", "Verbosity"]:

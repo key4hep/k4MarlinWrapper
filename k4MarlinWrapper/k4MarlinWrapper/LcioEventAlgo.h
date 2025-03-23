@@ -29,7 +29,7 @@
 #include <Gaudi/Property.h>
 
 namespace MT {
-  class LCReader;
+class LCReader;
 }
 
 class LcioEvent : public Gaudi::Algorithm {
@@ -40,11 +40,11 @@ public:
 
 private:
   Gaudi::Property<std::vector<std::string>> m_fileNames{this, "Files", {}};
-  Gaudi::Property<int>                      m_skipNEvents{this, "skipNEvents", 0};
-  MT::LCReader*                             m_reader = nullptr;
-  int                                       m_numberOfEvents{};
-  mutable int                               m_currentEvent{};  // No atomicity necessary since not re-entrant
-  bool                                      isReEntrant() const final { return false; }
+  Gaudi::Property<int> m_skipNEvents{this, "skipNEvents", 0};
+  MT::LCReader* m_reader = nullptr;
+  int m_numberOfEvents{};
+  mutable int m_currentEvent{}; // No atomicity necessary since not re-entrant
+  bool isReEntrant() const final { return false; }
 };
 
 #endif
