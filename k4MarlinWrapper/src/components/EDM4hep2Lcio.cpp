@@ -389,29 +389,33 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
   // use m_collsToConvert to detect whether we run the first time and cache the
   // results as we can assume that all the events have the same contents
   if (m_collsToConvert.empty()) {
-    // Start off with the pre-defined collection name mappings
-    m_collsToConvert = {m_collNames.value().begin(), m_collNames.value().end()};
+    // Start off with the pre-defined collection name mappings. We start with a
+    // copy of the configuration to not change that on the fly
+    auto collNameMapping = m_collNames.value();
+
     // We *always* want to convert the EventHeader
-    m_collsToConvert.emplace(edm4hep::labels::EventHeader, "<directly into LCEvent>");
+    m_collsToConvert.emplace_back(edm4hep::labels::EventHeader, "<directly into LCEvent>");
 
     if (m_convertAll) {
       info() << "Converting all collections from EDM4hep to LCIO" << endmsg;
-      std::vector<std::string> collectionNames{};
       if (m_podioDataSvc) {
         // If we have the PodioDataSvc get the collections available from frame
         edmEvent = m_podioDataSvc->getEventFrame();
-        collectionNames = edmEvent.value().get().getAvailableCollections();
+        for (const auto& name : edmEvent.value().get().getAvailableCollections()) {
+          const auto& [_, inserted] = collNameMapping.emplace(name, name);
+          debug() << fmt::format("Adding '{}' from Frame to conversion? {}", name, inserted);
+        }
       }
       // Always check the contents of the TES
       std::optional<std::map<uint32_t, std::string>> idToNameOpt(std::move(m_idToName));
-      auto collections = getAvailableCollectionsFromStore(this, idToNameOpt);
+      for (const auto& name : getAvailableCollectionsFromStore(this, idToNameOpt)) {
+        const auto& [_, inserted] = collNameMapping.emplace(name, name);
+        debug() << fmt::format("Adding '{}' from TES to conversion? {}", name, inserted);
+      }
       m_idToName = std::move(idToNameOpt.value());
-      collectionNames.insert(collectionNames.end(), collections.begin(), collections.end());
 
-      // And simply add the rest, exploiting the fact that emplace will not
-      // replace existing entries with the same key
-      for (const auto& name : collectionNames) {
-        m_collsToConvert.emplace(name, name);
+      for (auto&& [origName, newName] : collNameMapping) {
+        m_collsToConvert.emplace_back(std::move(origName), std::move(newName));
       }
     }
   }
