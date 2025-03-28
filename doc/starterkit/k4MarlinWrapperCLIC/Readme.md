@@ -158,7 +158,7 @@ The `MarlinDD4hep::InitializeDD4hep` processor can be replaced by the `k4SimGean
 This requires removing the wrapped `InitDD4hep` processor from the `algList` and the two new processed be appended to the `ExtSvc` argument in the `ApplicationMgr`.
 
 ```{note}
-If you are using a version of `k4MarlinWrapper` that is newer than `v00-11` then this replacement will be done automatically by the `convertMarlinSteeringToGaudi.py` script.
+If you are using a version of `k4MarlinWrapper` that is newer than `v00-11` (April 2025) this replacement will be done automatically by the `convertMarlinSteeringToGaudi.py` script.
 ```
 
 We will create another list, `svcList` for this.
