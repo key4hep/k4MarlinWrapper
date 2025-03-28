@@ -100,9 +100,9 @@ during [Simulation](#simulation).
 #### Reconstruction with LCIO input
 
 - When using **LCIO** format for the input events to be used in reconstruction:
-  + Modify the ``clicReconstruction.py`` file to point to the ``ttbar.slcio`` input file, and change the
-  ``DD4hepXMLFile`` parameter for the ``InitDD4hep`` algorithm.  In addition the two processors with the comment ``#
-  Config.OverlayFalse`` and ``# Config.TrackingConformal`` should be enabled by uncommenting their line in the ``algList``
+  + Modify the `clicReconstruction.py` file to point to the `ttbar.slcio` input file, and change the
+  `detectors` parameter for the `geoSvc` service.  In addition the two processors with the comment `#
+  Config.OverlayFalse` and `# Config.TrackingConformal` should be enabled by uncommenting their line in the `algList`
   at the end of the file.
 
 ```bash
@@ -116,8 +116,7 @@ sed -i 's;# algList.append(OverlayFalse);algList.append(OverlayFalse);' clicReco
 sed -i 's;# algList.append(MyConformalTracking);algList.append(MyConformalTracking);' clicReconstruction.py
 sed -i 's;# algList.append(ClonesAndSplitTracksFinder);algList.append(ClonesAndSplitTracksFinder);' clicReconstruction.py
 sed -i 's;# algList.append(RenameCollection);algList.append(RenameCollection);' clicReconstruction.py
-sed -i 's;"DD4hepXMLFile": \[".*"\],; "DD4hepXMLFile": \[os.environ["LCGEO"]+"/CLIC/compact/CLIC_o3_v14/CLIC_o3_v14.xml"\],;' clicReconstruction.py
-
+sed -i 's;geoSvc.detectors = \[".*"\];geoSvc.detectors = \[os.environ["K4GEO"]+"/CLIC/compact/CLIC_o3_v14/CLIC_o3_v14.xml"\];' clicReconstruction.py
 ```
 
 Then the reconstruction using the k4MarlinWrapper can be run with
@@ -154,9 +153,13 @@ k4run clicRec_e4h_input.py --IOSvc.Input ttbar_edm4hep.root
 
 ### DD4hep Geometry Information
 
-The ``MarlinDD4hep::InitializeDD4hep`` processor can be replaced by the ``k4SimGeant4::GeoSvc`` and the
-``TrackingCellIDEncodingSvc`` the latter of which is part of the k4MarlinWrapper repository.
+The `MarlinDD4hep::InitializeDD4hep` processor can be replaced by the `k4SimGeant4::GeoSvc` and the
+`TrackingCellIDEncodingSvc` the latter of which is part of the k4MarlinWrapper repository.
 This requires removing the wrapped `InitDD4hep` processor from the `algList` and the two new processed be appended to the `ExtSvc` argument in the `ApplicationMgr`.
+
+```{note}
+If you are using a version of `k4MarlinWrapper` that is newer than `v00-11` (April 2025) this replacement will be done automatically by the `convertMarlinSteeringToGaudi.py` script.
+```
 
 We will create another list, `svcList` for this.
 In the space following
