@@ -81,9 +81,10 @@ def replaceConstants(value, constants):
     return ", ".join(formatted_array)
 
 
-def convertConstants(lines, tree):
+def convertConstants(tree):
     """Find constant tags, write them to python and replace constants within themselves"""
     constants = dict()
+    lines = []
 
     constElements = tree.findall("constants/constant")
     for const in constElements:
@@ -112,7 +113,7 @@ def convertConstants(lines, tree):
                     val_format = re.sub(r"\$\{(\w*)\}", r"%(\1)s", val)
                     val_format = '"{val_format}"'
                     formatted_array.append(val_format)
-            constants[key] = f'[{", ".join(formatted_array)}]'
+            constants[key] = f"[{', '.join(formatted_array)}]"
 
     lines.append("\nCONSTANTS = {")
     for key in constants:
@@ -121,7 +122,7 @@ def convertConstants(lines, tree):
 
     lines.append("parseConstants(CONSTANTS)\n")
 
-    return constants
+    return constants, lines
 
 
 def getValue(element, default=None):
@@ -148,48 +149,67 @@ def getGlobalParameters(tree):
     return getGlobalDict(tree.findall("global/parameter"))
 
 
-def resolveGroup(lines, proc, execGroup):
+def resolveGroup(proc, execGroup):
+    procNames = []
     for member in execGroup:
         if member.get("name") == proc:
             for child in member:
                 if child.tag == "processor":
-                    lines.append(f"algList.append({child.get('name').replace('.', '_')})")
+                    procNames.append(child.get("name").replace(".", "_"))
+    return procNames
 
 
-def getExecutingProcessors(lines, tree):
+def getExecutingProcessors(tree):
     """compare the list of processors to execute, order matters"""
     execProc = tree.findall("execute/*")
     execGroup = tree.findall("group")
-    optProcessors = False
+    procs = []
 
     for proc in execProc:
         if proc.tag == "if":
             for child in proc:
                 if child.tag == "processor":
-                    optProcessors = True
-                    lines.append(
-                        f"# algList.append({child.get('name').replace('.', '_')})  # {proc.get('condition')}"
-                    )
+                    procs.append((child.get("name").replace(".", "_"), proc.get("condition")))
         if proc.tag == "processor":
-            lines.append(f"algList.append({proc.get('name')})")
+            procs.append((proc.get("name").replace(".", "_"), ""))
         if proc.tag == "group":
-            resolveGroup(lines, proc.get("name"), execGroup)
+            for p in resolveGroup(proc.get("name"), execGroup):
+                procs.append((p, ""))
+
+    return procs
+
+
+def dumpAlgList(execProcs, lines):
+    """Dump the algorithms into the algList"""
+    optProcessors = False
+    for name, condition in execProcs:
+        if condition:
+            optProcessors = True
+            lines.append(f"# algList.append({name})  # {condition}")
+        else:
+            lines.append(f"algList.append({name})")
     return optProcessors
 
 
-def createHeader(lines):
+def createHeader(lines, geo_svc=False, cellid_svc=False):
     lines.append("from Gaudi.Configuration import *\n")
-    lines.append("from Configurables import LcioEvent, EventDataSvc, MarlinProcessorWrapper")
+    imports = ["LcioEvent", "EventDataSvc", "MarlinProcessorWrapper"]
+    if geo_svc:
+        imports.append("GeoSvc")
+    if cellid_svc:
+        imports.append("TrackingCellIDEncodingSvc")
+    lines.append(f"from Configurables import {', '.join(imports)}")
     lines.append("from k4MarlinWrapper.parseConstants import *")
     lines.append("algList = []")
+    lines.append("svcList = []")
     lines.append("evtsvc = EventDataSvc()\n")
-    # lines.append("END_TAG = \"END_TAG\"\n")
+    lines.append("svcList.append(evtsvc)")
 
 
 def createLcioReader(lines, glob):
     lines.append("read = LcioEvent()")
     lines.append(f"read.OutputLevel = {verbosityTranslator(glob.get('Verbosity', 'DEBUG'))}")
-    lines.append(f"read.Files = [\"{glob.get('LCIOInputFiles')}\"]")
+    lines.append(f'read.Files = ["{glob.get("LCIOInputFiles")}"]')
     lines.append("algList.append(read)\n")
 
 
@@ -198,7 +218,7 @@ def createFooter(lines, glob):
     lines.append("ApplicationMgr( TopAlg = algList,")
     lines.append("                EvtSel = 'NONE',")
     lines.append("                EvtMax   = 10,")
-    lines.append("                ExtSvc = [evtsvc],")
+    lines.append("                ExtSvc = svcList,")
     lines.append(
         f"                OutputLevel={verbosityTranslator(glob.get('Verbosity', 'DEBUG'))}"
     )
@@ -228,7 +248,7 @@ def convertParameters(params, proc, globParams, constants):
     if "Verbosity" in params:
         lines.append(f"{proc}.OutputLevel = {verbosityTranslator(params['Verbosity'])}")
 
-    lines.append(f"{proc}.ProcessorType = \"{params.get('type')}\"")
+    lines.append(f'{proc}.ProcessorType = "{params.get("type")}"')
     lines.append(f"{proc}.Parameters = {{")
     for para in sorted(params):
         if para not in ["type", "Verbosity"]:
@@ -240,9 +260,54 @@ def convertParameters(params, proc, globParams, constants):
     return lines
 
 
-def convertProcessors(lines, tree, globParams, constants):
+def filterInitDD4hep(processors, constants, tree, procList):
+    """Check if an InitDD4hep Processor is in the list of processors"""
+    init_proc = [k for k, v in processors.items() if v.get("type", "") == "InitializeDD4hep"]
+    exec_init = list(filter(lambda x: x[0] in init_proc and not x[1], procList))
+
+    if not exec_init:
+        return []
+
+    if len(exec_init) > 1:
+        print("WARNING: Found two InitDD4hep processors in the execute section.")
+        print("         Only the first one will be converted to use the GeoSvc.")
+
+    # extract the processor from the processor conversion and from the list of
+    # algs to execute
+    proc = processors.pop(exec_init[0][0])
+    procList[:] = [i for i in procList if i[0] != exec_init[0][0]]
+
+    lines = [
+        'geoSvc = GeoSvc("GeoSvc")',
+        f"geoSvc.OutputLevel = {verbosityTranslator(proc.get('Verbosity', 'MESSAGE'))}",
+        "geoSvc.EnableGeant4Geo = False",
+    ]
+
+    compactFile = proc.get("DD4hepXMLFile", None)
+    if compactFile:
+        value = compactFile.replace("\n", " ")
+        value = " ".join(value.split())
+        lines.append(f"geoSvc.detectors = [{replaceConstants(value, constants)}]")
+
+    lines.append("svcList.append(geoSvc)\n")
+
+    encString = proc.get("EncodingStringParameter", None)
+    if encString:
+        lines.extend(
+            [
+                'cellIDSvc = TrackingCellIDEncodingSvc("CellIDSvc")',
+                "cellIDSvc.GeoSvcName = geoSvc.name()",
+                f'cellIDSvc.EncodingStringParameterName = "{encString}"',
+                f"cellIDSvc.OutputLevel = {verbosityTranslator(proc.get('Verbosity', 'MESSAGE'))}",
+                "svcList.append(cellIDSvc)\n",
+            ]
+        )
+
+    return lines
+
+
+def convertProcessors(lines, processors, globParams, constants):
     """convert XML tree to list of strings"""
-    processors = getProcessors(tree)
     for proc in processors:
         proc_name = proc.replace(".", "_")
         lines.append(f'{proc_name} = MarlinProcessorWrapper("{proc}")')
@@ -267,12 +332,17 @@ def findWarnIncludes(tree):
 def generateGaudiSteering(tree):
     findWarnIncludes(tree)
     globParams = getGlobalParameters(tree)
+    processors = getProcessors(tree)
+    constants, constLines = convertConstants(tree)
+    procExecList = getExecutingProcessors(tree)
+    geoSvcLines = filterInitDD4hep(processors, constants, tree, procExecList)
     lines = []
-    createHeader(lines)
-    constants = convertConstants(lines, tree)
+    createHeader(lines, len(geoSvcLines) != 0, len(geoSvcLines) > 6)
+    lines.extend(constLines)
     createLcioReader(lines, globParams)
-    convertProcessors(lines, tree, globParams, constants)
-    optProcessors = getExecutingProcessors(lines, tree)
+    lines.extend(geoSvcLines)
+    convertProcessors(lines, processors, globParams, constants)
+    optProcessors = dumpAlgList(procExecList, lines)
     if optProcessors:
         print("Optional Processors were found!")
         print("Please uncomment the desired ones at the bottom of the resulting file\n")
