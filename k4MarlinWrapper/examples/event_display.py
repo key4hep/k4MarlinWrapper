@@ -523,6 +523,4 @@ algList.append(MyCEDViewer)
 # We need to convert the inputs in case we have EDM4hep input
 io_handler.finalize_converters()
 
-ApplicationMgr(
-    TopAlg=algList, EvtSel="NONE", EvtMax=10, ExtSvc=svcList, OutputLevel=INFO
-)
+ApplicationMgr(TopAlg=algList, EvtSel="NONE", EvtMax=10, ExtSvc=svcList, OutputLevel=INFO)

@@ -16,6 +16,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
 
 from Gaudi.Configurables import (
     MarlinProcessorWrapper,
@@ -85,6 +86,4 @@ if args.output_type in ("edm4hep", "both"):
 
 io_handler.finalize_converters()
 
-ApplicationMgr(
-    TopAlg=algList, EvtSel="NONE", EvtMax=1, ExtSvc=[evtsvc], OutputLevel=DEBUG
-)
+ApplicationMgr(TopAlg=algList, EvtSel="NONE", EvtMax=1, ExtSvc=[evtsvc], OutputLevel=DEBUG)
