@@ -63,7 +63,6 @@ class IOHandlerHelper:
         self._io_svc = io_svc
         self._lcio_input = False
         self._edm4hep_output = False
-        self._lcio_writers = []
 
     def add_reader(self, input_files):
         """Add a reader that is equipped to read the passed files
@@ -107,10 +106,7 @@ class IOHandlerHelper:
                 further configured
         """
         writer = MarlinProcessorWrapper(alg_name, ProcessorType="LCIOOutputProcessor")
-
         self._alg_list.append(writer)
-        self._lcio_writers.append(writer)
-
         return writer
 
     def add_edm4hep_writer(self, output_file, output_cmds=["keep *"]):
