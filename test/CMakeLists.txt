@@ -43,6 +43,7 @@ find_package(Marlin REQUIRED)
 add_library(MarlinTestProcessors SHARED
   src/TrivialMCTruthLinkerProcessor.cc
   src/MarlinMCRecoLinkChecker.cc
+  src/PseudoRecoProcessor.cc
 )
 target_link_libraries(MarlinTestProcessors PUBLIC ${Marlin_LIBRARIES})
 target_include_directories(MarlinTestProcessors PUBLIC ${Marlin_INCLUDE_DIRS})
@@ -137,6 +138,42 @@ ExternalData_Add_Test( marlinwrapper_tests
 ExternalData_Add_Test( marlinwrapper_tests
   NAME link_conversion_edm4hep_to_lcio_iosvc_gaudi_algorithm
   COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_link_conversion_edm4hep.py --use-gaudi-algorithm --inputfile DATA{${PROJECT_SOURCE_DIR}/test/input_files/ttbar_20240223_edm4hep.root}
+)
+
+# ---- IO Helpers tests
+ExternalData_Add_Test( marlinwrapper_tests
+  NAME io_helpers_lcio_marlin_only
+  COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_io_utilities.py --inputfile DATA{${PROJECT_SOURCE_DIR}/test/input_files/muons.slcio} --output-type lcio --outputbase lcio_marlin_only
+)
+
+ExternalData_Add_Test( marlinwrapper_tests
+  NAME io_helpers_edm4hep_marlin_only
+  COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_io_utilities.py --inputfile DATA{${PROJECT_SOURCE_DIR}/test/input_files/ttbar_20240223_edm4hep.root} --output-type edm4hep --outputbase edm4hep_marlin_only
+)
+
+ExternalData_Add_Test( marlinwrapper_tests
+  NAME io_helpers_lcio_in_edm4hep_out_marlin_only
+  COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_io_utilities.py --inputfile DATA{${PROJECT_SOURCE_DIR}/test/input_files/muons.slcio} --output-type edm4hep --outputbase lcio_in_edm4hep_out_marlin_only
+)
+
+ExternalData_Add_Test( marlinwrapper_tests
+  NAME io_helpers_edm4hep_in_lcio_out_marlin_only
+  COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_io_utilities.py --inputfile DATA{${PROJECT_SOURCE_DIR}/test/input_files/ttbar_20240223_edm4hep.root} --output-type lcio --outputbase edm4hep_in_lcio_out_marlin_only
+)
+
+ExternalData_Add_Test( marlinwrapper_tests
+  NAME io_helpers_lcio_marlin_gaudi
+  COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_io_utilities.py --inputfile DATA{${PROJECT_SOURCE_DIR}/test/input_files/muons.slcio} --with-gaudi-algorithm --output-type lcio --outputbase lcio_marlin_gaudi
+)
+
+ExternalData_Add_Test( marlinwrapper_tests
+  NAME io_helpers_edm4hep_marlin_gaudi
+  COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_io_utilities.py --inputfile DATA{${PROJECT_SOURCE_DIR}/test/input_files/ttbar_20240223_edm4hep.root} --with-gaudi-algorithm --output-type edm4hep --outputbase edm4hep_marlin_gaudi
+)
+
+ExternalData_Add_Test( marlinwrapper_tests
+  NAME io_helpers_edm4hep_both_out_marlin_gaudi
+  COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_io_utilities.py --inputfile DATA{${PROJECT_SOURCE_DIR}/test/input_files/ttbar_20240223_edm4hep.root} --with-gaudi-algorithm --output-type both --outputbase edm4hep_both_out_marlin_gaudi
 )
 
 add_test( event_header_conversion bash -c "k4run ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/createEventHeader.py && anajob test.slcio | grep 'EVENT: 42'" )
