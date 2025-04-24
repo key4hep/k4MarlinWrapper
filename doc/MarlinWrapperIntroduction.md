@@ -227,6 +227,71 @@ unconditionally. Hence, if it's missing the conversion will fail. Make sure to
 read it in, or create it on the fly.
 ```
 
+## Tools for facilitating interoperability
+Mixed reconstruction and analysis chains (i.e. chains that have wrapped Marlin
+processors and native Gaudi algorithms) come with some challenges, e.g. the need
+to handle LCIO and EDM4hep inputs and outputs transparently and making sure that
+all the necessary conversions are done at the appropriate places. To facilitate
+this k4MarlinWrapper provides some python tools to automate parts of this.
+
+Most importantly the `IOHandlerHelper` class can be used to create and insert
+the correct readers and writers as well as injecting converters at the necessary
+places. We recommend using it if you need to support different input and output
+formats. The basic setup looks like this:
+
+```python
+from Configurables import EventDataSvc
+from k4FWCore import IOSvc
+from k4MarlinWrapper.io_helpers import IOHandlerHelper
+
+alg_list = []
+evt_svc = EventDataSvc("EventDataSvc")
+svc_list = [evt_svc]
+io_svc = IOSvc()
+
+io_handler = IOHandlerHelper(alg_list, io_svc)
+# Create an appropriate reader for the input files
+io_handler.add_reader(input_files)
+```
+
+This will either add an EDM4hep reader to the `IOSvc` (at the very beginning of
+the reconstruction chain) or add an `LcioEvent` algorithm at the current place
+in the `alg_list`. You can now simply add all the algorithms
+(`MarlinProcessorWrapper` or native Gaudi algorithms) as usual to the
+`alg_list`.
+
+For adding EDm4hep output simply do
+```python
+io_handler.add_edm4hep_writer("output.edm4hep.root")
+```
+
+which will create an output file `output.edm4hep.root` and use the `["keep *"]`
+as `IOSvc.outputCommands`. The latter can be changed by passing a second
+argument.
+
+For adding LCIO output you need to
+```python
+lcio_writer = io_handler.add_lcio_writer("LCIOWriter")
+lcio_writer.Parameters = {
+    "LCIOOutputFile": ["output.slcio"]
+    "LCIOWriteMode": ["WRITE_NEW"]
+}
+```
+
+Note that in this case the `lcio_writer` is not yet fully configured but simply
+added to the chain of algorithms to execute.
+
+Finally, to insert all the necessary converters simply call
+`finalize_converters` before handing off the algorithm list to the
+`ApplicationMgr`, i.e.
+
+```python
+io_handler.finalize_converters()
+
+from k4FWCore import ApplicationMgr
+ApplicationMgr(TopAlg=alg_list, EvtSel="NONE", ExtSvc=[evt_svc])
+```
+
 ## Potential pitfalls when using other Gaudi Algorithms
 
 Although mixing wrapped Marlin Processors with other Gaudi Algorithms is working
