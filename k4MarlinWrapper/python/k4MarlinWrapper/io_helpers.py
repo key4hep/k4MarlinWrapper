@@ -33,6 +33,16 @@ from k4FWCore.utils import get_logger
 logger = get_logger()
 
 
+def _is_wrapped_proc_without_conv(alg, from_edm, to_edm):
+    """Check if this algorithm has a configured (i.e. named) converter attached
+    for the direction described by from_edm and to_edm"""
+    if isinstance(alg, MarlinProcessorWrapper):
+        if not getattr(alg, f"{from_edm}2{to_edm}Tool").getName():
+            return True
+
+    return False
+
+
 class IOHandlerHelper:
     """Helper class to facilitate the transparent handling of LCIO or EDM4hep
     inputs and outputs.
@@ -120,11 +130,15 @@ class IOHandlerHelper:
         self._edm4hep_output = True
 
     def finalize_converters(self):
-        """Attach the necessary converters in all places they are necessary
+        """Attach the appropriate converters in all places they are necessary
 
         Go through the algorihtm list and determine where appropriate converters
         need be inserted such that the algorithms or wrapped processors always
-        see a consistent picture of the event in both formats.
+        see a consistent picture of the event in both formats. Basically what
+        this does is to go through the complete list of algorithms and introduce
+        an LCIO to EDM4hep converter at the start of every run of
+        MarlinProcessorWrappers and in the other direction at the end of every
+        such run
 
         Note:
             Call this just before you pass the algorithm list to the ApplicationMgr
@@ -132,27 +146,39 @@ class IOHandlerHelper:
         Note:
             This will not change existing converters on wrapped processors
         """
-        # Check if we have only MarlinWrapper algorithms
-        only_wrappers = all(
-            isinstance(a, (LcioEvent, MarlinProcessorWrapper)) for a in self._alg_list
-        )
-        if only_wrappers and self._lcio_input and not self._edm4hep_output:
-            # We have LCIO input and LCIO output and no need to ever convert. We
-            # are done here
-            logger.debug(
-                "Not adding any converters, because everything is done in LCIO"
-            )
-            return
+        for alg, next_alg in zip(self._alg_list, self._alg_list[1:]):
+            if not isinstance(next_alg, MarlinProcessorWrapper) and _is_wrapped_proc_without_conv(
+                alg, "Lcio", "EDM4hep"
+            ):
+                # We change from a run of wrapped processors to algorithms and
+                # we don't have a converter yet
+                output_conv = Lcio2EDM4hepTool(f"{alg.getName()}_OutputConverter")
+                output_conv.convertAll = True
+                output_conv.collNameMapping = {"MCParticle": "MCParticles"}
+                alg.Lcio2EDM4hepTool = output_conv
+                logger.info(
+                    f"Added an output converter (LCIO to EDM4hep) to the {alg.getName()} algorithm"
+                )
+
+            if not isinstance(
+                alg, (MarlinProcessorWrapper, LcioEvent)
+            ) and _is_wrapped_proc_without_conv(next_alg, "EDM4hep", "Lcio"):
+                # We change from a run of algorithms to wrapped processors and
+                # we do not have a converter yet
+                input_conv = EDM4hep2LcioTool(f"{next_alg.getName()}_InputConverter")
+                input_conv.convertAll = True
+                input_conv.collNameMapping = {"MCParticles": "MCParticle"}
+                next_alg.EDM4hep2LcioTool = input_conv
+                logger.info(
+                    f"Added an input converter (EDM4hep to LCIO) to the {next_alg.getName()} algorithm"
+                )
 
         if not self._lcio_input:
             # We need to convert the input to LCIO from EDM4hep. We attach this
-            # to the first algorithm that does NOT have another converter
+            # to the first wrapped processor that does NOT have another converter
             # configured
             for alg in self._alg_list:
-                if (
-                    isinstance(alg, (LcioEvent, MarlinProcessorWrapper))
-                    and not alg.EDM4hep2LcioTool.getName()
-                ):
+                if _is_wrapped_proc_without_conv(alg, "EDM4hep", "Lcio"):
                     input_conv = EDM4hep2LcioTool("InputConversion")
                     input_conv.convertAll = True
                     input_conv.collNameMapping = {"MCParticles": "MCParticle"}
@@ -166,10 +192,7 @@ class IOHandlerHelper:
             # We need to convert to EDM4hep. We attach the converter to the last
             # wrapped processor that thas not have another converter attached
             for alg in reversed(self._alg_list):
-                if (
-                    isinstance(alg, MarlinProcessorWrapper)
-                    and not alg.Lcio2EDM4hepTool.getName()
-                ):
+                if _is_wrapped_proc_without_conv(alg, "Lcio", "EDM4hep"):
                     output_conv = Lcio2EDM4hepTool("OutputConverter")
                     output_conv.convertAll = True
                     output_conv.collNameMapping = {"MCParticle": "MCParticles"}
@@ -178,35 +201,3 @@ class IOHandlerHelper:
                         f"Added an output converter (LCIO to EDM4hep) to the {alg.getName()} algorithm"
                     )
                     break
-
-        if not only_wrappers:
-            if self._lcio_input:
-                # Attach a converter to the last wrapped processor BEFORE the
-                # first non-wrapper algorithm
-                for alg, next_alg in zip(self._alg_list, self._alg_list[1:]):
-                    if (
-                        isinstance(alg, MarlinProcessorWrapper)
-                        and not isinstance(next_alg, (MarlinProcessorWrapper))
-                        and not alg.Lcio2EDM4hepTool.getName()
-                    ):
-                        input_conv = Lcio2EDM4hepTool(
-                            f"{alg.getName()}_OutputConverter"
-                        )
-                        input_conv.convertAll = True
-                        input_conv.collNameMapping = {"MCParticle": "MCParticles"}
-                        alg.Lcio2EDM4hepTool = input_conv
-                        logger.info(
-                            f"Added an input converter (LCIO to EDM4hep) to the {alg.getName()} algorithm"
-                        )
-                        break
-
-            for writer in self._lcio_writers:
-                # Attach a converter to every LCIOOutputProcessor just to be
-                # sure they always see the correct event content
-                writer_conv = EDM4hep2LcioTool(f"{writer.getName()}_InputConverter")
-                writer_conv.collNameMapping = {"MCParticles": "MCParticle"}
-                writer_conv.convertAll = True
-                writer.EDM4hep2LcioTool = writer_conv
-                logger.info(
-                    f"Added an output converter (EDM4hep to LCIO) to the {writer.getName()} algorithm"
-                )
