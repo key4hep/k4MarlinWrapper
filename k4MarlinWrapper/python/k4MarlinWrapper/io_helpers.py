@@ -34,7 +34,23 @@ logger = get_logger()
 
 
 class IOHandlerHelper:
+    """Helper class to facilitate the transparent handling of LCIO or EDM4hep
+    inputs and outputs.
+
+    This class allows to
+    - add the correct reader as determined from the input file name(s)
+    - add (multiple) LCIO writers
+    - add an EDM4hep writer
+    - make sure that the necessary converters are introduced at the right places
+    """
+
     def __init__(self, alg_list, io_svc):
+        """Create a IOHandlerHelper
+
+        Args:
+            alg_list (list): The algorithm list which is being populated
+            io_svc (IOSvc): The IOSvc that is being used for this run
+        """
         self._alg_list = alg_list
         self._io_svc = io_svc
         self._lcio_input = False
@@ -42,8 +58,15 @@ class IOHandlerHelper:
         self._lcio_writers = []
 
     def add_reader(self, input_files):
-        """Add a reader that is equipped to read the passed files and make sure
-        it appears on the list of algorithms if necessary
+        """Add a reader that is equipped to read the passed files
+
+        If the input is LCIO the necessary algorithm will be configured and
+        added to the list of algorithms at the current spot. If the input is
+        EDM4hep the file names will be passed to the IOSvc.Input
+
+        Args:
+            input_files (list): The input files that should be read
+
         """
         if input_files[0].endswith(".slcio"):
             if any(not f.endswith(".slcio") for f in input_files):
@@ -62,8 +85,19 @@ class IOHandlerHelper:
             self._io_svc.Input = input_files
 
     def add_lcio_writer(self, alg_name):
-        """Add a writer for LCIO output. Note, this doesn't configure anything
-        yet, that is still left to do outside"""
+        """Add a writer for LCIO output at the current spot in the algorithm list
+
+        Note:
+            This doesn't configure anything yet, that is still left to do outside
+
+        Args:
+            alg_name (str): The name this writer should have
+
+        Returns:
+            MarlinProcessorWrapper: The wrapped processor that has just been
+                inserted into the algorithm list and that now needs to be
+                further configured
+        """
         writer = MarlinProcessorWrapper(alg_name, ProcessorType="LCIOOutputProcessor")
 
         self._alg_list.append(writer)
@@ -72,14 +106,32 @@ class IOHandlerHelper:
         return writer
 
     def add_edm4hep_writer(self, output_file, output_cmds):
-        """Add an EDM4hep writer"""
+        """Add an EDM4hep writer at the very end of the algorithm execution
+
+        This will pass the output file name as well as the output commands to
+        the IOSvc.Ouptut and IOSvc.outputCommands respectively
+
+        Args:
+            output_file (str): The name of the output file
+            output_cmds (list): The list of output commands that should be applied
+        """
         self._io_svc.Output = output_file
         self._io_svc.outputCommands = output_cmds
         self._edm4hep_output = True
 
     def finalize_converters(self):
-        """Attach the necessary converters to make sure data are available in
-        the desired format always"""
+        """Attach the necessary converters in all places they are necessary
+
+        Go through the algorihtm list and determine where appropriate converters
+        need be inserted such that the algorithms or wrapped processors always
+        see a consistent picture of the event in both formats.
+
+        Note:
+            Call this just before you pass the algorithm list to the ApplicationMgr
+
+        Note:
+            This will not change existing converters on wrapped processors
+        """
         # Check if we have only MarlinWrapper algorithms
         only_wrappers = all(
             isinstance(a, (LcioEvent, MarlinProcessorWrapper)) for a in self._alg_list
