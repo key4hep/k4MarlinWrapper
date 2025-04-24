@@ -19,9 +19,10 @@
 #
 
 from Gaudi.Configuration import INFO
-from Configurables import MarlinProcessorWrapper, k4DataSvc, GeoSvc
+from Configurables import MarlinProcessorWrapper, EventDataSvc, GeoSvc
+from k4FWCore import ApplicationMgr, IOSvc
 from k4FWCore.parseArgs import parser
-from k4MarlinWrapper.inputReader import create_reader, attach_edm4hep2lcio_conversion
+from k4MarlinWrapper.io_helpers import IOHandlerHelper
 
 
 parser.add_argument(
@@ -42,11 +43,9 @@ parser.add_argument(
 reco_args = parser.parse_known_args()[0]
 
 algList = []
-svcList = []
+svcList = [EventDataSvc("EventDataSvc")]
 
-evtsvc = k4DataSvc("EventDataSvc")
-svcList.append(evtsvc)
-
+iosvc = IOSvc()
 
 geoSvc = GeoSvc("GeoSvc")
 geoSvc.detectors = [reco_args.compactFile]
@@ -54,13 +53,8 @@ geoSvc.OutputLevel = INFO
 geoSvc.EnableGeant4Geo = False
 svcList.append(geoSvc)
 
-
-if reco_args.inputFiles:
-    read = create_reader(reco_args.inputFiles, evtsvc)
-    read.OutputLevel = INFO
-    algList.append(read)
-else:
-    read = None
+io_handler = IOHandlerHelper(algList, iosvc)
+io_handler.add_reader(reco_args.inputFiles)
 
 MyCEDViewer = MarlinProcessorWrapper("MyCEDViewer")
 MyCEDViewer.OutputLevel = INFO
@@ -527,8 +521,8 @@ MyCEDViewer.Parameters = {
 algList.append(MyCEDViewer)
 
 # We need to convert the inputs in case we have EDM4hep input
-attach_edm4hep2lcio_conversion(algList, read)
+io_handler.finalize_converters()
 
-from Configurables import ApplicationMgr
-
-ApplicationMgr(TopAlg=algList, EvtSel="NONE", EvtMax=10, ExtSvc=svcList, OutputLevel=INFO)
+ApplicationMgr(
+    TopAlg=algList, EvtSel="NONE", EvtMax=10, ExtSvc=svcList, OutputLevel=INFO
+)
