@@ -113,7 +113,7 @@ class IOHandlerHelper:
 
         return writer
 
-    def add_edm4hep_writer(self, output_file, output_cmds):
+    def add_edm4hep_writer(self, output_file, output_cmds=["keep *"]):
         """Add an EDM4hep writer at the very end of the algorithm execution
 
         This will pass the output file name as well as the output commands to
@@ -121,7 +121,9 @@ class IOHandlerHelper:
 
         Args:
             output_file (str): The name of the output file
-            output_cmds (list): The list of output commands that should be applied
+
+            output_cmds (list, optional): The list of output commands that
+                should be applied. Defaults to ["keep *"]
         """
         self._io_svc.Output = output_file
         self._io_svc.outputCommands = output_cmds
