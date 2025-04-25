@@ -18,7 +18,21 @@
 #
 
 import sys
-from Configurables import LcioEvent, PodioInput, MarlinProcessorWrapper, EDM4hep2LcioTool
+import warnings
+
+warnings.warn(
+    "The 'k4MarlinWrapper.inputReader' module is deprecated and will be removed in a future version. "
+    "Please use the utilities in `k4MarlinWrapper.io_helpers` instead.",
+    category=DeprecationWarning,
+    stacklevel=2,
+)
+
+from Configurables import (
+    LcioEvent,
+    PodioInput,
+    MarlinProcessorWrapper,
+    EDM4hep2LcioTool,
+)
 
 
 def create_reader(input_files, evtSvc):
