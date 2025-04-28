@@ -273,7 +273,7 @@ For adding LCIO output you need to
 ```python
 lcio_writer = io_handler.add_lcio_writer("LCIOWriter")
 lcio_writer.Parameters = {
-    "LCIOOutputFile": ["output.slcio"]
+    "LCIOOutputFile": ["output.slcio"],
     "LCIOWriteMode": ["WRITE_NEW"]
 }
 ```
