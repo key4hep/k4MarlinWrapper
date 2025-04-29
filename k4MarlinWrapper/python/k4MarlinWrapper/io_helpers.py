@@ -73,7 +73,6 @@ class IOHandlerHelper:
 
         Args:
             input_files (list): The input files that should be read
-
         """
         if input_files[0].endswith(".slcio"):
             if any(not f.endswith(".slcio") for f in input_files):
@@ -128,8 +127,8 @@ class IOHandlerHelper:
     def finalize_converters(self):
         """Attach the appropriate converters in all places they are necessary
 
-        Go through the algorihtm list and determine where appropriate converters
-        need be inserted such that the algorithms or wrapped processors always
+        Go through the algorithm list and determine where appropriate converters
+        need to be inserted such that the algorithms or wrapped processors always
         see a consistent picture of the event in both formats. Basically what
         this does is to go through the complete list of algorithms and introduce
         an LCIO to EDM4hep converter at the start of every run of
@@ -186,7 +185,7 @@ class IOHandlerHelper:
 
         if self._edm4hep_output:
             # We need to convert to EDM4hep. We attach the converter to the last
-            # wrapped processor that thas not have another converter attached
+            # wrapped processor that does not have another converter attached
             for alg in reversed(self._alg_list):
                 if _is_wrapped_proc_without_conv(alg, "Lcio", "EDM4hep"):
                     output_conv = Lcio2EDM4hepTool("OutputConverter")
