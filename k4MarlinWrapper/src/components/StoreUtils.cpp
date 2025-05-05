@@ -88,13 +88,13 @@ std::vector<std::string> getAvailableCollectionsFromStore(const AlgTool* thisCla
       }
     }
     // Remove the leading /
-    const auto collName = pReg->name().substr(1, pReg->name().size() - 1);
-    collectionNames.push_back(collName);
+    auto name = pReg->name().substr(1, pReg->name().size() - 1);
+    collectionNames.push_back(name);
     if (idToName) {
       if (functionalWrapper) {
-        idToName->emplace(functionalWrapper->getData()->getID(), collName);
+        idToName->emplace(functionalWrapper->getData()->getID(), std::move(name));
       } else {
-        idToName->emplace(algorithmWrapper->collectionBase()->getID(), collName);
+        idToName->emplace(algorithmWrapper->collectionBase()->getID(), std::move(name));
       }
     }
   }
