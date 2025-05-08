@@ -363,10 +363,8 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
             << "SimCalorimeterHit collection to be converted in order to be able to attach to them" << endmsg;
   } else {
     warning() << "Error trying to convert requested " << fulltype << " with name " << e4h_coll_name << endmsg;
-    warning() << "List of supported types: "
-              << "Track, TrackerHit3D, TrackerHitPlane, SimTrackerHit, "
-              << "Cluster, CalorimeterHit, RawCalorimeterHit, "
-              << "SimCalorimeterHit, Vertex, ReconstructedParticle, "
+    warning() << "List of supported types: " << "Track, TrackerHit3D, TrackerHitPlane, SimTrackerHit, "
+              << "Cluster, CalorimeterHit, RawCalorimeterHit, " << "SimCalorimeterHit, Vertex, ReconstructedParticle, "
               << "MCParticle." << endmsg;
   }
 }
@@ -385,7 +383,7 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
     // We *always* want to convert the EventHeader (iff it's available)
     if (getEDM4hepCollection(edm4hep::labels::EventHeader, true)) {
       debug() << edm4hep::labels::EventHeader << " collection available. Converting it." << endmsg;
-      m_collsToConvert.emplace_back(edm4hep::labels::EventHeader, "<directly into LCEvent>");
+      m_collsToConvert.emplace(edm4hep::labels::EventHeader, "<directly into LCEvent>");
     } else {
       info() << "The " << edm4hep::labels::EventHeader << " collection is not available. Not converting it." << endmsg;
     }
@@ -400,7 +398,7 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
       m_idToName = std::move(idToNameOpt.value());
     }
     for (auto&& [origName, newName] : collNameMapping) {
-      m_collsToConvert.emplace_back(std::move(origName), std::move(newName));
+      m_collsToConvert.emplace(std::move(origName), std::move(newName));
     }
   }
 
