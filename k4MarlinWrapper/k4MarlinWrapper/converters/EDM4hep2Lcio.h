@@ -29,6 +29,7 @@
 #include <map>
 #include <string>
 #include <tuple>
+#include <unordered_map>
 #include <vector>
 
 class PodioDataSvc;
@@ -73,7 +74,8 @@ private:
   SmartIF<IMetadataSvc> m_metadataSvc;
   /// A (caching) "map" of original to new collection names that will be populated
   /// during the first conversion
-  std::vector<std::tuple<std::string, std::string>> m_collsToConvert{};
+  // std::vector<std::tuple<std::string, std::string>> m_collsToConvert{};
+  std::unordered_map<std::string, std::string> m_collsToConvert{};
   std::map<uint32_t, std::string> m_idToName;
 
   void convertTracks(TrackMap& tracks_vec, const std::string& e4h_coll_name, const std::string& lcio_coll_name,
