@@ -381,10 +381,8 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
             << "SimCalorimeterHit collection to be converted in order to be able to attach to them" << endmsg;
   } else {
     warning() << "Error trying to convert requested " << fulltype << " with name " << e4h_coll_name << endmsg;
-    warning() << "List of supported types: "
-              << "Track, TrackerHit3D, TrackerHitPlane, SimTrackerHit, "
-              << "Cluster, CalorimeterHit, RawCalorimeterHit, "
-              << "SimCalorimeterHit, Vertex, ReconstructedParticle, "
+    warning() << "List of supported types: " << "Track, TrackerHit3D, TrackerHitPlane, SimTrackerHit, "
+              << "Cluster, CalorimeterHit, RawCalorimeterHit, " << "SimCalorimeterHit, Vertex, ReconstructedParticle, "
               << "MCParticle." << endmsg;
   }
 }
@@ -436,7 +434,7 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
     auto collNameMapping = m_collNames.value();
 
     // We *always* want to convert the EventHeader
-    m_collsToConvert.emplace_back(edm4hep::labels::EventHeader, "<directly into LCEvent>");
+    m_collsToConvert.emplace(edm4hep::labels::EventHeader, "<directly into LCEvent>");
 
     if (m_convertAll) {
       info() << "Converting all collections from EDM4hep to LCIO" << endmsg;
@@ -458,7 +456,7 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
       m_idToName = std::move(idToNameOpt.value());
 
       for (auto&& [origName, newName] : collNameMapping) {
-        m_collsToConvert.emplace_back(std::move(origName), std::move(newName));
+        m_collsToConvert.emplace(std::move(origName), std::move(newName));
       }
     }
   }
@@ -493,14 +491,16 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
       // Now go over the collections that have been produced in a functional algorithm (if any)
       bool found = false;
       if (!m_podioDataSvc) {
-        const auto id = (*pidCollMeta.coll)[0].getParticle().id().collectionID;
-        if (auto it = m_idToName.find(id); it != m_idToName.end()) {
-          auto name = it->second;
-          if (pidCollMeta.metadata.has_value()) {
+        if (pidCollMeta.metadata.has_value()) {
+          if (const auto it = m_collsToConvert.find(pidCollMeta.name); it != m_collsToConvert.end()) {
+            const auto& name = it->second;
             UTIL::PIDHandler pidHandler(lcio_event->getCollection(name));
             algoId =
                 pidHandler.addAlgorithm(pidCollMeta.metadata.value().algoName, pidCollMeta.metadata.value().paramNames);
-            found = true;
+
+          } else {
+            warning() << "Could not find a corresponding LCIO collection to " << pidCollMeta.name
+                      << " to attach ParticleID metadata to" << endmsg;
           }
         }
       }
