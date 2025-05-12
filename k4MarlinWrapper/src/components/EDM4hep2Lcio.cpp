@@ -491,16 +491,20 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
       // Now go over the collections that have been produced in a functional algorithm (if any)
       bool found = false;
       if (!m_podioDataSvc) {
-        if (pidCollMeta.metadata.has_value()) {
-          if (const auto it = m_collsToConvert.find(pidCollMeta.name); it != m_collsToConvert.end()) {
-            const auto& name = it->second;
-            UTIL::PIDHandler pidHandler(lcio_event->getCollection(name));
+        const auto id = (*pidCollMeta.coll)[0].getParticle().id().collectionID;
+        debug() << fmt::format(
+                       "Using {:0>8x} as collection id to lookup LCIO collection for attaching ParticleID metadata", id)
+                << endmsg;
+        if (const auto it = m_idToName.find(id); it != m_idToName.end()) {
+          const auto& name = it->second;
+          debug() << "Corresponding name in EDM4hep is: " << name << endmsg;
+          if (pidCollMeta.metadata.has_value()) {
+            const auto lcioColl = lcio_event->getCollection(name);
+            debug() << "LCIO collection has type: " << lcioColl->getTypeName() << endmsg;
+            UTIL::PIDHandler pidHandler(lcioColl);
             algoId =
                 pidHandler.addAlgorithm(pidCollMeta.metadata.value().algoName, pidCollMeta.metadata.value().paramNames);
-
-          } else {
-            warning() << "Could not find a corresponding LCIO collection to " << pidCollMeta.name
-                      << " to attach ParticleID metadata to" << endmsg;
+            found = true;
           }
         }
       }
