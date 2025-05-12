@@ -443,7 +443,7 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
       std::optional<std::map<uint32_t, std::string>> idToNameOpt(std::move(m_idToName));
       for (const auto& name : getAvailableCollectionsFromStore(this, idToNameOpt)) {
         const auto& [_, inserted] = collNameMapping.emplace(name, name);
-        debug() << fmt::format("Adding '{}' from TES to conversion? {}", name, inserted);
+        debug() << fmt::format("Adding '{}' from TES to conversion? {}", name, inserted) << endmsg;
       }
       m_idToName = std::move(idToNameOpt.value());
 
