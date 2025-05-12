@@ -374,10 +374,8 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
             << "SimCalorimeterHit collection to be converted in order to be able to attach to them" << endmsg;
   } else {
     warning() << "Error trying to convert requested " << fulltype << " with name " << e4h_coll_name << endmsg;
-    warning() << "List of supported types: "
-              << "Track, TrackerHit3D, TrackerHitPlane, SimTrackerHit, "
-              << "Cluster, CalorimeterHit, RawCalorimeterHit, "
-              << "SimCalorimeterHit, Vertex, ReconstructedParticle, "
+    warning() << "List of supported types: " << "Track, TrackerHit3D, TrackerHitPlane, SimTrackerHit, "
+              << "Cluster, CalorimeterHit, RawCalorimeterHit, " << "SimCalorimeterHit, Vertex, ReconstructedParticle, "
               << "MCParticle." << endmsg;
   }
 }
@@ -394,7 +392,7 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
     auto collNameMapping = m_collNames.value();
 
     // We *always* want to convert the EventHeader
-    m_collsToConvert.emplace_back(edm4hep::labels::EventHeader, "<directly into LCEvent>");
+    m_collsToConvert.emplace(edm4hep::labels::EventHeader, "<directly into LCEvent>");
 
     if (m_convertAll) {
       info() << "Converting all collections from EDM4hep to LCIO" << endmsg;
@@ -403,7 +401,7 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
         edmEvent = m_podioDataSvc->getEventFrame();
         for (const auto& name : edmEvent.value().get().getAvailableCollections()) {
           const auto& [_, inserted] = collNameMapping.emplace(name, name);
-          debug() << fmt::format("Adding '{}' from Frame to conversion? {}", name, inserted);
+          debug() << fmt::format("Adding '{}' from Frame to conversion? {}", name, inserted) << endmsg;
         }
       }
       // Always check the contents of the TES because algorithms that do not use
@@ -412,12 +410,12 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
       std::optional<std::map<uint32_t, std::string>> idToNameOpt(std::move(m_idToName));
       for (const auto& name : getAvailableCollectionsFromStore(this, idToNameOpt)) {
         const auto& [_, inserted] = collNameMapping.emplace(name, name);
-        debug() << fmt::format("Adding '{}' from TES to conversion? {}", name, inserted);
+        debug() << fmt::format("Adding '{}' from TES to conversion? {}", name, inserted) << endmsg;
       }
       m_idToName = std::move(idToNameOpt.value());
 
       for (auto&& [origName, newName] : collNameMapping) {
-        m_collsToConvert.emplace_back(std::move(origName), std::move(newName));
+        m_collsToConvert.emplace(std::move(origName), std::move(newName));
       }
     }
   }
@@ -463,10 +461,16 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
       bool found = false;
       if (!m_podioDataSvc) {
         const auto id = (*pidCollMeta.coll)[0].getParticle().id().collectionID;
-        if (auto it = m_idToName.find(id); it != m_idToName.end()) {
-          auto name = it->second;
+        debug() << fmt::format(
+                       "Using {:0>8x} as collection id to lookup LCIO collection for attaching ParticleID metadata", id)
+                << endmsg;
+        if (const auto it = m_idToName.find(id); it != m_idToName.end()) {
+          const auto& name = it->second;
+          debug() << "Corresponding name in EDM4hep is: " << name << endmsg;
           if (pidCollMeta.metadata.has_value()) {
-            UTIL::PIDHandler pidHandler(lcio_event->getCollection(name));
+            const auto lcioColl = lcio_event->getCollection(name);
+            debug() << "LCIO collection has type: " << lcioColl->getTypeName() << endmsg;
+            UTIL::PIDHandler pidHandler(lcioColl);
             algoId =
                 pidHandler.addAlgorithm(pidCollMeta.metadata.value().algoName, pidCollMeta.metadata.value().paramNames);
             found = true;

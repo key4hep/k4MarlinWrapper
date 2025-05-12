@@ -92,9 +92,9 @@ void Lcio2EDM4hepTool::registerCollection(
     return;
   }
 
-  auto wrapper = new DataWrapper<podio::CollectionBase>();
-  wrapper->setData(e4hColl.release());
-
+  e4hColl->setID(k4FWCore::details::getCollectionID(name));
+  debug() << fmt::format("Adding collection '{}' with collection id: {:0>8x}", name, e4hColl->getID()) << endmsg;
+  auto wrapper = new AnyDataWrapper<std::unique_ptr<podio::CollectionBase>>(std::move(e4hColl));
   // No need to check for pre-existing collections, since we only ever end up
   // here if that is not the case
   auto sc = m_eventDataSvc->registerObject("/Event", "/" + std::string(name), wrapper);
@@ -196,7 +196,7 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
   for (const auto& [lcioName, edm4hepName] : collsToConvert) {
     try {
       auto* lcio_coll = the_event->getCollection(lcioName);
-      debug() << "Converting collection " << lcioName << " (storing it as " << edm4hepName << "). ";
+      debug() << "Converting collection " << lcioName << " (storing it as " << edm4hepName << "). " << endmsg;
       if (collectionExist(edm4hepName)) {
         debug() << "Collection already exists, skipping." << endmsg;
         continue; // No need to convert again
