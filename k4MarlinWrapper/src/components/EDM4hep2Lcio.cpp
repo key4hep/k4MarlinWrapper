@@ -432,10 +432,16 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
       // Check if we can figure out the collection from information on the TES
       if (!pidCollMeta.coll->empty()) {
         const auto id = (*pidCollMeta.coll)[0].getParticle().id().collectionID;
-        if (auto it = m_idToName.find(id); it != m_idToName.end()) {
-          auto name = it->second;
+        debug() << fmt::format(
+                       "Using {:0>8x} as collection id to lookup LCIO collection for attaching ParticleID metadata", id)
+                << endmsg;
+        if (const auto it = m_idToName.find(id); it != m_idToName.end()) {
+          const auto& name = it->second;
+          debug() << "Corresponding name in EDM4hep is: " << name << endmsg;
           if (pidCollMeta.metadata.has_value()) {
-            UTIL::PIDHandler pidHandler(lcio_event->getCollection(name));
+            const auto lcioColl = lcio_event->getCollection(name);
+            debug() << "LCIO collection has type: " << lcioColl->getTypeName() << endmsg;
+            UTIL::PIDHandler pidHandler(lcioColl);
             algoId =
                 pidHandler.addAlgorithm(pidCollMeta.metadata.value().algoName, pidCollMeta.metadata.value().paramNames);
           }
