@@ -27,9 +27,8 @@
 
 #include <edm4hep/utils/ParticleIDUtils.h>
 
-#include <k4FWCore/DataHandle.h>
 #include <k4FWCore/FunctionalUtils.h>
-#include <k4FWCore/MetaDataHandle.h>
+#include <k4FWCore/MetadataUtils.h>
 #include <k4FWCore/PodioDataSvc.h>
 
 #include "GaudiKernel/AnyDataWrapper.h"
@@ -92,9 +91,8 @@ void Lcio2EDM4hepTool::registerCollection(
     return;
   }
 
-  auto wrapper = new DataWrapper<podio::CollectionBase>();
-  wrapper->setData(e4hColl.release());
-
+  debug() << fmt::format("Adding collection '{}' () to the TES", name, e4hColl->getTypeName()) << endmsg;
+  auto wrapper = new AnyDataWrapper<std::unique_ptr<podio::CollectionBase>>(std::move(e4hColl));
   // No need to check for pre-existing collections, since we only ever end up
   // here if that is not the case
   auto sc = m_eventDataSvc->registerObject("/Event", "/" + std::string(name), wrapper);
