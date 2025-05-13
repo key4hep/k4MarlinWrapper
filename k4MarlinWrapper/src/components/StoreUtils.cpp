@@ -28,6 +28,9 @@
 
 #include "k4FWCore/FunctionalUtils.h"
 
+#include <fmt/format.h>
+#include <fmt/ranges.h>
+
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -59,6 +62,7 @@ std::vector<std::string> getAvailableCollectionsFromStore(const AlgTool* thisCla
     throw std::runtime_error("Failed to retrieve object leaves");
   }
   for (const auto& pReg : leaves) {
+    thisClass->verbose() << fmt::format("Now processing {} while obtaining collections", pReg->name()) << endmsg;
     if (pReg->name() == k4FWCore::frameLocation) {
       if (!returnFrameCollections)
         continue;
@@ -69,6 +73,9 @@ std::vector<std::string> getAvailableCollectionsFromStore(const AlgTool* thisCla
       for (const auto& name : wrapper->getData().getAvailableCollections()) {
         collectionNames.push_back(name);
       }
+      thisClass->verbose() << fmt::format("Retrieved the following collection names from Frame in TES: {}",
+                                          collectionNames)
+                           << endmsg;
     }
     DataObject* p;
     sc = thisClass->evtSvc()->retrieveObject("/Event" + pReg->name(), p);
@@ -89,11 +96,18 @@ std::vector<std::string> getAvailableCollectionsFromStore(const AlgTool* thisCla
     }
     // Remove the leading /
     auto name = pReg->name().substr(1, pReg->name().size() - 1);
+    thisClass->verbose() << "Adding '" << name << "' as collection name obtained from TES" << endmsg;
     collectionNames.push_back(name);
     if (idToName) {
       if (functionalWrapper) {
+        thisClass->verbose() << fmt::format("Retrieving id for '{}': {:0>8x}", name,
+                                            functionalWrapper->getData()->getID())
+                             << endmsg;
         idToName->emplace(functionalWrapper->getData()->getID(), std::move(name));
       } else {
+        thisClass->verbose() << fmt::format("Retrieving id for '{}': {:0>8x}", name,
+                                            algorithmWrapper->collectionBase()->getID())
+                             << endmsg;
         idToName->emplace(algorithmWrapper->collectionBase()->getID(), std::move(name));
       }
     }
