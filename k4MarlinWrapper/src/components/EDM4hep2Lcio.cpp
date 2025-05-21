@@ -527,20 +527,22 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
     }
 
     std::optional<int32_t> algoId{std::nullopt};
-    if (recoCollName.has_value() && pidMetaInfo.has_value()) {
+    if (recoCollName.has_value()) {
       debug() << "Corresponding ReconstructedParticle (EDM4hep) collection is " << recoCollName.value() << endmsg;
       if (const auto it = m_collsToConvert.find(recoCollName.value()); it != m_collsToConvert.end()) {
         const auto lcioRecoName = it->second;
         debug() << "Corresponding ReconstructedParticle (LCIO) collection is " << lcioRecoName << endmsg;
         UTIL::PIDHandler pidHandler(lcio_event->getCollection(lcioRecoName));
-        try {
-          algoId = pidHandler.getAlgorithmID(pidMetaInfo.value().algoName);
-          debug() << "PID Algorithm already present with id " << algoId.value() << endmsg;
-          debug() << fmt::format("params: {}", pidHandler.getParameterNames(algoId.value())) << endmsg;
-          debug() << fmt::format("our params: {}", pidMetaInfo->paramNames) << endmsg;
-        } catch (const UTIL::UnknownAlgorithm&) {
-          algoId = pidHandler.addAlgorithm(pidMetaInfo->algoName, pidMetaInfo->paramNames);
-          debug() << "Determined algoId via LCIO PIDHandler: " << algoId.value() << endmsg;
+        if (pidMetaInfo.has_value()) {
+          try {
+            algoId = pidHandler.getAlgorithmID(pidMetaInfo->algoName);
+            debug() << "PID Algorithm already present with id " << algoId.value() << endmsg;
+            debug() << fmt::format("params: {}", pidHandler.getParameterNames(algoId.value())) << endmsg;
+            debug() << fmt::format("our params: {}", pidMetaInfo->paramNames) << endmsg;
+          } catch (const UTIL::UnknownAlgorithm&) {
+            algoId = pidHandler.addAlgorithm(pidMetaInfo->algoName, pidMetaInfo->paramNames);
+            debug() << "Determined algoId via LCIO PIDHandler: " << algoId.value() << endmsg;
+          }
         }
       } else {
         warning() << "Could not find a name mapping for ReconstructedParticle collection " << recoCollName.value()
