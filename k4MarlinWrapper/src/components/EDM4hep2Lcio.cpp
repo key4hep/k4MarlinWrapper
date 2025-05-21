@@ -82,7 +82,7 @@ StatusCode EDM4hep2LcioTool::initialize() {
     }
   }
 
-  m_collFromObjSvc = service("CollectionFromObjSvc", false);
+  m_collFromObjSvc = service("CollectionFromObjectSvc", false);
   if (!m_collFromObjSvc) {
     error() << "Could not retrieve CollectionFromObjectSvc" << endmsg;
     return StatusCode::FAILURE;
