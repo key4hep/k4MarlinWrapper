@@ -32,6 +32,10 @@
 #include "GaudiKernel/IDataManagerSvc.h"
 #include "GaudiKernel/IDataProviderSvc.h"
 
+#include <fmt/format.h>
+#include <fmt/ranges.h>
+
+#include <functional>
 #include <memory>
 
 DECLARE_COMPONENT(EDM4hep2LcioTool);
@@ -425,7 +429,6 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
   debug() << "Event: " << lcio_event->getEventNumber() << " Run: " << lcio_event->getRunNumber() << endmsg;
 
   EDM4hep2LCIOConv::sortParticleIDs(pidCollections);
-
   for (const auto& pidCollMeta : pidCollections) {
     auto algoId = attachParticleIDMetaData(lcio_event, edmEvent, pidCollMeta);
     if (!algoId.has_value()) {
@@ -454,6 +457,7 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
                   << endmsg;
       }
     }
+
     convertParticleIDs(collection_pairs.particleIDs, pidCollMeta.name, algoId.value_or(-1));
   }
 
