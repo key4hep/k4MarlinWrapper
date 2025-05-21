@@ -23,6 +23,8 @@
 
 #include "k4EDM4hep2LcioConv/k4EDM4hep2LcioConv.h"
 
+#include "k4FWCore/ICollectionFromObjectSvc.h"
+
 #include <Gaudi/Property.h>
 #include <GaudiKernel/AlgTool.h>
 
@@ -72,6 +74,9 @@ private:
   ServiceHandle<IDataProviderSvc> m_eventDataSvc;
   // Metadata service from k4FWCore that is used together with IOSvc
   SmartIF<IMetadataSvc> m_metadataSvc;
+  /// Service to retrive collection names from objects
+  SmartIF<ICollectionFromObjectSvc> m_collFromObjSvc;
+
   /// A (caching) "map" of original to new collection names that will be populated
   /// during the first conversion
   // std::vector<std::tuple<std::string, std::string>> m_collsToConvert{};
