@@ -498,11 +498,17 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
     // named in EDM4hep. With that we can map it to the correct LCIO name and
     // then attach the corresponding meta information via the PIDHandler
     const auto& [pidCollName, pidColl, pidMetaInfo] = pidCollMeta;
-    debug() << "Attaching PID meta information for ParticleID collection " << pidCollName << endmsg;
+    debug() << fmt::format(
+                   "Attaching PID meta information for ParticleID collection {}, PID meta information available? {}",
+                   pidCollName, pidMetaInfo.has_value())
+            << endmsg;
     if (msgLevel(MSG::DEBUG) && pidMetaInfo.has_value()) {
       debug() << fmt::format("PID meta information: algoName: {}, algoType: {}, paramNames: {}", pidMetaInfo->algoName,
                              pidMetaInfo->algoType(), pidMetaInfo->paramNames)
               << endmsg;
+    }
+    if (!pidMetaInfo.has_value()) {
+      info() << "Could not collect PID meta information for ParticleID collection " << pidCollName << endmsg;
     }
     const auto recoCollName = [&]() {
       auto name = m_collFromObjSvc->getCollectionNameFor((*pidColl)[0].getParticle());
@@ -514,8 +520,14 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
       }
       return name;
     }();
+    if (!recoCollName.has_value()) {
+      warning() << "Could not determine the name of the (LCIO) ReconstructedParticle collection to attach ParticleID "
+                   "metadata for (EDM4hep) ParticleID collection "
+                << pidCollName << endmsg;
+    }
+
     std::optional<int32_t> algoId{std::nullopt};
-    if (recoCollName.has_value()) {
+    if (recoCollName.has_value() && pidMetaInfo.has_value()) {
       debug() << "Corresponding ReconstructedParticle (EDM4hep) collection is " << recoCollName.value() << endmsg;
       if (const auto it = m_collsToConvert.find(recoCollName.value()); it != m_collsToConvert.end()) {
         const auto lcioRecoName = it->second;
@@ -534,15 +546,10 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
         warning() << "Could not find a name mapping for ReconstructedParticle collection " << recoCollName.value()
                   << " when trying to attach ParticleID meta information" << endmsg;
       }
-    } else {
-      warning() << "Could not determine the name of the (LCIO) ReconstructedParticle collection to attach ParticleID "
-                   "metadata for (EDM4hep) ParticleID collection "
-                << pidCollName << endmsg;
+    } else if (pidMetaInfo.has_value()) {
       // We can still set the value we collected along the way. NOTE: It will
       // almost certainly not be consistent in roundtrip conversions.
-      if (pidMetaInfo.has_value()) {
-        algoId = pidMetaInfo->algoType();
-      }
+      algoId = pidMetaInfo->algoType();
     }
 
     convertParticleIDs(collection_pairs.particleIDs, pidCollMeta.name, algoId.value_or(-1));
