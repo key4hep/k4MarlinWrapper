@@ -429,14 +429,14 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
   std::vector<std::tuple<std::string, const podio::CollectionBase*>> linkCollections{};
 
   for (const auto& [edm4hepName, lcioName] : m_collsToConvert) {
-    const auto coll = getEDM4hepCollection(edm4hepName);
-    if (coll->getTypeName().find("LinkCollection") != std::string_view::npos) {
-      debug() << edm4hepName << " is a link collection, converting it later" << endmsg;
-      linkCollections.emplace_back(lcioName, coll);
-      continue;
-    }
     debug() << "Converting collection " << edm4hepName << " (storing it as " << lcioName << ")" << endmsg;
     if (!EDM4hep2LCIOConv::collectionExist(lcioName, lcio_event)) {
+      const auto coll = getEDM4hepCollection(edm4hepName);
+      if (coll->getTypeName().find("LinkCollection") != std::string_view::npos) {
+        debug() << edm4hepName << " is a link collection, converting it later" << endmsg;
+        linkCollections.emplace_back(lcioName, coll);
+        continue;
+      }
       convertAdd(edm4hepName, lcioName, lcio_event, collection_pairs, pidCollections, dQdxCollections);
     } else {
       debug() << " Collection " << lcioName << " already in place, skipping conversion. " << endmsg;
