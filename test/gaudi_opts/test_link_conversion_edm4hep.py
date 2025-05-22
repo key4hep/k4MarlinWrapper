@@ -99,7 +99,30 @@ mcLinkConverter.collNameMapping = {
 mcLinkConverter.OutputLevel = DEBUG
 MarlinMCLinkChecker.EDM4hep2LcioTool = mcLinkConverter
 
-algList = [PseudoRecoAlg, MCRecoLinker, MarlinMCLinkChecker]
+# Another link checker and converter
+# We use this to avoid regressions for the fix in #237
+AnotherLinkChecker = MarlinProcessorWrapper(
+    "AnotherLinkChecker",
+    ProcessorType="MarlinMCRecoLinkChecker",
+    Parameters={
+        "MCRecoLinks": ["TrivialMCRecoLinks"],
+        "InputMCs": ["MCParticles"],
+        "InputRecos": ["PseudoRecoParticles"],
+    },
+)
+
+anotherLinkConverter = EDM4hep2LcioTool("AnotherLinkConverter")
+anotherLinkConverter.convertAll = True
+anotherLinkConverter.collNameMapping = {
+    "TrivialMCRecoLinks": "TrivialMCRecoLinks",
+    "MCParticles": "MCParticles",
+    "PseudoRecoParticles": "PseudoRecoParticles",
+}
+anotherLinkConverter.OutputLevel = DEBUG
+AnotherLinkChecker.EDM4hep2LcioTool = anotherLinkConverter
+
+
+algList = [PseudoRecoAlg, MCRecoLinker, MarlinMCLinkChecker, AnotherLinkChecker]
 
 if args.no_iosvc:
     algList = [podioInput] + algList
