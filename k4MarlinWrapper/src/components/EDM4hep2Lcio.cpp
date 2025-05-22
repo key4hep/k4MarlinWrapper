@@ -390,9 +390,9 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
             << "SimCalorimeterHit collection to be converted in order to be able to attach to them" << endmsg;
   } else {
     warning() << "Error trying to convert requested " << fulltype << " with name " << e4h_coll_name << endmsg;
-    warning() << "List of supported types: " << "Track, TrackerHit3D, TrackerHitPlane, SimTrackerHit, "
-              << "Cluster, CalorimeterHit, RawCalorimeterHit, " << "SimCalorimeterHit, Vertex, ReconstructedParticle, "
-              << "MCParticle." << endmsg;
+    warning() << "List of supported types: Track, TrackerHit3D, TrackerHitPlane, SimTrackerHit, Cluster, "
+              << "CalorimeterHit, RawCalorimeterHit, SimCalorimeterHit, Vertex, ReconstructedParticle, MCParticle."
+              << endmsg;
   }
 }
 
