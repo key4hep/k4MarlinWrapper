@@ -390,10 +390,29 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
   }
 }
 
+std::optional<std::reference_wrapper<const podio::Frame>> EDM4hep2LcioTool::getEDM4hepEvent() const {
+  debug() << "Retrieving EDM4hep event (Frame)" << endmsg;
+  if (m_podioDataSvc) {
+    return m_podioDataSvc->getEventFrame();
+  } else {
+    DataObject* p;
+    StatusCode code = m_eventDataSvc->retrieveObject("/Event" + k4FWCore::frameLocation, p);
+    if (code.isSuccess()) {
+      auto* frame = dynamic_cast<AnyDataWrapper<podio::Frame>*>(p);
+      return std::cref(frame->getData());
+    }
+  }
+
+  return std::nullopt;
+}
+
 // Parse property parameters and convert the indicated collections.
 // Use the collection names in the parameters to read and write them
 StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
-  std::optional<std::reference_wrapper<const podio::Frame>> edmEvent;
+  const auto edmEvent = getEDM4hepEvent();
+  if (!edmEvent.has_value()) {
+    warning() << "Could not get EDM4hep event (Frame) for conversions" << endmsg;
+  }
   // use m_collsToConvert to detect whether we run the first time and cache the
   // results as we can assume that all the events have the same contents
   if (m_collsToConvert.empty()) {
@@ -408,7 +427,6 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
       info() << "Converting all collections from EDM4hep to LCIO" << endmsg;
       if (m_podioDataSvc) {
         // If we have the PodioDataSvc get the collections available from frame
-        edmEvent = m_podioDataSvc->getEventFrame();
         for (const auto& name : edmEvent.value().get().getAvailableCollections()) {
           const auto& [_, inserted] = collNameMapping.emplace(name, name);
           debug() << fmt::format("Adding '{}' from Frame to conversion? {}", name, inserted) << endmsg;
@@ -453,17 +471,7 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
   debug() << "Event: " << lcio_event->getEventNumber() << " Run: " << lcio_event->getRunNumber() << endmsg;
 
   EDM4hep2LCIOConv::sortParticleIDs(pidCollections);
-  if (!m_podioDataSvc) {
-    DataObject* p;
-    StatusCode code = m_eventDataSvc->retrieveObject("/Event" + k4FWCore::frameLocation, p);
-    if (code.isSuccess()) {
-      auto* frame = dynamic_cast<AnyDataWrapper<podio::Frame>*>(p);
-      edmEvent = std::cref(frame->getData());
-    } else {
-      auto frame = podio::Frame{};
-      edmEvent = frame;
-    }
-  }
+
   for (const auto& pidCollMeta : pidCollections) {
     auto algoId = attachParticleIDMetaData(lcio_event, edmEvent.value(), pidCollMeta);
     if (!algoId.has_value()) {
