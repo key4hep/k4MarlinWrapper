@@ -390,7 +390,7 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
   }
 }
 
-std::optional<std::reference_wrapper<const podio::Frame>> EDM4hep2LcioTool::getEDM4hepEvent() const {
+const podio::Frame& EDM4hep2LcioTool::getEDM4hepEvent() const {
   debug() << "Retrieving EDM4hep event (Frame)" << endmsg;
   if (m_podioDataSvc) {
     return m_podioDataSvc->getEventFrame();
@@ -399,20 +399,17 @@ std::optional<std::reference_wrapper<const podio::Frame>> EDM4hep2LcioTool::getE
     StatusCode code = m_eventDataSvc->retrieveObject("/Event" + k4FWCore::frameLocation, p);
     if (code.isSuccess()) {
       auto* frame = dynamic_cast<AnyDataWrapper<podio::Frame>*>(p);
-      return std::cref(frame->getData());
+      return frame->getData();
     }
   }
 
-  return std::nullopt;
+  throw std::runtime_error("Could not get EDM4hep event (Frame) for conversions");
 }
 
 // Parse property parameters and convert the indicated collections.
 // Use the collection names in the parameters to read and write them
 StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
-  const auto edmEvent = getEDM4hepEvent();
-  if (!edmEvent.has_value()) {
-    warning() << "Could not get EDM4hep event (Frame) for conversions" << endmsg;
-  }
+  const auto& edmEvent = getEDM4hepEvent();
   // use m_collsToConvert to detect whether we run the first time and cache the
   // results as we can assume that all the events have the same contents
   if (m_collsToConvert.empty()) {
@@ -427,7 +424,7 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
       info() << "Converting all collections from EDM4hep to LCIO" << endmsg;
       if (m_podioDataSvc) {
         // If we have the PodioDataSvc get the collections available from frame
-        for (const auto& name : edmEvent.value().get().getAvailableCollections()) {
+        for (const auto& name : edmEvent.getAvailableCollections()) {
           const auto& [_, inserted] = collNameMapping.emplace(name, name);
           debug() << fmt::format("Adding '{}' from Frame to conversion? {}", name, inserted) << endmsg;
         }
@@ -473,7 +470,7 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
   EDM4hep2LCIOConv::sortParticleIDs(pidCollections);
 
   for (const auto& pidCollMeta : pidCollections) {
-    auto algoId = attachParticleIDMetaData(lcio_event, edmEvent.value(), pidCollMeta);
+    auto algoId = attachParticleIDMetaData(lcio_event, edmEvent, pidCollMeta);
     if (!algoId.has_value()) {
       // Now go over the collections that have been produced in a functional algorithm (if any)
       bool found = false;
