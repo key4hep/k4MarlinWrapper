@@ -79,7 +79,6 @@ private:
 
   /// A (caching) "map" of original to new collection names that will be populated
   /// during the first conversion
-  // std::vector<std::tuple<std::string, std::string>> m_collsToConvert{};
   std::unordered_map<std::string, std::string> m_collsToConvert{};
   std::map<uint32_t, std::string> m_idToName;
 
