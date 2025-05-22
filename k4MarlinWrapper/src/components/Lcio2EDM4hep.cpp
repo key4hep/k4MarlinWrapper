@@ -92,17 +92,11 @@ void Lcio2EDM4hepTool::registerCollection(
     return;
   }
 
-  auto& idTable = k4FWCore::details::getTESCollectionIDTable(m_eventDataSvc.get(), this);
-  if (idTable.present(name)) {
-    error() << "Collection with name " << name
-            << " is already stored in the TES. Cannot overwrite it with a converted collection" << endmsg;
-  }
-  const auto collId = idTable.add(name);
-  e4hColl->setID(collId);
-  debug() << fmt::format("Adding collection '{}' with collection id: {:0>8x}", name, e4hColl->getID()) << endmsg;
-  auto wrapper = new AnyDataWrapper<std::unique_ptr<podio::CollectionBase>>(std::move(e4hColl));
   // No need to check for pre-existing collections, since we only ever end up
   // here if that is not the case
+  // NOTE: This also takes care of assigning a collectionID
+  auto wrapper = new DataWrapper<podio::CollectionBase>();
+  wrapper->setData(e4hColl.release());
   auto sc = m_eventDataSvc->registerObject("/Event", "/" + std::string(name), wrapper);
   if (sc == StatusCode::FAILURE) {
     error() << "Could not register collection " << name << endmsg;
