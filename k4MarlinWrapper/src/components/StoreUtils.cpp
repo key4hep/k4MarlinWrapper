@@ -39,9 +39,7 @@
 // store that can be found in Writer.cpp in k4FWCore with some modifications
 // that are specific to the usage of this function in the converters, like
 // returning also a map from collection ID to collection name
-std::vector<std::string> getAvailableCollectionsFromStore(const AlgTool* thisClass,
-                                                          std::optional<std::map<uint32_t, std::string>>& idToName,
-                                                          bool returnFrameCollections) {
+std::vector<std::string> getAvailableCollectionsFromStore(const AlgTool* thisClass, bool returnFrameCollections) {
   std::vector<std::string> collectionNames;
 
   SmartIF<IDataManagerSvc> mgr;
@@ -98,19 +96,6 @@ std::vector<std::string> getAvailableCollectionsFromStore(const AlgTool* thisCla
     auto name = pReg->name().substr(1, pReg->name().size() - 1);
     thisClass->verbose() << "Adding '" << name << "' as collection name obtained from TES" << endmsg;
     collectionNames.push_back(name);
-    if (idToName) {
-      if (functionalWrapper) {
-        thisClass->verbose() << fmt::format("Retrieving id for '{}': {:0>8x}", name,
-                                            functionalWrapper->getData()->getID())
-                             << endmsg;
-        idToName->emplace(functionalWrapper->getData()->getID(), std::move(name));
-      } else {
-        thisClass->verbose() << fmt::format("Retrieving id for '{}': {:0>8x}", name,
-                                            algorithmWrapper->collectionBase()->getID())
-                             << endmsg;
-        idToName->emplace(algorithmWrapper->collectionBase()->getID(), std::move(name));
-      }
-    }
   }
   return collectionNames;
 }
