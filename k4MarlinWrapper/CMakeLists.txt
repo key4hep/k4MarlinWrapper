@@ -58,7 +58,9 @@ target_include_directories(MarlinWrapper PUBLIC
 gaudi_add_library(k4MarlinWrapperUtils SHARED
   SOURCES
     src/components/StoreUtils.cpp
-  LINK k4FWCore::k4FWCore
+  LINK
+    k4FWCore::k4FWCore
+    k4EDM4hep2LcioConv::k4EDM4hep2LcioConv
 )
 
 # EDM4hep2lcio

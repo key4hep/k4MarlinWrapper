@@ -17,7 +17,6 @@
  * limitations under the License.
  */
 #include "k4MarlinWrapper/converters/EDM4hep2Lcio.h"
-#include "GlobalConvertedObjectsMap.h"
 #include "StoreUtils.h"
 #include <GaudiKernel/StatusCode.h>
 
@@ -35,7 +34,12 @@
 #include "GaudiKernel/IDataManagerSvc.h"
 #include "GaudiKernel/IDataProviderSvc.h"
 
+#include <IMPL/LCEventImpl.h>
+#include <fmt/format.h>
+#include <fmt/ranges.h>
+
 #include <functional>
+#include <k4EDM4hep2LcioConv/k4EDM4hep2LcioConv.h>
 #include <memory>
 
 DECLARE_COMPONENT(EDM4hep2LcioTool);
@@ -80,6 +84,12 @@ StatusCode EDM4hep2LcioTool::initialize() {
     }
   }
 
+  m_collFromObjSvc = service("CollectionFromObjectSvc", false);
+  if (!m_collFromObjSvc) {
+    error() << "Could not retrieve CollectionFromObjectSvc" << endmsg;
+    return StatusCode::FAILURE;
+  }
+
   return AlgTool::initialize();
 }
 
@@ -117,10 +127,17 @@ void EDM4hep2LcioTool::convertTrackerHits(TrackerHitMap& trackerhits_vec, const 
   lcio_event->addCollection(conv_trackerhits.release(), lcio_coll_name);
 }
 
-void EDM4hep2LcioTool::convertParticleIDs(ParticleIDMap& pidMap, const std::string& e4h_coll_name, int32_t algoId) {
-  DataHandle<edm4hep::ParticleIDCollection> pidHandle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
+void EDM4hep2LcioTool::convertParticleIDs(ParticleIDMap& pidMap,
+                                          std::vector<EDM4hep2LCIOConv::ParticleIDConvData>& pidCollections,
+                                          lcio::LCEventImpl* lcio_event, const podio::Frame& edmEvent) {
 
-  EDM4hep2LCIOConv::convertParticleIDs(pidHandle.get(), pidMap, algoId);
+  EDM4hep2LCIOConv::sortParticleIDs(pidCollections);
+  for (const auto& pidCollMeta : pidCollections) {
+    DataHandle<edm4hep::ParticleIDCollection> pidHandle{pidCollMeta.name, Gaudi::DataHandle::Reader, this};
+
+    auto algoId = attacheParticleIDMetaInfo(pidCollMeta, lcio_event, edmEvent);
+    EDM4hep2LCIOConv::convertParticleIDs(pidHandle.get(), pidMap, algoId.value_or(-1));
+  }
 }
 
 void EDM4hep2LcioTool::convertTrackerHitPlanes(TrackerHitPlaneMap& trackerhits_vec, const std::string& e4h_coll_name,
@@ -374,18 +391,117 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
             << "SimCalorimeterHit collection to be converted in order to be able to attach to them" << endmsg;
   } else {
     warning() << "Error trying to convert requested " << fulltype << " with name " << e4h_coll_name << endmsg;
-    warning() << "List of supported types: "
-              << "Track, TrackerHit3D, TrackerHitPlane, SimTrackerHit, "
-              << "Cluster, CalorimeterHit, RawCalorimeterHit, "
-              << "SimCalorimeterHit, Vertex, ReconstructedParticle, "
-              << "MCParticle." << endmsg;
+    warning() << "List of supported types: Track, TrackerHit3D, TrackerHitPlane, SimTrackerHit, Cluster, "
+              << "CalorimeterHit, RawCalorimeterHit, SimCalorimeterHit, Vertex, ReconstructedParticle, MCParticle."
+              << endmsg;
   }
+}
+
+const podio::Frame& EDM4hep2LcioTool::getEDM4hepEvent() const {
+  debug() << "Retrieving EDM4hep event (Frame)" << endmsg;
+  if (m_podioDataSvc) {
+    debug() << "Getting it from PodioDataSvc" << endmsg;
+    return m_podioDataSvc->getEventFrame();
+  } else {
+    debug() << "Trying to get it from TES" << endmsg;
+    DataObject* p;
+    StatusCode code = m_eventDataSvc->retrieveObject("/Event" + k4FWCore::frameLocation, p);
+    if (code.isSuccess()) {
+      auto* frame = dynamic_cast<AnyDataWrapper<podio::Frame>*>(p);
+      return frame->getData();
+    }
+  }
+
+  // We can do this because the following assumptions are true:
+  // - We only end up here if we are using the IOSvc and we are NOT reading
+  //   EDM4hep data. Otherwise the Reader will be scheduled as FIRST algorithm,
+  //   most importantly BEFORE any of the wrapped Marlin processors to which
+  //   this converter is attached.
+  // - The empty Frame we introduce into the TES here does not interfere with
+  //   the Writer for EDM4hep output (which is always scheduled last), as that
+  //   will simply get this Frame instead of creating an empty one itself
+  // - There are no scheduling issues / race conditions, since the
+  //   MarlinProcessorWrapper algorithm is not re-entrant and can thus not be
+  //   run in parallel
+  debug() << "Could not retrieve Frame from expected location. Registering a new empty Frame into the TES" << endmsg;
+  auto tmp = new AnyDataWrapper<podio::Frame>(podio::Frame());
+  if (m_eventDataSvc->registerObject("/Event" + k4FWCore::frameLocation, tmp).isFailure()) {
+    error() << "Could not retrieve Frame from expected location in TES and could not register a new one" << endmsg;
+    throw std::runtime_error("Could not get EDM4hep event (Frame) for conversions");
+  }
+  return tmp->getData();
+}
+
+std::optional<int32_t>
+EDM4hep2LcioTool::attacheParticleIDMetaInfo(const EDM4hep2LCIOConv::ParticleIDConvData& pidCollMeta,
+                                            lcio::LCEventImpl* lcio_event, const podio::Frame& edmEvent) const {
+
+  // We first have to figure out how the corresponding reco collection is
+  // named in EDM4hep. With that we can map it to the correct LCIO name and
+  // then attach the corresponding meta information via the PIDHandler
+  const auto& [pidCollName, pidColl, pidMetaInfo] = pidCollMeta;
+  debug() << fmt::format(
+                 "Attaching PID meta information for ParticleID collection {}, PID meta information available? {}",
+                 pidCollName, pidMetaInfo.has_value())
+          << endmsg;
+  if (msgLevel(MSG::DEBUG) && pidMetaInfo.has_value()) {
+    debug() << fmt::format("PID meta information: algoName: {}, algoType: {}, paramNames: {}", pidMetaInfo->algoName,
+                           pidMetaInfo->algoType(), pidMetaInfo->paramNames)
+            << endmsg;
+  }
+  if (!pidMetaInfo.has_value()) {
+    info() << "Could not collect PID meta information for ParticleID collection " << pidCollName << endmsg;
+  }
+  const auto recoCollName = [&]() {
+    auto name = m_collFromObjSvc->getCollectionNameFor((*pidColl)[0].getParticle());
+    if (!name.has_value()) {
+      // If we can't get a name from the TES we try again via the PodioDataSvc
+      if (m_podioDataSvc) {
+        name = edmEvent.getName((*pidColl)[0].getParticle());
+      }
+    }
+    return name;
+  }();
+  if (!recoCollName.has_value()) {
+    warning() << "Could not determine the name of the (LCIO) ReconstructedParticle collection to attach ParticleID "
+                 "metadata for (EDM4hep) ParticleID collection "
+              << pidCollName << endmsg;
+  }
+
+  std::optional<int32_t> algoId{std::nullopt};
+  if (recoCollName.has_value()) {
+    debug() << "Corresponding ReconstructedParticle (EDM4hep) collection is " << recoCollName.value() << endmsg;
+    if (const auto it = m_collsToConvert.find(recoCollName.value()); it != m_collsToConvert.end()) {
+      const auto lcioRecoName = it->second;
+      debug() << "Corresponding ReconstructedParticle (LCIO) collection is " << lcioRecoName << endmsg;
+      UTIL::PIDHandler pidHandler(lcio_event->getCollection(lcioRecoName));
+      if (pidMetaInfo.has_value()) {
+        try {
+          algoId = pidHandler.getAlgorithmID(pidMetaInfo->algoName);
+          debug() << "PID Algorithm already present with id " << algoId.value() << endmsg;
+          debug() << fmt::format("params: {}", pidHandler.getParameterNames(algoId.value())) << endmsg;
+          debug() << fmt::format("our params: {}", pidMetaInfo->paramNames) << endmsg;
+        } catch (const UTIL::UnknownAlgorithm&) {
+          algoId = pidHandler.addAlgorithm(pidMetaInfo->algoName, pidMetaInfo->paramNames);
+          debug() << "Determined algoId via LCIO PIDHandler: " << algoId.value() << endmsg;
+        }
+      }
+    } else {
+      warning() << "Could not find a name mapping for ReconstructedParticle collection " << recoCollName.value()
+                << " when trying to attach ParticleID meta information" << endmsg;
+    }
+  } else if (pidMetaInfo.has_value()) {
+    // We can still set the value we collected along the way. NOTE: It will
+    // almost certainly not be consistent in roundtrip conversions.
+    algoId = pidMetaInfo->algoType();
+  }
+  return algoId;
 }
 
 // Parse property parameters and convert the indicated collections.
 // Use the collection names in the parameters to read and write them
 StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
-  std::optional<std::reference_wrapper<const podio::Frame>> edmEvent;
+  const auto& edmEvent = getEDM4hepEvent();
   // use m_collsToConvert to detect whether we run the first time and cache the
   // results as we can assume that all the events have the same contents
   if (m_collsToConvert.empty()) {
@@ -394,30 +510,27 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
     auto collNameMapping = m_collNames.value();
 
     // We *always* want to convert the EventHeader
-    m_collsToConvert.emplace_back(edm4hep::labels::EventHeader, "<directly into LCEvent>");
+    m_collsToConvert.emplace(edm4hep::labels::EventHeader, "<directly into LCEvent>");
 
     if (m_convertAll) {
       info() << "Converting all collections from EDM4hep to LCIO" << endmsg;
       if (m_podioDataSvc) {
         // If we have the PodioDataSvc get the collections available from frame
-        edmEvent = m_podioDataSvc->getEventFrame();
-        for (const auto& name : edmEvent.value().get().getAvailableCollections()) {
+        for (const auto& name : edmEvent.getAvailableCollections()) {
           const auto& [_, inserted] = collNameMapping.emplace(name, name);
-          debug() << fmt::format("Adding '{}' from Frame to conversion? {}", name, inserted);
+          debug() << fmt::format("Adding '{}' from Frame to conversion? {}", name, inserted) << endmsg;
         }
       }
       // Always check the contents of the TES because algorithms that do not use
       // the PodioDataSvc (e.g. all Functional ones) go to the TES directly and
       // the PodioDataSvc Frame doesn't now about them.
-      std::optional<std::map<uint32_t, std::string>> idToNameOpt(std::move(m_idToName));
-      for (const auto& name : getAvailableCollectionsFromStore(this, idToNameOpt)) {
+      for (const auto& name : getAvailableCollectionsFromStore(this)) {
         const auto& [_, inserted] = collNameMapping.emplace(name, name);
-        debug() << fmt::format("Adding '{}' from TES to conversion? {}", name, inserted);
+        debug() << fmt::format("Adding '{}' from TES to conversion? {}", name, inserted) << endmsg;
       }
-      m_idToName = std::move(idToNameOpt.value());
 
       for (auto&& [origName, newName] : collNameMapping) {
-        m_collsToConvert.emplace_back(std::move(origName), std::move(newName));
+        m_collsToConvert.emplace(std::move(origName), std::move(newName));
       }
     }
   }
@@ -444,61 +557,11 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
   }
   debug() << "Event: " << lcio_event->getEventNumber() << " Run: " << lcio_event->getRunNumber() << endmsg;
 
-  EDM4hep2LCIOConv::sortParticleIDs(pidCollections);
-  if (!m_podioDataSvc) {
-    DataObject* p;
-    StatusCode code = m_eventDataSvc->retrieveObject("/Event" + k4FWCore::frameLocation, p);
-    if (code.isSuccess()) {
-      auto* frame = dynamic_cast<AnyDataWrapper<podio::Frame>*>(p);
-      edmEvent = std::cref(frame->getData());
-    } else {
-      auto frame = podio::Frame{};
-      edmEvent = frame;
-    }
-  }
-  for (const auto& pidCollMeta : pidCollections) {
-    auto algoId = attachParticleIDMetaData(lcio_event, edmEvent.value(), pidCollMeta);
-    if (!algoId.has_value()) {
-      // Now go over the collections that have been produced in a functional algorithm (if any)
-      bool found = false;
-      if (!m_podioDataSvc) {
-        const auto id = (*pidCollMeta.coll)[0].getParticle().id().collectionID;
-        if (auto it = m_idToName.find(id); it != m_idToName.end()) {
-          auto name = it->second;
-          if (pidCollMeta.metadata.has_value()) {
-            UTIL::PIDHandler pidHandler(lcio_event->getCollection(name));
-            algoId =
-                pidHandler.addAlgorithm(pidCollMeta.metadata.value().algoName, pidCollMeta.metadata.value().paramNames);
-            found = true;
-          }
-        }
-      }
-      if (!found) {
-        warning() << "Could not determine algorithm type for ParticleID collection " << pidCollMeta.name
-                  << " for setting consistent metadata" << endmsg;
-      }
-    }
-    convertParticleIDs(collection_pairs.particleIDs, pidCollMeta.name, algoId.value_or(-1));
-  }
+  convertParticleIDs(collection_pairs.particleIDs, pidCollections, lcio_event, edmEvent);
 
   EDM4hep2LCIOConv::attachDqdxInfo(collection_pairs.tracks, dQdxCollections);
 
-  // We want one "global" map that is created the first time it is used in the event.
-  DataObject* obj = nullptr;
-  auto sc = evtSvc()->retrieveObject(GlobalConvertedObjectsMap::TESpath.data(), obj);
-  if (sc.isFailure()) {
-    debug() << "Creating GlobalconvertedObjectsMap for this event since it is not already in the EventStore" << endmsg;
-    auto globalObjMapWrapper = new AnyDataWrapper(GlobalConvertedObjectsMap{});
-    auto nsc = evtSvc()->registerObject(GlobalConvertedObjectsMap::TESpath.data(), globalObjMapWrapper);
-    if (nsc.isFailure()) {
-      error() << "Could not register GlobalConvertedObjectsMap in the EventStore" << endmsg;
-      return StatusCode::FAILURE;
-    }
-    obj = globalObjMapWrapper;
-  }
-
-  auto globalObjMapWrapper = static_cast<AnyDataWrapper<GlobalConvertedObjectsMap>*>(obj);
-  auto& globalObjMap = globalObjMapWrapper->getData();
+  auto& globalObjMap = getGlobalObjectMap(this);
 
   debug() << "Updating global object map" << endmsg;
   globalObjMap.update(collection_pairs);
