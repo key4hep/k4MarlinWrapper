@@ -99,3 +99,24 @@ std::vector<std::string> getAvailableCollectionsFromStore(const AlgTool* thisCla
   }
   return collectionNames;
 }
+
+k4MarlinWrapper::GlobalConvertedObjectsMap& getGlobalObjectMap(AlgTool* thisTool) {
+  // We want one "global" map that is created the first time it is used in the event.
+  DataObject* obj = nullptr;
+  auto sc = thisTool->evtSvc()->retrieveObject(k4MarlinWrapper::GlobalConvertedObjectsMap::TESpath.data(), obj);
+  if (sc.isFailure()) {
+    thisTool->debug() << "Creating GlobalconvertedObjectsMap for this event since it is not already in the EventStore"
+                      << endmsg;
+    auto globalObjMapWrapper = new AnyDataWrapper(k4MarlinWrapper::GlobalConvertedObjectsMap{});
+    auto nsc = thisTool->evtSvc()->registerObject(k4MarlinWrapper::GlobalConvertedObjectsMap::TESpath.data(),
+                                                  globalObjMapWrapper);
+    if (nsc.isFailure()) {
+      thisTool->error() << "Could not register GlobalConvertedObjectsMap in the EventStore" << endmsg;
+      throw std::runtime_error("Could not register GlobalConvertedObjectsMap in the EventStore");
+    }
+    obj = globalObjMapWrapper;
+  }
+
+  auto globalObjMapWrapper = static_cast<AnyDataWrapper<k4MarlinWrapper::GlobalConvertedObjectsMap>*>(obj);
+  return globalObjMapWrapper->getData();
+}
