@@ -30,7 +30,6 @@
 
 #include <map>
 #include <string>
-#include <tuple>
 #include <unordered_map>
 #include <vector>
 
@@ -115,7 +114,8 @@ private:
   void convertReconstructedParticles(RecoParticleMap& recoparticles_vec, const std::string& e4h_coll_name,
                                      const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event);
 
-  void convertParticleIDs(ParticleIDMap& pidMap, const std::string& e4h_coll_name, int32_t algoId);
+  void convertParticleIDs(ParticleIDMap& pidMap, std::vector<EDM4hep2LCIOConv::ParticleIDConvData>& pidCollections,
+                          lcio::LCEventImpl* lcio_event, const podio::Frame& edmEvent);
 
   void convertMCParticles(MCParticleMap& mc_particles_vec, const std::string& e4h_coll_name,
                           const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event);
@@ -128,6 +128,13 @@ private:
                   std::vector<EDM4hep2LCIOConv::TrackDqdxConvData>& dQdxCollections);
 
   const podio::Frame& getEDM4hepEvent() const;
+
+  /// Try to attach the ParticleID related metadata (algorithm name, parameter
+  /// names) to the corresponding LCIO *ReconstructedParticle* collection and
+  /// return the value of the algorithmType that has been used (in case of
+  /// success).
+  std::optional<int32_t> attacheParticleIDMetaInfo(const EDM4hep2LCIOConv::ParticleIDConvData& pidCollMeta,
+                                                   lcio::LCEventImpl* lcio_event, const podio::Frame& edmEvent) const;
 
   /// Get an EDM4hep collection by name, consulting either the podio based data
   /// svc or the IOSvc

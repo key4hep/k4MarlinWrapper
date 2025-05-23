@@ -34,10 +34,12 @@
 #include "GaudiKernel/IDataManagerSvc.h"
 #include "GaudiKernel/IDataProviderSvc.h"
 
+#include <IMPL/LCEventImpl.h>
 #include <fmt/format.h>
 #include <fmt/ranges.h>
 
 #include <functional>
+#include <k4EDM4hep2LcioConv/k4EDM4hep2LcioConv.h>
 #include <memory>
 
 DECLARE_COMPONENT(EDM4hep2LcioTool);
@@ -126,10 +128,17 @@ void EDM4hep2LcioTool::convertTrackerHits(TrackerHitMap& trackerhits_vec, const 
   lcio_event->addCollection(conv_trackerhits.release(), lcio_coll_name);
 }
 
-void EDM4hep2LcioTool::convertParticleIDs(ParticleIDMap& pidMap, const std::string& e4h_coll_name, int32_t algoId) {
-  k4FWCore::DataHandle<edm4hep::ParticleIDCollection> pidHandle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
+void EDM4hep2LcioTool::convertParticleIDs(ParticleIDMap& pidMap,
+                                          std::vector<EDM4hep2LCIOConv::ParticleIDConvData>& pidCollections,
+                                          lcio::LCEventImpl* lcio_event, const podio::Frame& edmEvent) {
 
-  EDM4hep2LCIOConv::convertParticleIDs(pidHandle.get(), pidMap, algoId);
+  EDM4hep2LCIOConv::sortParticleIDs(pidCollections);
+  for (const auto& pidCollMeta : pidCollections) {
+    DataHandle<edm4hep::ParticleIDCollection> pidHandle{pidCollMeta.name, Gaudi::DataHandle::Reader, this};
+
+    auto algoId = attacheParticleIDMetaInfo(pidCollMeta, lcio_event, edmEvent);
+    EDM4hep2LCIOConv::convertParticleIDs(pidHandle.get(), pidMap, algoId.value_or(-1));
+  }
 }
 
 void EDM4hep2LcioTool::convertTrackerHitPlanes(TrackerHitPlaneMap& trackerhits_vec, const std::string& e4h_coll_name,
@@ -431,6 +440,72 @@ const podio::Frame& EDM4hep2LcioTool::getEDM4hepEvent() const {
   return tmp->getData();
 }
 
+std::optional<int32_t>
+EDM4hep2LcioTool::attacheParticleIDMetaInfo(const EDM4hep2LCIOConv::ParticleIDConvData& pidCollMeta,
+                                            lcio::LCEventImpl* lcio_event, const podio::Frame& edmEvent) const {
+
+  // We first have to figure out how the corresponding reco collection is
+  // named in EDM4hep. With that we can map it to the correct LCIO name and
+  // then attach the corresponding meta information via the PIDHandler
+  const auto& [pidCollName, pidColl, pidMetaInfo] = pidCollMeta;
+  debug() << fmt::format(
+                 "Attaching PID meta information for ParticleID collection {}, PID meta information available? {}",
+                 pidCollName, pidMetaInfo.has_value())
+          << endmsg;
+  if (msgLevel(MSG::DEBUG) && pidMetaInfo.has_value()) {
+    debug() << fmt::format("PID meta information: algoName: {}, algoType: {}, paramNames: {}", pidMetaInfo->algoName,
+                           pidMetaInfo->algoType(), pidMetaInfo->paramNames)
+            << endmsg;
+  }
+  if (!pidMetaInfo.has_value()) {
+    info() << "Could not collect PID meta information for ParticleID collection " << pidCollName << endmsg;
+  }
+  const auto recoCollName = [&]() {
+    auto name = m_collFromObjSvc->getCollectionNameFor((*pidColl)[0].getParticle());
+    if (!name.has_value()) {
+      // If we can't get a name from the TES we try again via the PodioDataSvc
+      if (m_podioDataSvc) {
+        name = edmEvent.getName((*pidColl)[0].getParticle());
+      }
+    }
+    return name;
+  }();
+  if (!recoCollName.has_value()) {
+    warning() << "Could not determine the name of the (LCIO) ReconstructedParticle collection to attach ParticleID "
+                 "metadata for (EDM4hep) ParticleID collection "
+              << pidCollName << endmsg;
+  }
+
+  std::optional<int32_t> algoId{std::nullopt};
+  if (recoCollName.has_value()) {
+    debug() << "Corresponding ReconstructedParticle (EDM4hep) collection is " << recoCollName.value() << endmsg;
+    if (const auto it = m_collsToConvert.find(recoCollName.value()); it != m_collsToConvert.end()) {
+      const auto lcioRecoName = it->second;
+      debug() << "Corresponding ReconstructedParticle (LCIO) collection is " << lcioRecoName << endmsg;
+      UTIL::PIDHandler pidHandler(lcio_event->getCollection(lcioRecoName));
+      if (pidMetaInfo.has_value()) {
+        try {
+          algoId = pidHandler.getAlgorithmID(pidMetaInfo->algoName);
+          debug() << "PID Algorithm already present with id " << algoId.value() << endmsg;
+          debug() << fmt::format("params: {}", pidHandler.getParameterNames(algoId.value())) << endmsg;
+          debug() << fmt::format("our params: {}", pidMetaInfo->paramNames) << endmsg;
+        } catch (const UTIL::UnknownAlgorithm&) {
+          algoId = pidHandler.addAlgorithm(pidMetaInfo->algoName, pidMetaInfo->paramNames);
+          debug() << "Determined algoId via LCIO PIDHandler: " << algoId.value() << endmsg;
+        }
+      }
+    } else {
+      warning() << "Could not find a name mapping for ReconstructedParticle collection " << recoCollName.value()
+                << " when trying to attach ParticleID meta information" << endmsg;
+    }
+  } else if (pidMetaInfo.has_value()) {
+    // We can still set the value we collected along the way. NOTE: It will
+    // almost certainly not be consistent in roundtrip conversions.
+    algoId = pidMetaInfo->algoType();
+  }
+  return algoId;
+}
+
 // Parse property parameters and convert the indicated collections.
 // Use the collection names in the parameters to read and write them
 StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
@@ -492,70 +567,7 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
   }
   debug() << "Event: " << lcio_event->getEventNumber() << " Run: " << lcio_event->getRunNumber() << endmsg;
 
-  EDM4hep2LCIOConv::sortParticleIDs(pidCollections);
-  for (const auto& pidCollMeta : pidCollections) {
-    // We first have to figure out how the corresponding reco collection is
-    // named in EDM4hep. With that we can map it to the correct LCIO name and
-    // then attach the corresponding meta information via the PIDHandler
-    const auto& [pidCollName, pidColl, pidMetaInfo] = pidCollMeta;
-    debug() << fmt::format(
-                   "Attaching PID meta information for ParticleID collection {}, PID meta information available? {}",
-                   pidCollName, pidMetaInfo.has_value())
-            << endmsg;
-    if (msgLevel(MSG::DEBUG) && pidMetaInfo.has_value()) {
-      debug() << fmt::format("PID meta information: algoName: {}, algoType: {}, paramNames: {}", pidMetaInfo->algoName,
-                             pidMetaInfo->algoType(), pidMetaInfo->paramNames)
-              << endmsg;
-    }
-    if (!pidMetaInfo.has_value()) {
-      info() << "Could not collect PID meta information for ParticleID collection " << pidCollName << endmsg;
-    }
-    const auto recoCollName = [&]() {
-      auto name = m_collFromObjSvc->getCollectionNameFor((*pidColl)[0].getParticle());
-      if (!name.has_value()) {
-        // If we can't get a name from the TES we try again via the PodioDataSvc
-        if (m_podioDataSvc) {
-          name = edmEvent.value().get().getName((*pidColl)[0].getParticle());
-        }
-      }
-      return name;
-    }();
-    if (!recoCollName.has_value()) {
-      warning() << "Could not determine the name of the (LCIO) ReconstructedParticle collection to attach ParticleID "
-                   "metadata for (EDM4hep) ParticleID collection "
-                << pidCollName << endmsg;
-    }
-
-    std::optional<int32_t> algoId{std::nullopt};
-    if (recoCollName.has_value()) {
-      debug() << "Corresponding ReconstructedParticle (EDM4hep) collection is " << recoCollName.value() << endmsg;
-      if (const auto it = m_collsToConvert.find(recoCollName.value()); it != m_collsToConvert.end()) {
-        const auto lcioRecoName = it->second;
-        debug() << "Corresponding ReconstructedParticle (LCIO) collection is " << lcioRecoName << endmsg;
-        UTIL::PIDHandler pidHandler(lcio_event->getCollection(lcioRecoName));
-        if (pidMetaInfo.has_value()) {
-          try {
-            algoId = pidHandler.getAlgorithmID(pidMetaInfo->algoName);
-            debug() << "PID Algorithm already present with id " << algoId.value() << endmsg;
-            debug() << fmt::format("params: {}", pidHandler.getParameterNames(algoId.value())) << endmsg;
-            debug() << fmt::format("our params: {}", pidMetaInfo->paramNames) << endmsg;
-          } catch (const UTIL::UnknownAlgorithm&) {
-            algoId = pidHandler.addAlgorithm(pidMetaInfo->algoName, pidMetaInfo->paramNames);
-            debug() << "Determined algoId via LCIO PIDHandler: " << algoId.value() << endmsg;
-          }
-        }
-      } else {
-        warning() << "Could not find a name mapping for ReconstructedParticle collection " << recoCollName.value()
-                  << " when trying to attach ParticleID meta information" << endmsg;
-      }
-    } else if (pidMetaInfo.has_value()) {
-      // We can still set the value we collected along the way. NOTE: It will
-      // almost certainly not be consistent in roundtrip conversions.
-      algoId = pidMetaInfo->algoType();
-    }
-
-    convertParticleIDs(collection_pairs.particleIDs, pidCollMeta.name, algoId.value_or(-1));
-  }
+  convertParticleIDs(collection_pairs.particleIDs, pidCollections, lcio_event, edmEvent);
 
   EDM4hep2LCIOConv::attachDqdxInfo(collection_pairs.tracks, dQdxCollections);
 
