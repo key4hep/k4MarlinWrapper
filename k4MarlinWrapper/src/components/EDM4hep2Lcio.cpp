@@ -532,12 +532,10 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
       // Always check the contents of the TES because algorithms that do not use
       // the PodioDataSvc (e.g. all Functional ones) go to the TES directly and
       // the PodioDataSvc Frame doesn't now about them.
-      std::optional<std::map<uint32_t, std::string>> idToNameOpt(std::move(m_idToName));
-      for (const auto& name : getAvailableCollectionsFromStore(this, idToNameOpt)) {
+      for (const auto& name : getAvailableCollectionsFromStore(this)) {
         const auto& [_, inserted] = collNameMapping.emplace(name, name);
         debug() << fmt::format("Adding '{}' from TES to conversion? {}", name, inserted) << endmsg;
       }
-      m_idToName = std::move(idToNameOpt.value());
 
       for (auto&& [origName, newName] : collNameMapping) {
         m_collsToConvert.emplace(std::move(origName), std::move(newName));
