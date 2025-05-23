@@ -393,8 +393,10 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
 const podio::Frame& EDM4hep2LcioTool::getEDM4hepEvent() const {
   debug() << "Retrieving EDM4hep event (Frame)" << endmsg;
   if (m_podioDataSvc) {
+    debug() << "Getting it from PodioDataSvc" << endmsg;
     return m_podioDataSvc->getEventFrame();
   } else {
+    debug() << "Trying to get it from TES" << endmsg;
     DataObject* p;
     StatusCode code = m_eventDataSvc->retrieveObject("/Event" + k4FWCore::frameLocation, p);
     if (code.isSuccess()) {
@@ -402,8 +404,14 @@ const podio::Frame& EDM4hep2LcioTool::getEDM4hepEvent() const {
       return frame->getData();
     }
   }
+  debug() << "Could not retrieve Frame from expected location. Registering a new empty Frame into the TES" << endmsg;
 
-  throw std::runtime_error("Could not get EDM4hep event (Frame) for conversions");
+  auto tmp = new AnyDataWrapper<podio::Frame>(podio::Frame());
+  if (m_eventDataSvc->registerObject("/Event" + k4FWCore::frameLocation, tmp).isFailure()) {
+    error() << "Could not retrieve Frame from expected location in TES and could not register a new one" << endmsg;
+    throw std::runtime_error("Could not get EDM4hep event (Frame) for conversions");
+  }
+  return tmp->getData();
 }
 
 // Parse property parameters and convert the indicated collections.
