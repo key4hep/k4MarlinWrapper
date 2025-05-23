@@ -404,8 +404,19 @@ const podio::Frame& EDM4hep2LcioTool::getEDM4hepEvent() const {
       return frame->getData();
     }
   }
-  debug() << "Could not retrieve Frame from expected location. Registering a new empty Frame into the TES" << endmsg;
 
+  // We can do this because the following assumptions are true:
+  // - We only end up here if we are using the IOSvc and we are NOT reading
+  //   EDM4hep data. Otherwise the Reader will be scheduled as FIRST algorithm,
+  //   most importantly BEFORE any of the wrapped Marlin processors to which
+  //   this converter is attached.
+  // - The empty Frame we introduce into the TES here does not interfere with
+  //   the Writer for EDM4hep output (which is always scheduled last), as that
+  //   will simply get this Frame instead of creating an empty one itself
+  // - There are no scheduling issues / race conditions, since the
+  //   MarlinProcessorWrapper algorithm is not re-entrant and can thus not be
+  //   run in parallel
+  debug() << "Could not retrieve Frame from expected location. Registering a new empty Frame into the TES" << endmsg;
   auto tmp = new AnyDataWrapper<podio::Frame>(podio::Frame());
   if (m_eventDataSvc->registerObject("/Event" + k4FWCore::frameLocation, tmp).isFailure()) {
     error() << "Could not retrieve Frame from expected location in TES and could not register a new one" << endmsg;
