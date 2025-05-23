@@ -28,7 +28,6 @@
 
 #include <map>
 #include <string>
-#include <tuple>
 #include <unordered_map>
 #include <vector>
 
@@ -104,7 +103,8 @@ private:
   void convertReconstructedParticles(RecoParticleMap& recoparticles_vec, const std::string& e4h_coll_name,
                                      const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event);
 
-  void convertParticleIDs(ParticleIDMap& pidMap, const std::string& e4h_coll_name, int32_t algoId);
+  void convertParticleIDs(ParticleIDMap& pidMap, std::vector<EDM4hep2LCIOConv::ParticleIDConvData>& pidCollections,
+                          lcio::LCEventImpl* lcio_event, const podio::Frame& edmEvent);
 
   void convertMCParticles(MCParticleMap& mc_particles_vec, const std::string& e4h_coll_name,
                           const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event);

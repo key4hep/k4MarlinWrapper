@@ -32,10 +32,12 @@
 #include "GaudiKernel/IDataManagerSvc.h"
 #include "GaudiKernel/IDataProviderSvc.h"
 
+#include <IMPL/LCEventImpl.h>
 #include <fmt/format.h>
 #include <fmt/ranges.h>
 
 #include <functional>
+#include <k4EDM4hep2LcioConv/k4EDM4hep2LcioConv.h>
 #include <memory>
 
 DECLARE_COMPONENT(EDM4hep2LcioTool);
@@ -107,10 +109,17 @@ void EDM4hep2LcioTool::convertTrackerHits(TrackerHitMap& trackerhits_vec, const 
   lcio_event->addCollection(conv_trackerhits.release(), lcio_coll_name);
 }
 
-void EDM4hep2LcioTool::convertParticleIDs(ParticleIDMap& pidMap, const std::string& e4h_coll_name, int32_t algoId) {
-  k4FWCore::DataHandle<edm4hep::ParticleIDCollection> pidHandle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
+void EDM4hep2LcioTool::convertParticleIDs(ParticleIDMap& pidMap,
+                                          std::vector<EDM4hep2LCIOConv::ParticleIDConvData>& pidCollections,
+                                          lcio::LCEventImpl* lcio_event, const podio::Frame& edmEvent) {
 
-  EDM4hep2LCIOConv::convertParticleIDs(pidHandle.get(), pidMap, algoId);
+  EDM4hep2LCIOConv::sortParticleIDs(pidCollections);
+  for (const auto& pidCollMeta : pidCollections) {
+    DataHandle<edm4hep::ParticleIDCollection> pidHandle{pidCollMeta.name, Gaudi::DataHandle::Reader, this};
+
+    auto algoId = attacheParticleIDMetaInfo(pidCollMeta, lcio_event, edmEvent);
+    EDM4hep2LCIOConv::convertParticleIDs(pidHandle.get(), pidMap, algoId.value_or(-1));
+  }
 }
 
 void EDM4hep2LcioTool::convertTrackerHitPlanes(TrackerHitPlaneMap& trackerhits_vec, const std::string& e4h_coll_name,
