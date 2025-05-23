@@ -105,13 +105,12 @@ k4MarlinWrapper::GlobalConvertedObjectsMap& getGlobalObjectMap(AlgTool* thisTool
   DataObject* obj = nullptr;
   auto sc = thisTool->evtSvc()->retrieveObject(k4MarlinWrapper::GlobalConvertedObjectsMap::TESpath.data(), obj);
   if (sc.isFailure()) {
-    thisTool->debug() << "Creating GlobalconvertedObjectsMap for this event since it is not already in the EventStore"
+    thisTool->debug() << "Creating GlobalConvertedObjectsMap for this event since it is not already in the EventStore"
                       << endmsg;
     auto globalObjMapWrapper = new AnyDataWrapper(k4MarlinWrapper::GlobalConvertedObjectsMap{});
     auto nsc = thisTool->evtSvc()->registerObject(k4MarlinWrapper::GlobalConvertedObjectsMap::TESpath.data(),
                                                   globalObjMapWrapper);
     if (nsc.isFailure()) {
-      thisTool->error() << "Could not register GlobalConvertedObjectsMap in the EventStore" << endmsg;
       throw std::runtime_error("Could not register GlobalConvertedObjectsMap in the EventStore");
     }
     obj = globalObjMapWrapper;
