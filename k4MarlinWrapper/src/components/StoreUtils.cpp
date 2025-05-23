@@ -103,12 +103,12 @@ std::vector<std::string> getAvailableCollectionsFromStore(const AlgTool* thisCla
         thisClass->verbose() << fmt::format("Retrieving id for '{}': {:0>8x}", name,
                                             functionalWrapper->getData()->getID())
                              << endmsg;
-        idToName->emplace(functionalWrapper->getData()->getID(), std::move(name));
+        idToName->emplace(functionalWrapper->getData()->getID(), name);
       } else {
         thisClass->verbose() << fmt::format("Retrieving id for '{}': {:0>8x}", name,
                                             algorithmWrapper->collectionBase()->getID())
                              << endmsg;
-        idToName->emplace(algorithmWrapper->collectionBase()->getID(), std::move(name));
+        idToName->emplace(algorithmWrapper->collectionBase()->getID(), name);
       }
     }
   }
