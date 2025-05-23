@@ -17,7 +17,6 @@
  * limitations under the License.
  */
 #include "k4MarlinWrapper/converters/EDM4hep2Lcio.h"
-#include "GlobalConvertedObjectsMap.h"
 #include "StoreUtils.h"
 #include <GaudiKernel/StatusCode.h>
 
@@ -515,22 +514,7 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
 
   EDM4hep2LCIOConv::attachDqdxInfo(collection_pairs.tracks, dQdxCollections);
 
-  // We want one "global" map that is created the first time it is used in the event.
-  DataObject* obj = nullptr;
-  auto sc = evtSvc()->retrieveObject(GlobalConvertedObjectsMap::TESpath.data(), obj);
-  if (sc.isFailure()) {
-    debug() << "Creating GlobalconvertedObjectsMap for this event since it is not already in the EventStore" << endmsg;
-    auto globalObjMapWrapper = new AnyDataWrapper(GlobalConvertedObjectsMap{});
-    auto nsc = evtSvc()->registerObject(GlobalConvertedObjectsMap::TESpath.data(), globalObjMapWrapper);
-    if (nsc.isFailure()) {
-      error() << "Could not register GlobalConvertedObjectsMap in the EventStore" << endmsg;
-      return StatusCode::FAILURE;
-    }
-    obj = globalObjMapWrapper;
-  }
-
-  auto globalObjMapWrapper = static_cast<AnyDataWrapper<GlobalConvertedObjectsMap>*>(obj);
-  auto& globalObjMap = globalObjMapWrapper->getData();
+  auto& globalObjMap = getGlobalObjectMap(this);
 
   debug() << "Updating global object map" << endmsg;
   globalObjMap.update(collection_pairs);

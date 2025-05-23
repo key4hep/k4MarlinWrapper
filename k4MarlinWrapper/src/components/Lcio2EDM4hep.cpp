@@ -249,22 +249,7 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
     }
   }
 
-  // We want one "global" map that is created the first time it is used in the event.
-  DataObject* obj = nullptr;
-  auto sc = evtSvc()->retrieveObject(GlobalConvertedObjectsMap::TESpath.data(), obj);
-  if (sc.isFailure()) {
-    debug() << "Creating GlobalconvertedObjectsMap for this event since it is not already in the EventStore" << endmsg;
-    auto globalObjMapWrapper = new AnyDataWrapper(GlobalConvertedObjectsMap{});
-    auto nsc = evtSvc()->registerObject(GlobalConvertedObjectsMap::TESpath.data(), globalObjMapWrapper);
-    if (nsc.isFailure()) {
-      error() << "Could not register GlobalConvertedObjectsMap in the EventStore" << endmsg;
-      return StatusCode::FAILURE;
-    }
-    obj = globalObjMapWrapper;
-  }
-
-  auto globalObjMapWrapper = static_cast<AnyDataWrapper<GlobalConvertedObjectsMap>*>(obj);
-  auto& globalObjMap = globalObjMapWrapper->getData();
+  auto& globalObjMap = getGlobalObjectMap(this);
 
   globalObjMap.update(lcio2edm4hepMaps);
 
