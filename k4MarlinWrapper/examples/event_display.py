@@ -20,12 +20,12 @@
 
 from collections import namedtuple
 
+from Configurables import EventDataSvc, GeoSvc, MarlinProcessorWrapper
 from Gaudi.Configuration import INFO
-from Configurables import MarlinProcessorWrapper, EventDataSvc, GeoSvc
 from k4FWCore import ApplicationMgr, IOSvc
 from k4FWCore.parseArgs import parser
-from k4MarlinWrapper.io_helpers import IOHandlerHelper
 
+from k4MarlinWrapper.io_helpers import IOHandlerHelper
 
 parser.add_argument(
     "--inputFiles",
