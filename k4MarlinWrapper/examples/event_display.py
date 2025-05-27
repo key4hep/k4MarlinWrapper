@@ -191,9 +191,9 @@ MyCEDViewer.Parameters = {
         for config in colConfigs
         for item in [
             config.col_name,
-            str(config.marker_type),
-            str(config.size),
-            str(config.toggle_group),
+            config.marker_type,
+            config.size,
+            config.toggle_group,
         ]
     ],
     "DrawSurfaces": ["true"],
