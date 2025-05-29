@@ -1,3 +1,67 @@
+# v00-12
+
+* 2025-05-28 Victor Schwan ([PR#240](https://github.com/key4hep/k4MarlinWrapper/pull/240))
+  - Introduced a `NamedTuple` (`ColDrawConfig`) to capture the true substructure of each configuration entry.
+  - Refactored the configuration list to be a list of these structured entries.
+  - Added a one-liner flattening back to the old list format for backward compatibility with legacy code.
+  - General code formatting
+  
+  Previously, the configuration was stored as one extremely long, flat list, ignoring the logical grouping of each entry’s components (name, marker type, size, CED draw layer). This mismatch caused multiple problems:
+  
+  - Autoformatters spread the list over many lines.
+  - Workarounds like disabling autoformatting on this section were a hotfix, not a real solution.
+
+* 2025-05-27 Thomas Madlener ([PR#241](https://github.com/key4hep/k4MarlinWrapper/pull/241))
+  - Switch to an Ubuntu 24 runner to run pre-commit
+
+* 2025-05-22 Thomas Madlener ([PR#237](https://github.com/key4hep/k4MarlinWrapper/pull/237))
+  - Make sure that Link collections are properly skipped from conversion if they already exist in the LCIO event
+
+* 2025-04-29 Thomas Madlener ([PR#234](https://github.com/key4hep/k4MarlinWrapper/pull/234))
+  - Introduce the `io_helpers.IOHandlerHelper` class that makes it possible to more easily transparently handle LCIO and EDM4hep inputs and outputs as well as the necessary conversions between them.
+    - Fully based on the `IOSvc` so that the `PodioInput`, `PodioOutput` and `k4DataSvc` are no longer necessary for mixing and matching
+  - Deprecate the `inputReader` module and suggest people to switch to the `io_helpers` instead.
+
+* 2025-04-03 Thomas Madlener ([PR#230](https://github.com/key4hep/k4MarlinWrapper/pull/230))
+  - Replace instances of `InitializeDD4hep` processors with `GeoSvc` and `TrackingCellIDEncodingSvc` (if necessary) in the conversion of Marlin steering files to Gaudi options files.
+
+* 2025-03-28 Thomas Madlener ([PR#233](https://github.com/key4hep/k4MarlinWrapper/pull/233))
+  - Unconditionally check the TES when looking for EDM4hep collections to convert in case `convertAll` is set to `True`.
+  - Restructure conversion slightly and only do this lookup once and cache the results from the first conversion. This is possible since event contents are assumed to be constant.
+
+* 2025-03-11 Thomas Madlener ([PR#232](https://github.com/key4hep/k4MarlinWrapper/pull/232))
+  - Improve the debug log message for where EventHeader collections are converted to.
+
+* 2025-03-11 Thomas Madlener ([PR#229](https://github.com/key4hep/k4MarlinWrapper/pull/229))
+  - Make sure to read the `"EventHeader"` collection in the tests as it will be converted unconditionally and lead to termination if it's not found.
+
+* 2025-03-11 Thomas Madlener ([PR#228](https://github.com/key4hep/k4MarlinWrapper/pull/228))
+  - Switch to f-strings for formatting strings in the steering file converter script
+  - Remove python2 compatibility
+  - Fix erroneous removal of opening `{` when the parameters of a Marlin Processor are empty (see #222)
+
+* 2025-03-11 Mateusz Jakub Fila ([PR#227](https://github.com/key4hep/k4MarlinWrapper/pull/227))
+  - Update docs to use `IOSvc` instead of `k4DataSvc`. Use`IOSvc` by the default in the examples
+
+* 2025-03-11 jmcarcell ([PR#225](https://github.com/key4hep/k4MarlinWrapper/pull/225))
+  - Fix missing collections with IOSvc when using `convertAll=True`
+  - Add a test that would fail without this fix
+  - Rename `PseudoRecoAlgorithm` to `PseudoRecoFunctional` and create a new  `PseudoRecoAlgorithm` that implements a `Gaudi::Algorithm`
+
+* 2025-02-21 Thomas Madlener ([PR#223](https://github.com/key4hep/k4MarlinWrapper/pull/223))
+  - EDM4hep2Lcio: Make an exception message more useful by including the collection name for which retrieval fails
+
+* 2025-02-17 Thomas Madlener ([PR#221](https://github.com/key4hep/k4MarlinWrapper/pull/221))
+  - Fix the `trackerHitPlanes` name of the map going from EDM4hep to LCIO to make it work properly.
+  - Remove some no longer necessary special handling of ParticleID and TrackerHitPlane maps.
+
+* 2025-02-17 Thomas Madlener ([PR#220](https://github.com/key4hep/k4MarlinWrapper/pull/220))
+  - Add a `skipNEvents` property to the `LcioEvent` algorithm to make it possible to skip the first N input LCIO events.
+    - Assuming default algorithm name, `--LcioEvent.skipNEvents=<N>` can be used to change this parameter from the command line.
+
+* 2025-02-10 jmcarcell ([PR#218](https://github.com/key4hep/k4MarlinWrapper/pull/218))
+  - Try to retrieve the MetadataSvc only when not using PodioDataSvc to avoid a lookup error when using the Marlin wrapper.
+
 # v00-11
 
 * 2025-02-06 Thomas Madlener ([PR#217](https://github.com/key4hep/k4MarlinWrapper/pull/217))
