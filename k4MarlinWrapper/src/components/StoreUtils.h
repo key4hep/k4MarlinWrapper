@@ -16,6 +16,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include "GlobalConvertedObjectsMap.h"
+
 #include "GaudiKernel/AlgTool.h"
 
 #include <string>
@@ -25,5 +27,6 @@
 // here with some additions to make it useful for converting both from EDM4hep
 // to LCIO and vice versa
 std::vector<std::string> getAvailableCollectionsFromStore(const AlgTool* thisClass,
-                                                          std::optional<std::map<uint32_t, std::string>>& idToName,
                                                           bool returnFrameCollections = false);
+
+k4MarlinWrapper::GlobalConvertedObjectsMap& getGlobalObjectMap(AlgTool* thisTool);
