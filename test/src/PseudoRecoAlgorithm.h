@@ -32,7 +32,7 @@ public:
   StatusCode execute(const EventContext&) const override;
 
 private:
-  mutable DataHandle<edm4hep::MCParticleCollection> m_mcCollHandle{"MCParticles", Gaudi::DataHandle::Reader, this};
-  mutable DataHandle<edm4hep::ReconstructedParticleCollection> m_recoCollHandle{"RecoParticles",
+  mutable k4FWCore::DataHandle<edm4hep::MCParticleCollection> m_mcCollHandle{"MCParticles", Gaudi::DataHandle::Reader, this};
+  mutable k4FWCore::DataHandle<edm4hep::ReconstructedParticleCollection> m_recoCollHandle{"RecoParticles",
                                                                                 Gaudi::DataHandle::Writer, this};
 };

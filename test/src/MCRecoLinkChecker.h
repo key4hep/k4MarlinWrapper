@@ -36,10 +36,10 @@ public:
   StatusCode execute(const EventContext&) const;
 
 private:
-  mutable DataHandle<edm4hep::RecoMCParticleLinkCollection> m_relationCollHandle{"MCRecoTruthLinks",
+  mutable k4FWCore::DataHandle<edm4hep::RecoMCParticleLinkCollection> m_relationCollHandle{"MCRecoTruthLinks",
                                                                                  Gaudi::DataHandle::Reader, this};
-  mutable DataHandle<edm4hep::MCParticleCollection> m_mcCollHandle{"MCParticles", Gaudi::DataHandle::Reader, this};
-  mutable DataHandle<edm4hep::ReconstructedParticleCollection> m_recoCollHandle{"RecoParticles",
+  mutable k4FWCore::DataHandle<edm4hep::MCParticleCollection> m_mcCollHandle{"MCParticles", Gaudi::DataHandle::Reader, this};
+  mutable k4FWCore::DataHandle<edm4hep::ReconstructedParticleCollection> m_recoCollHandle{"RecoParticles",
                                                                                 Gaudi::DataHandle::Reader, this};
 };
 
