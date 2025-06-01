@@ -104,11 +104,12 @@ void EDM4hep2LcioTool::convertTracks(TrackMap& tracks_vec, const std::string& e4
 // Add LCIO Collection Vector to LCIO event
 void EDM4hep2LcioTool::convertTrackerHits(TrackerHitMap& trackerhits_vec, const std::string& e4h_coll_name,
                                           const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event) {
-  k4FWCore::DataHandle<edm4hep::TrackerHit3DCollection> trackerhits_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
+  k4FWCore::DataHandle<edm4hep::TrackerHit3DCollection> trackerhits_handle{e4h_coll_name, Gaudi::DataHandle::Reader,
+                                                                           this};
   const auto trackerhits_coll = trackerhits_handle.get();
 
   k4FWCore::MetaDataHandle<std::string> cellIDStrHandle{trackerhits_handle, edm4hep::labels::CellIDEncoding,
-                                              Gaudi::DataHandle::Reader};
+                                                        Gaudi::DataHandle::Reader};
 
   auto conv_trackerhits =
       EDM4hep2LCIOConv::convertTrackerHits(trackerhits_coll, cellIDStrHandle.get(""), trackerhits_vec);
@@ -125,11 +126,12 @@ void EDM4hep2LcioTool::convertParticleIDs(ParticleIDMap& pidMap, const std::stri
 
 void EDM4hep2LcioTool::convertTrackerHitPlanes(TrackerHitPlaneMap& trackerhits_vec, const std::string& e4h_coll_name,
                                                const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event) {
-  k4FWCore::DataHandle<edm4hep::TrackerHitPlaneCollection> trackerhits_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
+  k4FWCore::DataHandle<edm4hep::TrackerHitPlaneCollection> trackerhits_handle{e4h_coll_name, Gaudi::DataHandle::Reader,
+                                                                              this};
   const auto trackerhits_coll = trackerhits_handle.get();
 
   k4FWCore::MetaDataHandle<std::string> cellIDStrHandle{trackerhits_handle, edm4hep::labels::CellIDEncoding,
-                                              Gaudi::DataHandle::Reader};
+                                                        Gaudi::DataHandle::Reader};
 
   auto conv_trackerhits =
       EDM4hep2LCIOConv::convertTrackerHitPlanes(trackerhits_coll, cellIDStrHandle.get(""), trackerhits_vec);
@@ -143,11 +145,12 @@ void EDM4hep2LcioTool::convertTrackerHitPlanes(TrackerHitPlaneMap& trackerhits_v
 // Add LCIO Collection Vector to LCIO event
 void EDM4hep2LcioTool::convertSimTrackerHits(SimTrackerHitMap& simtrackerhits_vec, const std::string& e4h_coll_name,
                                              const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event) {
-  k4FWCore::DataHandle<edm4hep::SimTrackerHitCollection> simtrackerhits_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
+  k4FWCore::DataHandle<edm4hep::SimTrackerHitCollection> simtrackerhits_handle{e4h_coll_name, Gaudi::DataHandle::Reader,
+                                                                               this};
   const auto simtrackerhits_coll = simtrackerhits_handle.get();
 
   k4FWCore::MetaDataHandle<std::string> cellIDHandle{simtrackerhits_handle, edm4hep::labels::CellIDEncoding,
-                                           Gaudi::DataHandle::Reader};
+                                                     Gaudi::DataHandle::Reader};
   const auto cellIDstr = cellIDHandle.get();
 
   auto conv_simtrackerhits =
@@ -162,10 +165,12 @@ void EDM4hep2LcioTool::convertSimTrackerHits(SimTrackerHitMap& simtrackerhits_ve
 // Add converted LCIO Collection Vector to LCIO event
 void EDM4hep2LcioTool::convertCalorimeterHits(CaloHitMap& calo_hits_vec, const std::string& e4h_coll_name,
                                               const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event) {
-  k4FWCore::DataHandle<edm4hep::CalorimeterHitCollection> calohit_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
+  k4FWCore::DataHandle<edm4hep::CalorimeterHitCollection> calohit_handle{e4h_coll_name, Gaudi::DataHandle::Reader,
+                                                                         this};
   const auto calohit_coll = calohit_handle.get();
 
-  k4FWCore::MetaDataHandle<std::string> cellIDHandle{calohit_handle, edm4hep::labels::CellIDEncoding, Gaudi::DataHandle::Reader};
+  k4FWCore::MetaDataHandle<std::string> cellIDHandle{calohit_handle, edm4hep::labels::CellIDEncoding,
+                                                     Gaudi::DataHandle::Reader};
   const auto cellIDstr = cellIDHandle.get();
 
   auto conv_calohits = EDM4hep2LCIOConv::convertCalorimeterHits(calohit_coll, cellIDstr, calo_hits_vec);
@@ -179,7 +184,8 @@ void EDM4hep2LcioTool::convertCalorimeterHits(CaloHitMap& calo_hits_vec, const s
 // Add converted LCIO Collection Vector to LCIO event
 void EDM4hep2LcioTool::convertRawCalorimeterHits(RawCaloHitMap& raw_calo_hits_vec, const std::string& e4h_coll_name,
                                                  const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event) {
-  k4FWCore::DataHandle<edm4hep::RawCalorimeterHitCollection> raw_calohit_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
+  k4FWCore::DataHandle<edm4hep::RawCalorimeterHitCollection> raw_calohit_handle{e4h_coll_name,
+                                                                                Gaudi::DataHandle::Reader, this};
   const auto rawcalohit_coll = raw_calohit_handle.get();
 
   auto conv_rawcalohits = EDM4hep2LCIOConv::convertRawCalorimeterHits(rawcalohit_coll, raw_calo_hits_vec);
@@ -193,11 +199,12 @@ void EDM4hep2LcioTool::convertRawCalorimeterHits(RawCaloHitMap& raw_calo_hits_ve
 // Add converted LCIO Collection Vector to LCIO event
 void EDM4hep2LcioTool::convertSimCalorimeterHits(SimCaloHitMap& sim_calo_hits_vec, const std::string& e4h_coll_name,
                                                  const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event) {
-  k4FWCore::DataHandle<edm4hep::SimCalorimeterHitCollection> sim_calohit_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
+  k4FWCore::DataHandle<edm4hep::SimCalorimeterHitCollection> sim_calohit_handle{e4h_coll_name,
+                                                                                Gaudi::DataHandle::Reader, this};
   const auto simcalohit_coll = sim_calohit_handle.get();
 
   k4FWCore::MetaDataHandle<std::string> cellIDHandle{sim_calohit_handle, edm4hep::labels::CellIDEncoding,
-                                           Gaudi::DataHandle::Reader};
+                                                     Gaudi::DataHandle::Reader};
   const auto cellIDstr = cellIDHandle.get();
 
   // TODO mcparticles_vdc
@@ -271,7 +278,8 @@ void EDM4hep2LcioTool::convertReconstructedParticles(RecoParticleMap& recopartic
                                                      const std::string& e4h_coll_name,
                                                      const std::string& lcio_coll_name, lcio::LCEventImpl* lcio_event) {
   // ReconstructedParticles handle
-  k4FWCore::DataHandle<edm4hep::ReconstructedParticleCollection> recos_handle{e4h_coll_name, Gaudi::DataHandle::Reader, this};
+  k4FWCore::DataHandle<edm4hep::ReconstructedParticleCollection> recos_handle{e4h_coll_name, Gaudi::DataHandle::Reader,
+                                                                              this};
   const auto recos_coll = recos_handle.get();
 
   auto conv_recops = EDM4hep2LCIOConv::convertReconstructedParticles(recos_coll, recoparticles_vec);
