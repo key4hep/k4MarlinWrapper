@@ -121,6 +121,8 @@ private:
                   std::vector<EDM4hep2LCIOConv::ParticleIDConvData>& pidCollections,
                   std::vector<EDM4hep2LCIOConv::TrackDqdxConvData>& dQdxCollections);
 
+  const podio::Frame& getEDM4hepEvent() const;
+
   /// Get an EDM4hep collection by name, consulting either the podio based data
   /// svc or the IOSvc
   podio::CollectionBase* getEDM4hepCollection(const std::string& name) const;

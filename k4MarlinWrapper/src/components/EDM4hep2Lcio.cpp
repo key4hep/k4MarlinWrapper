@@ -390,10 +390,45 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
   }
 }
 
+const podio::Frame& EDM4hep2LcioTool::getEDM4hepEvent() const {
+  debug() << "Retrieving EDM4hep event (Frame)" << endmsg;
+  if (m_podioDataSvc) {
+    debug() << "Getting it from PodioDataSvc" << endmsg;
+    return m_podioDataSvc->getEventFrame();
+  } else {
+    debug() << "Trying to get it from TES" << endmsg;
+    DataObject* p;
+    StatusCode code = m_eventDataSvc->retrieveObject("/Event" + k4FWCore::frameLocation, p);
+    if (code.isSuccess()) {
+      auto* frame = dynamic_cast<AnyDataWrapper<podio::Frame>*>(p);
+      return frame->getData();
+    }
+  }
+
+  // We can do this because the following assumptions are true:
+  // - We only end up here if we are using the IOSvc and we are NOT reading
+  //   EDM4hep data. Otherwise the Reader will be scheduled as FIRST algorithm,
+  //   most importantly BEFORE any of the wrapped Marlin processors to which
+  //   this converter is attached.
+  // - The empty Frame we introduce into the TES here does not interfere with
+  //   the Writer for EDM4hep output (which is always scheduled last), as that
+  //   will simply get this Frame instead of creating an empty one itself
+  // - There are no scheduling issues / race conditions, since the
+  //   MarlinProcessorWrapper algorithm is not re-entrant and can thus not be
+  //   run in parallel
+  debug() << "Could not retrieve Frame from expected location. Registering a new empty Frame into the TES" << endmsg;
+  auto tmp = new AnyDataWrapper<podio::Frame>(podio::Frame());
+  if (m_eventDataSvc->registerObject("/Event" + k4FWCore::frameLocation, tmp).isFailure()) {
+    error() << "Could not retrieve Frame from expected location in TES and could not register a new one" << endmsg;
+    throw std::runtime_error("Could not get EDM4hep event (Frame) for conversions");
+  }
+  return tmp->getData();
+}
+
 // Parse property parameters and convert the indicated collections.
 // Use the collection names in the parameters to read and write them
 StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
-  std::optional<std::reference_wrapper<const podio::Frame>> edmEvent;
+  const auto& edmEvent = getEDM4hepEvent();
   // use m_collsToConvert to detect whether we run the first time and cache the
   // results as we can assume that all the events have the same contents
   if (m_collsToConvert.empty()) {
@@ -408,8 +443,7 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
       info() << "Converting all collections from EDM4hep to LCIO" << endmsg;
       if (m_podioDataSvc) {
         // If we have the PodioDataSvc get the collections available from frame
-        edmEvent = m_podioDataSvc->getEventFrame();
-        for (const auto& name : edmEvent.value().get().getAvailableCollections()) {
+        for (const auto& name : edmEvent.getAvailableCollections()) {
           const auto& [_, inserted] = collNameMapping.emplace(name, name);
           debug() << fmt::format("Adding '{}' from Frame to conversion? {}", name, inserted) << endmsg;
         }
@@ -453,19 +487,9 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
   debug() << "Event: " << lcio_event->getEventNumber() << " Run: " << lcio_event->getRunNumber() << endmsg;
 
   EDM4hep2LCIOConv::sortParticleIDs(pidCollections);
-  if (!m_podioDataSvc) {
-    DataObject* p;
-    StatusCode code = m_eventDataSvc->retrieveObject("/Event" + k4FWCore::frameLocation, p);
-    if (code.isSuccess()) {
-      auto* frame = dynamic_cast<AnyDataWrapper<podio::Frame>*>(p);
-      edmEvent = std::cref(frame->getData());
-    } else {
-      auto frame = podio::Frame{};
-      edmEvent = frame;
-    }
-  }
+
   for (const auto& pidCollMeta : pidCollections) {
-    auto algoId = attachParticleIDMetaData(lcio_event, edmEvent.value(), pidCollMeta);
+    auto algoId = attachParticleIDMetaData(lcio_event, edmEvent, pidCollMeta);
     if (!algoId.has_value()) {
       // Now go over the collections that have been produced in a functional algorithm (if any)
       bool found = false;
