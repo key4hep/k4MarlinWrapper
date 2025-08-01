@@ -202,13 +202,6 @@ set_tests_properties(
 # ${PROJECT_BINARY_DIR}/${PROJECT_NAME}/genConfDir              # The genConfDir of the plugins
 # ${CMAKE_CURRENT_BINARY_DIR}/genConfDir                        # The genConfDir of the tests if there are algorithms in the tests
 
-# If the package also includes python code to be imported in a module with the same as the package name,
-# then the Python files have to be copied in the build directory to
-# ${PROJECT_BINARY_DIR}/${PROJECT_NAME}/genConfDir
-# after genConfDir has been populated by Gaudi
-# See, for example:
-# https://github.com/key4hep/k4FWCore/blob/42497b71c23425a3a26648f30a1285a499dcda28/test/k4FWCoreTest/CMakeLists.txt#L71
-
 get_filename_component(CURRENT_DIR_NAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 
 set(test_environment "\
