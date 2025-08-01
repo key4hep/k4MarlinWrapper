@@ -223,10 +223,7 @@ MARLIN_DLL=$ENV{MARLIN_DLL}:${CMAKE_CURRENT_BINARY_DIR}/libMarlinTestProcessors.
 "
 )
 get_property(test_names DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY TESTS)
-set_tests_properties(
-  ${test_names}
-  PROPERTIES ENVIRONMENT "${test_environment}"
-)
+set_tests_properties(${test_names} PROPERTIES ENVIRONMENT "${test_environment}")
 
 # The following is done to make the tests work without installing the files in
 # the installation directory. The k4MarlinWrapper in the build directory is populated by
