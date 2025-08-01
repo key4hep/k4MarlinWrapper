@@ -194,13 +194,13 @@ set_tests_properties(
 
 
 # For LD_LIBRARY_PATH
-# ${PROJECT_BINARY_DIR}:\                                         # The files <plugins>.components and <plugins>.confdb are here
-# ${PROJECT_BINARY_DIR}/${PROJECT_NAME}:\                         # The plugins (.so) are here
-# ${CMAKE_CURRENT_BINARY_DIR}:\                                   # The tests (.so) are here if there are algorithms in the tests
-# ${CMAKE_CURRENT_BINARY_DIR}/genConfDir/${CURRENT_DIR_NAME}:\    # The files <test>.components and <test>.confdb are here
+# ${PROJECT_BINARY_DIR}                                         # The files <plugins>.components and <plugins>.confdb are here
+# ${PROJECT_BINARY_DIR}/${PROJECT_NAME}                         # The plugins (.so) are here
+# ${CMAKE_CURRENT_BINARY_DIR}                                   # The tests (.so) are here if there are algorithms in the tests
+# ${CMAKE_CURRENT_BINARY_DIR}/genConfDir/${CURRENT_DIR_NAME}    # The files <test>.components and <test>.confdb are here
 # For PYTHONPATH
-# ${PROJECT_BINARY_DIR}/${PROJECT_NAME}/genConfDir:\              # The genConfDir of the plugins
-# ${CMAKE_CURRENT_BINARY_DIR}/genConfDir:\                        # The genConfDir of the tests if there are algorithms in the tests
+# ${PROJECT_BINARY_DIR}/${PROJECT_NAME}/genConfDir              # The genConfDir of the plugins
+# ${CMAKE_CURRENT_BINARY_DIR}/genConfDir                        # The genConfDir of the tests if there are algorithms in the tests
 
 # If the package also includes python code to be imported in a module with the same as the package name,
 # then the Python files have to be copied in the build directory to
