@@ -74,8 +74,7 @@ bool Lcio2EDM4hepTool::collectionExist(const std::string& collection_name) {
   if (m_podioDataSvc) {
     collections = m_podioDataSvc->getEventFrame().getAvailableCollections();
   } else {
-    std::optional<std::map<uint32_t, std::string>> dummy = std::nullopt;
-    collections = getAvailableCollectionsFromStore(this, dummy, true);
+    collections = getAvailableCollectionsFromStore(this, true);
   }
   if (std::find(collections.begin(), collections.end(), collection_name) != collections.end()) {
     debug() << "Collection named " << collection_name << " already registered, skipping conversion." << endmsg;
@@ -92,11 +91,11 @@ void Lcio2EDM4hepTool::registerCollection(
     return;
   }
 
-  auto wrapper = new DataWrapper<podio::CollectionBase>();
-  wrapper->setData(e4hColl.release());
-
   // No need to check for pre-existing collections, since we only ever end up
   // here if that is not the case
+  // NOTE: This also takes care of assigning a collectionID
+  auto wrapper = new DataWrapper<podio::CollectionBase>();
+  wrapper->setData(e4hColl.release());
   auto sc = m_eventDataSvc->registerObject("/Event", "/" + std::string(name), wrapper);
   if (sc == StatusCode::FAILURE) {
     error() << "Could not register collection " << name << endmsg;
@@ -149,14 +148,17 @@ struct ObjectMappings {
 } // namespace
 
 StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
+  debug() << "Converting from EDM4hep to LCIO" << endmsg;
   // Convert event parameters
   if (m_podioDataSvc) {
+    debug() << "Converting event parameters directly into the Frame of the PodioDataSvc" << endmsg;
     LCIO2EDM4hepConv::convertObjectParameters(the_event, m_podioDataSvc->m_eventframe);
   } else {
     DataObject* p;
     StatusCode code = m_eventDataSvc->retrieveObject("/Event" + k4FWCore::frameLocation, p);
     if (code.isSuccess()) {
       auto* frameWrapper = dynamic_cast<AnyDataWrapper<podio::Frame>*>(p);
+      debug() << "Converting event parameters into the Frame stored in the TES" << endmsg;
       LCIO2EDM4hepConv::convertObjectParameters(the_event, frameWrapper->getData());
     } else {
       warning() << "Could not retrieve the event frame; event parameters will not be converted. This is a known "
@@ -167,16 +169,19 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
 
   // Convert Event Header outside the collections loop
   if (!collectionExist(edm4hep::labels::EventHeader)) {
+    debug() << "Converting the EventHeader" << endmsg;
     registerCollection(edm4hep::labels::EventHeader, LCIO2EDM4hepConv::createEventHeader(the_event));
   }
 
   // Start off with the pre-defined collection name mappings
   auto collsToConvert{m_collNames.value()};
   if (m_convertAll) {
+    info() << "Converting all collections from LCIO to EDM4hep" << endmsg;
     const auto* collections = the_event->getCollectionNames();
     for (const auto& collName : *collections) {
       // And simply add the rest, exploiting the fact that emplace will not
       // replace existing entries with the same key
+      debug() << "Adding '" << collName << "' to be converted from the LCIO Event" << endmsg;
       collsToConvert.emplace(collName, collName);
     }
   }
@@ -196,7 +201,7 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
   for (const auto& [lcioName, edm4hepName] : collsToConvert) {
     try {
       auto* lcio_coll = the_event->getCollection(lcioName);
-      debug() << "Converting collection " << lcioName << " (storing it as " << edm4hepName << "). ";
+      debug() << "Converting collection " << lcioName << " (storing it as " << edm4hepName << "). " << endmsg;
       if (collectionExist(edm4hepName)) {
         debug() << "Collection already exists, skipping." << endmsg;
         continue; // No need to convert again
