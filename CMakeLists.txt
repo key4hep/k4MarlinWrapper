@@ -46,5 +46,3 @@ add_subdirectory(k4MarlinWrapper)
 if(BUILD_TESTING)
   add_subdirectory(test)
 endif()
-
-gaudi_install(CMAKE)
