@@ -28,6 +28,9 @@
 
 #include "k4FWCore/FunctionalUtils.h"
 
+#include <fmt/format.h>
+#include <fmt/ranges.h>
+
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -36,9 +39,7 @@
 // store that can be found in Writer.cpp in k4FWCore with some modifications
 // that are specific to the usage of this function in the converters, like
 // returning also a map from collection ID to collection name
-std::vector<std::string> getAvailableCollectionsFromStore(const AlgTool* thisClass,
-                                                          std::optional<std::map<uint32_t, std::string>>& idToName,
-                                                          bool returnFrameCollections) {
+std::vector<std::string> getAvailableCollectionsFromStore(const AlgTool* thisClass, bool returnFrameCollections) {
   std::vector<std::string> collectionNames;
 
   SmartIF<IDataManagerSvc> mgr;
@@ -59,6 +60,7 @@ std::vector<std::string> getAvailableCollectionsFromStore(const AlgTool* thisCla
     throw std::runtime_error("Failed to retrieve object leaves");
   }
   for (const auto& pReg : leaves) {
+    thisClass->verbose() << fmt::format("Now processing {} while obtaining collections", pReg->name()) << endmsg;
     if (pReg->name() == k4FWCore::frameLocation) {
       if (!returnFrameCollections)
         continue;
@@ -69,6 +71,9 @@ std::vector<std::string> getAvailableCollectionsFromStore(const AlgTool* thisCla
       for (const auto& name : wrapper->getData().getAvailableCollections()) {
         collectionNames.push_back(name);
       }
+      thisClass->verbose() << fmt::format("Retrieved the following collection names from Frame in TES: {}",
+                                          collectionNames)
+                           << endmsg;
     }
     DataObject* p;
     sc = thisClass->evtSvc()->retrieveObject("/Event" + pReg->name(), p);
@@ -88,14 +93,9 @@ std::vector<std::string> getAvailableCollectionsFromStore(const AlgTool* thisCla
       }
     }
     // Remove the leading /
-    collectionNames.push_back(pReg->name().substr(1, pReg->name().size() - 1));
-    if (idToName) {
-      if (functionalWrapper) {
-        idToName->emplace(functionalWrapper->getData()->getID(), pReg->name());
-      } else {
-        idToName->emplace(algorithmWrapper->collectionBase()->getID(), pReg->name());
-      }
-    }
+    auto name = pReg->name().substr(1, pReg->name().size() - 1);
+    thisClass->verbose() << "Adding '" << name << "' as collection name obtained from TES" << endmsg;
+    collectionNames.push_back(name);
   }
   return collectionNames;
 }
