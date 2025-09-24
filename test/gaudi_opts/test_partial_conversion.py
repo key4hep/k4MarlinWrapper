@@ -50,6 +50,13 @@ wrapped_alg = MarlinProcessorWrapper(
 )
 algList.append(wrapped_alg)
 
+lcio_writer = io_handler.add_lcio_writer("LCIOWriter")
+lcio_writer.Parameters = {
+    "CompressionLevel": ["6"],
+    "LCIOOutputFile": ["partially_converted_lcio_output.slcio"],
+    "LCIOWriteMode": ["WRITE_NEW"],
+}
+
 input_conv = EDM4hep2LcioTool("InputConversion")
 input_conv.convertAll = False
 input_conv.collNameMapping = {"MCParticles": "MCParticle"}

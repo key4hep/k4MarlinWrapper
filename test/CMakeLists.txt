@@ -181,6 +181,16 @@ ExternalData_Add_Test( marlinwrapper_tests
   COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_partial_conversion.py --inputfile DATA{${PROJECT_SOURCE_DIR}/test/input_files/ttbar_20240223_edm4hep.root}
 )
 
+add_test(check_lcio_output_partial_conversion
+  bash -c "${CMAKE_CURRENT_SOURCE_DIR}/scripts/check_lcio_output_partial_conversion.sh partially_converted_lcio_output.slcio"
+)
+
+set_tests_properties(
+  check_lcio_output_partial_conversion
+  PROPERTIES
+  DEPENDS partial_edm4hep_to_lcio
+)
+
 add_test( event_header_conversion bash -c "k4run ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/createEventHeader.py && anajob test.slcio | grep 'EVENT: 42'" )
 
 ExternalData_Add_Target(marlinwrapper_tests)
