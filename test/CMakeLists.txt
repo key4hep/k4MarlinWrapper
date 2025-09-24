@@ -176,6 +176,11 @@ ExternalData_Add_Test( marlinwrapper_tests
   COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_io_utilities.py --inputfile DATA{${PROJECT_SOURCE_DIR}/test/input_files/ttbar_20240223_edm4hep.root} --with-gaudi-algorithm --output-type both --outputbase edm4hep_both_out_marlin_gaudi
 )
 
+ExternalData_Add_Test( marlinwrapper_tests
+  NAME partial_edm4hep_to_lcio
+  COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_partial_conversion.py --inputfile DATA{${PROJECT_SOURCE_DIR}/test/input_files/ttbar_20240223_edm4hep.root}
+)
+
 add_test( event_header_conversion bash -c "k4run ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/createEventHeader.py && anajob test.slcio | grep 'EVENT: 42'" )
 
 ExternalData_Add_Target(marlinwrapper_tests)
