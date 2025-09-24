@@ -456,10 +456,9 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
         debug() << fmt::format("Adding '{}' from TES to conversion? {}", name, inserted) << endmsg;
       }
       m_idToName = std::move(idToNameOpt.value());
-
-      for (auto&& [origName, newName] : collNameMapping) {
-        m_collsToConvert.emplace_back(std::move(origName), std::move(newName));
-      }
+    }
+    for (auto&& [origName, newName] : collNameMapping) {
+      m_collsToConvert.emplace_back(std::move(origName), std::move(newName));
     }
   }
 
