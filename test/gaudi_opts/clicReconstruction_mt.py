@@ -2272,7 +2272,7 @@ algList.append(MyLcioEventOutput_DST)
 ###########################################################
 for algo in algList:
     algo.Cardinality = cardinality
-    algo.OutputLevel = DEBUG
+    algo.OutputLevel = INFO
 
 seq = Sequencer("createViewSeq", Members=algList, Sequential=True, OutputLevel=VERBOSE)
 
