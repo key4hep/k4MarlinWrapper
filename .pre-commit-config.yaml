@@ -32,5 +32,5 @@ repos:
         "-o", "Key4hep-Project",
         "-n", "Key4hep",
         "-u", "https://key4hep.github.io/key4hep-doc/",
-        "-x", ".github/*", ".pre-commit-config.yaml", "README.md", "doc/ReleaseNotes.md", ".clang-format", "test/marlin_steering/MarlinWithEmptyParameter.xml",
+        "-x", ".github/*", ".pre-commit-config.yaml", "README.md", "doc/ReleaseNotes.md", ".clang-format", "test/marlin_steering/MarlinWithEmptyParameter.xml", "test/inputFiles/converterConstants.xml",
         "-f",]
