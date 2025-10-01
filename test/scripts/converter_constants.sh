@@ -18,7 +18,7 @@
 ## limitations under the License.
 ##
 
-# set -eu
+set -eux
 
 if [ ! -d $TEST_DIR/inputFiles/ ]; then
   mkdir $TEST_DIR/inputFiles
