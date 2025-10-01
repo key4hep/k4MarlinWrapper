@@ -32,6 +32,6 @@ fi
 python \
   $TEST_DIR/../k4MarlinWrapper/scripts/convertMarlinSteeringToGaudi.py \
   $TEST_DIR/inputFiles/converterConstants.xml \
-  $TEST_DIR/gaudi_opts/converterConstants.py
+  converterConstants.py
 
-k4run $TEST_DIR/gaudi_opts/converterConstants.py
+k4run converterConstants.py
