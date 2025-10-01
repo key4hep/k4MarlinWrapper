@@ -70,7 +70,7 @@ def replaceConstants(value, constants):
     formatted_array = []
     split_values = value.split()
     for val in split_values:
-        captured_patterns = re.findall("\$\{\w*\}", val)
+        captured_patterns = re.findall(r"\$\{\w*\}", val)
         if not captured_patterns:
             formatted_array.append(f'"{val}"')
         elif captured_patterns:
@@ -97,7 +97,7 @@ def convertConstants(tree):
         split_values = value.split()
         if len(split_values) == 1:
             # capture all ${constant}
-            captured_patterns = re.findall("\$\{\w*\}", value)
+            captured_patterns = re.findall(r"\$\{\w*\}", value)
             for pattern in captured_patterns:
                 # replace every ${constant} for %(constant)s
                 constants[key] = re.sub(r"\$\{(\w*)\}", r"%(\1)s", constants[key])
@@ -105,7 +105,7 @@ def convertConstants(tree):
         elif len(split_values) > 1:
             for val in split_values:
                 # capture all ${constant}
-                captured_patterns = re.findall("\$\{\w*\}", val)
+                captured_patterns = re.findall(r"\$\{\w*\}", val)
                 if len(captured_patterns) == 0:
                     formatted_array.append('"{val}"')
                 elif len(captured_patterns) >= 1:
