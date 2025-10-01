@@ -107,11 +107,11 @@ def convertConstants(tree):
                 # capture all ${constant}
                 captured_patterns = re.findall(r"\$\{\w*\}", val)
                 if len(captured_patterns) == 0:
-                    formatted_array.append('"{val}"')
+                    formatted_array.append(f'"{val}"')
                 elif len(captured_patterns) >= 1:
                     # replace every ${constant} for %(constant)s
                     val_format = re.sub(r"\$\{(\w*)\}", r"%(\1)s", val)
-                    val_format = '"{val_format}"'
+                    val_format = f'"{val_format}"'
                     formatted_array.append(val_format)
             constants[key] = f"[{', '.join(formatted_array)}]"
 
