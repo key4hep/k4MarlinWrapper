@@ -33,7 +33,7 @@ include(cmake/Key4hepConfig.cmake)
 include(GNUInstallDirs)
 
 find_package(Gaudi REQUIRED)
-find_package(LCIO REQUIRED)
+find_package(LCIO 2.21 REQUIRED)
 find_package(Marlin REQUIRED)
 find_package(EDM4HEP 0.99 REQUIRED)
 find_package(k4FWCore 1.3.0 REQUIRED)
