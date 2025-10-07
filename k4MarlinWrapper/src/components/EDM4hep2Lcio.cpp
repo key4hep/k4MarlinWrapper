@@ -299,10 +299,13 @@ void EDM4hep2LcioTool::convertEventHeader(const std::string& e4h_coll_name, lcio
   EDM4hep2LCIOConv::convertEventHeader(header_coll, lcio_event);
 }
 
-podio::CollectionBase* EDM4hep2LcioTool::getEDM4hepCollection(const std::string& collName) const {
+podio::CollectionBase* EDM4hep2LcioTool::getEDM4hepCollection(const std::string& collName, bool allowToFail) const {
   DataObject* p;
   auto sc = m_eventDataSvc->retrieveObject(collName, p);
   if (sc.isFailure()) {
+    if (allowToFail) {
+      return nullptr;
+    }
     throw GaudiException("Collection not found: " + collName, name(), StatusCode::FAILURE);
   }
   auto ptr = dynamic_cast<DataWrapperBase*>(p);
@@ -323,7 +326,10 @@ podio::CollectionBase* EDM4hep2LcioTool::getEDM4hepCollection(const std::string&
     return sptr->getData().get();
   }
 
-  throw GaudiException("Collection could not be casted to the expected type", name(), StatusCode::FAILURE);
+  if (!allowToFail) {
+    throw GaudiException("Collection could not be casted to the expected type", name(), StatusCode::FAILURE);
+  }
+  return nullptr;
 }
 
 // Select the appropriate method to convert a collection given its type
@@ -435,8 +441,14 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
     // copy of the configuration to not change that on the fly
     auto collNameMapping = m_collNames.value();
 
-    // We *always* want to convert the EventHeader
-    m_collsToConvert.emplace_back(edm4hep::labels::EventHeader, "<directly into LCEvent>");
+    // We *always* want to convert the EventHeader (iff it's available)
+    if (getEDM4hepCollection(edm4hep::labels::EventHeader, true)) {
+      debug() << edm4hep::labels::EventHeader << " collection available. Converting it." << endmsg;
+      m_collsToConvert.emplace_back(edm4hep::labels::EventHeader, "<directly into LCEvent>");
+    } else {
+      warning() << "The " << edm4hep::labels::EventHeader << " collection is not available. Not converting it."
+                << endmsg;
+    }
 
     if (m_convertAll) {
       info() << "Converting all collections from EDM4hep to LCIO" << endmsg;
