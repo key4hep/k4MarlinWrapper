@@ -25,33 +25,20 @@ gaudi_add_module(k4MarlinWrapperPlugins
   SOURCES
     src/components/LcioEventAlgo.cpp
     src/components/LcioEventOutput.cpp
+    src/components/MarlinProcessorWrapper.cpp
+    src/components/TrackingCellIDEncodingSvc.cpp
   LINK
     Gaudi::GaudiKernel
     ${Marlin_LIBRARIES}
+    k4FWCore::k4FWCore
+    k4FWCore::k4Interface
+    EDM4HEP::edm4hep
+    LCIO::lcio
 )
 
 target_include_directories(k4MarlinWrapperPlugins PUBLIC
   ${PROJECT_SOURCE_DIR}/k4MarlinWrapper
-  ${LCIO_INCLUDE_DIRS}
   ${Marlin_INCLUDE_DIRS}
-)
-
-# MarlinWrapper
-gaudi_add_module(MarlinWrapper
-  SOURCES
-    src/components/MarlinProcessorWrapper.cpp
-    src/components/TrackingCellIDEncodingSvc.cpp
-  LINK
-    k4FWCore::k4FWCore
-    k4FWCore::k4Interface
-    ${Marlin_LIBRARIES}
-    EDM4HEP::edm4hep
-)
-
-target_include_directories(MarlinWrapper PUBLIC
-  ${PROJECT_SOURCE_DIR}/k4MarlinWrapper
-  ${Marlin_INCLUDE_DIRS}
-  ${LCIO_INCLUDE_DIRS}
 )
 
 # k4MarlinWrapperUtils
@@ -100,7 +87,7 @@ target_include_directories(Lcio2EDM4hep PUBLIC
 
 # Copy python parsing file to genConfDir in Gaudi
 add_custom_command(
-        TARGET MarlinWrapper POST_BUILD
+        TARGET k4MarlinWrapperPlugins POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
                 ${PROJECT_SOURCE_DIR}/k4MarlinWrapper/python/k4MarlinWrapper/parseConstants.py
                 ${CMAKE_CURRENT_BINARY_DIR}/genConfDir/k4MarlinWrapper/parseConstants.py)
