@@ -177,6 +177,11 @@ ExternalData_Add_Test( marlinwrapper_tests
 )
 
 ExternalData_Add_Test( marlinwrapper_tests
+  NAME lcio_event_only
+  COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/lcio_event_only.py --inputfile DATA{${PROJECT_SOURCE_DIR}/test/input_files/muons.slcio}
+)
+
+ExternalData_Add_Test( marlinwrapper_tests
   NAME partial_edm4hep_to_lcio
   COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_partial_conversion.py --inputfile DATA{${PROJECT_SOURCE_DIR}/test/input_files/ttbar_20240223_edm4hep.root}
 )
