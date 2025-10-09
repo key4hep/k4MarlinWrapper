@@ -259,12 +259,12 @@ StatusCode MarlinProcessorWrapper::execute(const EventContext&) const {
   // once for each execute call
   // how can this be done more efficiently?
   try {
-    auto* procMgr = marlin::ProcessorMgr::instance();
-    procMgr->modifyEvent(the_event);
-
     streamlog::logscope scope(streamlog::out);
     scope.setName(name());
     scope.setLevel(m_verbosity);
+
+    auto* procMgr = marlin::ProcessorMgr::instance();
+    procMgr->modifyEvent(the_event);
 
     // process the event in the processor
     auto modifier = dynamic_cast<marlin::EventModifier*>(m_processor);
