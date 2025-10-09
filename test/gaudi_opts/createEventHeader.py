@@ -20,15 +20,15 @@ from Gaudi.Configuration import WARNING
 
 from Configurables import (
     EventHeaderCreator,
-    k4DataSvc,
     MarlinProcessorWrapper,
-    ApplicationMgr,
     EDM4hep2LcioTool,
+    EventDataSvc,
 )
+from k4FWCore import ApplicationMgr, IOSvc
+
+iosvc = IOSvc()
 
 eventHeaderCreator = EventHeaderCreator("eventHeaderCreator", eventNumberOffset=42)
-
-podioevent = k4DataSvc("EventDataSvc")
 
 EDM4hep2Lcio = EDM4hep2LcioTool("EDM4hep2Lcio")
 EDM4hep2Lcio.convertAll = False
@@ -45,6 +45,6 @@ ApplicationMgr(
     ],
     EvtSel="NONE",
     EvtMax=2,
-    ExtSvc=[podioevent],
+    ExtSvc=[EventDataSvc()],
     OutputLevel=WARNING,
 )
