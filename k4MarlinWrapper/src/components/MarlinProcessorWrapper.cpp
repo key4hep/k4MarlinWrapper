@@ -255,16 +255,20 @@ StatusCode MarlinProcessorWrapper::execute(const EventContext&) const {
   }
 
   // call the refreshSeeds via the processor manager
-  // FIXME: this is an overkill, but we need to call this once per event, not
-  // once for each execute call
-  // how can this be done more efficiently?
   try {
     streamlog::logscope scope(streamlog::out);
     scope.setName(name());
     scope.setLevel(m_verbosity);
 
-    auto* procMgr = marlin::ProcessorMgr::instance();
-    procMgr->modifyEvent(the_event);
+    // Ensure modifyEvent is called exactly once per event by the first processor
+    static thread_local lcio::LCEvent* lastProcessedEvent = nullptr;
+    if (lastProcessedEvent != the_event) {
+      debug() << "Calling into marlin::ProcessorMgr to refresh random seeds  " << endmsg;
+      auto* procMgr = marlin::ProcessorMgr::instance();
+      // This is the first processor to handle this event
+      procMgr->modifyEvent(the_event);
+      lastProcessedEvent = the_event;
+    }
 
     // process the event in the processor
     auto modifier = dynamic_cast<marlin::EventModifier*>(m_processor);
