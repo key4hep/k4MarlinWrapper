@@ -199,6 +199,7 @@ class IOHandlerHelper:
                     )
                     break
 
+
 def parse_collection_patch_file(patch_file: Union[str, os.PathLike]) -> List[str]:
     """Parse a collection patch file such that it can be used by the
     PatchCollections processor.
