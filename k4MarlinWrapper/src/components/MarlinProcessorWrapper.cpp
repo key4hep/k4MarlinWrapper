@@ -261,7 +261,7 @@ StatusCode MarlinProcessorWrapper::execute(const EventContext&) const {
     scope.setLevel(m_verbosity);
 
     // Ensure modifyEvent is called exactly once per event by the first processor
-    static thread_local lcio::LCEvent* lastProcessedEvent = nullptr;
+    static IMPL::LCEventImpl* lastProcessedEvent = nullptr;
     if (lastProcessedEvent != the_event) {
       debug() << "Calling into marlin::ProcessorMgr to refresh random seeds  " << endmsg;
       auto* procMgr = marlin::ProcessorMgr::instance();
