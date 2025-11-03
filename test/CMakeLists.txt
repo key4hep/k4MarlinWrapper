@@ -201,7 +201,7 @@ add_test( event_header_conversion bash -c "k4run ${CMAKE_CURRENT_SOURCE_DIR}/gau
 add_test(event_header_conversion_no_header ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/createEventHeader.py --no-event-header )
 set_tests_properties(event_header_conversion_no_header
   PROPERTIES
-  PASS_REGULAR_EXPRESSION "WARNING The EventHeader collection is not available. Not converting it."
+  PASS_REGULAR_EXPRESSION "INFO The EventHeader collection is not available. Not converting it."
 )
 
 ExternalData_Add_Target(marlinwrapper_tests)

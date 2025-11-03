@@ -446,8 +446,7 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
       debug() << edm4hep::labels::EventHeader << " collection available. Converting it." << endmsg;
       m_collsToConvert.emplace_back(edm4hep::labels::EventHeader, "<directly into LCEvent>");
     } else {
-      warning() << "The " << edm4hep::labels::EventHeader << " collection is not available. Not converting it."
-                << endmsg;
+      info() << "The " << edm4hep::labels::EventHeader << " collection is not available. Not converting it." << endmsg;
     }
 
     if (m_convertAll) {
