@@ -125,6 +125,6 @@ private:
 
   /// Get an EDM4hep collection by name, consulting either the podio based data
   /// svc or the IOSvc
-  podio::CollectionBase* getEDM4hepCollection(const std::string& name) const;
+  podio::CollectionBase* getEDM4hepCollection(const std::string& name, bool allowToFail = false) const;
 };
 #endif
