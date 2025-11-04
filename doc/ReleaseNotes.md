@@ -1,3 +1,56 @@
+# v00-13
+
+* 2025-11-03 Thomas Madlener ([PR#254](https://github.com/key4hep/k4MarlinWrapper/pull/254))
+  - Refresh the seeds for Marlin exactly once instead of doing it for every wrapped processor (over and over)
+
+* 2025-11-03 Thomas Madlener ([PR#253](https://github.com/key4hep/k4MarlinWrapper/pull/253))
+  - Allow for missing `EventHeader` collection when converting from EDM4hep to LCIO.
+
+* 2025-10-24 Leonhard Reichenbach ([PR#256](https://github.com/key4hep/k4MarlinWrapper/pull/256))
+  - Upstream the `parse_collection_patch_file` helper [from ILDConfig](https://github.com/iLCSoft/ILDConfig/blob/master/StandardConfig/production/py_utils.py), it is used by both CLD and ILD.
+
+* 2025-10-10 Thomas Madlener ([PR#255](https://github.com/key4hep/k4MarlinWrapper/pull/255))
+  - Make sure to set the logscope and corresponding log level before doing this to avoid emitting DEBUG output from Marlin independent of the output level of the algorithm
+
+* 2025-10-09 Thomas Madlener ([PR#252](https://github.com/key4hep/k4MarlinWrapper/pull/252))
+  - Switch one test case from using `k4DataSvc` to `IOSvc`
+  - Remove an unused Gaudi options file
+
+* 2025-10-07 Thomas Madlener ([PR#251](https://github.com/key4hep/k4MarlinWrapper/pull/251))
+  - Merge the `MarlinWrapper` into the `k4MarlinWrapperPlugins` library to ensure that necessary global Marlin related variables are intialized properly for all Gaudi components that we export from here.
+  - CMake: Switch to use LCIO cmake targets, requires LCIO 2.21.0
+
+* 2025-10-01 Thomas Madlener ([PR#249](https://github.com/key4hep/k4MarlinWrapper/pull/249))
+  - Make sure that the test for converting constants actually tests the conversion as well
+  - Fix small bugs in conversion and replacement of constants
+    - One introduced in https://github.com/key4hep/k4MarlinWrapper/pull/228 (missing `f` for f-strings in two cases)
+    - One introduced by ruff formatting(?) where the regex engine started complaining now but didn't before.
+
+* 2025-09-30 Juan Miguel Carceller ([PR#248](https://github.com/key4hep/k4MarlinWrapper/pull/248))
+  - Lower the amount of output messages in clicReconstruction_mt.py
+
+* 2025-09-24 Leonhard Reichenbach ([PR#246](https://github.com/key4hep/k4MarlinWrapper/pull/246))
+  -  Make it possible again to use the collection mapping to specify which collections should be converted
+
+* 2025-09-24 Juan Miguel Carceller ([PR#245](https://github.com/key4hep/k4MarlinWrapper/pull/245))
+  - Remove a useless gaudi_install call
+
+* 2025-08-12 Thomas Madlener ([PR#239](https://github.com/key4hep/k4MarlinWrapper/pull/239))
+  - Refactor duplicated code to retrieve the global converted objects map into a helper function and call that instead
+
+* 2025-08-11 Thomas Madlener ([PR#238](https://github.com/key4hep/k4MarlinWrapper/pull/238))
+  - Refactor the retrieval of the EDM4hep event (Frame) into standalone method
+
+* 2025-08-04 jmcarcell ([PR#244](https://github.com/key4hep/k4MarlinWrapper/pull/244))
+  - Update the test environment to run tests without installing following the changes in https://github.com/key4hep/k4-project-template/pull/30
+
+* 2025-06-13 Thomas Madlener ([PR#243](https://github.com/key4hep/k4MarlinWrapper/pull/243))
+  - EDM4hep2LCIO: Add missing newlines to debug outputs to improve readability
+
+* 2025-06-01 jmcarcell ([PR#242](https://github.com/key4hep/k4MarlinWrapper/pull/242))
+  - Move DataHandle and MetaDataHandle to the k4FWCore namespace, done in k4FWCore in https://github.com/key4hep/k4FWCore/pull/317
+  - Bump the required version of k4FWCore
+
 # v00-12
 
 * 2025-05-28 Victor Schwan ([PR#240](https://github.com/key4hep/k4MarlinWrapper/pull/240))
