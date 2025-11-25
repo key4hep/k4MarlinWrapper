@@ -16,7 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from Gaudi.Configuration import WARNING
+from Gaudi.Configuration import INFO
 
 from Configurables import (
     EventHeaderCreator,
@@ -61,5 +61,5 @@ ApplicationMgr(
     EvtSel="NONE",
     EvtMax=2,
     ExtSvc=[EventDataSvc()],
-    OutputLevel=WARNING,
+    OutputLevel=INFO,
 )
