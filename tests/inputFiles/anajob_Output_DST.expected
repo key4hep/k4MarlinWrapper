@@ -1,0 +1,142 @@
+anajob:  will open and read from files: 
+
+     Output_DST_e4h_input.slcio     [ number of runs: 0, number of events: 3 ] 
+
+
+ will reopen and read from files: 
+     Output_DST_e4h_input.slcio
+///////////////////////////////////
+EVENT: 0
+RUN: 0
+DETECTOR: unknown
+COLLECTIONS: (see below)
+///////////////////////////////////
+
+---------------------------------------------------------------------------
+COLLECTION NAME               COLLECTION TYPE          NUMBER OF ELEMENTS  
+===========================================================================
+BuildUpVertices               Vertex                           4
+BuildUpVertices_RP            ReconstructedParticle            4
+BuildUpVertices_V0            Vertex                           0
+BuildUpVertices_V0_RP         ReconstructedParticle            0
+LE_LooseSelectedPandoraPFOs   ReconstructedParticle           90
+LE_SelectedPandoraPFOs        ReconstructedParticle           83
+LE_TightSelectedPandoraPFOs   ReconstructedParticle           82
+LooseSelectedPandoraPFOs      ReconstructedParticle           85
+LumiCalClusters               Cluster                          0
+LumiCalRecoParticles          ReconstructedParticle            0
+MCParticlesSkimmed            MCParticle                     283
+MCPhysicsParticles            MCParticle                     467
+MergedClusters                Cluster                         88
+MergedRecoParticles           ReconstructedParticle           91
+PandoraClusters               Cluster                         88
+PandoraPFOs                   ReconstructedParticle           91
+PandoraStartVertices          Vertex                          91
+PrimaryVertices               Vertex                           1
+PrimaryVertices_RP            ReconstructedParticle            1
+RecoMCTruthLink               LCRelation                      91
+RefinedVertexJets             ReconstructedParticle            2
+RefinedVertexJets_rel         LCRelation                       0
+RefinedVertexJets_vtx         Vertex                           0
+RefinedVertexJets_vtx_RP      ReconstructedParticle            0
+RefinedVertices               Vertex                           0
+RefinedVertices_RP            ReconstructedParticle            0
+SelectedPandoraPFOs           ReconstructedParticle           81
+SiTracks                      Track                           38
+SiTracks_Refitted             Track                           38
+TightSelectedPandoraPFOs      ReconstructedParticle           67
+---------------------------------------------------------------------------
+
+
+
+///////////////////////////////////
+EVENT: 1
+RUN: 0
+DETECTOR: unknown
+COLLECTIONS: (see below)
+///////////////////////////////////
+
+---------------------------------------------------------------------------
+COLLECTION NAME               COLLECTION TYPE          NUMBER OF ELEMENTS  
+===========================================================================
+BuildUpVertices               Vertex                           2
+BuildUpVertices_RP            ReconstructedParticle            2
+BuildUpVertices_V0            Vertex                           0
+BuildUpVertices_V0_RP         ReconstructedParticle            0
+LE_LooseSelectedPandoraPFOs   ReconstructedParticle           90
+LE_SelectedPandoraPFOs        ReconstructedParticle           85
+LE_TightSelectedPandoraPFOs   ReconstructedParticle           79
+LooseSelectedPandoraPFOs      ReconstructedParticle           87
+LumiCalClusters               Cluster                          0
+LumiCalRecoParticles          ReconstructedParticle            0
+MCParticlesSkimmed            MCParticle                     333
+MCPhysicsParticles            MCParticle                     561
+MergedClusters                Cluster                         82
+MergedRecoParticles           ReconstructedParticle           93
+PandoraClusters               Cluster                         82
+PandoraPFOs                   ReconstructedParticle           93
+PandoraStartVertices          Vertex                          93
+PrimaryVertices               Vertex                           1
+PrimaryVertices_RP            ReconstructedParticle            1
+RecoMCTruthLink               LCRelation                      93
+RefinedVertexJets             ReconstructedParticle            2
+RefinedVertexJets_rel         LCRelation                       1
+RefinedVertexJets_vtx         Vertex                           1
+RefinedVertexJets_vtx_RP      ReconstructedParticle            1
+RefinedVertices               Vertex                           1
+RefinedVertices_RP            ReconstructedParticle            1
+SelectedPandoraPFOs           ReconstructedParticle           81
+SiTracks                      Track                           43
+SiTracks_Refitted             Track                           43
+TightSelectedPandoraPFOs      ReconstructedParticle           73
+---------------------------------------------------------------------------
+
+
+
+///////////////////////////////////
+EVENT: 2
+RUN: 0
+DETECTOR: unknown
+COLLECTIONS: (see below)
+///////////////////////////////////
+
+---------------------------------------------------------------------------
+COLLECTION NAME               COLLECTION TYPE          NUMBER OF ELEMENTS  
+===========================================================================
+BuildUpVertices               Vertex                           2
+BuildUpVertices_RP            ReconstructedParticle            2
+BuildUpVertices_V0            Vertex                           0
+BuildUpVertices_V0_RP         ReconstructedParticle            0
+LE_LooseSelectedPandoraPFOs   ReconstructedParticle           74
+LE_SelectedPandoraPFOs        ReconstructedParticle           66
+LE_TightSelectedPandoraPFOs   ReconstructedParticle           65
+LooseSelectedPandoraPFOs      ReconstructedParticle           67
+LumiCalClusters               Cluster                          0
+LumiCalRecoParticles          ReconstructedParticle            0
+MCParticlesSkimmed            MCParticle                     294
+MCPhysicsParticles            MCParticle                     500
+MergedClusters                Cluster                         71
+MergedRecoParticles           ReconstructedParticle           79
+PandoraClusters               Cluster                         71
+PandoraPFOs                   ReconstructedParticle           79
+PandoraStartVertices          Vertex                          79
+PrimaryVertices               Vertex                           1
+PrimaryVertices_RP            ReconstructedParticle            1
+RecoMCTruthLink               LCRelation                      79
+RefinedVertexJets             ReconstructedParticle            2
+RefinedVertexJets_rel         LCRelation                       0
+RefinedVertexJets_vtx         Vertex                           0
+RefinedVertexJets_vtx_RP      ReconstructedParticle            0
+RefinedVertices               Vertex                           0
+RefinedVertices_RP            ReconstructedParticle            0
+SelectedPandoraPFOs           ReconstructedParticle           63
+SiTracks                      Track                           34
+SiTracks_Refitted             Track                           34
+TightSelectedPandoraPFOs      ReconstructedParticle           55
+---------------------------------------------------------------------------
+
+
+
+
+  3 events read from files: 
+     Output_DST_e4h_input.slcio
