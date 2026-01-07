@@ -4,7 +4,7 @@ repos:
     hooks:
       - id: mixed-line-ending
       - id: trailing-whitespace
-        exclude: (doc/ReleaseNotes.md|test/inputFiles/.*\.expected)
+        exclude: (doc/ReleaseNotes.md|tests/inputFiles/.*\.expected)
   - repo: local
     hooks:
       # - id: clang-tidy
@@ -32,5 +32,5 @@ repos:
         "-o", "Key4hep-Project",
         "-n", "Key4hep",
         "-u", "https://key4hep.github.io/key4hep-doc/",
-        "-x", ".github/*", ".pre-commit-config.yaml", "README.md", "doc/ReleaseNotes.md", ".clang-format", "test/marlin_steering/MarlinWithEmptyParameter.xml", "test/inputFiles/converterConstants.xml",
+        "-x", ".github/*", ".pre-commit-config.yaml", "README.md", "doc/ReleaseNotes.md", ".clang-format", "tests/marlin_steering/MarlinWithEmptyParameter.xml", "tests/inputFiles/converterConstants.xml",
         "-f",]
