@@ -69,8 +69,6 @@ private:
   PodioDataSvc* m_podioDataSvc;
   // EventDataSvc that is used together with IOSvc
   ServiceHandle<IDataProviderSvc> m_eventDataSvc;
-  // Metadata service from k4FWCore that is used together with IOSvc
-  SmartIF<IMetadataSvc> m_metadataSvc;
   /// A (caching) "map" of original to new collection names that will be populated
   /// during the first conversion
   std::vector<std::tuple<std::string, std::string>> m_collsToConvert{};
