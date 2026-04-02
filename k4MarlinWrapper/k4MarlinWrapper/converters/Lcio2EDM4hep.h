@@ -22,8 +22,6 @@
 #include <Gaudi/Property.h>
 #include <GaudiKernel/AlgTool.h>
 
-#include "k4FWCore/IMetadataSvc.h"
-
 #include "k4MarlinWrapper/converters/IEDMConverter.h"
 
 #include <edm4hep/utils/ParticleIDUtils.h>
@@ -47,6 +45,7 @@ class PodioDataSvc;
 class Lcio2EDM4hepTool : public AlgTool, virtual public IEDMConverter {
 public:
   Lcio2EDM4hepTool(const std::string& type, const std::string& name, const IInterface* parent);
+
   StatusCode initialize() final;
   StatusCode finalize() final;
 
@@ -63,7 +62,6 @@ private:
   Gaudi::Property<bool> m_convertAll{this, "convertAll", true};
 
   ServiceHandle<IDataProviderSvc> m_eventDataSvc;
-  SmartIF<IMetadataSvc> m_metadataSvc;
   PodioDataSvc* m_podioDataSvc;
 
   std::map<std::string, std::string> m_cellIDEncodings{};

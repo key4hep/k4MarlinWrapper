@@ -52,14 +52,6 @@ Lcio2EDM4hepTool::Lcio2EDM4hepTool(const std::string& type, const std::string& n
 StatusCode Lcio2EDM4hepTool::initialize() {
   m_podioDataSvc = dynamic_cast<PodioDataSvc*>(m_eventDataSvc.get());
 
-  if (!m_podioDataSvc) {
-    m_metadataSvc = service("MetadataSvc", false);
-    if (!m_metadataSvc) {
-      error() << "Could not retrieve MetadataSvc" << endmsg;
-      return StatusCode::FAILURE;
-    }
-  }
-
   return AlgTool::initialize();
 }
 
@@ -116,15 +108,7 @@ void Lcio2EDM4hepTool::registerCollection(
     for (auto& elem : string_keys) {
       if (elem == edm4hep::labels::CellIDEncoding) {
         const auto& lcio_coll_cellid_str = lcioColl->getParameters().getStringVal(lcio::LCIO::CellIDEncoding);
-        if (m_podioDataSvc) {
-          auto& mdFrame = m_podioDataSvc->getMetaDataFrame();
-          mdFrame.putParameter(podio::collMetadataParamName(name, edm4hep::labels::CellIDEncoding),
-                               lcio_coll_cellid_str);
-        } else {
-          m_cellIDEncodings[podio::collMetadataParamName(name, edm4hep::labels::CellIDEncoding)] = lcio_coll_cellid_str;
-        }
-        debug() << "Storing CellIDEncoding " << podio::collMetadataParamName(name, edm4hep::labels::CellIDEncoding)
-                << " value: " << lcio_coll_cellid_str << endmsg;
+        m_cellIDEncodings[podio::collMetadataParamName(name, edm4hep::labels::CellIDEncoding)] = lcio_coll_cellid_str;
       } else {
         // TODO: figure out where this actually needs to go
       }
