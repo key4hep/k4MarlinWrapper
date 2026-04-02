@@ -23,6 +23,10 @@
 #include <string>
 #include <vector>
 
+namespace podio {
+class Frame;
+}
+
 // This functionality is used in the Writer from k4FWCore and is reimplemented
 // here with some additions to make it useful for converting both from EDM4hep
 // to LCIO and vice versa
@@ -31,3 +35,6 @@ std::vector<std::string> getAvailableCollectionsFromStore(const AlgTool* thisCla
                                                           bool returnFrameCollections = false);
 
 k4MarlinWrapper::GlobalConvertedObjectsMap& getGlobalObjectMap(AlgTool* thisTool);
+
+/// Get the Frame that underpins the current event from the TES
+podio::Frame& getEDM4hepEvent(AlgTool* thisTool);
