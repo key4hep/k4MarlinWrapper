@@ -25,7 +25,7 @@ from Configurables import MarlinProcessorWrapper
 from k4MarlinWrapper.parseConstants import parseConstants
 
 from Configurables import Lcio2EDM4hepTool, EDM4hep2LcioTool
-from Configurables import k4DataSvc, PodioInput, PodioOutput, EventDataSvc
+from Configurables import k4DataSvc, PodioInput, PodioOutput, EventDataSvc, MetadataSvc
 
 from k4FWCore import ApplicationMgr, IOSvc
 from k4FWCore.parseArgs import parser
@@ -2507,4 +2507,6 @@ algList.append(Output_DST)
 if args.no_iosvc:
     algList = [inp] + algList + [out]
 
-ApplicationMgr(TopAlg=algList, EvtSel="NONE", EvtMax=3, ExtSvc=[evtsvc], OutputLevel=WARNING)
+ApplicationMgr(
+    TopAlg=algList, EvtSel="NONE", EvtMax=3, ExtSvc=[evtsvc, MetadataSvc()], OutputLevel=WARNING
+)

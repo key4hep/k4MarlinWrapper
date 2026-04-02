@@ -52,18 +52,8 @@ Lcio2EDM4hepTool::Lcio2EDM4hepTool(const std::string& type, const std::string& n
 StatusCode Lcio2EDM4hepTool::initialize() {
   m_podioDataSvc = dynamic_cast<PodioDataSvc*>(m_eventDataSvc.get());
 
-  if (!m_podioDataSvc) {
-    m_metadataSvc = service("MetadataSvc", false);
-    if (!m_metadataSvc) {
-      error() << "Could not retrieve MetadataSvc" << endmsg;
-      return StatusCode::FAILURE;
-    }
-  }
-
   return AlgTool::initialize();
 }
-
-StatusCode Lcio2EDM4hepTool::finalize() { return AlgTool::finalize(); }
 
 // **********************************
 // Check if a collection was already registered to skip it
@@ -108,16 +98,7 @@ void Lcio2EDM4hepTool::registerCollection(
     for (auto& elem : string_keys) {
       if (elem == edm4hep::labels::CellIDEncoding) {
         const auto& lcio_coll_cellid_str = lcioColl->getParameters().getStringVal(lcio::LCIO::CellIDEncoding);
-        if (m_podioDataSvc) {
-          auto& mdFrame = m_podioDataSvc->getMetaDataFrame();
-          mdFrame.putParameter(podio::collMetadataParamName(name, edm4hep::labels::CellIDEncoding),
-                               lcio_coll_cellid_str);
-        } else {
-          k4FWCore::putParameter(podio::collMetadataParamName(name, edm4hep::labels::CellIDEncoding),
-                                 lcio_coll_cellid_str);
-        }
-        debug() << "Storing CellIDEncoding " << podio::collMetadataParamName(name, edm4hep::labels::CellIDEncoding)
-                << " value: " << lcio_coll_cellid_str << endmsg;
+        k4FWCore::putCellIDEncoding(name, lcio_coll_cellid_str, this);
       } else {
         // TODO: figure out where this actually needs to go
       }
@@ -235,16 +216,8 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
     }
   }
 
-  // Set the ParticleID meta information
-  if (m_podioDataSvc) {
-    auto& metadataFrame = m_podioDataSvc->getMetaDataFrame();
-    for (const auto& [collName, pidInfo] : pidInfos) {
-      edm4hep::utils::PIDHandler::setAlgoInfo(metadataFrame, collName, pidInfo);
-    }
-  } else {
-    for (const auto& [collName, pidInfo] : pidInfos) {
-      m_metadataSvc->put(collName, pidInfo);
-    }
+  for (const auto& [collName, pidInfo] : pidInfos) {
+    k4FWCore::putParameter(collName, pidInfo, this);
   }
 
   auto& globalObjMap = getGlobalObjectMap(this);
