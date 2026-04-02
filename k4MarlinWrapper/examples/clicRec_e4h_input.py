@@ -21,11 +21,15 @@ import os
 
 from Gaudi.Configuration import DEBUG, WARNING
 
-from Configurables import MarlinProcessorWrapper
 from k4MarlinWrapper.parseConstants import parseConstants
 
-from Configurables import Lcio2EDM4hepTool, EDM4hep2LcioTool
-from Configurables import k4DataSvc, PodioInput, PodioOutput, EventDataSvc, MetadataSvc
+from Configurables import (
+    MarlinProcessorWrapper,
+    Lcio2EDM4hepTool,
+    EDM4hep2LcioTool,
+    EventDataSvc,
+    MetadataSvc,
+)
 
 from k4FWCore import ApplicationMgr, IOSvc
 from k4FWCore.parseArgs import parser
@@ -40,12 +44,6 @@ CONSTANTS = {
 parseConstants(CONSTANTS)
 
 parser.add_argument(
-    "--no-iosvc",
-    action="store_true",
-    default=False,
-    help="Use k4DataSvc instead of IOSvc",
-)
-parser.add_argument(
     "--rec-output", default="Output_REC_e4h_input.slcio", help="Output file name for the REC file"
 )
 parser.add_argument(
@@ -54,27 +52,15 @@ parser.add_argument(
 parser.add_argument(
     "--gaudi-output", default="my_output.root", help="Output file name for the Gaudi file"
 )
-
 args = parser.parse_known_args()[0]
-if not args.no_iosvc:
-    evtsvc = EventDataSvc("EventDataSvc")
-    iosvc = IOSvc()
-    iosvc.Input = os.path.join(
-        "$TEST_DIR/inputFiles/", os.environ.get("INPUTFILE", "ttbar_edm4hep_frame.root")
-    )
-    iosvc.Output = args.gaudi_output
-    iosvc.outputCommands = ["keep *", "drop RefinedVertexJets_PID_RefinedVertex"]
-else:
-    evtsvc = k4DataSvc("EventDataSvc")
-    evtsvc.input = os.path.join(
-        "$TEST_DIR/inputFiles/", os.environ.get("INPUTFILE", "ttbar_edm4hep_frame.root")
-    )
 
-    inp = PodioInput("InputReader")
-    inp.OutputLevel = DEBUG
-
-    out = PodioOutput("PodioOutput", filename=args.gaudi_output)
-    out.outputCommands = ["keep *", "drop RefinedVertexJets_PID_RefinedVertex"]
+evtsvc = EventDataSvc("EventDataSvc")
+iosvc = IOSvc()
+iosvc.Input = os.path.join(
+    "$TEST_DIR/inputFiles/", os.environ.get("INPUTFILE", "ttbar_edm4hep_frame.root")
+)
+iosvc.Output = args.gaudi_output
+iosvc.outputCommands = ["keep *", "drop RefinedVertexJets_PID_RefinedVertex"]
 
 MyAIDAProcessor = MarlinProcessorWrapper("MyAIDAProcessor")
 MyAIDAProcessor.OutputLevel = WARNING
@@ -2503,9 +2489,6 @@ algList.append(JetClusteringAndRefiner)
 # # algList.append(VertexFinderUnconstrained)  # Config.VertexUnconstrainedON
 algList.append(Output_REC)
 algList.append(Output_DST)
-
-if args.no_iosvc:
-    algList = [inp] + algList + [out]
 
 ApplicationMgr(
     TopAlg=algList, EvtSel="NONE", EvtMax=3, ExtSvc=[evtsvc, MetadataSvc()], OutputLevel=WARNING
