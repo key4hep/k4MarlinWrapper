@@ -119,3 +119,34 @@ k4MarlinWrapper::GlobalConvertedObjectsMap& getGlobalObjectMap(AlgTool* thisTool
   auto globalObjMapWrapper = static_cast<AnyDataWrapper<k4MarlinWrapper::GlobalConvertedObjectsMap>*>(obj);
   return globalObjMapWrapper->getData();
 }
+
+podio::Frame& getEDM4hepEvent(AlgTool* thisTool) {
+  thisTool->debug() << "Retrieving EDM4hep event (Frame) from TES" << endmsg;
+  DataObject* p;
+  StatusCode code = thisTool->evtSvc()->retrieveObject("/Event" + k4FWCore::frameLocation, p);
+  if (code.isSuccess()) {
+    auto* frame = dynamic_cast<AnyDataWrapper<podio::Frame>*>(p);
+    return frame->getData();
+  }
+
+  // We can do this because the following assumptions are true:
+  // - We only end up here if we are using the IOSvc and we are NOT reading
+  //   EDM4hep data. Otherwise the Reader will be scheduled as FIRST algorithm,
+  //   most importantly BEFORE any of the wrapped Marlin processors to which
+  //   this converter is attached.
+  // - The empty Frame we introduce into the TES here does not interfere with
+  //   the Writer for EDM4hep output (which is always scheduled last), as that
+  //   will simply get this Frame instead of creating an empty one itself
+  // - There are no scheduling issues / race conditions, since the
+  //   MarlinProcessorWrapper algorithm is not re-entrant and can thus not be
+  //   run in parallel
+  thisTool->debug() << "Could not retrieve Frame from expected location. Registering a new empty Frame into the TES"
+                    << endmsg;
+  auto tmp = new AnyDataWrapper<podio::Frame>(podio::Frame());
+  if (thisTool->evtSvc()->registerObject("/Event" + k4FWCore::frameLocation, tmp).isFailure()) {
+    thisTool->error() << "Could not retrieve Frame from expected location in TES and could not register a new one"
+                      << endmsg;
+    throw std::runtime_error("Could not get EDM4hep event (Frame) for conversions");
+  }
+  return tmp->getData();
+}
