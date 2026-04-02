@@ -27,14 +27,13 @@
 
 #include "k4FWCore/DataHandle.h"
 #include "k4FWCore/FunctionalUtils.h"
-#include "k4FWCore/MetaDataHandle.h"
 #include "k4FWCore/PodioDataSvc.h"
+#include <k4FWCore/MetadataUtils.h>
 
 #include "GaudiKernel/AnyDataWrapper.h"
 #include "GaudiKernel/IDataManagerSvc.h"
 #include "GaudiKernel/IDataProviderSvc.h"
 
-#include <functional>
 #include <memory>
 
 DECLARE_COMPONENT(EDM4hep2LcioTool);
@@ -71,14 +70,6 @@ StatusCode EDM4hep2LcioTool::initialize() {
 
   m_podioDataSvc = dynamic_cast<PodioDataSvc*>(m_eventDataSvc.get());
 
-  if (!m_podioDataSvc) {
-    m_metadataSvc = service("MetadataSvc", false);
-    if (!m_metadataSvc) {
-      error() << "Could not retrieve MetadataSvc" << endmsg;
-      return StatusCode::FAILURE;
-    }
-  }
-
   return AlgTool::initialize();
 }
 
@@ -107,11 +98,10 @@ void EDM4hep2LcioTool::convertTrackerHits(TrackerHitMap& trackerhits_vec, const 
                                                                            this};
   const auto trackerhits_coll = trackerhits_handle.get();
 
-  k4FWCore::MetaDataHandle<std::string> cellIDStrHandle{trackerhits_handle, edm4hep::labels::CellIDEncoding,
-                                                        Gaudi::DataHandle::Reader};
+  const auto cellIDencoding = k4FWCore::getCellIDEncoding(trackerhits_handle.objKey(), this);
+  debug() << "Retrieved CellID encoding: " << cellIDencoding.value_or("<not-present>") << endmsg;
 
-  auto conv_trackerhits =
-      EDM4hep2LCIOConv::convertTrackerHits(trackerhits_coll, cellIDStrHandle.get(""), trackerhits_vec);
+  auto conv_trackerhits = EDM4hep2LCIOConv::convertTrackerHits(trackerhits_coll, cellIDencoding, trackerhits_vec);
 
   // Add all trackerhits to event
   lcio_event->addCollection(conv_trackerhits.release(), lcio_coll_name);
@@ -129,11 +119,10 @@ void EDM4hep2LcioTool::convertTrackerHitPlanes(TrackerHitPlaneMap& trackerhits_v
                                                                               this};
   const auto trackerhits_coll = trackerhits_handle.get();
 
-  k4FWCore::MetaDataHandle<std::string> cellIDStrHandle{trackerhits_handle, edm4hep::labels::CellIDEncoding,
-                                                        Gaudi::DataHandle::Reader};
+  const auto cellIDencoding = k4FWCore::getCellIDEncoding(trackerhits_handle.objKey(), this);
+  debug() << "Retrieved CellID encoding: " << cellIDencoding.value_or("<not-present>") << endmsg;
 
-  auto conv_trackerhits =
-      EDM4hep2LCIOConv::convertTrackerHitPlanes(trackerhits_coll, cellIDStrHandle.get(""), trackerhits_vec);
+  auto conv_trackerhits = EDM4hep2LCIOConv::convertTrackerHitPlanes(trackerhits_coll, cellIDencoding, trackerhits_vec);
 
   // Add all trackerhits to event
   lcio_event->addCollection(conv_trackerhits.release(), lcio_coll_name);
@@ -148,12 +137,11 @@ void EDM4hep2LcioTool::convertSimTrackerHits(SimTrackerHitMap& simtrackerhits_ve
                                                                                this};
   const auto simtrackerhits_coll = simtrackerhits_handle.get();
 
-  k4FWCore::MetaDataHandle<std::string> cellIDHandle{simtrackerhits_handle, edm4hep::labels::CellIDEncoding,
-                                                     Gaudi::DataHandle::Reader};
-  const auto cellIDstr = cellIDHandle.get();
+  const auto cellIDencoding = k4FWCore::getCellIDEncoding(simtrackerhits_handle.objKey(), this);
+  debug() << "Retrieved CellID encoding: " << cellIDencoding.value_or("<not-present>") << endmsg;
 
   auto conv_simtrackerhits =
-      EDM4hep2LCIOConv::convertSimTrackerHits(simtrackerhits_coll, cellIDstr, simtrackerhits_vec);
+      EDM4hep2LCIOConv::convertSimTrackerHits(simtrackerhits_coll, cellIDencoding, simtrackerhits_vec);
 
   // Add all simtrackerhits to event
   lcio_event->addCollection(conv_simtrackerhits.release(), lcio_coll_name);
@@ -168,11 +156,10 @@ void EDM4hep2LcioTool::convertCalorimeterHits(CaloHitMap& calo_hits_vec, const s
                                                                          this};
   const auto calohit_coll = calohit_handle.get();
 
-  k4FWCore::MetaDataHandle<std::string> cellIDHandle{calohit_handle, edm4hep::labels::CellIDEncoding,
-                                                     Gaudi::DataHandle::Reader};
-  const auto cellIDstr = cellIDHandle.get();
+  const auto cellIDencoding = k4FWCore::getCellIDEncoding(calohit_handle.objKey(), this);
+  debug() << "Retrieved CellID encoding: " << cellIDencoding.value_or("<not-present>") << endmsg;
 
-  auto conv_calohits = EDM4hep2LCIOConv::convertCalorimeterHits(calohit_coll, cellIDstr, calo_hits_vec);
+  auto conv_calohits = EDM4hep2LCIOConv::convertCalorimeterHits(calohit_coll, cellIDencoding, calo_hits_vec);
 
   // Add all Calorimeter Hits to event
   lcio_event->addCollection(conv_calohits.release(), lcio_coll_name);
@@ -202,12 +189,12 @@ void EDM4hep2LcioTool::convertSimCalorimeterHits(SimCaloHitMap& sim_calo_hits_ve
                                                                                 Gaudi::DataHandle::Reader, this};
   const auto simcalohit_coll = sim_calohit_handle.get();
 
-  k4FWCore::MetaDataHandle<std::string> cellIDHandle{sim_calohit_handle, edm4hep::labels::CellIDEncoding,
-                                                     Gaudi::DataHandle::Reader};
-  const auto cellIDstr = cellIDHandle.get();
+  const auto cellIDencoding = k4FWCore::getCellIDEncoding(sim_calohit_handle.objKey(), this);
+  debug() << "Retrieved CellID encoding: " << cellIDencoding.value_or("<not-present>") << endmsg;
 
   // TODO mcparticles_vdc
-  auto conv_simcalohits = EDM4hep2LCIOConv::convertSimCalorimeterHits(simcalohit_coll, cellIDstr, sim_calo_hits_vec);
+  auto conv_simcalohits =
+      EDM4hep2LCIOConv::convertSimCalorimeterHits(simcalohit_coll, cellIDencoding, sim_calo_hits_vec);
 
   // Add all Sim Calorimeter Hits to event
   lcio_event->addCollection(conv_simcalohits.release(), lcio_coll_name);
@@ -337,7 +324,6 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
                                   lcio::LCEventImpl* lcio_event, CollectionPairMappings& collection_pairs,
                                   std::vector<EDM4hep2LCIOConv::ParticleIDConvData>& pidCollections,
                                   std::vector<EDM4hep2LCIOConv::TrackDqdxConvData>& dQdxCollections) {
-  const auto& metadata = m_podioDataSvc->getMetaDataFrame();
   const auto collPtr = getEDM4hepCollection(e4h_coll_name);
   const auto fulltype = collPtr->getValueTypeName();
 
@@ -370,13 +356,7 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
   } else if (fulltype == "edm4hep::EventHeader") {
     convertEventHeader(e4h_coll_name, lcio_event);
   } else if (fulltype == "edm4hep::ParticleID") {
-    std::optional<edm4hep::utils::ParticleIDMeta> pidInfo;
-    if (m_podioDataSvc) {
-      pidInfo = edm4hep::utils::PIDHandler::getAlgoInfo(metadata, e4h_coll_name);
-    } else {
-      pidInfo = m_metadataSvc->get<edm4hep::utils::ParticleIDMeta>(e4h_coll_name);
-    }
-
+    const auto pidInfo = k4FWCore::getParameter<edm4hep::utils::ParticleIDMeta>(e4h_coll_name, this);
     pidCollections.emplace_back(e4h_coll_name, static_cast<const edm4hep::ParticleIDCollection*>(collPtr), pidInfo);
   } else if (fulltype == "edm4hep::RecDqDx") {
     dQdxCollections.emplace_back(e4h_coll_name, static_cast<const edm4hep::RecDqdxCollection*>(collPtr));
