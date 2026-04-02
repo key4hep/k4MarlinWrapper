@@ -21,8 +21,6 @@
 from Gaudi.Configuration import INFO, DEBUG
 
 from Configurables import (
-    PodioInput,
-    k4DataSvc,
     PseudoRecoAlgorithm,
     PseudoRecoFunctional,
     TrivialMCRecoLinker,
@@ -37,12 +35,6 @@ from k4FWCore.parseArgs import parser
 
 parser.add_argument("--inputfile", help="Input file")
 parser.add_argument(
-    "--no-iosvc",
-    action="store_true",
-    default=False,
-    help="Use k4DataSvc instead of IOSvc",
-)
-parser.add_argument(
     "--use-gaudi-algorithm",
     action="store_true",
     default=False,
@@ -50,17 +42,10 @@ parser.add_argument(
 )
 args = parser.parse_known_args()[0]
 
-if not args.no_iosvc:
-    evtsvc = EventDataSvc("EventDataSvc")
-    iosvc = IOSvc()
-    iosvc.Input = args.inputfile
-    iosvc.CollectionNames = ["EventHeader", "MCParticles"]
-else:
-    evtsvc = k4DataSvc("EventDataSvc")
-    evtsvc.input = args.inputfile
-    podioInput = PodioInput("InputReader")
-    podioInput.collections = ["EventHeader", "MCParticles"]
-    podioInput.OutputLevel = INFO
+evtsvc = EventDataSvc("EventDataSvc")
+iosvc = IOSvc()
+iosvc.Input = args.inputfile
+iosvc.CollectionNames = ["EventHeader", "MCParticles"]
 
 
 if args.use_gaudi_algorithm:
@@ -123,9 +108,6 @@ AnotherLinkChecker.EDM4hep2LcioTool = anotherLinkConverter
 
 
 algList = [PseudoRecoAlg, MCRecoLinker, MarlinMCLinkChecker, AnotherLinkChecker]
-
-if args.no_iosvc:
-    algList = [podioInput] + algList
 
 ApplicationMgr(
     TopAlg=algList,
