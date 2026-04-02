@@ -38,13 +38,9 @@ namespace EVENT {
 class LCCollection;
 }
 
-class PodioDataSvc;
-
 class Lcio2EDM4hepTool : public AlgTool, virtual public IEDMConverter {
 public:
   Lcio2EDM4hepTool(const std::string& type, const std::string& name, const IInterface* parent);
-
-  StatusCode initialize() final;
 
   // **********************************
   // - Convert all collections indicated in Tool parameters
@@ -59,7 +55,6 @@ private:
   Gaudi::Property<bool> m_convertAll{this, "convertAll", true};
 
   ServiceHandle<IDataProviderSvc> m_eventDataSvc;
-  PodioDataSvc* m_podioDataSvc;
 
   // **********************************
   // Check if a collection was already registered to skip it

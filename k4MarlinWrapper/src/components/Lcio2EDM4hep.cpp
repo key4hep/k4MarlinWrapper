@@ -29,7 +29,6 @@
 
 #include <k4FWCore/FunctionalUtils.h>
 #include <k4FWCore/MetadataUtils.h>
-#include <k4FWCore/PodioDataSvc.h>
 
 #include "GaudiKernel/AnyDataWrapper.h"
 
@@ -49,23 +48,12 @@ Lcio2EDM4hepTool::Lcio2EDM4hepTool(const std::string& type, const std::string& n
   }
 }
 
-StatusCode Lcio2EDM4hepTool::initialize() {
-  m_podioDataSvc = dynamic_cast<PodioDataSvc*>(m_eventDataSvc.get());
-
-  return AlgTool::initialize();
-}
-
 // **********************************
 // Check if a collection was already registered to skip it
 // **********************************
 bool Lcio2EDM4hepTool::collectionExist(const std::string& collection_name) {
-  std::vector<std::string> collections;
-  if (m_podioDataSvc) {
-    collections = m_podioDataSvc->getEventFrame().getAvailableCollections();
-  } else {
-    std::optional<std::map<uint32_t, std::string>> dummy = std::nullopt;
-    collections = getAvailableCollectionsFromStore(this, dummy, true);
-  }
+  std::optional<std::map<uint32_t, std::string>> dummy = std::nullopt;
+  const auto collections = getAvailableCollectionsFromStore(this, dummy, true);
   if (std::find(collections.begin(), collections.end(), collection_name) != collections.end()) {
     debug() << "Collection named " << collection_name << " already registered, skipping conversion." << endmsg;
     return true;
@@ -128,21 +116,8 @@ struct ObjectMappings {
 } // namespace
 
 StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
-  // Convert event parameters
-  if (m_podioDataSvc) {
-    LCIO2EDM4hepConv::convertObjectParameters(the_event, m_podioDataSvc->m_eventframe);
-  } else {
-    DataObject* p;
-    StatusCode code = m_eventDataSvc->retrieveObject("/Event" + k4FWCore::frameLocation, p);
-    if (code.isSuccess()) {
-      auto* frameWrapper = dynamic_cast<AnyDataWrapper<podio::Frame>*>(p);
-      LCIO2EDM4hepConv::convertObjectParameters(the_event, frameWrapper->getData());
-    } else {
-      warning() << "Could not retrieve the event frame; event parameters will not be converted. This is a known "
-                   "limitation when running with IOSvc without an input file."
-                << endmsg;
-    }
-  }
+  auto& event = getEDM4hepEvent(this);
+  LCIO2EDM4hepConv::convertObjectParameters(the_event, event);
 
   // Convert Event Header outside the collections loop
   if (!collectionExist(edm4hep::labels::EventHeader)) {
