@@ -68,8 +68,6 @@ StatusCode EDM4hep2LcioTool::initialize() {
     return StatusCode::FAILURE;
   }
 
-  m_podioDataSvc = dynamic_cast<PodioDataSvc*>(m_eventDataSvc.get());
-
   return AlgTool::initialize();
 }
 
@@ -376,18 +374,12 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
 }
 
 const podio::Frame& EDM4hep2LcioTool::getEDM4hepEvent() const {
-  debug() << "Retrieving EDM4hep event (Frame)" << endmsg;
-  if (m_podioDataSvc) {
-    debug() << "Getting it from PodioDataSvc" << endmsg;
-    return m_podioDataSvc->getEventFrame();
-  } else {
-    debug() << "Trying to get it from TES" << endmsg;
-    DataObject* p;
-    StatusCode code = m_eventDataSvc->retrieveObject("/Event" + k4FWCore::frameLocation, p);
-    if (code.isSuccess()) {
-      auto* frame = dynamic_cast<AnyDataWrapper<podio::Frame>*>(p);
-      return frame->getData();
-    }
+  debug() << "Retrieving EDM4hep event (Frame) from TES" << endmsg;
+  DataObject* p;
+  StatusCode code = m_eventDataSvc->retrieveObject("/Event" + k4FWCore::frameLocation, p);
+  if (code.isSuccess()) {
+    auto* frame = dynamic_cast<AnyDataWrapper<podio::Frame>*>(p);
+    return frame->getData();
   }
 
   // We can do this because the following assumptions are true:
@@ -431,16 +423,6 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
 
     if (m_convertAll) {
       info() << "Converting all collections from EDM4hep to LCIO" << endmsg;
-      if (m_podioDataSvc) {
-        // If we have the PodioDataSvc get the collections available from frame
-        for (const auto& name : edmEvent.getAvailableCollections()) {
-          const auto& [_, inserted] = collNameMapping.emplace(name, name);
-          debug() << fmt::format("Adding '{}' from Frame to conversion? {}", name, inserted) << endmsg;
-        }
-      }
-      // Always check the contents of the TES because algorithms that do not use
-      // the PodioDataSvc (e.g. all Functional ones) go to the TES directly and
-      // the PodioDataSvc Frame doesn't now about them.
       std::optional<std::map<uint32_t, std::string>> idToNameOpt(std::move(m_idToName));
       for (const auto& name : getAvailableCollectionsFromStore(this, idToNameOpt)) {
         const auto& [_, inserted] = collNameMapping.emplace(name, name);
@@ -480,21 +462,16 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
   for (const auto& pidCollMeta : pidCollections) {
     auto algoId = attachParticleIDMetaData(lcio_event, edmEvent, pidCollMeta);
     if (!algoId.has_value()) {
-      // Now go over the collections that have been produced in a functional algorithm (if any)
-      bool found = false;
-      if (!m_podioDataSvc) {
-        const auto id = (*pidCollMeta.coll)[0].getParticle().id().collectionID;
-        if (auto it = m_idToName.find(id); it != m_idToName.end()) {
-          auto name = it->second;
-          if (pidCollMeta.metadata.has_value()) {
-            UTIL::PIDHandler pidHandler(lcio_event->getCollection(name));
-            algoId =
-                pidHandler.addAlgorithm(pidCollMeta.metadata.value().algoName, pidCollMeta.metadata.value().paramNames);
-            found = true;
-          }
+      // Check if we can figure out the collection from information on the TES
+      const auto id = (*pidCollMeta.coll)[0].getParticle().id().collectionID;
+      if (auto it = m_idToName.find(id); it != m_idToName.end()) {
+        auto name = it->second;
+        if (pidCollMeta.metadata.has_value()) {
+          UTIL::PIDHandler pidHandler(lcio_event->getCollection(name));
+          algoId =
+              pidHandler.addAlgorithm(pidCollMeta.metadata.value().algoName, pidCollMeta.metadata.value().paramNames);
         }
-      }
-      if (!found) {
+      } else {
         warning() << "Could not determine algorithm type for ParticleID collection " << pidCollMeta.name
                   << " for setting consistent metadata" << endmsg;
       }
