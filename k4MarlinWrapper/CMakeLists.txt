@@ -23,6 +23,7 @@ gaudi_install(SCRIPTS)
 # k4MarlinWrapperPlugins
 gaudi_add_module(k4MarlinWrapperPlugins
   SOURCES
+    src/components/CellIDEncodingFiller.cpp
     src/components/LcioEventAlgo.cpp
     src/components/LcioEventOutput.cpp
     src/components/MarlinProcessorWrapper.cpp

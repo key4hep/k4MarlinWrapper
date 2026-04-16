@@ -19,6 +19,7 @@ limitations under the License.
 
 gaudi_add_module(GaudiTestAlgorithms
   SOURCES
+    src/CellIDEncodingChecker.cc
     src/MCRecoLinkChecker.cc
     src/MCRecoLinkCheckerFunctional.cc
     src/PseudoRecoAlgorithm.cc
@@ -180,6 +181,8 @@ set_tests_properties(
   PROPERTIES
   DEPENDS partial_edm4hep_to_lcio
 )
+
+add_test( cellid_encoding_filler ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_cellid_encoding_filler.py )
 
 add_test( event_header_conversion bash -c "k4run ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/createEventHeader.py && anajob test.slcio | grep 'EVENT: 42'" )
 
