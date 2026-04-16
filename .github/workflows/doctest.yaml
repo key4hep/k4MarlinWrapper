@@ -1,6 +1,6 @@
 name: doctest-linux
 
-on: 
+on:
   push:
     branches: [main]
   pull_request:
