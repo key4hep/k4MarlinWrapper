@@ -19,7 +19,7 @@ jobs:
     - uses: actions/checkout@v3
     - name: Start container
       run: |
-        docker run -it --name CI_container --privileged -v ${GITHUB_WORKSPACE}:/Package -d ghcr.io/key4hep/key4hep-images/ubuntu24-cvmfs:latest /bin/bash
+        docker run -it --name CI_container --privileged -v ${GITHUB_WORKSPACE}:/Package -d ghcr.io/key4hep/key4hep-images/alma9-cvmfs:latest /bin/bash
     - name: Compile
       run: |
         docker exec CI_container /bin/bash -c '/mount.sh;
@@ -34,10 +34,8 @@ jobs:
         docker exec CI_container /bin/bash -c '/mount.sh
         cd ./Package;
         source ${{ matrix.SETUP }};
-        export LD_LIBRARY_PATH=/Package/install/lib64:$LD_LIBRARY_PATH
-        export PYTHONPATH=/Package/install/python:$PYTHONPATH
+        k4_local_repo
         export K4MARLINWRAPPER=/Package/install/share/k4MarlinWrapper
-        export PATH=/Package/install/bin:$PATH
         unset KEY4HEP_STACK;
         mkdir testdir;
         cat .github/scripts/yamlheader.md  ${{ matrix.PAGE }}.md > testdir/test.md;
