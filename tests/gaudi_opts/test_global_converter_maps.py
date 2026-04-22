@@ -55,9 +55,9 @@ evtsvc = EventDataSvc("EventDataSvc")
 iosvc = IOSvc()
 iosvc.CollectionNames = ["EventHeader", "MCParticles"]
 if not args.use_functional_checker:
-    iosvc.Output = "global_converter_maps_iosvc.root"
+    iosvc.Output = "global_converter_maps.root"
 else:
-    iosvc.Output = "global_converter_maps_iosvc_functional.root"
+    iosvc.Output = "global_converter_maps_functional.root"
 
 if args.use_gaudi_algorithm:
     PseudoRecoAlg = PseudoRecoAlgorithm(
