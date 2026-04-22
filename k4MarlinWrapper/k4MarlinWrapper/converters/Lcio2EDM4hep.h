@@ -50,11 +50,15 @@ public:
   // **********************************
   StatusCode convertCollections(lcio::LCEventImpl* lcio_event) final;
 
+  StatusCode finalize();
+
 private:
   Gaudi::Property<std::map<std::string, std::string>> m_collNames{this, "collNameMapping", {}};
   Gaudi::Property<bool> m_convertAll{this, "convertAll", true};
 
   ServiceHandle<IDataProviderSvc> m_eventDataSvc;
+
+  std::map<std::string, std::string> m_cellIDEncodings{};
 
   // **********************************
   // Check if a collection was already registered to skip it

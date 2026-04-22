@@ -48,6 +48,13 @@ Lcio2EDM4hepTool::Lcio2EDM4hepTool(const std::string& type, const std::string& n
   }
 }
 
+StatusCode Lcio2EDM4hepTool::finalize() {
+  for (const auto& [key, value] : m_cellIDEncodings) {
+    k4FWCore::putParameter(key, value, this);
+  }
+  return AlgTool::finalize();
+}
+
 // **********************************
 // Check if a collection was already registered to skip it
 // **********************************
@@ -86,7 +93,7 @@ void Lcio2EDM4hepTool::registerCollection(
     for (auto& elem : string_keys) {
       if (elem == edm4hep::labels::CellIDEncoding) {
         const auto& lcio_coll_cellid_str = lcioColl->getParameters().getStringVal(lcio::LCIO::CellIDEncoding);
-        k4FWCore::putCellIDEncoding(name, lcio_coll_cellid_str, this);
+        m_cellIDEncodings[podio::collMetadataParamName(name, edm4hep::labels::CellIDEncoding)] = lcio_coll_cellid_str;
       } else {
         // TODO: figure out where this actually needs to go
       }
