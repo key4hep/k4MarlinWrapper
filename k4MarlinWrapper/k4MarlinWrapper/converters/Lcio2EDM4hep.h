@@ -56,6 +56,8 @@ private:
 
   ServiceHandle<IDataProviderSvc> m_eventDataSvc;
 
+  std::map<std::string, std::string> m_cellIDEncodings{};
+
   // **********************************
   // Check if a collection was already registered to skip it
   // **********************************
