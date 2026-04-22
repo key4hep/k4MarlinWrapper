@@ -64,7 +64,12 @@ StatusCode Lcio2EDM4hepTool::initialize() {
   return AlgTool::initialize();
 }
 
-StatusCode Lcio2EDM4hepTool::finalize() { return AlgTool::finalize(); }
+StatusCode Lcio2EDM4hepTool::finalize() {
+  for (const auto& [key, value] : m_cellIDEncodings) {
+    k4FWCore::putParameter(key, value, this);
+  }
+  return AlgTool::finalize();
+}
 
 // **********************************
 // Check if a collection was already registered to skip it
@@ -115,8 +120,7 @@ void Lcio2EDM4hepTool::registerCollection(
           mdFrame.putParameter(podio::collMetadataParamName(name, edm4hep::labels::CellIDEncoding),
                                lcio_coll_cellid_str);
         } else {
-          k4FWCore::putParameter(podio::collMetadataParamName(name, edm4hep::labels::CellIDEncoding),
-                                 lcio_coll_cellid_str);
+          m_cellIDEncodings[podio::collMetadataParamName(name, edm4hep::labels::CellIDEncoding)] = lcio_coll_cellid_str;
         }
         debug() << "Storing CellIDEncoding " << podio::collMetadataParamName(name, edm4hep::labels::CellIDEncoding)
                 << " value: " << lcio_coll_cellid_str << endmsg;

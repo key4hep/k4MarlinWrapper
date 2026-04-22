@@ -64,6 +64,8 @@ private:
   SmartIF<IMetadataSvc> m_metadataSvc;
   PodioDataSvc* m_podioDataSvc;
 
+  std::map<std::string, std::string> m_cellIDEncodings{};
+
   // **********************************
   // Check if a collection was already registered to skip it
   // **********************************
