@@ -68,6 +68,9 @@ StatusCode Lcio2EDM4hepTool::finalize() {
   for (const auto& [key, value] : m_cellIDEncodings) {
     k4FWCore::putParameter(key, value, this);
   }
+  for (const auto& [coll, pidMeta] : m_pidMetas) {
+    k4FWCore::putParameter(coll, pidMeta, this);
+  }
   return AlgTool::finalize();
 }
 
@@ -195,8 +198,6 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
   // were empty
   bool needCaloHitContribs = false;
 
-  std::map<std::string, edm4hep::utils::ParticleIDMeta> pidInfos{};
-
   for (const auto& [lcioName, edm4hepName] : collsToConvert) {
     try {
       auto* lcio_coll = the_event->getCollection(lcioName);
@@ -221,7 +222,7 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
         // Collect the ParticleID meta information because that has to go to the
         // ParticleID collections
         for (const auto& pidInfo : LCIO2EDM4hepConv::getPIDMetaInfo(lcio_coll)) {
-          pidInfos.try_emplace(LCIO2EDM4hepConv::getPIDCollName(lcioName, pidInfo.algoName), pidInfo);
+          m_pidMetas.try_emplace(LCIO2EDM4hepConv::getPIDCollName(lcioName, pidInfo.algoName), pidInfo);
         }
       }
 
@@ -238,18 +239,6 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
       warning() << "LCIO Collection " << lcioName << " not found in the event, skipping conversion to EDM4hep"
                 << endmsg;
       continue;
-    }
-  }
-
-  // Set the ParticleID meta information
-  if (m_podioDataSvc) {
-    auto& metadataFrame = m_podioDataSvc->getMetaDataFrame();
-    for (const auto& [collName, pidInfo] : pidInfos) {
-      edm4hep::utils::PIDHandler::setAlgoInfo(metadataFrame, collName, pidInfo);
-    }
-  } else {
-    for (const auto& [collName, pidInfo] : pidInfos) {
-      m_metadataSvc->put(collName, pidInfo);
     }
   }
 

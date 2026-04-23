@@ -26,6 +26,8 @@
 
 #include "k4MarlinWrapper/converters/IEDMConverter.h"
 
+#include <edm4hep/utils/ParticleIDUtils.h>
+
 #include <lcio.h>
 
 #include <map>
@@ -65,6 +67,7 @@ private:
   PodioDataSvc* m_podioDataSvc;
 
   std::map<std::string, std::string> m_cellIDEncodings{};
+  std::map<std::string, edm4hep::utils::ParticleIDMeta> m_pidMetas{};
 
   // **********************************
   // Check if a collection was already registered to skip it
