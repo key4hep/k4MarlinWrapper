@@ -247,11 +247,12 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
     for (const auto& [collName, pidInfo] : pidInfos) {
       edm4hep::utils::PIDHandler::setAlgoInfo(metadataFrame, collName, pidInfo);
     }
-  } else {
-    for (const auto& [collName, pidInfo] : pidInfos) {
-      m_metadataSvc->put(collName, pidInfo);
-    }
   }
+  // else {
+  //   for (const auto& [collName, pidInfo] : pidInfos) {
+  //     m_metadataSvc->put(collName, pidInfo);
+  //   }
+  // }
 
   auto& globalObjMap = getGlobalObjectMap(this);
 
