@@ -50,7 +50,7 @@ Lcio2EDM4hepTool::Lcio2EDM4hepTool(const std::string& type, const std::string& n
 
 StatusCode Lcio2EDM4hepTool::finalize() {
   for (const auto& [key, value] : m_cellIDEncodings) {
-    k4FWCore::putParameter(key, value, this);
+    k4FWCore::putCellIDEncoding(key, value, this);
   }
   for (const auto& [coll, pidMeta] : m_pidMetas) {
     k4FWCore::putParameter(coll, pidMeta, this);
@@ -96,7 +96,7 @@ void Lcio2EDM4hepTool::registerCollection(
     for (auto& elem : string_keys) {
       if (elem == edm4hep::labels::CellIDEncoding) {
         const auto& lcio_coll_cellid_str = lcioColl->getParameters().getStringVal(lcio::LCIO::CellIDEncoding);
-        m_cellIDEncodings[podio::collMetadataParamName(name, edm4hep::labels::CellIDEncoding)] = lcio_coll_cellid_str;
+        m_cellIDEncodings[name] = lcio_coll_cellid_str;
       } else {
         // TODO: figure out where this actually needs to go
       }
