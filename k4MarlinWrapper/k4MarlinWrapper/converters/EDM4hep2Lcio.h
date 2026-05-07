@@ -31,9 +31,7 @@
 #include <tuple>
 #include <vector>
 
-class PodioDataSvc;
 class IDataProviderSvc;
-class IMetadataSvc;
 
 template <typename K, typename V>
 using ObjMapT = k4EDM4hep2LcioConv::VecMapT<K, V>;
@@ -66,11 +64,7 @@ private:
   Gaudi::Property<std::map<std::string, std::string>> m_collNames{this, "collNameMapping", {}};
   Gaudi::Property<bool> m_convertAll{this, "convertAll", true};
 
-  PodioDataSvc* m_podioDataSvc;
-  // EventDataSvc that is used together with IOSvc
   ServiceHandle<IDataProviderSvc> m_eventDataSvc;
-  // Metadata service from k4FWCore that is used together with IOSvc
-  SmartIF<IMetadataSvc> m_metadataSvc;
   /// A (caching) "map" of original to new collection names that will be populated
   /// during the first conversion
   std::vector<std::tuple<std::string, std::string>> m_collsToConvert{};
@@ -120,8 +114,6 @@ private:
                   CollectionPairMappings& collection_pairs,
                   std::vector<EDM4hep2LCIOConv::ParticleIDConvData>& pidCollections,
                   std::vector<EDM4hep2LCIOConv::TrackDqdxConvData>& dQdxCollections);
-
-  const podio::Frame& getEDM4hepEvent() const;
 
   /// Get an EDM4hep collection by name, consulting either the podio based data
   /// svc or the IOSvc

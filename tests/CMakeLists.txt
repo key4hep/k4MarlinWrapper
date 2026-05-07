@@ -89,9 +89,7 @@ set_tests_properties( skip_events
     PASS_REGULAR_EXPRESSION "Output has expected number of events")
 
 # Test clicReconstruction with EDM4hep input and output
-ExternalData_Add_Test( marlinwrapper_tests NAME clicRec_edm4hep_input COMMAND bash -c "${CMAKE_CURRENT_SOURCE_DIR}/scripts/clicRec_e4h_input.sh DATA{${PROJECT_SOURCE_DIR}/tests/input_files/ttbar_20240223_edm4hep.root} --no-iosvc")
-ExternalData_Add_Test( marlinwrapper_tests NAME clicRec_edm4hep_input_iosvc COMMAND bash -c "${CMAKE_CURRENT_SOURCE_DIR}/scripts/clicRec_e4h_input.sh DATA{${PROJECT_SOURCE_DIR}/tests/input_files/ttbar_20240223_edm4hep.root} --iosvc")
-add_test( clicRec_edm4hep_input_compare_output bash -c "diff <(podio-dump CLICPerformance/clicConfig/my_output.root | grep -v 'input file:') <(podio-dump CLICPerformance/clicConfig/my_output_iosvc.root | grep -v 'input file:')")
+ExternalData_Add_Test( marlinwrapper_tests NAME clicRec_edm4hep_input COMMAND bash -c "${CMAKE_CURRENT_SOURCE_DIR}/scripts/clicRec_e4h_input.sh DATA{${PROJECT_SOURCE_DIR}/tests/input_files/ttbar_20240223_edm4hep.root}")
 
 # Run clicReconstruction sequence with LCIO input and output, no converters, with inter-event parallelism
 ExternalData_Add_Test( marlinwrapper_tests NAME clicRec_lcio_mt COMMAND bash -c "${CMAKE_CURRENT_SOURCE_DIR}/scripts/clicRec_lcio_mt.sh DATA{${PROJECT_SOURCE_DIR}/tests/input_files/testSimulation.slcio}")
@@ -103,40 +101,27 @@ add_test( clic_geo_test ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/geoTest_
 # multiple processors
 ExternalData_Add_Test( marlinwrapper_tests
   NAME global_converter_maps
-  COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_global_converter_maps.py --no-iosvc --EventDataSvc.input DATA{${PROJECT_SOURCE_DIR}/tests/input_files/ttbar_20240223_edm4hep.root}
-)
-ExternalData_Add_Test( marlinwrapper_tests
-  NAME global_converter_maps_algorithm
-  COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_global_converter_maps.py --no-iosvc --use-gaudi-algorithm --OutputWriter.filename=global_converter_maps_algorithm.root --EventDataSvc.input DATA{${PROJECT_SOURCE_DIR}/tests/input_files/ttbar_20240223_edm4hep.root}
-)
-
-ExternalData_Add_Test( marlinwrapper_tests
-  NAME global_converter_maps_iosvc
   COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_global_converter_maps.py --IOSvc.Input DATA{${PROJECT_SOURCE_DIR}/tests/input_files/ttbar_20240223_edm4hep.root}
 )
 ExternalData_Add_Test( marlinwrapper_tests
-  NAME global_converter_maps_iosvc_functional
+  NAME global_converter_maps_functional
   COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_global_converter_maps.py --use-functional-checker --IOSvc.Input DATA{${PROJECT_SOURCE_DIR}/tests/input_files/ttbar_20240223_edm4hep.root}
 )
 ExternalData_Add_Test( marlinwrapper_tests
-  NAME global_converter_maps_iosvc_algorithm
-  COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_global_converter_maps.py --use-gaudi-algorithm --IOSvc.Input DATA{${PROJECT_SOURCE_DIR}/tests/input_files/ttbar_20240223_edm4hep.root} --IOSvc.Output=global_converter_maps_iosvc_algorithm.root
+  NAME global_converter_maps_algorithm
+  COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_global_converter_maps.py --use-gaudi-algorithm --IOSvc.Input DATA{${PROJECT_SOURCE_DIR}/tests/input_files/ttbar_20240223_edm4hep.root} --IOSvc.Output=global_converter_maps_algorithm.root
 )
 ExternalData_Add_Test( marlinwrapper_tests
-  NAME global_converter_maps_iosvc_algorithm_functional
-  COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_global_converter_maps.py --use-gaudi-algorithm --use-functional-checker --IOSvc.Input DATA{${PROJECT_SOURCE_DIR}/tests/input_files/ttbar_20240223_edm4hep.root} --IOSvc.Output=global_converter_maps_iosvc_algorithm_functional.root
+  NAME global_converter_maps_algorithm_functional
+  COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_global_converter_maps.py --use-gaudi-algorithm --use-functional-checker --IOSvc.Input DATA{${PROJECT_SOURCE_DIR}/tests/input_files/ttbar_20240223_edm4hep.root} --IOSvc.Output=global_converter_maps_algorithm_functional.root
 )
 
 ExternalData_Add_Test( marlinwrapper_tests
   NAME link_conversion_edm4hep_to_lcio
-  COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_link_conversion_edm4hep.py --no-iosvc --inputfile DATA{${PROJECT_SOURCE_DIR}/tests/input_files/ttbar_20240223_edm4hep.root}
-)
-ExternalData_Add_Test( marlinwrapper_tests
-  NAME link_conversion_edm4hep_to_lcio_iosvc
   COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_link_conversion_edm4hep.py --inputfile DATA{${PROJECT_SOURCE_DIR}/tests/input_files/ttbar_20240223_edm4hep.root}
 )
 ExternalData_Add_Test( marlinwrapper_tests
-  NAME link_conversion_edm4hep_to_lcio_iosvc_gaudi_algorithm
+  NAME link_conversion_edm4hep_to_lcio_gaudi_algorithm
   COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_link_conversion_edm4hep.py --use-gaudi-algorithm --inputfile DATA{${PROJECT_SOURCE_DIR}/tests/input_files/ttbar_20240223_edm4hep.root}
 )
 
@@ -207,15 +192,9 @@ set_tests_properties(event_header_conversion_no_header
 ExternalData_Add_Target(marlinwrapper_tests)
 
 set_tests_properties(
-  clicRec clicRec_lcio_mt clicRec_edm4hep_input clicRec_edm4hep_input_iosvc
+  clicRec clicRec_lcio_mt clicRec_edm4hep_input
   PROPERTIES
   DEPENDS CLICPerformance_setup
-)
-
-set_tests_properties(
-  clicRec_edm4hep_input_compare_output
-  PROPERTIES
-  DEPENDS "clicRec_edm4hep_input;clicRec_edm4hep_input_iosvc"
 )
 
 

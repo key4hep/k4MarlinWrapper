@@ -26,15 +26,12 @@
 #include "edm4hep/utils/ParticleIDUtils.h"
 
 #include "k4FWCore/DataHandle.h"
-#include "k4FWCore/FunctionalUtils.h"
-#include "k4FWCore/MetaDataHandle.h"
-#include "k4FWCore/PodioDataSvc.h"
+#include <k4FWCore/MetadataUtils.h>
 
 #include "GaudiKernel/AnyDataWrapper.h"
 #include "GaudiKernel/IDataManagerSvc.h"
 #include "GaudiKernel/IDataProviderSvc.h"
 
-#include <functional>
 #include <memory>
 
 DECLARE_COMPONENT(EDM4hep2LcioTool);
@@ -69,16 +66,6 @@ StatusCode EDM4hep2LcioTool::initialize() {
     return StatusCode::FAILURE;
   }
 
-  m_podioDataSvc = dynamic_cast<PodioDataSvc*>(m_eventDataSvc.get());
-
-  if (!m_podioDataSvc) {
-    m_metadataSvc = service("MetadataSvc", false);
-    if (!m_metadataSvc) {
-      error() << "Could not retrieve MetadataSvc" << endmsg;
-      return StatusCode::FAILURE;
-    }
-  }
-
   return AlgTool::initialize();
 }
 
@@ -107,11 +94,10 @@ void EDM4hep2LcioTool::convertTrackerHits(TrackerHitMap& trackerhits_vec, const 
                                                                            this};
   const auto trackerhits_coll = trackerhits_handle.get();
 
-  k4FWCore::MetaDataHandle<std::string> cellIDStrHandle{trackerhits_handle, edm4hep::labels::CellIDEncoding,
-                                                        Gaudi::DataHandle::Reader};
+  const auto cellIDencoding = k4FWCore::getCellIDEncoding(trackerhits_handle.objKey(), this);
+  debug() << "Retrieved CellID encoding: " << cellIDencoding.value_or("<not-present>") << endmsg;
 
-  auto conv_trackerhits =
-      EDM4hep2LCIOConv::convertTrackerHits(trackerhits_coll, cellIDStrHandle.get(""), trackerhits_vec);
+  auto conv_trackerhits = EDM4hep2LCIOConv::convertTrackerHits(trackerhits_coll, cellIDencoding, trackerhits_vec);
 
   // Add all trackerhits to event
   lcio_event->addCollection(conv_trackerhits.release(), lcio_coll_name);
@@ -129,11 +115,10 @@ void EDM4hep2LcioTool::convertTrackerHitPlanes(TrackerHitPlaneMap& trackerhits_v
                                                                               this};
   const auto trackerhits_coll = trackerhits_handle.get();
 
-  k4FWCore::MetaDataHandle<std::string> cellIDStrHandle{trackerhits_handle, edm4hep::labels::CellIDEncoding,
-                                                        Gaudi::DataHandle::Reader};
+  const auto cellIDencoding = k4FWCore::getCellIDEncoding(trackerhits_handle.objKey(), this);
+  debug() << "Retrieved CellID encoding: " << cellIDencoding.value_or("<not-present>") << endmsg;
 
-  auto conv_trackerhits =
-      EDM4hep2LCIOConv::convertTrackerHitPlanes(trackerhits_coll, cellIDStrHandle.get(""), trackerhits_vec);
+  auto conv_trackerhits = EDM4hep2LCIOConv::convertTrackerHitPlanes(trackerhits_coll, cellIDencoding, trackerhits_vec);
 
   // Add all trackerhits to event
   lcio_event->addCollection(conv_trackerhits.release(), lcio_coll_name);
@@ -148,12 +133,11 @@ void EDM4hep2LcioTool::convertSimTrackerHits(SimTrackerHitMap& simtrackerhits_ve
                                                                                this};
   const auto simtrackerhits_coll = simtrackerhits_handle.get();
 
-  k4FWCore::MetaDataHandle<std::string> cellIDHandle{simtrackerhits_handle, edm4hep::labels::CellIDEncoding,
-                                                     Gaudi::DataHandle::Reader};
-  const auto cellIDstr = cellIDHandle.get();
+  const auto cellIDencoding = k4FWCore::getCellIDEncoding(simtrackerhits_handle.objKey(), this);
+  debug() << "Retrieved CellID encoding: " << cellIDencoding.value_or("<not-present>") << endmsg;
 
   auto conv_simtrackerhits =
-      EDM4hep2LCIOConv::convertSimTrackerHits(simtrackerhits_coll, cellIDstr, simtrackerhits_vec);
+      EDM4hep2LCIOConv::convertSimTrackerHits(simtrackerhits_coll, cellIDencoding, simtrackerhits_vec);
 
   // Add all simtrackerhits to event
   lcio_event->addCollection(conv_simtrackerhits.release(), lcio_coll_name);
@@ -168,11 +152,10 @@ void EDM4hep2LcioTool::convertCalorimeterHits(CaloHitMap& calo_hits_vec, const s
                                                                          this};
   const auto calohit_coll = calohit_handle.get();
 
-  k4FWCore::MetaDataHandle<std::string> cellIDHandle{calohit_handle, edm4hep::labels::CellIDEncoding,
-                                                     Gaudi::DataHandle::Reader};
-  const auto cellIDstr = cellIDHandle.get();
+  const auto cellIDencoding = k4FWCore::getCellIDEncoding(calohit_handle.objKey(), this);
+  debug() << "Retrieved CellID encoding: " << cellIDencoding.value_or("<not-present>") << endmsg;
 
-  auto conv_calohits = EDM4hep2LCIOConv::convertCalorimeterHits(calohit_coll, cellIDstr, calo_hits_vec);
+  auto conv_calohits = EDM4hep2LCIOConv::convertCalorimeterHits(calohit_coll, cellIDencoding, calo_hits_vec);
 
   // Add all Calorimeter Hits to event
   lcio_event->addCollection(conv_calohits.release(), lcio_coll_name);
@@ -202,12 +185,12 @@ void EDM4hep2LcioTool::convertSimCalorimeterHits(SimCaloHitMap& sim_calo_hits_ve
                                                                                 Gaudi::DataHandle::Reader, this};
   const auto simcalohit_coll = sim_calohit_handle.get();
 
-  k4FWCore::MetaDataHandle<std::string> cellIDHandle{sim_calohit_handle, edm4hep::labels::CellIDEncoding,
-                                                     Gaudi::DataHandle::Reader};
-  const auto cellIDstr = cellIDHandle.get();
+  const auto cellIDencoding = k4FWCore::getCellIDEncoding(sim_calohit_handle.objKey(), this);
+  debug() << "Retrieved CellID encoding: " << cellIDencoding.value_or("<not-present>") << endmsg;
 
   // TODO mcparticles_vdc
-  auto conv_simcalohits = EDM4hep2LCIOConv::convertSimCalorimeterHits(simcalohit_coll, cellIDstr, sim_calo_hits_vec);
+  auto conv_simcalohits =
+      EDM4hep2LCIOConv::convertSimCalorimeterHits(simcalohit_coll, cellIDencoding, sim_calo_hits_vec);
 
   // Add all Sim Calorimeter Hits to event
   lcio_event->addCollection(conv_simcalohits.release(), lcio_coll_name);
@@ -337,7 +320,6 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
                                   lcio::LCEventImpl* lcio_event, CollectionPairMappings& collection_pairs,
                                   std::vector<EDM4hep2LCIOConv::ParticleIDConvData>& pidCollections,
                                   std::vector<EDM4hep2LCIOConv::TrackDqdxConvData>& dQdxCollections) {
-  const auto& metadata = m_podioDataSvc->getMetaDataFrame();
   const auto collPtr = getEDM4hepCollection(e4h_coll_name);
   const auto fulltype = collPtr->getValueTypeName();
 
@@ -370,13 +352,7 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
   } else if (fulltype == "edm4hep::EventHeader") {
     convertEventHeader(e4h_coll_name, lcio_event);
   } else if (fulltype == "edm4hep::ParticleID") {
-    std::optional<edm4hep::utils::ParticleIDMeta> pidInfo;
-    if (m_podioDataSvc) {
-      pidInfo = edm4hep::utils::PIDHandler::getAlgoInfo(metadata, e4h_coll_name);
-    } else {
-      pidInfo = m_metadataSvc->get<edm4hep::utils::ParticleIDMeta>(e4h_coll_name);
-    }
-
+    const auto pidInfo = k4FWCore::getParameter<edm4hep::utils::ParticleIDMeta>(e4h_coll_name, this);
     pidCollections.emplace_back(e4h_coll_name, static_cast<const edm4hep::ParticleIDCollection*>(collPtr), pidInfo);
   } else if (fulltype == "edm4hep::RecDqDx") {
     dQdxCollections.emplace_back(e4h_coll_name, static_cast<const edm4hep::RecDqdxCollection*>(collPtr));
@@ -395,45 +371,10 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
   }
 }
 
-const podio::Frame& EDM4hep2LcioTool::getEDM4hepEvent() const {
-  debug() << "Retrieving EDM4hep event (Frame)" << endmsg;
-  if (m_podioDataSvc) {
-    debug() << "Getting it from PodioDataSvc" << endmsg;
-    return m_podioDataSvc->getEventFrame();
-  } else {
-    debug() << "Trying to get it from TES" << endmsg;
-    DataObject* p;
-    StatusCode code = m_eventDataSvc->retrieveObject("/Event" + k4FWCore::frameLocation, p);
-    if (code.isSuccess()) {
-      auto* frame = dynamic_cast<AnyDataWrapper<podio::Frame>*>(p);
-      return frame->getData();
-    }
-  }
-
-  // We can do this because the following assumptions are true:
-  // - We only end up here if we are using the IOSvc and we are NOT reading
-  //   EDM4hep data. Otherwise the Reader will be scheduled as FIRST algorithm,
-  //   most importantly BEFORE any of the wrapped Marlin processors to which
-  //   this converter is attached.
-  // - The empty Frame we introduce into the TES here does not interfere with
-  //   the Writer for EDM4hep output (which is always scheduled last), as that
-  //   will simply get this Frame instead of creating an empty one itself
-  // - There are no scheduling issues / race conditions, since the
-  //   MarlinProcessorWrapper algorithm is not re-entrant and can thus not be
-  //   run in parallel
-  debug() << "Could not retrieve Frame from expected location. Registering a new empty Frame into the TES" << endmsg;
-  auto tmp = new AnyDataWrapper<podio::Frame>(podio::Frame());
-  if (m_eventDataSvc->registerObject("/Event" + k4FWCore::frameLocation, tmp).isFailure()) {
-    error() << "Could not retrieve Frame from expected location in TES and could not register a new one" << endmsg;
-    throw std::runtime_error("Could not get EDM4hep event (Frame) for conversions");
-  }
-  return tmp->getData();
-}
-
 // Parse property parameters and convert the indicated collections.
 // Use the collection names in the parameters to read and write them
 StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
-  const auto& edmEvent = getEDM4hepEvent();
+  const auto& edmEvent = getEDM4hepEvent(this);
   // use m_collsToConvert to detect whether we run the first time and cache the
   // results as we can assume that all the events have the same contents
   if (m_collsToConvert.empty()) {
@@ -451,16 +392,6 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
 
     if (m_convertAll) {
       info() << "Converting all collections from EDM4hep to LCIO" << endmsg;
-      if (m_podioDataSvc) {
-        // If we have the PodioDataSvc get the collections available from frame
-        for (const auto& name : edmEvent.getAvailableCollections()) {
-          const auto& [_, inserted] = collNameMapping.emplace(name, name);
-          debug() << fmt::format("Adding '{}' from Frame to conversion? {}", name, inserted) << endmsg;
-        }
-      }
-      // Always check the contents of the TES because algorithms that do not use
-      // the PodioDataSvc (e.g. all Functional ones) go to the TES directly and
-      // the PodioDataSvc Frame doesn't now about them.
       std::optional<std::map<uint32_t, std::string>> idToNameOpt(std::move(m_idToName));
       for (const auto& name : getAvailableCollectionsFromStore(this, idToNameOpt)) {
         const auto& [_, inserted] = collNameMapping.emplace(name, name);
@@ -500,21 +431,16 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
   for (const auto& pidCollMeta : pidCollections) {
     auto algoId = attachParticleIDMetaData(lcio_event, edmEvent, pidCollMeta);
     if (!algoId.has_value()) {
-      // Now go over the collections that have been produced in a functional algorithm (if any)
-      bool found = false;
-      if (!m_podioDataSvc) {
-        const auto id = (*pidCollMeta.coll)[0].getParticle().id().collectionID;
-        if (auto it = m_idToName.find(id); it != m_idToName.end()) {
-          auto name = it->second;
-          if (pidCollMeta.metadata.has_value()) {
-            UTIL::PIDHandler pidHandler(lcio_event->getCollection(name));
-            algoId =
-                pidHandler.addAlgorithm(pidCollMeta.metadata.value().algoName, pidCollMeta.metadata.value().paramNames);
-            found = true;
-          }
+      // Check if we can figure out the collection from information on the TES
+      const auto id = (*pidCollMeta.coll)[0].getParticle().id().collectionID;
+      if (auto it = m_idToName.find(id); it != m_idToName.end()) {
+        auto name = it->second;
+        if (pidCollMeta.metadata.has_value()) {
+          UTIL::PIDHandler pidHandler(lcio_event->getCollection(name));
+          algoId =
+              pidHandler.addAlgorithm(pidCollMeta.metadata.value().algoName, pidCollMeta.metadata.value().paramNames);
         }
-      }
-      if (!found) {
+      } else {
         warning() << "Could not determine algorithm type for ParticleID collection " << pidCollMeta.name
                   << " for setting consistent metadata" << endmsg;
       }
