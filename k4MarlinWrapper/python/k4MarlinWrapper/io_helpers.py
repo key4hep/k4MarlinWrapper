@@ -76,6 +76,9 @@ class IOHandlerHelper:
         Args:
             input_files (list): The input files that should be read
         """
+        if not input_files:
+            return
+
         if input_files[0].endswith(".slcio"):
             if any(not f.endswith(".slcio") for f in input_files):
                 logger.error("All input files need to have the same format (LCIO)")
