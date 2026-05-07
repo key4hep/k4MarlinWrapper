@@ -64,7 +64,6 @@ private:
   Gaudi::Property<std::map<std::string, std::string>> m_collNames{this, "collNameMapping", {}};
   Gaudi::Property<bool> m_convertAll{this, "convertAll", true};
 
-  // EventDataSvc that is used together with IOSvc
   ServiceHandle<IDataProviderSvc> m_eventDataSvc;
   /// A (caching) "map" of original to new collection names that will be populated
   /// during the first conversion
