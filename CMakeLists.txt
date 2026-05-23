@@ -47,5 +47,5 @@ include(CTest)
 add_subdirectory(k4MarlinWrapper)
 
 if(BUILD_TESTING)
-  add_subdirectory(tests)
+  add_subdirectory(test)
 endif()
