@@ -241,3 +241,13 @@ add_custom_target(copy_directory ALL
   COMMENT "Copying k4MarlinWrapper python package after building all the libraries and plugins"
   DEPENDS MarlinTestProcessors
 )
+
+# Create an __init__.py in genConfDir/tests so it is treated as a regular Python
+# package and takes priority over any 'tests' package installed in site-packages
+# (e.g. from the LCG view), which would otherwise shadow GaudiTestAlgorithmsConf.
+add_custom_target(create_tests_init ALL
+  COMMAND ${CMAKE_COMMAND} -E touch
+    ${CMAKE_CURRENT_BINARY_DIR}/genConfDir/${CURRENT_DIR_NAME}/__init__.py
+  COMMENT "Creating __init__.py in genConfDir/${CURRENT_DIR_NAME} to avoid shadowing by installed 'tests' packages"
+  DEPENDS GaudiTestAlgorithms
+)
