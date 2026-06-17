@@ -28,6 +28,7 @@
 #include <edm4hep/utils/ParticleIDUtils.h>
 
 #include <k4FWCore/FunctionalUtils.h>
+#include <k4FWCore/IMetadataSvc.h>
 #include <k4FWCore/MetadataUtils.h>
 
 #include "GaudiKernel/AnyDataWrapper.h"
@@ -52,8 +53,18 @@ StatusCode Lcio2EDM4hepTool::finalize() {
   for (const auto& [key, value] : m_cellIDEncodings) {
     k4FWCore::putCellIDEncoding(key, value, this);
   }
-  for (const auto& [coll, pidMeta] : m_pidMetas) {
-    k4FWCore::putParameter(coll, pidMeta, this);
+  if (!m_pidMetas.empty()) {
+    // edm4hep::utils::ParticleIDMeta is not equality comparable, so it cannot
+    // go through k4FWCore::putParameter. Store it via the dedicated
+    // IMetadataSvc::put specialization (PIDHandler::setAlgoInfo) instead.
+    auto metadataSvc = service<IMetadataSvc>("MetadataSvc", false);
+    if (!metadataSvc) {
+      error() << "MetadataSvc not found, cannot store ParticleID metadata" << endmsg;
+      return StatusCode::FAILURE;
+    }
+    for (const auto& [coll, pidMeta] : m_pidMetas) {
+      metadataSvc->put(coll, pidMeta);
+    }
   }
   return AlgTool::finalize();
 }
