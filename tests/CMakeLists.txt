@@ -30,8 +30,6 @@ gaudi_add_module(GaudiTestAlgorithms
     EDM4HEP::edm4hep
 )
 
-find_program(K4RUN k4run)
-
 include(ExternalData)
 set(ExternalData_URL_TEMPLATES
  "https://key4hep.web.cern.ch:443/testFiles/ddsimOutput/%(hash)"
@@ -49,10 +47,10 @@ target_link_libraries(MarlinTestProcessors PUBLIC ${Marlin_LIBRARIES})
 target_include_directories(MarlinTestProcessors PUBLIC ${Marlin_INCLUDE_DIRS})
 
 # Test simple processors
-ExternalData_Add_Test( marlinwrapper_tests NAME simple_processors COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/simple_processors.py --LcioEvent.Files DATA{${PROJECT_SOURCE_DIR}/tests/input_files/muons.slcio})
+ExternalData_Add_Test( marlinwrapper_tests NAME simple_processors COMMAND k4run ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/simple_processors.py --LcioEvent.Files DATA{${PROJECT_SOURCE_DIR}/tests/input_files/muons.slcio})
 
 # Test simple_processors2
-ExternalData_Add_Test( marlinwrapper_tests NAME simple_processors2 COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/simple_processors2.py --LcioEvent.Files DATA{${PROJECT_SOURCE_DIR}/tests/input_files/testSimulation.slcio})
+ExternalData_Add_Test( marlinwrapper_tests NAME simple_processors2 COMMAND k4run ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/simple_processors2.py --LcioEvent.Files DATA{${PROJECT_SOURCE_DIR}/tests/input_files/testSimulation.slcio})
 
 ExternalData_Add_Test( marlinwraper_tests NAME convert_empty_parameters
   COMMAND bash -c "${CMAKE_CURRENT_SOURCE_DIR}/scripts/convert_empty_parameters.sh DATA{${PROJECT_SOURCE_DIR}/tests/input_files/testSimulation.slcio}"
@@ -69,10 +67,10 @@ ExternalData_Add_Test( marlinwrapper_tests NAME clicRec COMMAND bash -c "${CMAKE
 add_test( converter_constants bash -c ${CMAKE_CURRENT_SOURCE_DIR}/scripts/converter_constants.sh )
 
 # Test indicating -1 to go over all events
-ExternalData_Add_Test( marlinwrapper_tests NAME all_events_bounds COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/simple_processors.py --num-events=-1 --LcioEvent.Files DATA{${PROJECT_SOURCE_DIR}/tests/input_files/muons.slcio})
+ExternalData_Add_Test( marlinwrapper_tests NAME all_events_bounds COMMAND k4run ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/simple_processors.py --num-events=-1 --LcioEvent.Files DATA{${PROJECT_SOURCE_DIR}/tests/input_files/muons.slcio})
 
 # Test putting more events than available, stopping on last available event gracefully
-ExternalData_Add_Test( marlinwrapper_tests NAME over_total_events COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/simple_processors.py --num-events=15 --LcioEvent.Files DATA{${PROJECT_SOURCE_DIR}/tests/input_files/muons.slcio})
+ExternalData_Add_Test( marlinwrapper_tests NAME over_total_events COMMAND k4run ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/simple_processors.py --num-events=15 --LcioEvent.Files DATA{${PROJECT_SOURCE_DIR}/tests/input_files/muons.slcio})
 set_tests_properties ( over_total_events
   PROPERTIES
     PASS_REGULAR_EXPRESSION "Application Manager Terminated successfully with a user requested ScheduledStop")
@@ -95,80 +93,80 @@ ExternalData_Add_Test( marlinwrapper_tests NAME clicRec_edm4hep_input COMMAND ba
 ExternalData_Add_Test( marlinwrapper_tests NAME clicRec_lcio_mt COMMAND bash -c "${CMAKE_CURRENT_SOURCE_DIR}/scripts/clicRec_lcio_mt.sh DATA{${PROJECT_SOURCE_DIR}/tests/input_files/testSimulation.slcio}")
 
 # Test the GeoSvc and TrackingCellIDEncodingSvc
-add_test( clic_geo_test ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/geoTest_cld.py )
+add_test( clic_geo_test k4run ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/geoTest_cld.py )
 
 # Test for checking whether the converters can resolve relations across
 # multiple processors
 ExternalData_Add_Test( marlinwrapper_tests
   NAME global_converter_maps
-  COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_global_converter_maps.py --IOSvc.Input DATA{${PROJECT_SOURCE_DIR}/tests/input_files/ttbar_20240223_edm4hep.root}
+  COMMAND k4run ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_global_converter_maps.py --IOSvc.Input DATA{${PROJECT_SOURCE_DIR}/tests/input_files/ttbar_20240223_edm4hep.root}
 )
 ExternalData_Add_Test( marlinwrapper_tests
   NAME global_converter_maps_functional
-  COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_global_converter_maps.py --use-functional-checker --IOSvc.Input DATA{${PROJECT_SOURCE_DIR}/tests/input_files/ttbar_20240223_edm4hep.root}
+  COMMAND k4run ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_global_converter_maps.py --use-functional-checker --IOSvc.Input DATA{${PROJECT_SOURCE_DIR}/tests/input_files/ttbar_20240223_edm4hep.root}
 )
 ExternalData_Add_Test( marlinwrapper_tests
   NAME global_converter_maps_algorithm
-  COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_global_converter_maps.py --use-gaudi-algorithm --IOSvc.Input DATA{${PROJECT_SOURCE_DIR}/tests/input_files/ttbar_20240223_edm4hep.root} --IOSvc.Output=global_converter_maps_algorithm.root
+  COMMAND k4run ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_global_converter_maps.py --use-gaudi-algorithm --IOSvc.Input DATA{${PROJECT_SOURCE_DIR}/tests/input_files/ttbar_20240223_edm4hep.root} --IOSvc.Output=global_converter_maps_algorithm.root
 )
 ExternalData_Add_Test( marlinwrapper_tests
   NAME global_converter_maps_algorithm_functional
-  COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_global_converter_maps.py --use-gaudi-algorithm --use-functional-checker --IOSvc.Input DATA{${PROJECT_SOURCE_DIR}/tests/input_files/ttbar_20240223_edm4hep.root} --IOSvc.Output=global_converter_maps_algorithm_functional.root
+  COMMAND k4run ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_global_converter_maps.py --use-gaudi-algorithm --use-functional-checker --IOSvc.Input DATA{${PROJECT_SOURCE_DIR}/tests/input_files/ttbar_20240223_edm4hep.root} --IOSvc.Output=global_converter_maps_algorithm_functional.root
 )
 
 ExternalData_Add_Test( marlinwrapper_tests
   NAME link_conversion_edm4hep_to_lcio
-  COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_link_conversion_edm4hep.py --inputfile DATA{${PROJECT_SOURCE_DIR}/tests/input_files/ttbar_20240223_edm4hep.root}
+  COMMAND k4run ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_link_conversion_edm4hep.py --inputfile DATA{${PROJECT_SOURCE_DIR}/tests/input_files/ttbar_20240223_edm4hep.root}
 )
 ExternalData_Add_Test( marlinwrapper_tests
   NAME link_conversion_edm4hep_to_lcio_gaudi_algorithm
-  COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_link_conversion_edm4hep.py --use-gaudi-algorithm --inputfile DATA{${PROJECT_SOURCE_DIR}/tests/input_files/ttbar_20240223_edm4hep.root}
+  COMMAND k4run ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_link_conversion_edm4hep.py --use-gaudi-algorithm --inputfile DATA{${PROJECT_SOURCE_DIR}/tests/input_files/ttbar_20240223_edm4hep.root}
 )
 
 # ---- IO Helpers tests
 ExternalData_Add_Test( marlinwrapper_tests
   NAME io_helpers_lcio_marlin_only
-  COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_io_utilities.py --inputfile DATA{${PROJECT_SOURCE_DIR}/tests/input_files/muons.slcio} --output-type lcio --outputbase lcio_marlin_only
+  COMMAND k4run ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_io_utilities.py --inputfile DATA{${PROJECT_SOURCE_DIR}/tests/input_files/muons.slcio} --output-type lcio --outputbase lcio_marlin_only
 )
 
 ExternalData_Add_Test( marlinwrapper_tests
   NAME io_helpers_edm4hep_marlin_only
-  COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_io_utilities.py --inputfile DATA{${PROJECT_SOURCE_DIR}/tests/input_files/ttbar_20240223_edm4hep.root} --output-type edm4hep --outputbase edm4hep_marlin_only
+  COMMAND k4run ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_io_utilities.py --inputfile DATA{${PROJECT_SOURCE_DIR}/tests/input_files/ttbar_20240223_edm4hep.root} --output-type edm4hep --outputbase edm4hep_marlin_only
 )
 
 ExternalData_Add_Test( marlinwrapper_tests
   NAME io_helpers_lcio_in_edm4hep_out_marlin_only
-  COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_io_utilities.py --inputfile DATA{${PROJECT_SOURCE_DIR}/tests/input_files/muons.slcio} --output-type edm4hep --outputbase lcio_in_edm4hep_out_marlin_only
+  COMMAND k4run ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_io_utilities.py --inputfile DATA{${PROJECT_SOURCE_DIR}/tests/input_files/muons.slcio} --output-type edm4hep --outputbase lcio_in_edm4hep_out_marlin_only
 )
 
 ExternalData_Add_Test( marlinwrapper_tests
   NAME io_helpers_edm4hep_in_lcio_out_marlin_only
-  COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_io_utilities.py --inputfile DATA{${PROJECT_SOURCE_DIR}/tests/input_files/ttbar_20240223_edm4hep.root} --output-type lcio --outputbase edm4hep_in_lcio_out_marlin_only
+  COMMAND k4run ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_io_utilities.py --inputfile DATA{${PROJECT_SOURCE_DIR}/tests/input_files/ttbar_20240223_edm4hep.root} --output-type lcio --outputbase edm4hep_in_lcio_out_marlin_only
 )
 
 ExternalData_Add_Test( marlinwrapper_tests
   NAME io_helpers_lcio_marlin_gaudi
-  COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_io_utilities.py --inputfile DATA{${PROJECT_SOURCE_DIR}/tests/input_files/muons.slcio} --with-gaudi-algorithm --output-type lcio --outputbase lcio_marlin_gaudi
+  COMMAND k4run ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_io_utilities.py --inputfile DATA{${PROJECT_SOURCE_DIR}/tests/input_files/muons.slcio} --with-gaudi-algorithm --output-type lcio --outputbase lcio_marlin_gaudi
 )
 
 ExternalData_Add_Test( marlinwrapper_tests
   NAME io_helpers_edm4hep_marlin_gaudi
-  COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_io_utilities.py --inputfile DATA{${PROJECT_SOURCE_DIR}/tests/input_files/ttbar_20240223_edm4hep.root} --with-gaudi-algorithm --output-type edm4hep --outputbase edm4hep_marlin_gaudi
+  COMMAND k4run ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_io_utilities.py --inputfile DATA{${PROJECT_SOURCE_DIR}/tests/input_files/ttbar_20240223_edm4hep.root} --with-gaudi-algorithm --output-type edm4hep --outputbase edm4hep_marlin_gaudi
 )
 
 ExternalData_Add_Test( marlinwrapper_tests
   NAME io_helpers_edm4hep_both_out_marlin_gaudi
-  COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_io_utilities.py --inputfile DATA{${PROJECT_SOURCE_DIR}/tests/input_files/ttbar_20240223_edm4hep.root} --with-gaudi-algorithm --output-type both --outputbase edm4hep_both_out_marlin_gaudi
+  COMMAND k4run ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_io_utilities.py --inputfile DATA{${PROJECT_SOURCE_DIR}/tests/input_files/ttbar_20240223_edm4hep.root} --with-gaudi-algorithm --output-type both --outputbase edm4hep_both_out_marlin_gaudi
 )
 
 ExternalData_Add_Test( marlinwrapper_tests
   NAME lcio_event_only
-  COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/lcio_event_only.py --inputfile DATA{${PROJECT_SOURCE_DIR}/tests/input_files/muons.slcio}
+  COMMAND k4run ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/lcio_event_only.py --inputfile DATA{${PROJECT_SOURCE_DIR}/tests/input_files/muons.slcio}
 )
 
 ExternalData_Add_Test( marlinwrapper_tests
   NAME partial_edm4hep_to_lcio
-  COMMAND ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_partial_conversion.py --inputfile DATA{${PROJECT_SOURCE_DIR}/tests/input_files/ttbar_20240223_edm4hep.root}
+  COMMAND k4run ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_partial_conversion.py --inputfile DATA{${PROJECT_SOURCE_DIR}/tests/input_files/ttbar_20240223_edm4hep.root}
 )
 
 add_test(check_lcio_output_partial_conversion
@@ -183,7 +181,7 @@ set_tests_properties(
 
 add_test( event_header_conversion bash -c "k4run ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/createEventHeader.py && anajob test.slcio | grep 'EVENT: 42'" )
 
-add_test(event_header_conversion_no_header ${K4RUN} ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/createEventHeader.py --no-event-header )
+add_test(event_header_conversion_no_header k4run ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/createEventHeader.py --no-event-header )
 set_tests_properties(event_header_conversion_no_header
   PROPERTIES
   PASS_REGULAR_EXPRESSION "INFO The EventHeader collection is not available. Not converting it."
