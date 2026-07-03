@@ -76,9 +76,6 @@ MarlinProcessorWrapper::MarlinProcessorWrapper(const std::string& name, ISvcLoca
   streamlog::out.addLevelName<streamlog::ERROR8>();
   streamlog::out.addLevelName<streamlog::ERROR9>();
   streamlog::out.addLevelName<streamlog::SILENT>();
-
-  declareProperty("EDM4hep2LcioTool", m_edm_conversionTool);
-  declareProperty("Lcio2EDM4hepTool", m_lcio_conversionTool);
 }
 
 StatusCode MarlinProcessorWrapper::loadProcessorLibraries() const {

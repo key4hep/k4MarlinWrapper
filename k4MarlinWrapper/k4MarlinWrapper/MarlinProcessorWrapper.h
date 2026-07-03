@@ -74,8 +74,8 @@ private:
   Gaudi::Property<std::string> m_processorType{this, "ProcessorType", {}};
   Gaudi::Property<std::map<std::string, std::vector<std::string>>> m_parameters{this, "Parameters", {}};
 
-  mutable ToolHandle<IEDMConverter> m_edm_conversionTool{"IEDMConverter/EDM4hep2Lcio", this};
-  mutable ToolHandle<IEDMConverter> m_lcio_conversionTool{"IEDMConverter/Lcio2EDM4hep", this};
+  mutable ToolHandle<IEDMConverter> m_edm_conversionTool{this, "EDM4hep2LcioTool", ""};
+  mutable ToolHandle<IEDMConverter> m_lcio_conversionTool{this, "Lcio2EDM4hepTool", ""};
 
   static std::stack<marlin::Processor*>& ProcessorStack();
 
