@@ -37,7 +37,10 @@ def _is_wrapped_proc_without_conv(alg, from_edm, to_edm):
     """Check if this algorithm has a configured (i.e. named) converter attached
     for the direction described by from_edm and to_edm"""
     if isinstance(alg, MarlinProcessorWrapper):
-        if not getattr(alg, f"{from_edm}2{to_edm}Tool").getName():
+        try:
+            if not getattr(alg, f"{from_edm}2{to_edm}Tool").getName():
+                return True
+        except (AttributeError, RuntimeError):
             return True
 
     return False
