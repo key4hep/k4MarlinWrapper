@@ -40,7 +40,7 @@ def _is_wrapped_proc_without_conv(alg, from_edm, to_edm):
         try:
             if not getattr(alg, f"{from_edm}2{to_edm}Tool").getName():
                 return True
-        except (AttributeError, RuntimeError):
+        except AttributeError:
             return True
 
     return False
