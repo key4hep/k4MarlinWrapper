@@ -432,17 +432,22 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
     auto algoId = attachParticleIDMetaData(lcio_event, edmEvent, pidCollMeta);
     if (!algoId.has_value()) {
       // Check if we can figure out the collection from information on the TES
-      const auto id = (*pidCollMeta.coll)[0].getParticle().id().collectionID;
-      if (auto it = m_idToName.find(id); it != m_idToName.end()) {
-        auto name = it->second;
-        if (pidCollMeta.metadata.has_value()) {
-          UTIL::PIDHandler pidHandler(lcio_event->getCollection(name));
-          algoId =
-              pidHandler.addAlgorithm(pidCollMeta.metadata.value().algoName, pidCollMeta.metadata.value().paramNames);
+      if (!pidCollMeta.coll->empty()) {
+        const auto id = (*pidCollMeta.coll)[0].getParticle().id().collectionID;
+        if (auto it = m_idToName.find(id); it != m_idToName.end()) {
+          auto name = it->second;
+          if (pidCollMeta.metadata.has_value()) {
+            UTIL::PIDHandler pidHandler(lcio_event->getCollection(name));
+            algoId =
+                pidHandler.addAlgorithm(pidCollMeta.metadata.value().algoName, pidCollMeta.metadata.value().paramNames);
+          }
+        } else {
+          warning() << "Could not determine algorithm type for ParticleID collection " << pidCollMeta.name
+                    << " for setting consistent metadata" << endmsg;
         }
       } else {
-        warning() << "Could not determine algorithm type for ParticleID collection " << pidCollMeta.name
-                  << " for setting consistent metadata" << endmsg;
+        warning() << "Could not determine algorithm type for empty ParticleID collection " << pidCollMeta.name
+                  << endmsg;
       }
     }
     convertParticleIDs(collection_pairs.particleIDs, pidCollMeta.name, algoId.value_or(-1));
