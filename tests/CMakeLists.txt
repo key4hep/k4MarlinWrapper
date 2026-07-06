@@ -19,6 +19,7 @@ limitations under the License.
 
 gaudi_add_module(GaudiTestAlgorithms
   SOURCES
+    src/PIDProducer.cc
     src/MCRecoLinkChecker.cc
     src/MCRecoLinkCheckerFunctional.cc
     src/PseudoRecoAlgorithm.cc
@@ -185,6 +186,14 @@ add_test(event_header_conversion_no_header k4run ${CMAKE_CURRENT_SOURCE_DIR}/gau
 set_tests_properties(event_header_conversion_no_header
   PROPERTIES
   PASS_REGULAR_EXPRESSION "INFO The EventHeader collection is not available. Not converting it."
+)
+
+# Test converting empty and non-empty ParticleID collections (with metadata)
+# through the Gaudi EDM4hep2LcioTool
+add_test( pid_gaudi k4run ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/test_pid_gaudi.py )
+set_tests_properties( pid_gaudi
+  PROPERTIES
+  PASS_REGULAR_EXPRESSION "Application Manager Terminated successfully"
 )
 
 ExternalData_Add_Target(marlinwrapper_tests)
