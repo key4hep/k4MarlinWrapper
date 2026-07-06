@@ -17,68 +17,80 @@
  * limitations under the License.
  */
 
-#include "PIDProducer.h"
+#include "k4FWCore/MetadataUtils.h"
+#include "k4FWCore/Transformer.h"
 
 #include "edm4hep/ParticleIDCollection.h"
 #include "edm4hep/ReconstructedParticleCollection.h"
 #include "edm4hep/utils/ParticleIDUtils.h"
 
-#include "k4FWCore/MetadataUtils.h"
-
-#include "Gaudi/Algorithm.h"
+#include "Gaudi/Property.h"
 
 #include <cstddef>
 #include <string>
+#include <tuple>
+#include <vector>
 
-PIDProducer::PIDProducer(const std::string& name, ISvcLocator* pSL) : Gaudi::Algorithm(name, pSL) {
-  declareProperty("OutputRecoColl", m_recoCollHandle, "Name of the output ReconstructedParticle collection");
-  declareProperty("OutputPIDColl", m_pidCollHandle, "Name of the output empty ParticleID collection");
-  declareProperty("OutputFilledPIDColl", m_filledPidCollHandle,
-                  "Name of the output non-empty ParticleID collection linked to the ReconstructedParticles");
-}
+using retType =
+    std::tuple<edm4hep::ReconstructedParticleCollection, edm4hep::ParticleIDCollection, edm4hep::ParticleIDCollection>;
 
-StatusCode PIDProducer::initialize() {
-  if (Gaudi::Algorithm::initialize().isFailure()) {
-    return StatusCode::FAILURE;
+/// Produce ReconstructedParticles, a non-empty ParticleID collection linked to
+/// them (with consistent metadata) and an empty ParticleID collection, so that
+/// both the non-empty and the empty ParticleID conversion paths can be tested.
+struct PIDProducer final : k4FWCore::MultiTransformer<retType()> {
+  PIDProducer(const std::string& name, ISvcLocator* svcLoc)
+      : MultiTransformer(name, svcLoc, {},
+                         {KeyValue("OutputRecoColl", "RecoParticles"), KeyValue("OutputFilledPIDColl", "ParticleIDs"),
+                          KeyValue("OutputPIDColl", "EmptyParticleIDs")}) {}
+
+  StatusCode initialize() override {
+    m_pidMeta = {m_pidAlgoName, m_pidParamNames};
+    // The metadata has to be attached to both ParticleID collections before the
+    // event loop starts, so that the EDM4hep2Lcio conversion can pick it up
+    k4FWCore::putParameter(outputLocations("OutputFilledPIDColl")[0], m_pidMeta, this);
+    k4FWCore::putParameter(outputLocations("OutputPIDColl")[0], m_pidMeta, this);
+    return StatusCode::SUCCESS;
   }
 
-  m_pidMeta = {m_pidAlgoName, m_pidParamNames};
-  // The metadata has to be attached to both ParticleID collections before the
-  // event loop starts, so that the EDM4hep2Lcio conversion can pick it up
-  k4FWCore::putParameter(m_filledPidCollHandle.objKey(), m_pidMeta, this);
-  k4FWCore::putParameter(m_pidCollHandle.objKey(), m_pidMeta, this);
-
-  return StatusCode::SUCCESS;
-}
-
-StatusCode PIDProducer::execute(const EventContext&) const {
-  // Create a non-empty ReconstructedParticle collection that the non-empty
-  // ParticleID collection can point to
-  auto* recoColl = m_recoCollHandle.createAndPut();
-  for (int i = 0; i < m_numRecos; ++i) {
-    auto reco = recoColl->create();
-    reco.setCharge(1.0f);
-    reco.setPDG(11);
-    reco.setEnergy(static_cast<float>(i + 1));
-    reco.setMomentum({static_cast<float>(i + 1), 2.0f, 3.0f});
-  }
-
-  // Create a non-empty ParticleID collection linked to the ReconstructedParticles
-  auto* filledPidColl = m_filledPidCollHandle.createAndPut();
-  for (const auto& reco : *recoColl) {
-    auto pid = filledPidColl->create();
-    pid.setAlgorithmType(m_pidMeta.algoType());
-    pid.setPDG(reco.getPDG());
-    pid.setParticle(reco);
-    for (std::size_t i = 0; i < m_pidMeta.paramNames.size(); ++i) {
-      pid.addToParameters(static_cast<float>(i) * 0.5f);
+  retType operator()() const override {
+    // Create a non-empty ReconstructedParticle collection that the non-empty
+    // ParticleID collection can point to
+    auto recoColl = edm4hep::ReconstructedParticleCollection{};
+    for (int i = 0; i < m_numRecos; ++i) {
+      auto reco = recoColl.create();
+      reco.setCharge(1.0f);
+      reco.setPDG(11);
+      reco.setEnergy(static_cast<float>(i + 1));
+      reco.setMomentum({static_cast<float>(i + 1), 2.0f, 3.0f});
     }
+
+    // Create a non-empty ParticleID collection linked to the ReconstructedParticles
+    auto filledPidColl = edm4hep::ParticleIDCollection{};
+    for (const auto& reco : recoColl) {
+      auto pid = filledPidColl.create();
+      pid.setAlgorithmType(m_pidMeta.algoType());
+      pid.setPDG(reco.getPDG());
+      pid.setParticle(reco);
+      for (std::size_t i = 0; i < m_pidMeta.paramNames.size(); ++i) {
+        pid.addToParameters(static_cast<float>(i) * 0.5f);
+      }
+    }
+
+    // Also produce an empty ParticleID collection to exercise the empty conversion path
+    auto emptyPidColl = edm4hep::ParticleIDCollection{};
+
+    return std::make_tuple(std::move(recoColl), std::move(filledPidColl), std::move(emptyPidColl));
   }
 
-  // Create an empty ParticleID collection to also exercise the empty conversion path
-  m_pidCollHandle.createAndPut();
+private:
+  Gaudi::Property<int> m_numRecos{this, "NumRecoParticles", 3,
+                                  "Number of ReconstructedParticles (and non-empty ParticleIDs) to produce"};
+  Gaudi::Property<std::string> m_pidAlgoName{this, "PIDAlgoName", "testPIDAlgo",
+                                             "Name of the ParticleID algorithm stored in the metadata"};
+  Gaudi::Property<std::vector<std::string>> m_pidParamNames{
+      this, "PIDParamNames", {"param1", "param2"}, "Names of the ParticleID parameters stored in the metadata"};
 
-  return StatusCode::SUCCESS;
-}
+  edm4hep::utils::ParticleIDMeta m_pidMeta{};
+};
 
 DECLARE_COMPONENT(PIDProducer)
