@@ -34,9 +34,6 @@
 using retType =
     std::tuple<edm4hep::ReconstructedParticleCollection, edm4hep::ParticleIDCollection, edm4hep::ParticleIDCollection>;
 
-/// Produce ReconstructedParticles, a non-empty ParticleID collection linked to
-/// them (with consistent metadata) and an empty ParticleID collection, so that
-/// both the non-empty and the empty ParticleID conversion paths can be tested.
 struct PIDProducer final : k4FWCore::MultiTransformer<retType()> {
   PIDProducer(const std::string& name, ISvcLocator* svcLoc)
       : MultiTransformer(name, svcLoc, {},
@@ -45,8 +42,6 @@ struct PIDProducer final : k4FWCore::MultiTransformer<retType()> {
 
   StatusCode initialize() override {
     m_pidMeta = {m_pidAlgoName, m_pidParamNames};
-    // The metadata has to be attached to both ParticleID collections before the
-    // event loop starts, so that the EDM4hep2Lcio conversion can pick it up
     k4FWCore::putParameter(outputLocations("OutputFilledPIDColl")[0], m_pidMeta, this);
     k4FWCore::putParameter(outputLocations("OutputPIDColl")[0], m_pidMeta, this);
     return StatusCode::SUCCESS;
