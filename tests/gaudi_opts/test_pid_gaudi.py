@@ -33,9 +33,6 @@ iosvc = IOSvc()
 # metadata that is attached to the produced ParticleID collections
 metadataSvc = MetadataSvc("MetadataSvc")
 
-# Produce ReconstructedParticles, a non-empty ParticleID collection linked to
-# them (with proper metadata) and an empty ParticleID collection, so that both
-# the non-empty and the empty ParticleID conversion paths are tested
 pidProd = PIDProducer(
     "PIDProducer",
     OutputRecoColl="RecoParticles",
