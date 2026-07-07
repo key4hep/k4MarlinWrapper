@@ -29,8 +29,6 @@ from k4FWCore import ApplicationMgr, IOSvc
 
 iosvc = IOSvc()
 
-# The MetadataSvc is necessary to store / retrieve the ParticleID algorithm
-# metadata that is attached to the produced ParticleID collections
 metadataSvc = MetadataSvc("MetadataSvc")
 
 pidProd = PIDProducer(
