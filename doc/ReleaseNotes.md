@@ -1,3 +1,38 @@
+# v00-15
+
+* 2026-07-07 Juan Miguel Carceller ([PR#487](https://github.com/key4hep/k4MarlinWrapper/pull/487))
+  - Fix a crash when converting empty PID collections by checking first if the collection is empty.
+  - Add a test that converts PID collections (empty and non-empty) from EDM4hep to LCIO to trigger the crash in #483. 
+  - Fix another issue with collection names in `StoreUtils.cpp` in a path that seems not to have been called before. Do not keep the leading `/` to avoid looking for `/<Collection>`, which will never be found.
+
+* 2026-07-06 Juan Miguel Carceller ([PR#486](https://github.com/key4hep/k4MarlinWrapper/pull/486))
+  - Delete the file simple_processors3.py, that is not used
+
+* 2026-07-05 Juan Miguel Carceller ([PR#484](https://github.com/key4hep/k4MarlinWrapper/pull/484))
+  - Do not assign `=` in properties since it doesn't compile with newer versions of Gaudi (after 40.4, see https://gitlab.cern.ch/gaudi/Gaudi/-/merge_requests/1938)
+  - Add a check in `io_helpers.py` to catch when there is no converter, now throws an exception when the converter is not set.
+
+* 2026-07-03 Juan Miguel Carceller ([PR#485](https://github.com/key4hep/k4MarlinWrapper/pull/485))
+  - Use k4run directly in tests to be consistent everywhere
+
+* 2026-05-23 Juan Miguel Carceller ([PR#481](https://github.com/key4hep/k4MarlinWrapper/pull/481))
+  - Fix a few deprecation warnings for the checkout action, pin hash
+
+* 2026-05-23 Juan Miguel Carceller ([PR#480](https://github.com/key4hep/k4MarlinWrapper/pull/480))
+  - Create an `__init__.py` file to fix the nightlies in LCG stacks
+
+* 2026-05-07 Juan Miguel Carceller ([PR#479](https://github.com/key4hep/k4MarlinWrapper/pull/479))
+  - Return when there are no input files to allow using -h
+
+* 2026-05-07 Thomas Madlener ([PR#475](https://github.com/key4hep/k4MarlinWrapper/pull/475))
+  - Remove support for running the wrapper with legacy I/O components since they will be removed with [k4FWCore#392](https://github.com/key4hep/k4FWCore/pull/392)
+
+* 2026-04-29 Juan Miguel Carceller ([PR#478](https://github.com/key4hep/k4MarlinWrapper/pull/478))
+  - Set the CellID encoding parameters at `finalize` in `Lcio2EDM4hep.cpp`
+
+* 2026-04-16 Thomas Madlener ([PR#476](https://github.com/key4hep/k4MarlinWrapper/pull/476))
+  - Make doctest and pre-commit workflows triggerable by dispatch
+
 # v00-14
 
 * 2026-01-16 Thomas Madlener ([PR#472](https://github.com/key4hep/k4MarlinWrapper/pull/472))
