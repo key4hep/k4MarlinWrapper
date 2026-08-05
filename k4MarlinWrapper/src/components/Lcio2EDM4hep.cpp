@@ -83,9 +83,6 @@ void Lcio2EDM4hepTool::registerCollection(
   auto wrapper = new AnyDataWrapper<std::unique_ptr<podio::CollectionBase>>(std::move(e4hColl));
   // No need to check for pre-existing collections, since we only ever end up
   // here if that is not the case
-  // NOTE: This also takes care of assigning a collectionID
-  auto wrapper = new DataWrapper<podio::CollectionBase>();
-  wrapper->setData(e4hColl.release());
   auto sc = m_eventDataSvc->registerObject("/Event", "/" + std::string(name), wrapper);
   if (sc == StatusCode::FAILURE) {
     error() << "Could not register collection " << name << endmsg;
