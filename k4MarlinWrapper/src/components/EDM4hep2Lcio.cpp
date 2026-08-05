@@ -32,6 +32,12 @@
 #include "GaudiKernel/IDataManagerSvc.h"
 #include "GaudiKernel/IDataProviderSvc.h"
 
+#include <IMPL/LCEventImpl.h>
+#include <fmt/format.h>
+#include <fmt/ranges.h>
+
+#include <functional>
+#include <k4EDM4hep2LcioConv/k4EDM4hep2LcioConv.h>
 #include <memory>
 
 DECLARE_COMPONENT(EDM4hep2LcioTool);
@@ -363,11 +369,9 @@ void EDM4hep2LcioTool::convertAdd(const std::string& e4h_coll_name, const std::s
             << "SimCalorimeterHit collection to be converted in order to be able to attach to them" << endmsg;
   } else {
     warning() << "Error trying to convert requested " << fulltype << " with name " << e4h_coll_name << endmsg;
-    warning() << "List of supported types: "
-              << "Track, TrackerHit3D, TrackerHitPlane, SimTrackerHit, "
-              << "Cluster, CalorimeterHit, RawCalorimeterHit, "
-              << "SimCalorimeterHit, Vertex, ReconstructedParticle, "
-              << "MCParticle." << endmsg;
+    warning() << "List of supported types: Track, TrackerHit3D, TrackerHitPlane, SimTrackerHit, Cluster, "
+              << "CalorimeterHit, RawCalorimeterHit, SimCalorimeterHit, Vertex, ReconstructedParticle, MCParticle."
+              << endmsg;
   }
 }
 
@@ -385,7 +389,7 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
     // We *always* want to convert the EventHeader (iff it's available)
     if (getEDM4hepCollection(edm4hep::labels::EventHeader, true)) {
       debug() << edm4hep::labels::EventHeader << " collection available. Converting it." << endmsg;
-      m_collsToConvert.emplace_back(edm4hep::labels::EventHeader, "<directly into LCEvent>");
+      m_collsToConvert.emplace(edm4hep::labels::EventHeader, "<directly into LCEvent>");
     } else {
       info() << "The " << edm4hep::labels::EventHeader << " collection is not available. Not converting it." << endmsg;
     }
@@ -400,7 +404,7 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
       m_idToName = std::move(idToNameOpt.value());
     }
     for (auto&& [origName, newName] : collNameMapping) {
-      m_collsToConvert.emplace_back(std::move(origName), std::move(newName));
+      m_collsToConvert.emplace(std::move(origName), std::move(newName));
     }
   }
 
@@ -427,17 +431,22 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
   debug() << "Event: " << lcio_event->getEventNumber() << " Run: " << lcio_event->getRunNumber() << endmsg;
 
   EDM4hep2LCIOConv::sortParticleIDs(pidCollections);
-
   for (const auto& pidCollMeta : pidCollections) {
     auto algoId = attachParticleIDMetaData(lcio_event, edmEvent, pidCollMeta);
     if (!algoId.has_value()) {
       // Check if we can figure out the collection from information on the TES
       if (!pidCollMeta.coll->empty()) {
         const auto id = (*pidCollMeta.coll)[0].getParticle().id().collectionID;
-        if (auto it = m_idToName.find(id); it != m_idToName.end()) {
-          auto name = it->second;
+        debug() << fmt::format(
+                       "Using {:0>8x} as collection id to lookup LCIO collection for attaching ParticleID metadata", id)
+                << endmsg;
+        if (const auto it = m_idToName.find(id); it != m_idToName.end()) {
+          const auto& name = it->second;
+          debug() << "Corresponding name in EDM4hep is: " << name << endmsg;
           if (pidCollMeta.metadata.has_value()) {
-            UTIL::PIDHandler pidHandler(lcio_event->getCollection(name));
+            const auto lcioColl = lcio_event->getCollection(name);
+            debug() << "LCIO collection has type: " << lcioColl->getTypeName() << endmsg;
+            UTIL::PIDHandler pidHandler(lcioColl);
             algoId =
                 pidHandler.addAlgorithm(pidCollMeta.metadata.value().algoName, pidCollMeta.metadata.value().paramNames);
           }
@@ -450,6 +459,7 @@ StatusCode EDM4hep2LcioTool::convertCollections(lcio::LCEventImpl* lcio_event) {
                   << endmsg;
       }
     }
+
     convertParticleIDs(collection_pairs.particleIDs, pidCollMeta.name, algoId.value_or(-1));
   }
 
