@@ -126,21 +126,25 @@ struct ObjectMappings {
 } // namespace
 
 StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
+  debug() << "Converting from EDM4hep to LCIO" << endmsg;
   auto& event = getEDM4hepEvent(this);
   LCIO2EDM4hepConv::convertObjectParameters(the_event, event);
 
   // Convert Event Header outside the collections loop
   if (!collectionExist(edm4hep::labels::EventHeader)) {
+    debug() << "Converting the EventHeader" << endmsg;
     registerCollection(edm4hep::labels::EventHeader, LCIO2EDM4hepConv::createEventHeader(the_event));
   }
 
   // Start off with the pre-defined collection name mappings
   auto collsToConvert{m_collNames.value()};
   if (m_convertAll) {
+    info() << "Converting all collections from LCIO to EDM4hep" << endmsg;
     const auto* collections = the_event->getCollectionNames();
     for (const auto& collName : *collections) {
       // And simply add the rest, exploiting the fact that emplace will not
       // replace existing entries with the same key
+      debug() << "Adding '" << collName << "' to be converted from the LCIO Event" << endmsg;
       collsToConvert.emplace(collName, collName);
     }
   }
@@ -158,7 +162,7 @@ StatusCode Lcio2EDM4hepTool::convertCollections(lcio::LCEventImpl* the_event) {
   for (const auto& [lcioName, edm4hepName] : collsToConvert) {
     try {
       auto* lcio_coll = the_event->getCollection(lcioName);
-      debug() << "Converting collection " << lcioName << " (storing it as " << edm4hepName << "). ";
+      debug() << "Converting collection " << lcioName << " (storing it as " << edm4hepName << "). " << endmsg;
       if (collectionExist(edm4hepName)) {
         debug() << "Collection already exists, skipping." << endmsg;
         continue; // No need to convert again
