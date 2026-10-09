@@ -43,6 +43,7 @@ add_library(MarlinTestProcessors SHARED
   src/TrivialMCTruthLinkerProcessor.cc
   src/MarlinMCRecoLinkChecker.cc
   src/PseudoRecoProcessor.cc
+  src/MarlinRandomSeedChecker.cc
 )
 target_link_libraries(MarlinTestProcessors PUBLIC ${Marlin_LIBRARIES})
 target_include_directories(MarlinTestProcessors PUBLIC ${Marlin_INCLUDE_DIRS})
@@ -163,6 +164,12 @@ ExternalData_Add_Test( marlinwrapper_tests
 ExternalData_Add_Test( marlinwrapper_tests
   NAME lcio_event_only
   COMMAND k4run ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/lcio_event_only.py --inputfile DATA{${PROJECT_SOURCE_DIR}/tests/input_files/muons.slcio}
+)
+
+# The Marlin random seeds have to be refreshed for every event
+ExternalData_Add_Test( marlinwrapper_tests
+  NAME random_seeds_per_event
+  COMMAND k4run ${CMAKE_CURRENT_SOURCE_DIR}/gaudi_opts/random_seeds.py --inputfile DATA{${PROJECT_SOURCE_DIR}/tests/input_files/muons.slcio}
 )
 
 ExternalData_Add_Test( marlinwrapper_tests
