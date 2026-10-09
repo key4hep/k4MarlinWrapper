@@ -213,7 +213,7 @@ StatusCode MarlinProcessorWrapper::initialize() {
   return StatusCode::SUCCESS;
 }
 
-StatusCode MarlinProcessorWrapper::execute(const EventContext&) const {
+StatusCode MarlinProcessorWrapper::execute(const EventContext& ctx) const {
   // Get flag to check if this processor should be skipped or not
   DataObject* pStatus = nullptr;
   StatusCode scStatus = eventSvc()->retrieveObject("/Event/LCEventStatus", pStatus);
@@ -261,13 +261,15 @@ StatusCode MarlinProcessorWrapper::execute(const EventContext&) const {
     scope.setLevel(m_verbosity);
 
     // Ensure modifyEvent is called exactly once per event by the first processor
-    static IMPL::LCEventImpl* lastProcessedEvent = nullptr;
-    if (lastProcessedEvent != the_event) {
+    // identify the event by the Gaudi event counter: a new LCEvent can be allocated at the address of the previous
+    // one, so comparing pointers can skip the seed refresh for many events
+    static EventContext::ContextEvt_t lastProcessedEvent = EventContext::INVALID_CONTEXT_EVT;
+    if (lastProcessedEvent != ctx.evt()) {
       debug() << "Calling into marlin::ProcessorMgr to refresh random seeds  " << endmsg;
       auto* procMgr = marlin::ProcessorMgr::instance();
       // This is the first processor to handle this event
       procMgr->modifyEvent(the_event);
-      lastProcessedEvent = the_event;
+      lastProcessedEvent = ctx.evt();
     }
 
     // process the event in the processor
