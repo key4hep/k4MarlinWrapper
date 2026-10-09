@@ -36,7 +36,9 @@ alg_list = []
 io_handler = IOHandlerHelper(alg_list, io_svc)
 io_handler.add_reader([args.inputfile])
 
-alg_list.append(MarlinProcessorWrapper("RandomSeedChecker", ProcessorType="MarlinRandomSeedChecker"))
+alg_list.append(
+    MarlinProcessorWrapper("RandomSeedChecker", ProcessorType="MarlinRandomSeedChecker")
+)
 
 io_handler.finalize_converters()
 ApplicationMgr(
