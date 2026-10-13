@@ -1,3 +1,11 @@
+# v00-15-01
+
+* 2026-10-09 Victor Schwan ([PR#490](https://github.com/Key4hep/k4MarlinWrapper/pull/490))
+  - Fix random seed refreshing
+
+* 2026-09-30 Juan Miguel Carceller ([PR#489](https://github.com/Key4hep/k4MarlinWrapper/pull/489))
+  - Remove the deprecated `inputReader` module, which uses `PodioInput` that has been removed. Use `k4MarlinWrapper.io_helpers` instead.
+
 # v00-15
 
 * 2026-07-07 Juan Miguel Carceller ([PR#487](https://github.com/key4hep/k4MarlinWrapper/pull/487))
