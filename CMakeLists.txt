@@ -28,9 +28,9 @@ SET( ${PROJECT_NAME}_VERSION_PATCH 1 )
 
 SET( ${PROJECT_NAME}_VERSION  "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_PATCH}" )
 
-include(cmake/Key4hepConfig.cmake)
-
 include(GNUInstallDirs)
+
+include(cmake/Key4hepConfig.cmake)
 
 find_package(Gaudi REQUIRED)
 find_package(LCIO 2.21 REQUIRED)
