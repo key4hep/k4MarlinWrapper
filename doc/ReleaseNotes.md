@@ -1,3 +1,8 @@
+# v00-15-02
+
+* 2026-11-03 Juan Miguel Carceller ([PR#491](https://github.com/key4hep/k4MarlinWrapper/pull/491))
+  - Initialize install directories before setting the install RPATH.
+
 # v00-15-01
 
 * 2026-10-09 Victor Schwan ([PR#490](https://github.com/Key4hep/k4MarlinWrapper/pull/490))
