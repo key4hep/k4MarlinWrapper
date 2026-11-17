@@ -62,4 +62,6 @@ void MarlinRandomSeedChecker::processEvent(LCEvent* evt) {
   }
 }
 
+namespace {
 MarlinRandomSeedChecker aMarlinRandomSeedChecker{};
+} // namespace
