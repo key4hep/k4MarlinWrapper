@@ -24,7 +24,9 @@
 
 #include <array>
 
+namespace {
 PseudoRecoProcessor aPseudoRecoProcessor;
+} // namespace
 
 PseudoRecoProcessor::PseudoRecoProcessor() : marlin::Processor("PseudoRecoProcessor") {
   registerInputCollection(LCIO::MCPARTICLE, "InputMCs", "Name of the input MCParticle collection", m_mcCollName,

@@ -23,7 +23,9 @@
 #include "IMPL/LCCollectionVec.h"
 #include "IMPL/LCRelationImpl.h"
 
+namespace {
 TrivialMCTruthLinkerProcessor aTrivialMCTruthLinkerProcessor;
+} // namespace
 
 TrivialMCTruthLinkerProcessor::TrivialMCTruthLinkerProcessor() : marlin::Processor("TrivialMCTruthLinkerProcessor") {
   registerInputCollection(LCIO::MCPARTICLE, "InputMCs", "Name of the input MCParticle collection", m_mcCollName,

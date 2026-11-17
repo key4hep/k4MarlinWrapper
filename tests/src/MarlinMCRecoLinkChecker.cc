@@ -83,4 +83,6 @@ void MarlinMCRecoLinkChecker::processEvent(LCEvent* evt) {
   }
 }
 
+namespace {
 MarlinMCRecoLinkChecker aMarlinMCRecoLinkChecker{};
+} // namespace
